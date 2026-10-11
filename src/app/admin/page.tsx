@@ -1,0 +1,2494 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { CITIES_DATA } from '@/lib/cities';
+import { PIYE_TO_KIH_AI_PERSONA, WAHNOTIF_TOOL_SCHEMA } from '@/lib/wahnotif';
+import {
+  Users,
+  Ticket,
+  Calendar,
+  Settings,
+  Download,
+  Search,
+  ExternalLink,
+  MessageSquare,
+  Activity,
+  Globe,
+  Trash2,
+  Save,
+  CheckCircle,
+  Copy,
+  RefreshCw,
+  Eye,
+  Menu,
+  X,
+  MapPin,
+  Film,
+  Mail,
+  Send,
+  AlertCircle,
+  Check,
+  Newspaper,
+  Plus,
+  Edit,
+  Image,
+  LogOut,
+  Key,
+  Shield,
+  Lock,
+} from 'lucide-react';
+
+export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<'leads' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics'>('leads');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Articles state
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loadingArticles, setLoadingArticles] = useState(false);
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<any>(null);
+  const [articleForm, setArticleForm] = useState({
+    id: '',
+    title: '',
+    slug: '',
+    category: 'Roadshow',
+    cityTag: '',
+    publishedAt: new Date().toISOString().split('T')[0],
+    readTime: '3 menit baca',
+    author: 'Tim Media Miracle Pictures',
+    summary: '',
+    content: '',
+    coverImage: '',
+    galleryImagesText: '',
+    isPublished: true,
+    seoTitle: '',
+    seoDescription: '',
+  });
+  const [savingArticle, setSavingArticle] = useState(false);
+
+  // Leads state
+  const [leads, setLeads] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('all');
+  const [cityFilter, setCityFilter] = useState('all');
+  const [cityBreakdown, setCityBreakdown] = useState<Record<string, number>>({});
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [loadingLeads, setLoadingLeads] = useState(true);
+
+  // Settings state
+  const [settings, setSettings] = useState<any>({
+    totalQuota: 500,
+    isWarOpen: true,
+    countdownTarget: '2026-10-22T13:00:00+07:00',
+    metaPixelId: '',
+    wahnotifApiKey: '',
+    wahnotifSenderNumber: '',
+    cityLinkOverrides: {},
+    // Email defaults
+    smtpHost: '',
+    smtpPort: 465,
+    smtpUser: '',
+    smtpPass: '',
+    smtpFrom: 'Miracle Pictures <ticket@piyetokihfilm.com>',
+    emailSubject: '🎟️ E-Voucher Resmi Nonton Film PIYE TO KIH? - Miracle Pictures',
+    // Premiere validity
+    voucherValidDatesText: '19 - 22 November 2026 (Penayangan Perdana)',
+    voucherValidStart: '2026-11-19',
+    voucherValidEnd: '2026-11-22',
+    voucherTermsText: 'Hanya dapat ditukarkan di loket kasir bioskop mitra pada periode penayangan perdana film Piye To Kih.',
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsSuccess, setSettingsSuccess] = useState(false);
+
+  // Email test state
+  const [testEmailTo, setTestEmailTo] = useState('');
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [testEmailResult, setTestEmailResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Visitors state
+  const [visitors, setVisitors] = useState<any[]>([]);
+
+  // Security & Authentication state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [passwordStatus, setPasswordStatus] = useState<{ success: boolean; msg: string } | null>(null);
+
+  const handleLogout = async () => {
+    if (!confirm('Apakah Anda yakin ingin keluar dari Dashboard Administrator?')) return;
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+    } finally {
+      window.location.href = '/admin/login';
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordStatus(null);
+    setUpdatingPassword(true);
+
+    try {
+      const res = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newUsername,
+          newPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPasswordStatus({ success: true, msg: data.message || 'Kredensial berhasil diperbarui!' });
+        setCurrentPassword('');
+        setNewPassword('');
+        setNewUsername('');
+      } else {
+        setPasswordStatus({ success: false, msg: data.error || 'Gagal mengubah password.' });
+      }
+    } catch (err: any) {
+      setPasswordStatus({ success: false, msg: err.message || 'Terjadi kesalahan jaringan.' });
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
+  const fetchLeads = () => {
+    setLoadingLeads(true);
+    fetch(`/api/admin/leads?search=${encodeURIComponent(search)}&source=${sourceFilter}&city=${cityFilter}`)
+      .then(r => r.json())
+      .then(data => {
+        setLeads(data.leads || []);
+        if (data.cityBreakdown) setCityBreakdown(data.cityBreakdown);
+        if (data.availableCities) setAvailableCities(data.availableCities);
+      })
+      .finally(() => setLoadingLeads(false));
+  };
+
+  const fetchSettings = () => {
+    fetch('/api/admin/settings')
+      .then(r => r.json())
+      .then(data => {
+        if (data.settings) setSettings(data.settings);
+      });
+  };
+
+  const fetchVisitors = () => {
+    fetch('/api/track')
+      .then(r => r.json())
+      .then(data => {
+        setVisitors(data.visitors || []);
+      });
+  };
+
+  const fetchArticles = () => {
+    setLoadingArticles(true);
+    fetch('/api/articles')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.articles)) {
+          setArticles(data.articles);
+        }
+      })
+      .finally(() => setLoadingArticles(false));
+  };
+
+  useEffect(() => {
+    fetchLeads();
+    fetchSettings();
+    fetchVisitors();
+    fetchArticles();
+  }, [search, sourceFilter, cityFilter]);
+
+  const handleOpenNewArticle = () => {
+    setEditingArticle(null);
+    setArticleForm({
+      id: '',
+      title: '',
+      slug: '',
+      category: 'Roadshow',
+      cityTag: '',
+      publishedAt: new Date().toISOString().split('T')[0],
+      readTime: '3 menit baca',
+      author: 'Tim Media Miracle Pictures',
+      summary: '',
+      content: '',
+      coverImage: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+      galleryImagesText: '',
+      isPublished: true,
+      seoTitle: '',
+      seoDescription: '',
+    });
+    setIsArticleModalOpen(true);
+  };
+
+  const handleOpenEditArticle = (art: any) => {
+    setEditingArticle(art);
+    setArticleForm({
+      id: art.id,
+      title: art.title,
+      slug: art.slug,
+      category: art.category || 'Roadshow',
+      cityTag: art.cityTag || '',
+      publishedAt: art.publishedAt || new Date().toISOString().split('T')[0],
+      readTime: art.readTime || '3 menit baca',
+      author: art.author || 'Tim Media Miracle Pictures',
+      summary: art.summary || '',
+      content: art.content || '',
+      coverImage: art.coverImage || '',
+      galleryImagesText: Array.isArray(art.galleryImages) ? art.galleryImages.join('\n') : '',
+      isPublished: art.isPublished !== undefined ? art.isPublished : true,
+      seoTitle: art.seoTitle || '',
+      seoDescription: art.seoDescription || '',
+    });
+    setIsArticleModalOpen(true);
+  };
+
+  const handleSaveArticle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!articleForm.title.trim()) {
+      alert('Judul artikel wajib diisi!');
+      return;
+    }
+    setSavingArticle(true);
+
+    try {
+      const galleryImages = articleForm.galleryImagesText
+        .split('\n')
+        .map(url => url.trim())
+        .filter(url => url.length > 0);
+
+      const payload = {
+        ...articleForm,
+        galleryImages,
+      };
+
+      const res = await fetch('/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setIsArticleModalOpen(false);
+        fetchArticles();
+      } else {
+        alert(data.error || 'Gagal menyimpan artikel');
+      }
+    } catch (err: any) {
+      alert('Terjadi kesalahan jaringan: ' + err.message);
+    } finally {
+      setSavingArticle(false);
+    }
+  };
+
+  const handleDeleteArticle = async (id: string, title: string) => {
+    if (!confirm(`Hapus artikel "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/articles?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchArticles();
+      } else {
+        alert(data.error || 'Gagal menghapus artikel');
+      }
+    } catch (err: any) {
+      alert('Terjadi kesalahan jaringan: ' + err.message);
+    }
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    setSettingsSuccess(false);
+
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      if (res.ok) {
+        setSettingsSuccess(true);
+        setTimeout(() => setSettingsSuccess(false), 3000);
+      }
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    if (!testEmailTo) {
+      alert('Masukkan alamat email penerima untuk pengujian!');
+      return;
+    }
+    setTestingEmail(true);
+    setTestEmailResult(null);
+    try {
+      const res = await fetch('/api/admin/email-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          host: settings.smtpHost,
+          port: settings.smtpPort,
+          user: settings.smtpUser,
+          pass: settings.smtpPass,
+          from: settings.smtpFrom,
+          to: testEmailTo,
+        }),
+      });
+      const data = await res.json();
+      setTestEmailResult({
+        success: data.success,
+        message: data.success ? data.message : (data.error || 'Gagal mengirim email uji coba'),
+      });
+    } catch (err: any) {
+      setTestEmailResult({
+        success: false,
+        message: err.message || 'Terjadi kesalahan jaringan.',
+      });
+    } finally {
+      setTestingEmail(false);
+    }
+  };
+
+  const handleDeleteLead = async (id: string) => {
+    if (!confirm('Yakin ingin menghapus data lead ini?')) return;
+    await fetch('/api/admin/leads', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    fetchLeads();
+  };
+
+  const handleExportCsv = () => {
+    const headers = ['Nomor Seri', 'Nama Lengkap', 'Nomor WA', 'Email', 'Kota', 'Sumber', 'Status WA', 'Waktu Klaim'];
+    const rows = leads.map(l => [
+      `"${l.serialNumber}"`,
+      `"${l.name}"`,
+      `"${l.phone}"`,
+      `"${l.email}"`,
+      `"${l.cityLocation || 'Nasional'}"`,
+      `"${l.source}"`,
+      `"${l.whatsappStatus}"`,
+      `"${l.claimedAt}"`,
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `leads-war-voucher-${cityFilter !== 'all' ? cityFilter : 'semua-kota'}-${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const copyToClipboard = (text: string, type: 'prompt' | 'webhook') => {
+    navigator.clipboard.writeText(text);
+    if (type === 'prompt') {
+      setCopiedPrompt(true);
+      setTimeout(() => setCopiedPrompt(false), 2000);
+    } else {
+      setCopiedWebhook(true);
+      setTimeout(() => setCopiedWebhook(false), 2000);
+    }
+  };
+
+  const remainingQuota = Math.max(0, (settings.totalQuota || 500) - leads.length);
+
+  const menuItems = [
+    { id: 'leads', label: 'Database Leads', icon: Users, badge: leads.length },
+    { id: 'articles', label: 'Kabar & Galeri Roadshow', icon: Newspaper, badge: articles.length },
+    { id: 'settings', label: 'Pengaturan Voucher & Tayang', icon: Settings },
+    { id: 'bogo', label: 'Promo Buy 1 Get 1 (BOGO)', icon: Ticket, badge: 'Promo' },
+    { id: 'email', label: 'Pengaturan Email Gateway', icon: Mail },
+    { id: 'cities', label: 'Link Tiket 17 Kota', icon: Calendar, badge: '17' },
+    { id: 'wahnotif', label: 'Wahnotif & Webhook', icon: MessageSquare },
+    { id: 'analytics', label: 'Visitor Analytics', icon: Globe, badge: visitors.length },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row antialiased">
+      {/* MOBILE HEADER BAR */}
+      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
+            <Film className="w-4 h-4" />
+          </div>
+          <span className="font-extrabold text-sm text-slate-900 tracking-tight">PIYE TO KIH DASHBOARD</span>
+        </div>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* LEFT SIDEBAR NAVIGATION (CLEAN WHITE) */}
+      <aside
+        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-200 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <div>
+          {/* Brand header in sidebar */}
+          <div className="p-6 border-b border-slate-100">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white font-black shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
+                <Film className="w-5 h-5" />
+              </div>
+              <div className="leading-tight">
+                <span className="block font-black text-sm tracking-tight text-slate-900">
+                  PIYE TO KIH?
+                </span>
+                <span className="text-[10px] text-amber-600 font-bold tracking-widest uppercase">
+                  MIRACLE PICTURES
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="p-4 space-y-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
+              Menu Utama
+            </span>
+
+            {menuItems.map(item => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id as any);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
+                    isActive
+                      ? 'bg-slate-900 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge !== undefined && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom Sidebar Info & Logout */}
+        <div className="p-4 border-t border-slate-100 text-xs bg-slate-50/75 space-y-2">
+          <div className="flex items-center justify-between px-1 mb-1">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-bold text-slate-700">Admin Aktif</span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-mono">v1.2</span>
+          </div>
+
+          <Link
+            href="/"
+            target="_blank"
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition font-bold shadow-sm text-xs"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Kunjungi Web</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200/60 transition font-bold text-xs"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Keluar (Logout)</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* RIGHT MAIN CONTENT AREA */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* TOP BAR */}
+        <header className="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-sm">
+          <div>
+            <h2 className="text-lg font-black text-slate-900 capitalize tracking-tight">
+              {menuItems.find(m => m.id === activeTab)?.label}
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Dashboard Operasional Roadshow & War Voucher Film Piye To Kih
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                fetchLeads();
+                fetchSettings();
+                fetchVisitors();
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200 shadow-sm"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Muat Ulang Data</span>
+            </button>
+          </div>
+        </header>
+
+        {/* BODY PADDING */}
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
+          {/* STATS TILES (CLEAN WHITE) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-500 text-xs mb-1.5 font-medium">
+                <span>Total Pendaftar</span>
+                <Users className="w-4 h-4 text-amber-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{leads.length}</div>
+              <div className="text-[11px] text-slate-500 mt-1">Calon Penonton Terkumpul</div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-500 text-xs mb-1.5 font-medium">
+                <span>Sisa Kuota Voucher</span>
+                <Ticket className="w-4 h-4 text-rose-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight">{remainingQuota}</div>
+              <div className="text-[11px] text-slate-500 mt-1">Dari Total {settings.totalQuota} Kuota</div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-500 text-xs mb-1.5 font-medium">
+                <span>Leads WhatsApp</span>
+                <MessageSquare className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight">
+                {leads.filter(l => l.source === 'whatsapp').length}
+              </div>
+              <div className="text-[11px] text-slate-500 mt-1">Via Wahnotif Webhook</div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-500 text-xs mb-1.5 font-medium">
+                <span>Pengunjung (Logs)</span>
+                <Globe className="w-4 h-4 text-blue-500" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-blue-600 tracking-tight">{visitors.length}</div>
+              <div className="text-[11px] text-slate-500 mt-1">Visitor Geo Tracking</div>
+            </div>
+          </div>
+
+          {/* TAB 1: LEADS DENGAN FILTER KOTA DINAMIS */}
+          {activeTab === 'leads' && (
+            <div className="space-y-4">
+              {/* REKAP / BREAKDOWN PER KOTA (HANYA MUNCUL DARI KOTA YANG MENGISI FORM) */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs font-extrabold uppercase text-slate-700 tracking-wider">
+                      Rekap Kota dari Penonton Terdaftar:
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-500">
+                    Otomatis bertambah saat ada penonton baru
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setCityFilter('all')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+                      cityFilter === 'all'
+                        ? 'bg-slate-900 text-white shadow-sm'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80'
+                    }`}
+                  >
+                    <span>Semua Kota</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${cityFilter === 'all' ? 'bg-white/20' : 'bg-slate-200'}`}>
+                      {leads.length}
+                    </span>
+                  </button>
+
+                  {Object.keys(cityBreakdown).length === 0 ? (
+                    <span className="text-xs text-slate-400 italic py-1">
+                      Belum ada kota yang tercatat dari formulir.
+                    </span>
+                  ) : (
+                    Object.entries(cityBreakdown).map(([cName, count]) => (
+                      <button
+                        key={cName}
+                        onClick={() => setCityFilter(cName)}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+                          cityFilter.toLowerCase() === cName.toLowerCase()
+                            ? 'bg-slate-900 text-white shadow-sm'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80'
+                        }`}
+                      >
+                        <span>{cName}</span>
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${cityFilter.toLowerCase() === cName.toLowerCase() ? 'bg-white/20' : 'bg-slate-200'}`}>
+                          {count}
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* SEARCH & FILTERS BAR */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="flex flex-1 items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                  <Search className="w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari nama penonton, nomor WA, email, kode voucher..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="bg-transparent text-slate-800 outline-none w-full placeholder:text-slate-400 font-medium"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={cityFilter}
+                    onChange={e => setCityFilter(e.target.value)}
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none font-medium cursor-pointer"
+                  >
+                    <option value="all">Semua Kota Terdaftar</option>
+                    {availableCities.map(c => (
+                      <option key={c} value={c}>
+                        Kota: {c}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={sourceFilter}
+                    onChange={e => setSourceFilter(e.target.value)}
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none font-medium cursor-pointer"
+                  >
+                    <option value="all">Semua Sumber</option>
+                    <option value="web">Formulir Web</option>
+                    <option value="whatsapp">WhatsApp (Wahnotif)</option>
+                  </select>
+
+                  <button
+                    onClick={handleExportCsv}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download CSV / Excel</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* TABLE LEADS (CLEAN WHITE) */}
+              <div className="overflow-x-auto bg-white border border-slate-200 rounded-2xl shadow-sm">
+                <table className="w-full text-left text-xs text-slate-700">
+                  <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th className="py-3.5 px-4">Kode Seri</th>
+                      <th className="py-3.5 px-4">Nama Lengkap</th>
+                      <th className="py-3.5 px-4">WhatsApp</th>
+                      <th className="py-3.5 px-4">Email</th>
+                      <th className="py-3.5 px-4">Kota Domisili</th>
+                      <th className="py-3.5 px-4">Sumber</th>
+                      <th className="py-3.5 px-4">Waktu Klaim</th>
+                      <th className="py-3.5 px-4 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {loadingLeads ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-8 text-slate-400">
+                          Memuat data leads...
+                        </td>
+                      </tr>
+                    ) : leads.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-8 text-slate-400">
+                          Tidak ada leads ditemukan untuk filter ini.
+                        </td>
+                      </tr>
+                    ) : (
+                      leads.map(l => (
+                        <tr key={l.id} className="hover:bg-slate-50/70 transition">
+                          <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                            {l.serialNumber}
+                          </td>
+                          <td className="py-3.5 px-4 font-bold text-slate-900">
+                            {l.name}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <a
+                              href={`https://wa.me/${l.phone.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-emerald-600 hover:text-emerald-700 font-mono font-bold hover:underline"
+                            >
+                              {l.phone}
+                            </a>
+                          </td>
+                          <td className="py-3.5 px-4 text-slate-500 truncate max-w-[150px]">
+                            {l.email}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[11px]">
+                              {l.cityLocation || 'Nasional'}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                l.source === 'whatsapp'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-blue-50 text-blue-700 border border-blue-200'
+                              }`}
+                            >
+                              {l.source}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                            {new Date(l.claimedAt).toLocaleDateString('id-ID')}
+                          </td>
+                          <td className="py-3.5 px-4 text-right flex items-center justify-end gap-1.5">
+                            <Link
+                              href={`/voucher/${l.serialNumber}`}
+                              target="_blank"
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                              title="Lihat Tiket"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteLead(l.id)}
+                              className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition"
+                              title="Hapus Lead"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: KABAR & GALERI ROADSHOW */}
+          {activeTab === 'articles' && (
+            <div className="space-y-6">
+              {/* Header Box */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                      SEO & CMS Roadshow
+                    </span>
+                    <span className="text-xs text-slate-400">• Terindeks Google & Dynamic Sitemap</span>
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                    Kabar & Dokumentasi Roadshow 17 Kota
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+                    Kelola artikel liputan, rilis berita resmi, galeri foto keseruan roadshow, dan meet & greet pemain. Setiap artikel otomatis dilengkapi Schema.org JSON-LD agar mudah tampil di halaman 1 Google.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <Link
+                    href="/artikel"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 hover:bg-slate-100 text-xs font-bold transition"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Lihat di Web</span>
+                  </Link>
+                  <button
+                    onClick={handleOpenNewArticle}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition active:scale-95"
+                  >
+                    <Plus className="w-4 h-4 stroke-[3]" />
+                    <span>Tulis Kabar Baru</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats Overview */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <span className="text-xs font-bold text-slate-400 block mb-1">Total Artikel Terbit</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-slate-900">{articles.length}</span>
+                    <span className="text-xs text-emerald-600 font-bold">Terpublikasi & SEO Ready</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <span className="text-xs font-bold text-slate-400 block mb-1">Total Galeri Dokumentasi</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-slate-900">
+                      {articles.reduce((acc, a) => acc + (a.galleryImages?.length || 0), 0)}
+                    </span>
+                    <span className="text-xs text-amber-600 font-bold">Foto Tersimpan</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <span className="text-xs font-bold text-slate-400 block mb-1">Status Sitemap & Google Index</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm font-black text-emerald-600 flex items-center gap-1.5">
+                      <CheckCircle className="w-4 h-4" /> /sitemap.xml Aktif
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Articles Table */}
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Newspaper className="w-4 h-4 text-amber-500" />
+                    <h4 className="text-sm font-black text-slate-900">Daftar Liputan & Artikel</h4>
+                  </div>
+                  <button
+                    onClick={fetchArticles}
+                    disabled={loadingArticles}
+                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition"
+                    title="Refresh data"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingArticles ? 'animate-spin text-amber-500' : ''}`} />
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                        <th className="py-3 px-4">Cover & Judul</th>
+                        <th className="py-3 px-4">Kategori & Kota</th>
+                        <th className="py-3 px-4">Waktu Terbit</th>
+                        <th className="py-3 px-4">Galeri</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4 text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {loadingArticles ? (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
+                            Memuat daftar artikel...
+                          </td>
+                        </tr>
+                      ) : articles.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-16 text-center">
+                            <Newspaper className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                            <p className="text-slate-600 font-bold mb-1">Belum ada artikel atau liputan roadshow</p>
+                            <p className="text-slate-400 text-xs mb-4">Mulai publikasikan keseruan roadshow untuk menarik penonton dan media.</p>
+                            <button
+                              onClick={handleOpenNewArticle}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs"
+                            >
+                              <Plus className="w-4 h-4" /> Tambah Artikel Baru
+                            </button>
+                          </td>
+                        </tr>
+                      ) : (
+                        articles.map((art) => (
+                          <tr key={art.id} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-3 max-w-md">
+                                <div className="w-16 h-11 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 relative">
+                                  {art.coverImage ? (
+                                    <img
+                                      src={art.coverImage}
+                                      alt={art.title}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                      <Image className="w-4 h-4" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0">
+                                  <Link
+                                    href={`/artikel/${art.slug}`}
+                                    target="_blank"
+                                    className="font-bold text-slate-900 hover:text-amber-600 transition block truncate"
+                                    title={art.title}
+                                  >
+                                    {art.title}
+                                  </Link>
+                                  <span className="text-[11px] text-slate-400 font-mono block truncate">
+                                    /artikel/{art.slug}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <div className="flex flex-col gap-1 items-start">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                  {art.category || 'Roadshow'}
+                                </span>
+                                {art.cityTag && (
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 flex items-center gap-1">
+                                    <MapPin className="w-2.5 h-2.5 text-amber-500" />
+                                    {art.cityTag}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap text-slate-600">
+                              <span className="font-medium block">{art.publishedAt}</span>
+                              <span className="text-[11px] text-slate-400">{art.author || 'Tim Media'}</span>
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+                                <Image className="w-3 h-3 text-slate-400" />
+                                {art.galleryImages?.length || 0} Foto
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              {art.isPublished ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  <Check className="w-3 h-3" /> Published
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+                                  Draft
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <Link
+                                  href={`/artikel/${art.slug}`}
+                                  target="_blank"
+                                  className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-amber-600 hover:bg-slate-100 transition"
+                                  title="Lihat Halaman Publik"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </Link>
+                                <button
+                                  onClick={() => handleOpenEditArticle(art)}
+                                  className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+                                  title="Edit Artikel"
+                                >
+                                  <Edit className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteArticle(art.id, art.title)}
+                                  className="p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
+                                  title="Hapus Artikel"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: PENGATURAN VOUCHER (CLEAN WHITE) */}
+          {activeTab === 'settings' && (
+            <form onSubmit={handleSaveSettings} className="max-w-3xl bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-8 shadow-sm">
+              <div className="border-b border-slate-100 pb-4">
+                <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                  Kontrol Kuota & Waktu Klaim War Voucher
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Atur batas kuota, durasi countdown, dan status buka/tutup war voucher secara mudah dan real-time.
+                </p>
+              </div>
+
+              {settingsSuccess && (
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2.5">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span className="font-bold">Pengaturan berhasil disimpan dan langsung aktif di website!</span>
+                </div>
+              )}
+
+              {/* 1. KONTROL JUMLAH KUOTA */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      1. Jumlah Kuota War Voucher
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Batas maksimal penonton yang dapat mengklaim voucher.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+                    <span className="text-slate-500">Terklaim: <b className="text-slate-900">{leads.length}</b></span>
+                    <span className="text-slate-300">|</span>
+                    <span className="text-slate-500">Sisa: <b className="text-rose-600">{remainingQuota}</b></span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      min={leads.length}
+                      value={settings.totalQuota}
+                      onChange={e => setSettings({ ...settings, totalQuota: Number(e.target.value) })}
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-base font-bold outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, totalQuota: (settings.totalQuota || 0) + 50 })}
+                      className="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-800 rounded-xl text-xs font-bold border border-slate-200 shadow-sm transition"
+                    >
+                      +50 Stok
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, totalQuota: (settings.totalQuota || 0) + 100 })}
+                      className="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-800 rounded-xl text-xs font-bold border border-slate-200 shadow-sm transition"
+                    >
+                      +100 Stok
+                    </button>
+                  </div>
+                </div>
+
+                {/* Preset Kuota Cepat */}
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                    Preset Kuota Cepat (Klik untuk memilih):
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {[100, 250, 500, 1000, 2500].map(amt => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setSettings({ ...settings, totalQuota: amt })}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                          settings.totalQuota === amt
+                            ? 'bg-slate-900 text-white shadow-sm'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {amt.toLocaleString('id-ID')} Voucher
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. KONTROL WAKTU KLAIM (COUNTDOWN TIMER) */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    2. Batas Waktu Klaim (Countdown Timer)
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Pilih tanggal & jam hitung mundur berakhirnya war voucher.
+                  </p>
+                </div>
+
+                <div>
+                  <input
+                    type="datetime-local"
+                    value={(() => {
+                      try {
+                        const d = new Date(settings.countdownTarget || Date.now());
+                        if (isNaN(d.getTime())) return '';
+                        const pad = (n: number) => String(n).padStart(2, '0');
+                        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                      } catch {
+                        return '';
+                      }
+                    })()}
+                    onChange={e => {
+                      if (!e.target.value) return;
+                      const dateObj = new Date(e.target.value);
+                      setSettings({ ...settings, countdownTarget: dateObj.toISOString() });
+                    }}
+                    className="w-full bg-white border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-sm font-semibold outline-none cursor-pointer"
+                  />
+                  <span className="text-[11px] text-slate-500 mt-1 block">
+                    Target Aktif Saat Ini: <b className="text-slate-900 font-mono">{new Date(settings.countdownTarget).toLocaleString('id-ID')}</b>
+                  </span>
+                </div>
+
+                {/* Preset Waktu Cepat */}
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                    Preset Durasi Hitung Mundur Cepat:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = new Date(Date.now() + 2 * 3600 * 1000);
+                        setSettings({ ...settings, countdownTarget: target.toISOString() });
+                      }}
+                      className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                    >
+                      ⏱️ 2 Jam Lagi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = new Date(Date.now() + 6 * 3600 * 1000);
+                        setSettings({ ...settings, countdownTarget: target.toISOString() });
+                      }}
+                      className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                    >
+                      ⏱️ 6 Jam Lagi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = new Date(Date.now() + 24 * 3600 * 1000);
+                        setSettings({ ...settings, countdownTarget: target.toISOString() });
+                      }}
+                      className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                    >
+                      📅 24 Jam (Besok)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = new Date(Date.now() + 72 * 3600 * 1000);
+                        setSettings({ ...settings, countdownTarget: target.toISOString() });
+                      }}
+                      className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                    >
+                      📅 3 Hari (Weekend)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSettings({ ...settings, countdownTarget: '2026-10-22T13:00:00+07:00' });
+                      }}
+                      className="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-bold transition shadow-sm"
+                    >
+                      🎬 Roadshow 22 Okt 2026
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. SAKLAR STATUS BUKA/TUTUP */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    3. Status Form War Voucher
+                  </label>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    {settings.isWarOpen
+                      ? '🟢 SEDANG DIBUKA — Formulir aktif dan penonton bisa klaim voucher.'
+                      : '🔴 DITUTUP — Formulir dinonaktifkan sementara.'}
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, isWarOpen: true })}
+                    className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                      settings.isWarOpen
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-white text-slate-600 border border-slate-200'
+                    }`}
+                  >
+                    Buka Klaim
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, isWarOpen: false })}
+                    className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                      !settings.isWarOpen
+                        ? 'bg-rose-600 text-white'
+                        : 'bg-white text-slate-600 border border-slate-200'
+                    }`}
+                  >
+                    Tutup Klaim
+                  </button>
+                </div>
+              </div>
+
+              {/* 4. META PIXEL */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2">
+                <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                  4. Meta Pixel ID (Facebook / Instagram Ads)
+                </label>
+                <input
+                  type="text"
+                  value={settings.metaPixelId}
+                  onChange={e => setSettings({ ...settings, metaPixelId: e.target.value })}
+                  placeholder="Contoh: 123456789012345"
+                  className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-xs outline-none font-mono"
+                />
+                <span className="text-[11px] text-slate-500 block">
+                  Event PageView, Lead, dan TicketIntent otomatis terhubung ke Pixel ID ini.
+                </span>
+              </div>
+
+              {/* 5. MASA BERLAKU REDEEM VOUCHER (PENAYANGAN PERDANA DI BIOSKOP) */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    5. Masa Berlaku Voucher di Bioskop (Penayangan Perdana)
+                  </label>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Atur tanggal berlaku penukaran tiket di kasir bioskop mitra secara fleksibel sesuai timeline film.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Teks Tampilan Masa Berlaku (Tercetak di E-Voucher & Email)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.voucherValidDatesText || ''}
+                      onChange={e => setSettings({ ...settings, voucherValidDatesText: e.target.value })}
+                      placeholder="Contoh: 19 - 22 November 2026 (Penayangan Perdana)"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 outline-none"
+                    />
+                  </div>
+
+                  {/* Preset Cepat Tanggal Tayang */}
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                      Pilihan Preset Tanggal Cepat:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            voucherValidDatesText: '19 - 22 November 2026 (Penayangan Perdana)',
+                            voucherValidStart: '2026-11-19',
+                            voucherValidEnd: '2026-11-22',
+                          })
+                        }
+                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                      >
+                        🎬 19 - 22 Nov 2026 (4 Hari Perdana)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            voucherValidDatesText: '19 - 25 November 2026 (Minggu Pertama Tayang)',
+                            voucherValidStart: '2026-11-19',
+                            voucherValidEnd: '2026-11-25',
+                          })
+                        }
+                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                      >
+                        📅 19 - 25 Nov 2026 (Pekan Pertama)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            voucherValidDatesText: '19 November - 02 Desember 2026 (2 Pekan Penayangan)',
+                            voucherValidStart: '2026-11-19',
+                            voucherValidEnd: '2026-12-02',
+                          })
+                        }
+                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
+                      >
+                        📅 19 Nov - 02 Des 2026 (2 Pekan)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        Tanggal Mulai Tayang
+                      </label>
+                      <input
+                        type="date"
+                        value={settings.voucherValidStart || '2026-11-19'}
+                        onChange={e => setSettings({ ...settings, voucherValidStart: e.target.value })}
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs font-bold text-slate-900 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        Tanggal Batas Akhir Redeem
+                      </label>
+                      <input
+                        type="date"
+                        value={settings.voucherValidEnd || '2026-11-22'}
+                        onChange={e => setSettings({ ...settings, voucherValidEnd: e.target.value })}
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs font-bold text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Petunjuk / Syarat Penukaran di Loket Bioskop
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={settings.voucherTermsText || ''}
+                      onChange={e => setSettings({ ...settings, voucherTermsText: e.target.value })}
+                      placeholder="Contoh: Voucher dapat ditukarkan di bioskop kesayangan Anda pada periode penayangan film Piye To Kih."
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. KEAMANAN & KREDENSIAL LOGIN DASHBOARD */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3 flex items-center justify-between">
+                  <div>
+                    <label className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
+                      <Shield className="w-4 h-4 text-emerald-600" />
+                      <span>5. Keamanan & Kredensial Akses Administrator</span>
+                    </label>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Ubah kata sandi login dashboard untuk menjamin keamanan operasional server.
+                    </p>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    HTTP-Only Protected
+                  </span>
+                </div>
+
+                {passwordStatus && (
+                  <div
+                    className={`p-3 rounded-xl text-xs font-medium border flex items-center gap-2 ${
+                      passwordStatus.success
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : 'bg-red-50 text-red-800 border-red-200'
+                    }`}
+                  >
+                    {passwordStatus.success ? <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" /> : <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />}
+                    <span>{passwordStatus.msg}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Username Baru (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={newUsername}
+                      onChange={e => setNewUsername(e.target.value)}
+                      placeholder="admin"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Password Saat Ini <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={e => setCurrentPassword(e.target.value)}
+                      placeholder="Kata sandi lama"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Password Baru <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      placeholder="Min. 8 karakter"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-1 flex items-center justify-between">
+                  <span className="text-[10px] text-slate-400">
+                    Default awal: <code className="bg-slate-200 px-1 py-0.5 rounded text-slate-700 font-mono">admin</code> / <code className="bg-slate-200 px-1 py-0.5 rounded text-slate-700 font-mono">PiyeToKih#2026</code>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleChangePassword}
+                    disabled={updatingPassword || !currentPassword || !newPassword}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition disabled:opacity-40"
+                  >
+                    <Key className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{updatingPassword ? 'Memproses...' : 'Ubah Kredensial Sekarang'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* TOMBOL SIMPAN */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={savingSettings}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl shadow-md transition-transform active:scale-95 disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4 text-amber-400" />
+                  <span>{savingSettings ? 'Menyimpan Pengaturan...' : 'SIMPAN SEMUA PENGATURAN'}</span>
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* TAB: PENGATURAN PROMO BUY 1 GET 1 (CLEAN WHITE) */}
+          {activeTab === 'bogo' && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                    <Ticket className="w-5 h-5 text-amber-500" />
+                    <span>Pengaturan Halaman Promo Buy 1 Get 1 (BOGO)</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Atur tautan tombol tiket bioskop mitra untuk kampanye iklan nonton berdua di halaman <code>/bogo</code>.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/bogo"
+                    target="_blank"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-bold transition shadow-sm"
+                  >
+                    <span>Lihat Halaman /bogo</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-amber-600" />
+                  </Link>
+                </div>
+              </div>
+
+              {settingsSuccess && (
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2.5">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span className="font-bold">Pengaturan promo Buy 1 Get 1 berhasil disimpan!</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSaveSettings} className="space-y-6">
+                {/* 1. STATUS AKTIF PROMO BOGO */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      1. Status Promo Buy 1 Get 1
+                    </label>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      {settings.isBogoActive !== false
+                        ? '🟢 SEDANG AKTIF — Tombol dan halaman /bogo dapat diakses langsung oleh audiens.'
+                        : '🔴 DINONAKTIFKAN — Promo sementara ditutup.'}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, isBogoActive: true })}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                        settings.isBogoActive !== false
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-white text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      Aktifkan Promo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, isBogoActive: false })}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                        settings.isBogoActive === false
+                          ? 'bg-rose-600 text-white'
+                          : 'bg-white text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      Nonaktifkan
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. LINK TIKET UTAMA / DEFAULT */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      2. Link Tiket Utama (Tombol Banner Besar)
+                    </label>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Tautan default saat penonton menekan tombol utama &quot;BELI TIKET BUY 1 GET 1 BIOSKOP SEKARANG&quot;.
+                    </p>
+                  </div>
+
+                  <input
+                    type="url"
+                    value={settings.bogoDefaultTicketLink || ''}
+                    onChange={e => setSettings({ ...settings, bogoDefaultTicketLink: e.target.value })}
+                    placeholder="Contoh: https://m.21cineplex.com atau link presale khusus"
+                    className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none font-mono"
+                  />
+                </div>
+
+                {/* 3. LINK TIKET SPESIFIK PER BIOSKOP MITRA */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      3. Link Tiket Khusus Per Bioskop Mitra (Opsional)
+                    </label>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Jika dikosongkan, kartu bioskop akan menggunakan link tiket utama di atas.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        Cinema XXI / m.tix URL:
+                      </label>
+                      <input
+                        type="url"
+                        value={settings.bogoCinemaLinks?.xxi || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            bogoCinemaLinks: { ...settings.bogoCinemaLinks, xxi: e.target.value },
+                          })
+                        }
+                        placeholder="Contoh: https://m.21cineplex.com"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        CGV Cinemas URL:
+                      </label>
+                      <input
+                        type="url"
+                        value={settings.bogoCinemaLinks?.cgv || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            bogoCinemaLinks: { ...settings.bogoCinemaLinks, cgv: e.target.value },
+                          })
+                        }
+                        placeholder="Contoh: https://www.cgv.id"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        Cinépolis Cinemas URL:
+                      </label>
+                      <input
+                        type="url"
+                        value={settings.bogoCinemaLinks?.cinepolis || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            bogoCinemaLinks: { ...settings.bogoCinemaLinks, cinepolis: e.target.value },
+                          })
+                        }
+                        placeholder="Contoh: https://cinepolis.co.id"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        TIX ID Official Partner URL:
+                      </label>
+                      <input
+                        type="url"
+                        value={settings.bogoCinemaLinks?.tixid || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            bogoCinemaLinks: { ...settings.bogoCinemaLinks, tixid: e.target.value },
+                          })
+                        }
+                        placeholder="Contoh: https://www.tix.id"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. SUBJUDUL PENAWARAN */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    4. Teks Subjudul Promo BOGO di Halaman Web
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.bogoSubtitle || ''}
+                    onChange={e => setSettings({ ...settings, bogoSubtitle: e.target.value })}
+                    placeholder="Contoh: Ajak pasangan, keluarga, atau bestie nonton film PIYE TO KIH di bioskop!"
+                    className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none"
+                  />
+                </div>
+
+                {/* TOMBOL SIMPAN */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={savingSettings}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl shadow-md transition-transform active:scale-95 disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4 text-amber-400" />
+                    <span>{savingSettings ? 'Menyimpan...' : 'SIMPAN PENGATURAN PROMO BOGO'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* TAB: PENGATURAN EMAIL GATEWAY (CLEAN WHITE) */}
+          {activeTab === 'email' && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-amber-500" />
+                      <span>Pengaturan Email Gateway (SMTP Delivery)</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Kirimkan e-voucher resmi langsung ke alamat email penonton sesaat setelah formulir dikirimkan.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold ${
+                        settings.smtpHost && settings.smtpUser
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          settings.smtpHost && settings.smtpUser ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                        }`}
+                      />
+                      {settings.smtpHost && settings.smtpUser ? 'SMTP Siap Digunakan' : 'Mode Simulasi (Mock Log)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {settingsSuccess && (
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2.5">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span className="font-bold">Pengaturan email berhasil disimpan!</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSaveSettings} className="space-y-6">
+                {/* SMTP Server Configuration */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                  <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
+                    Konfigurasi Server SMTP
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2 space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        SMTP Host / Server
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.smtpHost || ''}
+                        onChange={e => setSettings({ ...settings, smtpHost: e.target.value })}
+                        placeholder="Contoh: smtp.hostinger.com / smtp.gmail.com"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        Port SMTP
+                      </label>
+                      <select
+                        value={settings.smtpPort || 465}
+                        onChange={e => setSettings({ ...settings, smtpPort: Number(e.target.value) })}
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none font-mono"
+                      >
+                        <option value={465}>465 (SSL / Secure - Rekomendasi)</option>
+                        <option value={587}>587 (TLS / STARTTLS)</option>
+                        <option value={25}>25 (Standard)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        SMTP Username / Email Akun
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.smtpUser || ''}
+                        onChange={e => setSettings({ ...settings, smtpUser: e.target.value })}
+                        placeholder="Contoh: ticket@piyetokihfilm.com"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        SMTP Password / App Password
+                      </label>
+                      <input
+                        type="password"
+                        value={settings.smtpPass || ''}
+                        onChange={e => setSettings({ ...settings, smtpPass: e.target.value })}
+                        placeholder="••••••••••••"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        Nama & Email Pengirim (From)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.smtpFrom || 'Miracle Pictures <ticket@piyetokihfilm.com>'}
+                        onChange={e => setSettings({ ...settings, smtpFrom: e.target.value })}
+                        placeholder='Contoh: Miracle Pictures <ticket@piyetokihfilm.com>'
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                        Subjek Email Pengiriman Voucher
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.emailSubject || '🎟️ E-Voucher Resmi Nonton Film PIYE TO KIH? - Miracle Pictures'}
+                        onChange={e => setSettings({ ...settings, emailSubject: e.target.value })}
+                        placeholder="Subjek email..."
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={savingSettings}
+                    className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3 px-6 rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4 text-amber-400" />
+                    <span>{savingSettings ? 'Menyimpan...' : 'SIMPAN PENGATURAN EMAIL'}</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* UJI COBA PENGIRIMAN EMAIL */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-2">
+                  <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
+                    <Send className="w-4 h-4 text-amber-600" />
+                    <span>Uji Coba Pengiriman Email (Live Test)</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Kirimkan satu email uji coba untuk memverifikasi bahwa host, port, dan password SMTP Anda bekerja dengan lancar.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="flex-1">
+                    <input
+                      type="email"
+                      value={testEmailTo}
+                      onChange={e => setTestEmailTo(e.target.value)}
+                      placeholder="Masukkan email penerima (contoh: emailanda@gmail.com)"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleTestEmail}
+                    disabled={testingEmail || !testEmailTo}
+                    className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs py-2.5 px-5 rounded-xl shadow-sm transition disabled:opacity-50 active:scale-95 shrink-0"
+                  >
+                    {testingEmail ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Mengirim Tes...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Kirim Email Tes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {testEmailResult && (
+                  <div
+                    className={`p-3.5 rounded-xl text-xs font-medium flex items-start gap-2.5 ${
+                      testEmailResult.success
+                        ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                        : 'bg-rose-50 border border-rose-200 text-rose-800'
+                    }`}
+                  >
+                    {testEmailResult.success ? (
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    )}
+                    <span>{testEmailResult.message}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* PANDUAN PENGATURAN HOSTINGER & GMAIL */}
+              <div className="bg-amber-50/50 border border-amber-200/80 rounded-2xl p-5 space-y-3 text-xs text-amber-900">
+                <h5 className="font-extrabold uppercase text-[11px] tracking-wider text-amber-950 flex items-center gap-2">
+                  <span>💡 Rekomendasi Pengaturan SMTP:</span>
+                </h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] text-amber-800 leading-relaxed">
+                  <div className="bg-white/80 p-3 rounded-xl border border-amber-200/60">
+                    <b className="text-slate-900 block mb-1">Hostinger Email / Custom Domain:</b>
+                    Host: <code className="font-bold text-slate-800">smtp.hostinger.com</code><br />
+                    Port: <code className="font-bold text-slate-800">465</code> (SSL)<br />
+                    User: Email domain lengkap Anda (misal: info@piyetokihfilm.com)
+                  </div>
+                  <div className="bg-white/80 p-3 rounded-xl border border-amber-200/60">
+                    <b className="text-slate-900 block mb-1">Gmail SMTP:</b>
+                    Host: <code className="font-bold text-slate-800">smtp.gmail.com</code><br />
+                    Port: <code className="font-bold text-slate-800">465</code> (SSL) atau 587 (TLS)<br />
+                    Pass: Gunakan <i>App Password</i> (Sandi Aplikasi 16 karakter dari Google Account).
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: LINK TIKET 17 KOTA (CLEAN WHITE) */}
+          {activeTab === 'cities' && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-base font-black text-slate-900">
+                  Pengaturan Link Tombol Tiket 17 Kota
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Ubah URL tombol &quot;BELI TIKET BIOSKOP&quot; untuk bioskop di masing-masing kota roadshow.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {CITIES_DATA.map(city => (
+                  <div key={city.slug} className="bg-slate-50 border border-slate-200/80 rounded-xl p-4.5">
+                    <div className="flex items-center justify-between mb-3 border-b border-slate-200/60 pb-2">
+                      <span className="font-extrabold text-sm text-slate-900 uppercase">
+                        {city.name} ({city.dateStr})
+                      </span>
+                      <Link
+                        href={`/city/${city.slug}`}
+                        target="_blank"
+                        className="text-[11px] text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1"
+                      >
+                        <span>Preview Kota</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+
+                    <div className="space-y-3">
+                      {city.cinemas.map((cinema, cIdx) => {
+                        const overrideKey = `${city.slug}_${cIdx}`;
+                        const currentVal = settings.cityLinkOverrides?.[overrideKey] ?? cinema.ticketUrl;
+
+                        return (
+                          <div key={cIdx} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-xs">
+                            <div className="text-slate-700 font-bold">
+                              {cinema.name} ({cinema.chain})
+                            </div>
+                            <div className="sm:col-span-2">
+                              <input
+                                type="text"
+                                value={currentVal}
+                                onChange={e => {
+                                  const updated = {
+                                    ...(settings.cityLinkOverrides || {}),
+                                    [overrideKey]: e.target.value,
+                                  };
+                                  setSettings({ ...settings, cityLinkOverrides: updated });
+                                }}
+                                placeholder="URL tiket bioskop..."
+                                className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none font-mono text-[11px]"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  onClick={handleSaveSettings}
+                  className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3 px-6 rounded-xl transition shadow-sm"
+                >
+                  <Save className="w-4 h-4 text-amber-400" />
+                  <span>Simpan Perubahan Link Tiket</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: WAHNOTIF & SCRIPT CHAT (CLEAN WHITE) */}
+          {activeTab === 'wahnotif' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+                <h3 className="text-base font-black text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-emerald-600" />
+                  <span>Koneksi Wahnotif API & Webhook</span>
+                </h3>
+
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">
+                      Wahnotif API Key
+                    </label>
+                    <input
+                      type="password"
+                      value={settings.wahnotifApiKey || ''}
+                      onChange={e => setSettings({ ...settings, wahnotifApiKey: e.target.value })}
+                      placeholder="Masukkan API Key Wahnotif"
+                      className="w-full bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-xs outline-none font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1">
+                      Nomor Pengirim (Sender)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.wahnotifSenderNumber || ''}
+                      onChange={e => setSettings({ ...settings, wahnotifSenderNumber: e.target.value })}
+                      placeholder="6281234567890"
+                      className="w-full bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-xs outline-none font-mono"
+                    />
+                  </div>
+
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <span className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      URL Webhook Inbound:
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <code className="bg-white border border-slate-200 px-2.5 py-1.5 rounded text-slate-900 text-xs font-mono flex-1 truncate">
+                        {typeof window !== 'undefined' ? `${window.location.origin}/api/webhook/wahnotif` : '/api/webhook/wahnotif'}
+                      </code>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            `${window.location.origin}/api/webhook/wahnotif`,
+                            'webhook'
+                          )
+                        }
+                        className="p-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition"
+                        title="Salin Webhook URL"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {copiedWebhook && (
+                      <span className="text-[11px] text-emerald-600 font-bold mt-1 block">
+                        ✓ Webhook URL tersalin!
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleSaveSettings}
+                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-6 rounded-xl transition shadow-sm"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Simpan Pengaturan Wahnotif</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Script Asisten Chat & Custom AI Tool */}
+              <div className="space-y-6">
+                {/* 1. Custom AI Tool Configuration */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900">
+                        Skema Custom AI Tool Wahnotif
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        Menu Wahnotif: <b>AI CS Assistant &gt; Custom AI Tools</b>
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(JSON.stringify(WAHNOTIF_TOOL_SCHEMA, null, 2));
+                        alert('Skema Tool JSON berhasil disalin!');
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Salin Skema Tool JSON</span>
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-slate-600">
+                    Daftarkan nama tool <b>claim_war_voucher</b> di Wahnotif agar AI otomatis menembak webhook ketika penonton memberikan Nama, WA, Email, dan Kota.
+                  </p>
+
+                  <pre className="bg-slate-900 text-slate-200 p-3 rounded-xl text-[10px] font-mono overflow-x-auto max-h-36">
+                    {JSON.stringify(WAHNOTIF_TOOL_SCHEMA, null, 2)}
+                  </pre>
+                </div>
+
+                {/* 2. System Prompt Asisten War Voucher */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900">
+                        System Prompt: {PIYE_TO_KIH_AI_PERSONA.name}
+                      </h3>
+                      <p className="text-[11px] text-emerald-600 font-semibold">
+                        ✓ 100% Khusus War Voucher (Bebas Distraksi Roadshow)
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.systemPrompt, 'prompt')}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shadow-sm"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{copiedPrompt ? 'Tersalin!' : 'Salin Prompt AI'}</span>
+                    </button>
+                  </div>
+
+                  <textarea
+                    readOnly
+                    value={PIYE_TO_KIH_AI_PERSONA.systemPrompt}
+                    rows={10}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-700 text-xs font-mono outline-none leading-relaxed"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: VISITOR ANALYTICS (CLEAN WHITE) */}
+          {activeTab === 'analytics' && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-base font-black text-slate-900">
+                  Log Pengunjung & Deteksi Kota (IP Geo-Location)
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Catatan pengunjung yang mengakses website beserta asal kota dan perangkatnya.
+                </p>
+              </div>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                <table className="w-full text-left text-xs text-slate-700">
+                  <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-4">Waktu</th>
+                      <th className="py-3 px-4">Kota Terdeteksi</th>
+                      <th className="py-3 px-4">Perangkat</th>
+                      <th className="py-3 px-4">Halaman</th>
+                      <th className="py-3 px-4">Event</th>
+                      <th className="py-3 px-4">IP Address</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {visitors.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="text-center py-8 text-slate-400">
+                          Belum ada catatan pengunjung.
+                        </td>
+                      </tr>
+                    ) : (
+                      visitors.map(v => (
+                        <tr key={v.id} className="hover:bg-slate-50/70 transition">
+                          <td className="py-3 px-4 text-slate-500">
+                            {new Date(v.timestamp).toLocaleTimeString('id-ID')}
+                          </td>
+                          <td className="py-3 px-4 font-bold text-slate-900">
+                            {v.city}
+                          </td>
+                          <td className="py-3 px-4 text-slate-600">
+                            {v.platform}
+                          </td>
+                          <td className="py-3 px-4 font-mono text-[11px] text-slate-500">
+                            {v.path}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                v.event === 'TicketIntent'
+                                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                  : v.event === 'Lead'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {v.event}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
+                            {v.ip}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* MODAL FORM ARTIKEL & GALERI */}
+      {isArticleModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                  <Newspaper className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 tracking-tight">
+                    {editingArticle ? 'Edit Kabar / Galeri Roadshow' : 'Tulis Kabar & Galeri Baru'}
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Otomatis terindeks Google, sitemap.xml, dan tampil di halaman publik.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsArticleModalOpen(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body / Form */}
+            <form onSubmit={handleSaveArticle} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto text-xs">
+              {/* Judul & Slug */}
+              <div className="space-y-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Judul Artikel / Liputan <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={articleForm.title}
+                    onChange={(e) => {
+                      const newTitle = e.target.value;
+                      setArticleForm((prev) => ({
+                        ...prev,
+                        title: newTitle,
+                        slug: prev.slug || newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+                      }));
+                    }}
+                    placeholder="Contoh: Nobar & Meet Greet Piye To Kih di Solo Pecah, Dihadiri Ribuan Penonton!"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none text-slate-900 text-xs font-semibold transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    URL Slug (Alamat Halaman)
+                  </label>
+                  <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-slate-500 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20">
+                    <span className="text-[11px] font-mono text-slate-400 shrink-0">/artikel/</span>
+                    <input
+                      type="text"
+                      value={articleForm.slug}
+                      onChange={(e) => setArticleForm({ ...articleForm, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+                      placeholder="antusiasme-roadshow-solo"
+                      className="w-full bg-transparent outline-none text-xs font-mono text-slate-900 pl-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Kategori, Kota, Tanggal, Read Time */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Kategori</label>
+                  <select
+                    value={articleForm.category}
+                    onChange={(e) => setArticleForm({ ...articleForm, category: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none bg-white font-medium"
+                  >
+                    <option value="Roadshow">Roadshow</option>
+                    <option value="Meet & Greet">Meet & Greet</option>
+                    <option value="Kabar Film">Kabar Film</option>
+                    <option value="Behind The Scene">Behind The Scene</option>
+                    <option value="Promo & Event">Promo & Event</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Kota Terkait</label>
+                  <select
+                    value={articleForm.cityTag}
+                    onChange={(e) => setArticleForm({ ...articleForm, cityTag: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none bg-white font-medium"
+                  >
+                    <option value="">Nasional / Semua Kota</option>
+                    {CITIES_DATA.map((c) => (
+                      <option key={c.slug} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Tanggal Terbit</label>
+                  <input
+                    type="date"
+                    value={articleForm.publishedAt}
+                    onChange={(e) => setArticleForm({ ...articleForm, publishedAt: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none bg-white font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Waktu Baca</label>
+                  <input
+                    type="text"
+                    value={articleForm.readTime}
+                    onChange={(e) => setArticleForm({ ...articleForm, readTime: e.target.value })}
+                    placeholder="3 menit baca"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none bg-white font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Penulis & Cover Image */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Penulis / Sumber</label>
+                  <input
+                    type="text"
+                    value={articleForm.author}
+                    onChange={(e) => setArticleForm({ ...articleForm, author: e.target.value })}
+                    placeholder="Tim Media Miracle Pictures"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Cover Foto (URL)</label>
+                  <input
+                    type="url"
+                    value={articleForm.coverImage}
+                    onChange={(e) => setArticleForm({ ...articleForm, coverImage: e.target.value })}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Preview Cover Thumbnail if available */}
+              {articleForm.coverImage && (
+                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="w-20 h-12 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                    <img
+                      src={articleForm.coverImage}
+                      alt="Cover Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e: any) => (e.target.style.display = 'none')}
+                    />
+                  </div>
+                  <div className="text-[11px] text-slate-500 truncate">
+                    <span className="font-bold text-slate-700 block">Preview Cover Image</span>
+                    <span className="font-mono text-slate-400">{articleForm.coverImage}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Dokumentasi Galeri Foto (Multiple URLs) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-slate-700">
+                    Galeri Foto Dokumentasi (Multiple URLs)
+                  </label>
+                  <span className="text-[11px] text-slate-400">
+                    {articleForm.galleryImagesText.split('\n').filter((l) => l.trim().length > 0).length} foto ditambahkan
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  value={articleForm.galleryImagesText}
+                  onChange={(e) => setArticleForm({ ...articleForm, galleryImagesText: e.target.value })}
+                  placeholder="Masukkan 1 URL foto per baris. Contoh:&#10;https://images.unsplash.com/photo-1&#10;https://images.unsplash.com/photo-2"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none font-mono text-xs"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Foto-foto ini akan otomatis ditampilkan dalam grid galeri interaktif di halaman artikel.
+                </p>
+              </div>
+
+              {/* Ringkasan */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Ringkasan Singkat (Lead Paragraph / Cuplikan)
+                </label>
+                <textarea
+                  rows={2}
+                  value={articleForm.summary}
+                  onChange={(e) => setArticleForm({ ...articleForm, summary: e.target.value })}
+                  placeholder="Ringkasan 1-2 kalimat untuk kartu artikel dan cuplikan mesin pencari Google..."
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none"
+                />
+              </div>
+
+              {/* Konten Lengkap */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Isi Berita / Liputan Lengkap
+                </label>
+                <textarea
+                  rows={6}
+                  value={articleForm.content}
+                  onChange={(e) => setArticleForm({ ...articleForm, content: e.target.value })}
+                  placeholder="Tuliskan berita lengkap liputan roadshow, kesan penonton, kutipan cast, dan keseruan acara. Pisahkan antar-paragraf dengan baris baru (Enter)..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-amber-500 outline-none leading-relaxed"
+                />
+              </div>
+
+              {/* SEO Optimasi (Collapsible-like Box) */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-emerald-600" />
+                  <span className="font-bold text-slate-800">Optimasi SEO Mesin Pencari Google</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-medium text-slate-600 mb-1 text-[11px]">
+                      SEO Meta Title (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={articleForm.seoTitle}
+                      onChange={(e) => setArticleForm({ ...articleForm, seoTitle: e.target.value })}
+                      placeholder={articleForm.title || 'Judul di hasil pencarian Google'}
+                      className="w-full px-3 py-1.5 rounded-xl border border-slate-200 bg-white focus:border-amber-500 outline-none text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-600 mb-1 text-[11px]">
+                      SEO Meta Description (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={articleForm.seoDescription}
+                      onChange={(e) => setArticleForm({ ...articleForm, seoDescription: e.target.value })}
+                      placeholder={articleForm.summary || 'Deskripsi singkat saat muncul di Google'}
+                      className="w-full px-3 py-1.5 rounded-xl border border-slate-200 bg-white focus:border-amber-500 outline-none text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Publikasikan Checkbox */}
+              <div className="flex items-center gap-2.5 pt-1">
+                <input
+                  type="checkbox"
+                  id="isPublishedCheck"
+                  checked={articleForm.isPublished}
+                  onChange={(e) => setArticleForm({ ...articleForm, isPublished: e.target.checked })}
+                  className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                />
+                <label htmlFor="isPublishedCheck" className="font-bold text-slate-800 cursor-pointer select-none">
+                  Publikasikan artikel ini sekarang (Aktif di Web & Sitemap)
+                </label>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsArticleModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingArticle}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black shadow-md shadow-amber-500/20 transition disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{savingArticle ? 'Menyimpan...' : 'Simpan & Publikasikan'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

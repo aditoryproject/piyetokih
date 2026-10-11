@@ -1,0 +1,1169 @@
+{
+  "settings": {
+    "totalQuota": 500,
+    "initialStock": 500,
+    "isWarOpen": true,
+    "countdownTarget": "2026-10-22T13:00:00+07:00",
+    "warHeadline": "WAR VOUCHER NONTON FILM PIYE TO KIH",
+    "warSubtitle": "Klaim e-voucher resmi! Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan film.",
+    "metaPixelId": "123456789012345",
+    "wahnotifApiKey": "",
+    "wahnotifSenderNumber": "",
+    "cityLinkOverrides": {},
+    "smtpHost": "",
+    "smtpPort": 465,
+    "smtpUser": "",
+    "smtpPass": "",
+    "smtpFrom": "Miracle Pictures <ticket@piyetokihfilm.com>",
+    "emailSubject": "🎟️ E-Voucher Nonton Resmi Film PIYE TO KIH? - Miracle Pictures",
+    "voucherValidDatesText": "19 - 22 November 2026 (Penayangan Perdana)",
+    "voucherValidStart": "2026-11-19",
+    "voucherValidEnd": "2026-11-22",
+    "voucherTermsText": "Voucher dapat ditukarkan di bioskop kesayangan Anda pada periode penayangan film Piye To Kih (19 - 22 November 2026).",
+    "isBogoActive": true,
+    "bogoHeadline": "PROMO BUY 1 GET 1: NONTON BERDUA BAYAR 1 TIKET",
+    "bogoSubtitle": "Ajak pasangan, keluarga, atau bestie nonton film PIYE TO KIH di bioskop kesayanganmu!",
+    "bogoDefaultTicketLink": "https://m.21cineplex.com",
+    "bogoCinemaLinks": {
+      "xxi": "https://m.21cineplex.com",
+      "cgv": "https://www.cgv.id",
+      "cinepolis": "https://cinepolis.co.id",
+      "tixid": "https://www.tix.id"
+    }
+  },
+  "leads": [
+    {
+      "id": "lead-1791430476702-zpf34",
+      "serialNumber": "PTK-WAR-NLZ3KH",
+      "name": "Raditya Dika",
+      "phone": "081288776655",
+      "email": "radit@example.com",
+      "source": "web",
+      "claimedAt": "2026-10-08T03:34:36.704Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-NLZ3KH",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Jakarta"
+    },
+    {
+      "id": "lead-wa-1791384782862",
+      "serialNumber": "PTK-WAR-EZMVDZ",
+      "name": "Ahmad Dhani",
+      "phone": "081233221100",
+      "email": "dhani@republika.co.id",
+      "source": "whatsapp",
+      "claimedAt": "2026-10-07T14:53:02.862Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-EZMVDZ",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Surabaya"
+    },
+    {
+      "id": "lead-1791384145589-5hwn4",
+      "serialNumber": "PTK-WAR-961EKJ",
+      "name": "Dewi Sandra",
+      "phone": "081299881122",
+      "email": "dewisandra@example.com",
+      "source": "web",
+      "claimedAt": "2026-10-07T14:42:25.590Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-961EKJ",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Yogyakarta"
+    },
+    {
+      "id": "lead-wa-1791383277858",
+      "serialNumber": "PTK-WAR-VFHE7S",
+      "name": "Praditya Yoga",
+      "phone": "08122334455",
+      "email": "yoga@gmail.com",
+      "source": "whatsapp",
+      "claimedAt": "2026-10-07T14:27:57.858Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-VFHE7S",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Madiun"
+    },
+    {
+      "id": "lead-1791382245556-1jd78",
+      "serialNumber": "PTK-WAR-1FAVVE",
+      "name": "Gita Gutawa",
+      "phone": "081233445566",
+      "email": "gita@example.com",
+      "source": "web",
+      "claimedAt": "2026-10-07T14:10:45.558Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-1FAVVE",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Bandung"
+    },
+    {
+      "id": "lead-1791381337402-2resq",
+      "serialNumber": "PTK-WAR-QRX3BF",
+      "name": "Bambang Pamungkas",
+      "phone": "081399887766",
+      "email": "bambang@example.com",
+      "source": "web",
+      "claimedAt": "2026-10-07T13:55:37.404Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-QRX3BF",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Surakarta (Solo)"
+    },
+    {
+      "id": "lead-wa-1791379890331",
+      "serialNumber": "PTK-WAR-ZQ0R1V",
+      "name": "Dewi Lestari",
+      "phone": "085811223344",
+      "email": "dewi@gmail.com",
+      "source": "whatsapp",
+      "claimedAt": "2026-10-07T13:31:30.331Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-ZQ0R1V",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Surakarta (Solo)"
+    },
+    {
+      "id": "lead-1791379843930-g427m",
+      "serialNumber": "PTK-WAR-46K2X5",
+      "name": "Ahmad Fauzi",
+      "phone": "081298765432",
+      "email": "fauzi@gmail.com",
+      "source": "web",
+      "claimedAt": "2026-10-07T13:30:43.932Z",
+      "pdfUrl": "http://localhost:3000/voucher/PTK-WAR-46K2X5",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Nasional"
+    },
+    {
+      "id": "lead-sample-1",
+      "serialNumber": "PTK-WAR-849201",
+      "name": "Budi Santoso",
+      "phone": "081234567890",
+      "email": "budi@example.com",
+      "source": "web",
+      "claimedAt": "2026-10-07T09:30:43.927Z",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Solo"
+    },
+    {
+      "id": "lead-sample-2",
+      "serialNumber": "PTK-WAR-958102",
+      "name": "Rina Wulandari",
+      "phone": "085712348899",
+      "email": "rina@example.com",
+      "source": "whatsapp",
+      "claimedAt": "2026-10-07T11:30:43.929Z",
+      "whatsappStatus": "sent",
+      "emailStatus": "sent",
+      "cityLocation": "Semarang"
+    }
+  ],
+  "visitors": [
+    {
+      "id": "vis-1791726947390-xot9",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:47.390Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726947372-6cug",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:47.372Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726947115-z6gd",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:47.115Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726947106-luky",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:47.106Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726941397-mzpb",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:41.397Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726941396-dbfj",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:41.396Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726941394-78ki",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:41.394Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726941373-c4qz",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:41.374Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726937059-2qz0",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:37.059Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791726937057-utac",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T13:55:37.058Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719204959-gxmx",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:44.959Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719204950-wy2i",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:44.950Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719202904-izdw",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:42.904Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719202898-8g5c",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:42.898Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719202853-23bv",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:42.853Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719202823-b3vb",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:42.823Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719201253-7tcc",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:41.253Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719201139-bpai",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:41.139Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719182209-uiqq",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:22.209Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719182208-100i",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:22.209Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719179458-bzdt",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:19.458Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719179443-9sku",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:19.443Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719177752-5g5f",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:17.752Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719177722-pvy9",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:17.723Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719164332-hvmu",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:04.332Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791719164329-am97",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin/login",
+      "subdomain": "",
+      "timestamp": "2026-10-11T11:46:04.329Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692049055-7tkc",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:09.055Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692049003-qtot",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:09.003Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692048896-t9yi",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:08.896Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692048892-lwej",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:08.892Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692048756-micj",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:08.756Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692048732-n3u4",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:08.732Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692044770-aet0",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:04.770Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791692044249-hqvw",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-11T04:14:04.249Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791691061541-ij4y",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:57:41.541Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791691061512-x275",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:57:41.512Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688943455-z1bu",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:22:23.455Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688943417-ioa8",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:22:23.417Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688942492-fjh9",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:22:22.492Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688942485-p1rn",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:22:22.485Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688941022-l9ls",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:22:21.022Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688941004-tm79",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:22:21.004Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688709796-v4tg",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:29.796Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688709787-x5oo",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:29.787Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688708779-sm5u",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:28.779Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688708774-d1kc",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:28.774Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688707243-qfg8",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:27.243Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688707213-rcwf",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:27.213Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688705636-elrb",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:25.636Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688705634-zylh",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:18:25.635Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688132019-5pt5",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:08:52.019Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688131992-zmnx",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:08:51.992Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688131065-8u6c",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:08:51.065Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688131038-rfy7",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:08:51.038Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688123862-fuiu",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:08:43.862Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791688123852-v3w6",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-11T03:08:43.852Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791687240744-b2pl",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T02:54:00.744Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791687240741-tnbu",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-11T02:54:00.741Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791432197292-9gnp",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/bogo",
+      "subdomain": "",
+      "timestamp": "2026-10-08T04:03:17.292Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791432163732-a1vt",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/bogo",
+      "subdomain": "",
+      "timestamp": "2026-10-08T04:02:43.732Z",
+      "event": "TicketIntent"
+    },
+    {
+      "id": "vis-1791432158126-ax84",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/bogo",
+      "subdomain": "",
+      "timestamp": "2026-10-08T04:02:38.126Z",
+      "event": "TicketIntent"
+    },
+    {
+      "id": "vis-1791432145313-5v64",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-08T04:02:25.313Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791432143211-z35z",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-08T04:02:23.212Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791432134048-wewh",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/bogo",
+      "subdomain": "",
+      "timestamp": "2026-10-08T04:02:14.048Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791430811583-mv7v",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-NLZ3KH",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:40:11.584Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791430775973-zh61",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/city/semarang",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:39:35.973Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791430767557-dlxr",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:39:27.557Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791429444120-vvsn",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:17:24.120Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791429443695-gh2n",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:17:23.695Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791429425860-yf8s",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/city/jogja",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:17:05.861Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791429424569-qdea",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-08T03:17:04.569Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791384914464-56e0",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-849201",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:55:14.464Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791384910545-ojvg",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:55:10.546Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791384879167-3b3f",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/city/semarang",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:54:39.167Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791384672640-oa5y",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:51:12.640Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791384665939-jvdw",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:51:05.939Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791383296365-fn3a",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:28:16.365Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791383164408-mbsg",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-1FAVVE",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:26:04.408Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791383019027-eiuf",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:23:39.028Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791382780355-ayqs",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:19:40.355Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791382763924-0ex4",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:19:23.924Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791382596590-8kt1",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:16:36.590Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791382190209-0t2g",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:09:50.209Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791381925244-rfzl",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:05:25.244Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791381918250-63e9",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/city/jogja",
+      "subdomain": "",
+      "timestamp": "2026-10-07T14:05:18.250Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380926145-mlfi",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-46K2X5",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:48:46.145Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380907058-76jv",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/voucher/PTK-WAR-ZQ0R1V",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:48:27.058Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380879948-dzvn",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:47:59.948Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380696144-wxcs",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:44:56.144Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380659029-5xzs",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/city/jogja",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:44:19.029Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380486731-kwdo",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/admin",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:41:26.731Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1791380367430-72te",
+      "ip": "127.0.0.1 (Localhost)",
+      "city": "Jakarta / Jawa",
+      "platform": "Desktop (Mac)",
+      "path": "/",
+      "subdomain": "",
+      "timestamp": "2026-10-07T13:39:27.430Z",
+      "event": "PageView"
+    },
+    {
+      "id": "vis-1",
+      "ip": "182.253.110.12",
+      "city": "Surakarta (Solo)",
+      "platform": "Mobile / Android",
+      "path": "/city/solo",
+      "subdomain": "solo",
+      "timestamp": "2026-10-07T13:00:43.929Z",
+      "event": "TicketIntent"
+    },
+    {
+      "id": "vis-2",
+      "ip": "114.124.201.55",
+      "city": "Semarang",
+      "platform": "Mobile / iOS",
+      "path": "/",
+      "timestamp": "2026-10-07T12:30:43.929Z",
+      "event": "PageView"
+    }
+  ],
+  "articles": [
+    {
+      "id": "art-solo-paragon-roadshow",
+      "slug": "keseruan-roadshow-solo-paragon-xxi-meet-and-greet",
+      "title": "Keseruan Nobar Perdana & Meet The Cast PIYE TO KIH di Solo Paragon XXI",
+      "summary": "Suasana riuh penuh tawa menyelimuti Studio 3 Solo Paragon XXI. Ratusan penonton antusias berfoto dan berbincang hangat dengan para pemain film komedi nasional persembahan Miracle Pictures.",
+      "content": "Solo menjadi salah satu kota pertama yang disambangi oleh tim promosi dan jajaran pemain film \"PIYE TO KIH?\". Bertempat di Solo Paragon XXI, acara nonton bareng dan Meet & Greet berhasil menyedot animo luar biasa dari masyarakat Kota Bengawan.\\n\\nSejak pukul 14.00 WIB, lobi bioskop sudah dipadati para penggemar dan penonton setia yang telah mengamankan tiket presale. Tawa lepas terdengar berkali-kali di dalam studio selama pemutaran film komedi drama keluarga ini berlangsung.\\n\\nSetelah sesi nonton bareng selesai, para pemain langsung hadir menyapa penonton di dalam studio untuk sesi tanya jawab (Q&A) yang hangat dan penuh canda. Para penonton juga berkesempatan mendapatkan merchandise official dan berfoto bersama di backdrop resmi Miracle Pictures.\\n\\n\"Kami sangat terharu dengan sambutan guyub dan hangat warga Solo. Rasanya energi positif dan tawa penonton di sini menjadi suntikan semangat luar biasa untuk melanjutkan tur roadshow ke kota-kota berikutnya,\" ungkap salah satu pemain utama saat ditemui di lobi bioskop.",
+      "coverImage": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80"
+      ],
+      "cityTag": "Surakarta (Solo)",
+      "category": "Meet & Greet",
+      "author": "Tim Media Miracle Pictures",
+      "publishedAt": "2026-10-25",
+      "readTime": "3 menit baca",
+      "isPublished": true,
+      "seoTitle": "Keseruan Roadshow Film PIYE TO KIH di Solo Paragon XXI",
+      "seoDescription": "Liputan dokumentasi kemeriahan nobar dan Meet The Cast film komedi bioskop PIYE TO KIH di Solo Paragon XXI bersama Miracle Pictures."
+    },
+    {
+      "id": "art-semarang-the-park-xxi",
+      "slug": "tiket-ludes-sambutan-hangat-semarang-film-piye-to-kih",
+      "title": "Studio Penuh! Sambutan Hangat Warga Semarang Nobar Film PIYE TO KIH",
+      "summary": "The Park XXI Semarang dipadati penonton film komedi drama keluarga PIYE TO KIH. Simak dokumentasi galeri foto keseruan dan antusiasme pengunjung di sini.",
+      "content": "Kemeriahan tur roadshow film \"PIYE TO KIH?\" berlanjut di Kota Semarang. Digelar di The Park XXI dan Cinépolis Java Mall, antusiasme penonton Semarang terbukti sangat tinggi hingga kursi studio terisi penuh.\\n\\nFilm karya Miracle Pictures ini dinilai sangat dekat dengan keseharian keluarga Indonesia, dibalut komedi cerdas yang menghibur berbagai kalangan umur mulai dari remaja hingga orang tua.\\n\\nBanyak penonton mengaku sangat puas dan terhibur. Sesi foto bareng di photo booth resmi Miracle Pictures dipadati antrean yang ingin mengabadikan momen bersama poster film bertanda tangan.",
+      "coverImage": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=800&q=80"
+      ],
+      "cityTag": "Semarang",
+      "category": "Roadshow",
+      "author": "Tim Promosi Miracle Pictures",
+      "publishedAt": "2026-10-22",
+      "readTime": "2 menit baca",
+      "isPublished": true,
+      "seoTitle": "Keseruan Roadshow Film PIYE TO KIH di Semarang",
+      "seoDescription": "Dokumentasi nobar film bioskop PIYE TO KIH di The Park XXI Semarang. Cek foto keseruan dan jadwal penayangan kota berikutnya."
+    },
+    {
+      "id": "art-jogja-ambarrukmo-xxi",
+      "slug": "tawa-pecah-di-yogyakarta-roadshow-film-piye-to-kih",
+      "title": "Tawa Pecah di Yogyakarta! Roadshow & Diskusi Film Bersama Komunitas",
+      "summary": "Plaza Ambarrukmo XXI Jogja menjadi saksi pecahnya tawa penonton saat menyaksikan komedi drama PIYE TO KIH. Simak liputan selengkapnya.",
+      "content": "Yogyakarta selalu punya tempat istimewa bagi perfilman nasional. Roadshow film \"PIYE TO KIH?\" di Plaza Ambarrukmo XXI dan Jogja City Mall disambut meriah oleh komunitas pecinta film, mahasiswa, dan keluarga.\\n\\nKehangatan cerita yang disajikan sukses mengundang gelak tawa sekaligus momen haru. Seusai pemutaran, tim sutradara dan pemeran menyempatkan diri untuk berdiskusi santai mengenai proses kreatif di balik layar pembuatan film.\\n\\nRoadshow ini sekaligus menandai komitmen Miracle Pictures dalam menghadirkan tontonan layar lebar yang berkualitas, segar, dan sarat nilai kekeluargaan.",
+      "coverImage": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1200&q=80",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=800&q=80"
+      ],
+      "cityTag": "Yogyakarta",
+      "category": "Roadshow",
+      "author": "Redaksi Miracle Pictures",
+      "publishedAt": "2026-10-23",
+      "readTime": "3 menit baca",
+      "isPublished": true,
+      "seoTitle": "Keseruan Roadshow Film PIYE TO KIH di Yogyakarta",
+      "seoDescription": "Liputan kemeriahan pemutaran dan diskusi film komedi drama PIYE TO KIH di Yogyakarta bersama Miracle Pictures."
+    }
+  ]
+}
