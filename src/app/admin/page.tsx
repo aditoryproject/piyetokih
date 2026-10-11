@@ -109,6 +109,10 @@ export default function AdminPage() {
   // Visitors state
   const [visitors, setVisitors] = useState<any[]>([]);
 
+  // Copied states
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [copiedWebhook, setCopiedWebhook] = useState(false);
+
   // Security & Authentication state
   const [currentPassword, setCurrentPassword] = useState('');
   const [newUsername, setNewUsername] = useState('');

@@ -40,8 +40,8 @@ export function resetFailedAttempts(ipOrKey: string) {
   loginAttempts.delete(ipOrKey);
 }
 
-// Convert string to Uint8Array
-function textToBuffer(str: string): Uint8Array {
+// Convert string to Uint8Array as BufferSource
+function textToBuffer(str: string): any {
   return new TextEncoder().encode(str);
 }
 
