@@ -1,15 +1,27 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Script from 'next/script';
 
 interface MetaPixelTrackerProps {
   pixelId?: string;
 }
 
-export default function MetaPixelTracker({ pixelId = '123456789012345' }: MetaPixelTrackerProps) {
+export default function MetaPixelTracker({ pixelId: initialPixelId }: MetaPixelTrackerProps) {
+  const [pixelId, setPixelId] = useState<string>(initialPixelId || process.env.NEXT_PUBLIC_META_PIXEL_ID || '');
+
   useEffect(() => {
-    // Log PageView to server analytics
+    // Ambil Meta Pixel ID aktif dari pengaturan sistem
+    fetch('/api/admin/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings?.metaPixelId) {
+          setPixelId(data.settings.metaPixelId);
+        }
+      })
+      .catch(() => {});
+
+    // Log PageView ke internal visitor analytics
     try {
       fetch('/api/track', {
         method: 'POST',
