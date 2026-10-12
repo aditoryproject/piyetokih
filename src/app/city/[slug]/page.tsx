@@ -9,7 +9,6 @@ import CinemaPartnersStrip from '@/components/CinemaPartnersStrip';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
-import WarVoucherForm from '@/components/WarVoucherForm';
 import {
   Calendar,
   Clock,
@@ -93,7 +92,7 @@ export default function CityRoadshowPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black tracking-widest uppercase mb-4 shadow-sm">
             <MapPin className="w-3.5 h-3.5 text-red-500" />
-            <span>ROADSHOW RESMI FILM BIOSKOP</span>
+            <span>ROADSHOW &amp; PENAYANGAN RESMI FILM BIOSKOP</span>
           </div>
 
           {/* City Headline */}
@@ -128,12 +127,14 @@ export default function CityRoadshowPage() {
             </div>
           </div>
 
-          {/* 3. LIST BIOSKOP DI KOTA INI */}
+          {/* 3. LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
           <div className="max-w-2xl mx-auto text-left mb-16">
-            <div className="text-center mb-6">
-              <span className="text-xs font-black uppercase tracking-widest text-amber-400">PILIHAN BIOSKOP</span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white uppercase">Daftar Bioskop &amp; Jam Tayang</h2>
-              <p className="text-xs text-slate-400 mt-1">Pilih bioskop di {city.name} untuk memesan tiket nonton sekarang.</p>
+            <div className="text-center mb-8">
+              <span className="text-xs font-black uppercase tracking-widest text-amber-400">PRESALE TIKET RESMI BIOSKOP</span>
+              <h2 className="text-2xl sm:text-4xl font-black text-white uppercase mt-1">Pilih Bioskop di Kota {city.name}</h2>
+              <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
+                Pilih bioskop mitra di bawah ini untuk langsung memesan tiket presale resmi dan mengamankan nomor kursi studio Anda sebelum kehabisan.
+              </p>
             </div>
 
             <div className="space-y-4">
@@ -184,7 +185,7 @@ export default function CityRoadshowPage() {
                       className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 hover:text-white font-black text-sm py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-95 group"
                     >
                       <Ticket className="w-4 h-4" />
-                      <span>BELI TIKET {cinema.chain.toUpperCase()}</span>
+                      <span>BELI TIKET PRESALE {cinema.chain.toUpperCase()}</span>
                       <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </a>
                   </div>
@@ -195,37 +196,16 @@ export default function CityRoadshowPage() {
         </div>
       </section>
 
-      {/* 4. WAR VOUCHER FORM UNTUK KOTA INI */}
-      <section className="py-16 px-4 bg-gradient-to-b from-[#0b101d] via-[#121927] to-transparent border-y border-white/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600/15 border border-red-500/30 text-red-400 text-xs font-black tracking-widest uppercase mb-4 shadow-sm">
-            <Ticket className="w-3.5 h-3.5" />
-            <span>KLAIM VOUCHER KOTA {city.name.toUpperCase()}</span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight mb-2">
-            Amankan Kuota E-Voucher Nonton
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto mb-8">
-            Klaim voucher nonton resmi untuk penayangan di {city.name}. E-Voucher langsung dikirimkan ke WhatsApp &amp; Email Anda.
-          </p>
-
-          <div className="max-w-xl mx-auto">
-            <WarVoucherForm />
-          </div>
-        </div>
-      </section>
-
-      {/* 5. OFFICIAL TEASER TRAILER PLAYER (GLOBAL INHERITANCE) */}
+      {/* 4. OFFICIAL TEASER TRAILER PLAYER (GLOBAL INHERITANCE) */}
       <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
 
-      {/* 6. SINOPSIS & KISAH FILM (GLOBAL INHERITANCE) */}
+      {/* 5. SINOPSIS & KISAH FILM (GLOBAL INHERITANCE) */}
       <MovieStorySection movieSettings={movieSettings || undefined} />
 
-      {/* 7. CAST & PEMERAN WOKO CHANNEL (GLOBAL INHERITANCE) */}
+      {/* 6. CAST & PEMERAN WOKO CHANNEL (GLOBAL INHERITANCE) */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* 8. FOOTER CREDITS */}
+      {/* 7. FOOTER CREDITS */}
       <section className="py-12 px-4 border-t border-white/10 text-center text-xs text-slate-400 bg-black/80">
         <div className="max-w-4xl mx-auto space-y-4">
           <p className="text-slate-500 text-[11px]">
