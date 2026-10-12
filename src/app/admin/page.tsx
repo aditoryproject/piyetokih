@@ -112,6 +112,7 @@ export default function AdminPage() {
   const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);
   const [uploadingArticleCover, setUploadingArticleCover] = useState(false);
   const [uploadingArticleGallery, setUploadingArticleGallery] = useState(false);
+  const [uploadingBogoBanner, setUploadingBogoBanner] = useState(false);
 
   const handleFileUpload = async (file: File, category: string = 'movie'): Promise<string | null> => {
     const formData = new FormData();
@@ -2297,15 +2298,104 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* 2. LINK TIKET UTAMA / DEFAULT */}
+                {/* 2. BANNER VISUAL PROMO BOGO (UPLOAD LANGSUNG / OTOMATIS IKUT POSTER FILM) */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                        2. Banner Visual Promosi Halaman /bogo
+                      </label>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        {settings.bogoBannerUrl
+                          ? 'Menggunakan banner khusus promo BOGO yang diunggah.'
+                          : 'Otomatis mewarisi Poster Resmi Film yang telah Anda atur di tab 🎬 Official Film & Media.'}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {settings.bogoBannerUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setSettings({ ...settings, bogoBannerUrl: '' })}
+                          className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 transition"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Gunakan Poster Film</span>
+                        </button>
+                      )}
+
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-sm active:scale-95 shrink-0">
+                        <Upload className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{uploadingBogoBanner ? 'Mengunggah Banner...' : '📁 Upload Banner BOGO'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingBogoBanner}
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingBogoBanner(true);
+                            const url = await handleFileUpload(file, 'bogo-banner');
+                            setUploadingBogoBanner(false);
+                            if (url) {
+                              setSettings((prev) => ({ ...prev, bogoBannerUrl: url }));
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Visual Banner Preview */}
+                  {(() => {
+                    const activeBanner =
+                      settings.bogoBannerUrl ||
+                      settings.movieSettings?.posterUrl ||
+                      settings.movieSettings?.backdropUrl ||
+                      'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80';
+
+                    return (
+                      <div className="relative aspect-[16/9] max-w-xl rounded-xl overflow-hidden border border-slate-300 bg-slate-900 shadow-inner">
+                        <img
+                          src={activeBanner}
+                          alt="Banner BOGO Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e: any) => (e.target.style.display = 'none')}
+                        />
+                        <div className="absolute top-2 left-2 px-2.5 py-1 rounded bg-black/80 text-amber-400 text-[10px] font-bold">
+                          {settings.bogoBannerUrl ? '★ Banner Khusus BOGO Aktif' : '🎬 Poster Film Aktif (Otomatis)'}
+                        </div>
+                        <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded bg-black/80 text-slate-300 font-mono text-[10px] truncate max-w-[85%]">
+                          {activeBanner}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* 3. LINK TIKET UTAMA / DEFAULT */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
-                  <div>
-                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
-                      2. Link Tiket Utama (Tombol Banner Besar)
-                    </label>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Tautan default saat penonton menekan tombol utama &quot;BELI TIKET BUY 1 GET 1 BIOSKOP SEKARANG&quot;.
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                        3. Link Tiket Utama (Tombol Banner Besar)
+                      </label>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Tautan default saat penonton menekan tombol utama &quot;BELI TIKET BUY 1 GET 1 BIOSKOP SEKARANG&quot;.
+                      </p>
+                    </div>
+                    {settings.bogoDefaultTicketLink && (
+                      <a
+                        href={settings.bogoDefaultTicketLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1 shrink-0"
+                      >
+                        <span>Test Link</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
 
                   <input
@@ -2317,11 +2407,11 @@ export default function AdminPage() {
                   />
                 </div>
 
-                {/* 3. LINK TIKET SPESIFIK PER BIOSKOP MITRA */}
+                {/* 4. LINK TIKET SPESIFIK PER BIOSKOP MITRA */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                   <div>
                     <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
-                      3. Link Tiket Khusus Per Bioskop Mitra (Opsional)
+                      4. Link Tiket Khusus Per Bioskop Mitra (Opsional)
                     </label>
                     <p className="text-[11px] text-slate-500 mt-0.5">
                       Jika dikosongkan, kartu bioskop akan menggunakan link tiket utama di atas.
@@ -2330,9 +2420,22 @@ export default function AdminPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                        Cinema XXI / m.tix URL:
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                          Cinema XXI / m.tix URL:
+                        </label>
+                        {settings.bogoCinemaLinks?.xxi && (
+                          <a
+                            href={settings.bogoCinemaLinks.xxi}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                          >
+                            <span>Buka</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        )}
+                      </div>
                       <input
                         type="url"
                         value={settings.bogoCinemaLinks?.xxi || ''}
@@ -2348,9 +2451,22 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                        CGV Cinemas URL:
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                          CGV Cinemas URL:
+                        </label>
+                        {settings.bogoCinemaLinks?.cgv && (
+                          <a
+                            href={settings.bogoCinemaLinks.cgv}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                          >
+                            <span>Buka</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        )}
+                      </div>
                       <input
                         type="url"
                         value={settings.bogoCinemaLinks?.cgv || ''}
@@ -2366,9 +2482,22 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                        Cinépolis Cinemas URL:
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                          Cinépolis Cinemas URL:
+                        </label>
+                        {settings.bogoCinemaLinks?.cinepolis && (
+                          <a
+                            href={settings.bogoCinemaLinks.cinepolis}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                          >
+                            <span>Buka</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        )}
+                      </div>
                       <input
                         type="url"
                         value={settings.bogoCinemaLinks?.cinepolis || ''}
@@ -2384,9 +2513,22 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                        TIX ID Official Partner URL:
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                          TIX ID Official Partner URL:
+                        </label>
+                        {settings.bogoCinemaLinks?.tixid && (
+                          <a
+                            href={settings.bogoCinemaLinks.tixid}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                          >
+                            <span>Buka</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        )}
+                      </div>
                       <input
                         type="url"
                         value={settings.bogoCinemaLinks?.tixid || ''}
@@ -2403,10 +2545,10 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* 4. SUBJUDUL PENAWARAN */}
+                {/* 5. SUBJUDUL PENAWARAN */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2">
                   <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
-                    4. Teks Subjudul Promo BOGO di Halaman Web
+                    5. Teks Subjudul Promo BOGO di Halaman Web
                   </label>
                   <input
                     type="text"
