@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CITIES_DATA } from '@/lib/cities';
-import { PIYE_TO_KIH_AI_PERSONA, WAHNOTIF_TOOL_SCHEMA } from '@/lib/wahnotif';
+import { DEFAULT_MOVIE_SETTINGS, MovieSettings, MovieCastMember } from '@/lib/movie-types';
+import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
 import {
   Users,
   Ticket,
@@ -37,10 +38,12 @@ import {
   Key,
   Shield,
   Lock,
+  Play,
+  Share2,
 } from 'lucide-react';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'leads' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics'>('leads');
+  const [activeTab, setActiveTab] = useState<'leads' | 'movie' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics'>('movie');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Articles state
@@ -412,6 +415,7 @@ export default function AdminPage() {
 
   const menuItems = [
     { id: 'leads', label: 'Database Leads', icon: Users, badge: leads.length },
+    { id: 'movie', label: '🎬 Official Film & Media', icon: Film, badge: 'Global Sync' },
     { id: 'articles', label: 'Kabar & Galeri Roadshow', icon: Newspaper, badge: articles.length },
     { id: 'settings', label: 'Pengaturan Voucher & Tayang', icon: Settings },
     { id: 'bogo', label: 'Promo Buy 1 Get 1 (BOGO)', icon: Ticket, badge: 'Promo' },
@@ -1024,6 +1028,605 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: OFFICIAL FILM & MEDIA CONFIGURATION (GLOBAL SYNC) */}
+          {activeTab === 'movie' && (
+            <form onSubmit={handleSaveSettings} className="max-w-4xl bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-8 shadow-sm">
+              <div className="border-b border-slate-100 pb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest inline-block mb-1.5">
+                      GLOBAL INHERITANCE SYSTEM
+                    </span>
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                      🎬 Pengaturan Resmi Film, Media &amp; Tracking
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Sekali atur di sini, poster, trailer, sinopsis, cast, dan tracking otomatis sinkron ke <b>Halaman Utama</b> dan <b>SELURUH 17 Halaman Kota Roadshow</b> tanpa perlu update satu per satu!
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={savingSettings}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition active:scale-95 shrink-0"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>{savingSettings ? 'Menyimpan...' : 'Simpan Semua'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {settingsSuccess && (
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-xs flex items-center gap-3 animate-in fade-in">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <div>
+                    <span className="font-black block">Perubahan Berhasil Disimpan &amp; Sinkron!</span>
+                    <span className="text-[11px] text-emerald-700">Main page dan seluruh 17 halaman kota langsung menampilkan poster, trailer, dan cast terbaru secara otomatis.</span>
+                  </div>
+                </div>
+              )}
+
+              {/* 1. VISUAL POSTER & BACKDROP TEASER */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-5">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    1. Poster Resmi Film &amp; Backdrop Layar Lebar
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Masukkan URL link gambar poster resmi (format JPG/PNG/WebP resolusi tinggi).
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* Poster Input & Preview */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-slate-700">
+                      URL Poster Utama (Tampil di Hero Banner &amp; Halaman Kota)
+                    </label>
+                    <input
+                      type="url"
+                      value={settings.movieSettings?.posterUrl || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            posterUrl: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="https://.../poster-piye-to-kih.jpg"
+                      className="w-full bg-white border border-slate-300 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
+                    />
+
+                    {/* Preview Box */}
+                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center">
+                      {settings.movieSettings?.posterUrl ? (
+                        <img
+                          src={settings.movieSettings.posterUrl}
+                          alt="Preview Poster"
+                          className="w-full h-full object-cover"
+                          onError={(e: any) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="text-center p-4 text-slate-500 text-xs">
+                          <Image className="w-8 h-8 mx-auto mb-1 opacity-40" />
+                          <span>Preview Poster Belum Diatur</span>
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-amber-400 text-[10px] font-bold">
+                        Live Poster Preview
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Backdrop Teaser Input & Preview */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-slate-700">
+                      URL Backdrop Layar Teaser Player
+                    </label>
+                    <input
+                      type="url"
+                      value={settings.movieSettings?.backdropUrl || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            backdropUrl: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="https://.../backdrop-teaser.jpg"
+                      className="w-full bg-white border border-slate-300 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
+                    />
+
+                    {/* Preview Box */}
+                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center">
+                      {settings.movieSettings?.backdropUrl ? (
+                        <img
+                          src={settings.movieSettings.backdropUrl}
+                          alt="Preview Backdrop"
+                          className="w-full h-full object-cover"
+                          onError={(e: any) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="text-center p-4 text-slate-500 text-xs">
+                          <Image className="w-8 h-8 mx-auto mb-1 opacity-40" />
+                          <span>Preview Backdrop Teaser</span>
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-amber-400 text-[10px] font-bold">
+                        Live Backdrop Preview
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. TEASER & TRAILER YOUTUBE PLAYER */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    2. Link Video Teaser / Trailer YouTube
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Masukkan URL video YouTube resmi (contoh: <code>https://www.youtube.com/watch?v=VIDEO_ID</code> atau <code>https://youtu.be/VIDEO_ID</code>).
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={settings.movieSettings?.trailerYoutubeUrl || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            trailerYoutubeUrl: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                      className="flex-1 bg-white border border-slate-300 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono outline-none"
+                    />
+                  </div>
+
+                  {/* Live Embedded Video Test Player */}
+                  <div className="border border-slate-300 rounded-2xl overflow-hidden bg-black shadow-inner">
+                    <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 text-[11px] text-slate-300 font-bold flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-amber-400">
+                        <Play className="w-3.5 h-3.5 fill-amber-400" />
+                        Live Embedded Player Test
+                      </span>
+                      <span className="text-slate-400 text-[10px]">Tes putar sebelum rilis ke publik</span>
+                    </div>
+                    <div className="relative aspect-video w-full">
+                      <iframe
+                        src={getYouTubeEmbedUrl(settings.movieSettings?.trailerYoutubeUrl, false, false)}
+                        title="Live Preview Trailer"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full border-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. INFO FILM, TANGGAL RILIS & SINOPSIS */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    3. Keterangan Judul, Tanggal Rilis &amp; Cerita Sinopsis
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Informasi narasi film yang tampil pada bagian Hero dan Sinopsis Cerita.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Judul Film
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.movieSettings?.title || 'PIYE TO KIH? THE MOVIE'}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            title: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Teks Tanggal Penayangan Perdana
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.movieSettings?.releaseDateText || '19 November 2026'}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            releaseDateText: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="Contoh: 19 November 2026"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-bold outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Sutradara
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.movieSettings?.director || 'Ito Mavin'}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            director: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Penulis Skenario
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.movieSettings?.writer || 'Endik Koeswoyo & Ito Mavin'}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          movieSettings: {
+                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                            writer: e.target.value,
+                          },
+                        })
+                      }
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Kutipan Dialog Sinematik (Quote Block)
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.movieSettings?.quoteDialog || ''}
+                    onChange={e =>
+                      setSettings({
+                        ...settings,
+                        movieSettings: {
+                          ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                          quoteDialog: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Contoh: Niat ati golek omah murah gawe rabi..."
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 italic outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Sinopsis Cerita Film
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={settings.movieSettings?.synopsis || ''}
+                    onChange={e =>
+                      setSettings({
+                        ...settings,
+                        movieSettings: {
+                          ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                          synopsis: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Tuliskan sinopsis resmi film di sini..."
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3.5 text-xs text-slate-900 leading-relaxed outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* 4. CAST & PEMERAN RESMI */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      4. Jajaran Pemeran Resmi (Cast &amp; Characters)
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Kelola profil foto dan deskripsi aktor utama Woko Channel &amp; bintang film.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentCast = settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast;
+                      const newMember: MovieCastMember = {
+                        id: `cast-${Date.now()}`,
+                        actorName: '',
+                        characterName: '',
+                        badge: 'BINTANG FILM',
+                        photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+                        bio: '',
+                      };
+                      setSettings({
+                        ...settings,
+                        movieSettings: {
+                          ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                          cast: [...currentCast, newMember],
+                        },
+                      });
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-sm"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Tambah Pemeran</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast).map((c: MovieCastMember, idx: number) => (
+                    <div
+                      key={c.id || idx}
+                      className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3 relative group"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Thumbnail Photo */}
+                        <div className="w-16 h-20 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0">
+                          <img
+                            src={c.photoUrl}
+                            alt={c.actorName}
+                            className="w-full h-full object-cover"
+                            onError={(e: any) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+
+                        {/* Actor & Role Inputs */}
+                        <div className="flex-1 space-y-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <span className="text-[10px] font-bold text-slate-400 uppercase block">Nama Aktor</span>
+                              <input
+                                type="text"
+                                value={c.actorName}
+                                onChange={e => {
+                                  const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
+                                  updated[idx] = { ...updated[idx], actorName: e.target.value };
+                                  setSettings({
+                                    ...settings,
+                                    movieSettings: {
+                                      ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                      cast: updated,
+                                    },
+                                  });
+                                }}
+                                placeholder="Heri Chandra"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none"
+                              />
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-bold text-slate-400 uppercase block">Karakter</span>
+                              <input
+                                type="text"
+                                value={c.characterName}
+                                onChange={e => {
+                                  const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
+                                  updated[idx] = { ...updated[idx], characterName: e.target.value };
+                                  setSettings({
+                                    ...settings,
+                                    movieSettings: {
+                                      ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                      cast: updated,
+                                    },
+                                  });
+                                }}
+                                placeholder="MUKIDI"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-amber-600 outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase block">Badge Label</span>
+                            <input
+                              type="text"
+                              value={c.badge}
+                              onChange={e => {
+                                  const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
+                                  updated[idx] = { ...updated[idx], badge: e.target.value };
+                                  setSettings({
+                                    ...settings,
+                                    movieSettings: {
+                                      ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                      cast: updated,
+                                    },
+                                  });
+                              }}
+                              placeholder="PEMERAN UTAMA • WOKO CHANNEL"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-slate-700 outline-none"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Photo URL & Bio */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">URL Foto Aktor</span>
+                        <input
+                          type="url"
+                          value={c.photoUrl}
+                          onChange={e => {
+                            const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
+                            updated[idx] = { ...updated[idx], photoUrl: e.target.value };
+                            setSettings({
+                              ...settings,
+                              movieSettings: {
+                                ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                cast: updated,
+                              },
+                            });
+                          }}
+                          placeholder="https://.../foto.jpg"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] font-mono text-slate-800 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">Bio / Deskripsi Karakter</span>
+                        <textarea
+                          rows={2}
+                          value={c.bio}
+                          onChange={e => {
+                            const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
+                            updated[idx] = { ...updated[idx], bio: e.target.value };
+                            setSettings({
+                              ...settings,
+                              movieSettings: {
+                                ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                cast: updated,
+                              },
+                            });
+                          }}
+                          placeholder="Deskripsi peran dalam film..."
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[11px] text-slate-700 outline-none"
+                        />
+                      </div>
+
+                      {/* Delete Button */}
+                      <div className="pt-1 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentCast = settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast;
+                            if (currentCast.length <= 1) {
+                              alert('Minimal harus ada 1 pemeran film!');
+                              return;
+                            }
+                            const updated = currentCast.filter((_: any, cIdx: number) => cIdx !== idx);
+                            setSettings({
+                              ...settings,
+                              movieSettings: {
+                                ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                cast: updated,
+                              },
+                            });
+                          }}
+                          className="text-rose-600 hover:text-rose-700 text-[11px] font-bold flex items-center gap-1 transition"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Hapus Pemeran Ini</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 5. TRACKING PIXEL & ANALYTICS TERPUSAT */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    5. Pengaturan Tracking Pixel &amp; Ads (Otomatis Aktif di Semua Halaman)
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Masukkan Pixel ID Anda. Sistem otomatis mencatat event <b>PageView</b>, <b>AddToCart</b> (saat klik beli tiket), dan <b>Lead</b> (saat klaim e-voucher) di halaman utama &amp; seluruh 17 kota.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Meta Pixel ID (FB / IG Ads)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.metaPixelId || ''}
+                      onChange={e => setSettings({ ...settings, metaPixelId: e.target.value })}
+                      placeholder="Contoh: 123456789012345"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
+                    />
+                    <span className="text-[10px] text-slate-500 block">Digunakan untuk optimasi iklan Meta</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      TikTok Pixel ID
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.tiktokPixelId || ''}
+                      onChange={e => setSettings({ ...settings, tiktokPixelId: e.target.value })}
+                      placeholder="Contoh: C123456789ABC"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
+                    />
+                    <span className="text-[10px] text-slate-500 block">Opsional untuk iklan TikTok</span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Google Analytics ID (GA4)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.googleAnalyticsId || ''}
+                      onChange={e => setSettings({ ...settings, googleAnalyticsId: e.target.value })}
+                      placeholder="Contoh: G-XXXXXXXXXX"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
+                    />
+                    <span className="text-[10px] text-slate-500 block">Opsional untuk web traffic GA4</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* BOTTOM SAVE BUTTON */}
+              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-xs text-slate-500">
+                  ⚡ <b>Pemberitahuan:</b> Perubahan akan langsung aktif secara live pada domain utama dan seluruh subdomain/kota.
+                </div>
+                <button
+                  type="submit"
+                  disabled={savingSettings}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 active:scale-95 transition"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{savingSettings ? 'Menyimpan & Menyinkronkan...' : 'Simpan Semua Pengaturan Film & Media'}</span>
+                </button>
+              </div>
+            </form>
           )}
 
           {/* TAB 2: PENGATURAN VOUCHER (CLEAN WHITE) */}

@@ -1,46 +1,65 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { Users, Sparkles, Star } from 'lucide-react';
+import { MovieCastMember } from '@/lib/movie-types';
 
-interface CastMember {
-  name: string;
-  character: string;
-  roleDescription: string;
-  badge: string;
-  image: string;
-}
-
-const CAST_MEMBERS: CastMember[] = [
+const FALLBACK_CAST: MovieCastMember[] = [
   {
-    name: 'Heri Chandra',
-    character: 'MUKIDI',
-    roleDescription: 'Pria pekerja keras yang patah hati berat, bertekad membuktikan kemapanannya dengan nekat membeli rumah tua murah.',
-    badge: 'PEMERAN UTAMA',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    id: 'cast-1',
+    actorName: 'Heri Chandra',
+    characterName: 'MUKIDI',
+    bio: 'Pria pekerja keras yang patah hati berat, bertekad membuktikan kemapanannya dengan nekat membeli rumah tua murah.',
+    badge: 'PEMERAN UTAMA • WOKO CHANNEL',
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
   },
   {
-    name: 'Dara Sarasvati',
-    character: 'SUKMA',
-    roleDescription: 'Gadis misterius berparas jelita yang tinggal di rumah tua Mukidi, membawa teka-teki dari dimensi alam yang berbeda.',
+    id: 'cast-2',
+    actorName: 'Dara Sarasvati',
+    characterName: 'SUKMA',
+    bio: 'Gadis misterius berparas jelita yang tinggal di rumah tua Mukidi, membawa teka-teki dari dimensi alam yang berbeda.',
     badge: 'KARAKTER KUNCI',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
   },
   {
-    name: 'Sutrisno Agung',
-    character: 'GENDUT',
-    roleDescription: 'Sahabat karib Mukidi dari Woko Channel yang paling heboh, curigaan, dan panik saat mengira Mukidi kesambet roh halus.',
+    id: 'cast-3',
+    actorName: 'Sutrisno Agung',
+    characterName: 'GENDUT',
+    bio: 'Sahabat karib Mukidi dari Woko Channel yang paling heboh, curigaan, dan panik saat mengira Mukidi kesambet roh halus.',
     badge: 'WOKO CHANNEL',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80',
+    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80',
   },
   {
-    name: 'Eko Dunung',
-    character: 'PENYOK',
-    roleDescription: 'Sahabat setia Mukidi yang polos dan berhati lembut. Celetukan khas Jawa Timur-nya selalu memecah suasana tegang jadi tawa.',
+    id: 'cast-4',
+    actorName: 'Eko Dunung',
+    characterName: 'PENYOK',
+    bio: 'Sahabat setia Mukidi yang polos dan berhati lembut. Celetukan khas Jawa Timur-nya selalu memecah suasana tegang jadi tawa.',
     badge: 'WOKO CHANNEL',
-    image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=800&q=80',
+    photoUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
-export default function CastSection() {
+interface CastSectionProps {
+  castList?: MovieCastMember[];
+}
+
+export default function CastSection({ castList: propCast }: CastSectionProps) {
+  const [castList, setCastList] = useState<MovieCastMember[]>(propCast || FALLBACK_CAST);
+
+  useEffect(() => {
+    if (propCast && propCast.length > 0) {
+      setCastList(propCast);
+    } else {
+      fetch('/api/admin/settings')
+        .then(r => r.json())
+        .then(data => {
+          if (data.settings?.movieSettings?.cast && data.settings.movieSettings.cast.length > 0) {
+            setCastList(data.settings.movieSettings.cast);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [propCast]);
   return (
     <section id="cast" className="relative py-20 px-4 sm:px-6 overflow-hidden">
       {/* Glow Effect */}
@@ -64,18 +83,18 @@ export default function CastSection() {
           </p>
         </div>
 
-        {/* 4 Cards Grid */}
+        {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {CAST_MEMBERS.map((cast, idx) => (
+          {castList.map((cast, idx) => (
             <div
-              key={idx}
+              key={cast.id || idx}
               className="bg-gradient-to-b from-[#141b2a] to-[#0a0e17] border border-slate-800 hover:border-amber-500/40 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 group flex flex-col justify-between"
             >
               {/* Photo Container */}
               <div className="relative aspect-[4/5] overflow-hidden bg-slate-900">
                 <img
-                  src={cast.image}
-                  alt={`${cast.name} sebagai ${cast.character}`}
+                  src={cast.photoUrl}
+                  alt={`${cast.actorName} sebagai ${cast.characterName}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e17] via-transparent to-transparent" />
@@ -93,7 +112,7 @@ export default function CastSection() {
                     SEBAGAI
                   </span>
                   <h3 className="text-xl font-black text-white tracking-wide">
-                    {cast.character}
+                    {cast.characterName}
                   </h3>
                 </div>
               </div>
@@ -103,10 +122,10 @@ export default function CastSection() {
                 <div>
                   <h4 className="text-sm font-black text-amber-400 flex items-center gap-1.5">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                    <span>{cast.name}</span>
+                    <span>{cast.actorName}</span>
                   </h4>
                   <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                    {cast.roleDescription}
+                    {cast.bio}
                   </p>
                 </div>
               </div>

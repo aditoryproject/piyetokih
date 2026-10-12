@@ -1,5 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { MovieCastMember, MovieSettings, DEFAULT_MOVIE_SETTINGS } from './movie-types';
+export type { MovieCastMember, MovieSettings };
+export { DEFAULT_MOVIE_SETTINGS };
 
 export interface LeadRecord {
   id: string;
@@ -23,9 +26,14 @@ export interface AppSettings {
   warHeadline: string;
   warSubtitle: string;
   metaPixelId: string;
+  tiktokPixelId?: string;
+  googleAnalyticsId?: string;
   wahnotifApiKey: string;
   wahnotifSenderNumber: string;
   cityLinkOverrides: Record<string, string>; // city slug -> ticket url
+
+  // Movie Media & Content Configuration (Global Sync)
+  movieSettings?: MovieSettings;
 
   // Email Dispatcher Configuration
   smtpHost: string;
@@ -98,6 +106,8 @@ export interface DatabaseSchema {
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
+
+
 const DEFAULT_SETTINGS: AppSettings = {
   totalQuota: 500,
   initialStock: 500,
@@ -106,9 +116,14 @@ const DEFAULT_SETTINGS: AppSettings = {
   warHeadline: 'WAR VOUCHER NONTON FILM PIYE TO KIH',
   warSubtitle: 'Klaim e-voucher resmi! Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan film.',
   metaPixelId: '123456789012345',
+  tiktokPixelId: '',
+  googleAnalyticsId: '',
   wahnotifApiKey: '',
   wahnotifSenderNumber: '',
   cityLinkOverrides: {},
+
+  // Global Movie Content Settings
+  movieSettings: DEFAULT_MOVIE_SETTINGS,
 
   // Email Defaults
   smtpHost: '',
@@ -281,7 +296,19 @@ function ensureDb(): DatabaseSchema {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
     const parsed = JSON.parse(raw);
     return {
-      settings: { ...DEFAULT_SETTINGS, ...parsed.settings },
+      settings: {
+        ...DEFAULT_SETTINGS,
+        ...parsed.settings,
+        movieSettings: {
+          ...DEFAULT_MOVIE_SETTINGS,
+          ...(parsed.settings?.movieSettings || {}),
+          cast:
+            Array.isArray(parsed.settings?.movieSettings?.cast) &&
+            parsed.settings.movieSettings.cast.length > 0
+              ? parsed.settings.movieSettings.cast
+              : DEFAULT_MOVIE_SETTINGS.cast,
+        },
+      },
       leads: parsed.leads || [],
       visitors: parsed.visitors || [],
       articles: Array.isArray(parsed.articles) && parsed.articles.length > 0 ? parsed.articles : DEFAULT_ARTICLES,

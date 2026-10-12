@@ -1,7 +1,37 @@
-import React from 'react';
-import { Film, BookOpen, Quote, Sparkles, CheckCircle2 } from 'lucide-react';
+'use client';
 
-export default function MovieStorySection() {
+import React, { useEffect, useState } from 'react';
+import { Film, BookOpen, Quote, Sparkles, CheckCircle2 } from 'lucide-react';
+import { MovieSettings, DEFAULT_MOVIE_SETTINGS } from '@/lib/movie-types';
+
+interface MovieStorySectionProps {
+  movieSettings?: MovieSettings;
+}
+
+export default function MovieStorySection({ movieSettings: propSettings }: MovieStorySectionProps) {
+  const [movieSettings, setMovieSettings] = useState<MovieSettings>(propSettings || DEFAULT_MOVIE_SETTINGS);
+
+  useEffect(() => {
+    if (propSettings) {
+      setMovieSettings(propSettings);
+    } else {
+      fetch('/api/admin/settings')
+        .then(r => r.json())
+        .then(data => {
+          if (data.settings?.movieSettings) {
+            setMovieSettings(data.settings.movieSettings);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [propSettings]);
+
+  const posterImg = movieSettings.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1000&q=80';
+  const directorName = movieSettings.director || 'Ito Mavin';
+  const writerName = movieSettings.writer || 'Endik Koeswoyo & Ito Mavin';
+  const quoteText = movieSettings.quoteDialog || 'Niat ati golek omah murah gawe rabi, malah kepincut prawan ayu sing ora tau saba awan...';
+  const synopsisText = movieSettings.synopsis || DEFAULT_MOVIE_SETTINGS.synopsis;
+
   return (
     <section id="sinopsis" className="relative py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-[#0e1422]/60 to-transparent">
       {/* Decorative Blur Circles */}
@@ -14,7 +44,7 @@ export default function MovieStorySection() {
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black shadow-amber-500/20 group">
               <img
-                src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1000&q=80"
+                src={posterImg}
                 alt="Sinopsis Film Piye To Kih Miracle Pictures"
                 className="w-full h-[480px] object-cover group-hover:scale-105 transition-transform duration-700 opacity-85"
               />
@@ -57,20 +87,12 @@ export default function MovieStorySection() {
             {/* Quote Block */}
             <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-transparent border-l-4 border-amber-500 text-slate-300 text-xs sm:text-sm italic leading-relaxed">
               <Quote className="w-4 h-4 text-amber-400 inline -mt-1 mr-1.5 not-italic" />
-              &quot;Nek ra mergo buktikne tresno, Mukidi ora bakal nekat tuku omah kuwi. Nanging nang omah kuwi, ana Sukma sing ngenteni seka alam seje...&quot;
+              &quot;{quoteText}&quot;
             </div>
 
             {/* Synopsis Paragraphs */}
-            <div className="text-xs sm:text-sm text-slate-300 space-y-3.5 leading-relaxed">
-              <p>
-                Cerita berpusat pada <b className="text-white">Mukidi</b> (Heri Chandra), pria sederhana yang sedang mengalami patah hati berat setelah ditolak oleh wanita impiannya karena dianggap belum mapan. Demi membuktikan harga dirinya, Mukidi nekat membeli sebuah rumah tua murah untuk modal masa depan.
-              </p>
-              <p>
-                Namun, rumah tersebut ternyata menyimpan rahasia gaib yang janggal. Mukidi justru dipertemukan dengan <b className="text-amber-400">Sukma</b> (Dara Sarasvati), sosok gadis cantik misterius yang berasal dari dimensi alam berbeda.
-              </p>
-              <p>
-                Dua sahabat karib Mukidi, <b className="text-white">Gendut</b> (Sutrisno Agung) dan <b className="text-white">Penyok</b> (Eko Dunung), mulai curiga berat melihat tingkah Mukidi yang berbicara sendirian dan tersenyum ganjil. Mereka menduga Mukidi gila karena cinta mati! Terjadilah serangkaian aksi kocak, histeris, dan petualangan mistis yang mengocok perut sekaligus menghangatkan hati penonton.
-              </p>
+            <div className="text-xs sm:text-sm text-slate-300 space-y-3.5 leading-relaxed whitespace-pre-line">
+              <p>{synopsisText}</p>
             </div>
 
             {/* Production Metadata Cards */}
@@ -81,11 +103,11 @@ export default function MovieStorySection() {
               </div>
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Sutradara</span>
-                <span className="font-black text-white text-xs">Ito Mavin</span>
+                <span className="font-black text-white text-xs">{directorName}</span>
               </div>
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 col-span-2 sm:col-span-1">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Penulis Skenario</span>
-                <span className="font-black text-white text-xs">Endik Koeswoyo</span>
+                <span className="font-black text-white text-xs">{writerName}</span>
               </div>
             </div>
 

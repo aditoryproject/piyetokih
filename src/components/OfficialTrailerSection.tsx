@@ -1,16 +1,58 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Volume2, VolumeX, Film, Sparkles, X } from 'lucide-react';
+import { MovieSettings } from '@/lib/movie-types';
 
-export default function OfficialTrailerSection() {
+export function getYouTubeEmbedUrl(urlOrId?: string, autoplay = true, muted = false): string {
+  if (!urlOrId || !urlOrId.trim()) {
+    return `https://www.youtube.com/embed?listType=search&list=Piye+To+Kih+Official+Teaser+Trailer+Cinema+21&autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
+  }
+  const trimmed = urlOrId.trim();
+  if (trimmed.includes('youtube.com/embed/')) {
+    const clean = trimmed.split('?')[0];
+    return `${clean}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
+  }
+  const matchWatch = trimmed.match(/[?&]v=([^&]+)/);
+  if (matchWatch && matchWatch[1]) {
+    return `https://www.youtube.com/embed/${matchWatch[1]}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
+  }
+  const matchShort = trimmed.match(/youtu\.be\/([^?&]+)/);
+  if (matchShort && matchShort[1]) {
+    return `https://www.youtube.com/embed/${matchShort[1]}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
+  }
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+    return `https://www.youtube.com/embed/${trimmed}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
+  }
+  return trimmed;
+}
+
+interface OfficialTrailerSectionProps {
+  movieSettings?: MovieSettings;
+  cityContext?: string;
+}
+
+export default function OfficialTrailerSection({ movieSettings: propSettings, cityContext }: OfficialTrailerSectionProps) {
+  const [movieSettings, setMovieSettings] = useState<MovieSettings | undefined>(propSettings);
   const [isPlayingModal, setIsPlayingModal] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
-  // Official Cinema 21 / CGV Teaser URL & Embed ID
-  // Fallback YouTube embed search / teaser ID
-  const YOUTUBE_VIDEO_ID = 'Q9X0k8b4uY4'; // Official Cinema 21 / Teaser embed
-  const YOUTUBE_EMBED_URL = `https://www.youtube.com/embed?listType=search&list=Piye+To+Kih+Official+Teaser+Trailer+Cinema+21&autoplay=1&mute=${isMuted ? '1' : '0'}&rel=0&controls=1`;
+  useEffect(() => {
+    if (propSettings) {
+      setMovieSettings(propSettings);
+    } else {
+      fetch('/api/admin/settings')
+        .then(r => r.json())
+        .then(data => {
+          if (data.settings?.movieSettings) {
+            setMovieSettings(data.settings.movieSettings);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [propSettings]);
+
+  const rawTrailerUrl = movieSettings?.trailerYoutubeUrl || '';
+  const backdropUrl = movieSettings?.backdropUrl || movieSettings?.posterUrl || 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80';
+  const YOUTUBE_EMBED_URL = getYouTubeEmbedUrl(rawTrailerUrl, true, isMuted);
 
   return (
     <section id="teaser" className="relative py-16 px-4 sm:px-6 overflow-hidden">
@@ -61,7 +103,7 @@ export default function OfficialTrailerSection() {
           <div className="relative aspect-video w-full bg-slate-950 overflow-hidden">
             {/* Poster Backdrop Image */}
             <img
-              src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80"
+              src={backdropUrl}
               alt="Teaser Film Piye To Kih Miracle Pictures"
               className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
             />

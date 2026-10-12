@@ -24,9 +24,22 @@ export async function POST(req: NextRequest) {
     if (body.isWarOpen !== undefined) db.settings.isWarOpen = Boolean(body.isWarOpen);
     if (body.countdownTarget) db.settings.countdownTarget = String(body.countdownTarget);
     if (body.metaPixelId !== undefined) db.settings.metaPixelId = String(body.metaPixelId);
+    if (body.tiktokPixelId !== undefined) db.settings.tiktokPixelId = String(body.tiktokPixelId);
+    if (body.googleAnalyticsId !== undefined) db.settings.googleAnalyticsId = String(body.googleAnalyticsId);
     if (body.wahnotifApiKey !== undefined) db.settings.wahnotifApiKey = String(body.wahnotifApiKey);
     if (body.wahnotifSenderNumber !== undefined) db.settings.wahnotifSenderNumber = String(body.wahnotifSenderNumber);
     if (body.cityLinkOverrides) db.settings.cityLinkOverrides = { ...db.settings.cityLinkOverrides, ...body.cityLinkOverrides };
+
+    // Global Movie Content & Media Settings
+    if (body.movieSettings) {
+      db.settings.movieSettings = {
+        ...(db.settings.movieSettings || {}),
+        ...body.movieSettings,
+        cast: Array.isArray(body.movieSettings.cast)
+          ? body.movieSettings.cast
+          : db.settings.movieSettings?.cast || [],
+      };
+    }
 
     // SMTP settings
     if (body.smtpHost !== undefined) db.settings.smtpHost = String(body.smtpHost);

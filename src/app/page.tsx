@@ -17,6 +17,7 @@ export default function HomePage() {
   const [totalQuota, setTotalQuota] = useState(500);
   const [remainingStock, setRemainingStock] = useState(482);
   const [countdownTarget, setCountdownTarget] = useState('2026-10-22T13:00:00+07:00');
+  const [movieSettings, setMovieSettings] = useState<any>(null);
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -25,6 +26,7 @@ export default function HomePage() {
         if (data.totalQuota) setTotalQuota(data.totalQuota);
         if (data.remainingStock !== undefined) setRemainingStock(data.remainingStock);
         if (data.settings?.countdownTarget) setCountdownTarget(data.settings.countdownTarget);
+        if (data.settings?.movieSettings) setMovieSettings(data.settings.movieSettings);
       })
       .catch(() => {});
   }, []);
@@ -102,7 +104,7 @@ export default function HomePage() {
           {/* Featured Poster Visual Banner */}
           <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black aspect-[16/9] max-w-3xl mx-auto shadow-amber-500/10 group">
             <img
-              src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80"
+              src={movieSettings?.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80'}
               alt="Official Poster Piye To Kih Miracle Pictures"
               className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
             />
@@ -112,7 +114,7 @@ export default function HomePage() {
                 OFFICIAL CINEMA RELEASE
               </span>
               <p className="text-lg sm:text-2xl font-black text-amber-300 drop-shadow-md">
-                TAYANG PERDANA 19 NOVEMBER 2026
+                TAYANG PERDANA {movieSettings?.releaseDateText?.toUpperCase() || '19 NOVEMBER 2026'}
               </p>
               <p className="text-xs text-slate-300 font-medium">
                 Voucher resmi dapat ditukarkan di bioskop kesayangan Anda (Cinema XXI, CGV, Cinépolis)
@@ -162,13 +164,13 @@ export default function HomePage() {
       </section>
 
       {/* 4. OFFICIAL TEASER TRAILER PLAYER (CINEMA EXPERIENCE) */}
-      <OfficialTrailerSection />
+      <OfficialTrailerSection movieSettings={movieSettings || undefined} />
 
       {/* 5. SINOPSIS & KISAH FILM */}
-      <MovieStorySection />
+      <MovieStorySection movieSettings={movieSettings || undefined} />
 
       {/* 6. PEMERAN & KARAKTER RESMI (WOKO CHANNEL & DARA SARASVATI) */}
-      <CastSection />
+      <CastSection castList={movieSettings?.cast} />
 
       {/* RE-ENGAGEMENT CTA: Tombol ajakan klaim bagi penonton yang sudah membaca cerita & cast */}
       <section className="py-12 px-4 text-center bg-gradient-to-b from-transparent to-amber-950/20">
