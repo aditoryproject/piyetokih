@@ -110,6 +110,8 @@ export default function AdminPage() {
   const [uploadingPoster, setUploadingPoster] = useState(false);
   const [uploadingBackdrop, setUploadingBackdrop] = useState(false);
   const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);
+  const [uploadingArticleCover, setUploadingArticleCover] = useState(false);
+  const [uploadingArticleGallery, setUploadingArticleGallery] = useState(false);
 
   const handleFileUpload = async (file: File, category: string = 'movie'): Promise<string | null> => {
     const formData = new FormData();
@@ -253,7 +255,7 @@ export default function AdminPage() {
       author: 'Tim Media Miracle Pictures',
       summary: '',
       content: '',
-      coverImage: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+      coverImage: '',
       galleryImagesText: '',
       isPublished: true,
       seoTitle: '',
@@ -3071,69 +3073,280 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Penulis & Cover Image */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Penulis / Sumber</label>
-                  <input
-                    type="text"
-                    value={articleForm.author}
-                    onChange={(e) => setArticleForm({ ...articleForm, author: e.target.value })}
-                    placeholder="Tim Media Miracle Pictures"
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Cover Foto (URL)</label>
-                  <input
-                    type="url"
-                    value={articleForm.coverImage}
-                    onChange={(e) => setArticleForm({ ...articleForm, coverImage: e.target.value })}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none"
-                  />
-                </div>
+              {/* Penulis / Sumber */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Penulis / Sumber Berita</label>
+                <input
+                  type="text"
+                  value={articleForm.author}
+                  onChange={(e) => setArticleForm({ ...articleForm, author: e.target.value })}
+                  placeholder="Tim Media Miracle Pictures"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-amber-500 outline-none text-slate-900 text-xs font-semibold"
+                />
               </div>
 
-              {/* Preview Cover Thumbnail if available */}
-              {articleForm.coverImage && (
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                  <div className="w-20 h-12 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+              {/* Cover Foto Utama Artikel (Direct Upload) */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="font-extrabold text-slate-900 block text-xs">
+                      Cover Foto Utama Artikel
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Foto banner yang tampil di kartu liputan dan bagian atas halaman artikel.
+                    </p>
+                  </div>
+                  {articleForm.coverImage && (
+                    <button
+                      type="button"
+                      onClick={() => setArticleForm((prev) => ({ ...prev, coverImage: '' }))}
+                      className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 transition"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Hapus Cover</span>
+                    </button>
+                  )}
+                </div>
+
+                {articleForm.coverImage ? (
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-300 bg-slate-900 group shadow-sm">
                     <img
                       src={articleForm.coverImage}
                       alt="Cover Preview"
                       className="w-full h-full object-cover"
                       onError={(e: any) => (e.target.style.display = 'none')}
                     />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <label className="cursor-pointer px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-lg transition active:scale-95">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{uploadingArticleCover ? 'Sedang Mengunggah...' : 'Ganti Foto Cover'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingArticleCover}
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingArticleCover(true);
+                            const url = await handleFileUpload(file, 'article-cover');
+                            setUploadingArticleCover(false);
+                            if (url) {
+                              setArticleForm((prev) => ({ ...prev, coverImage: url }));
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                    <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-black/80 text-amber-400 font-mono text-[10px] truncate max-w-[85%]">
+                      {articleForm.coverImage}
+                    </div>
                   </div>
-                  <div className="text-[11px] text-slate-500 truncate">
-                    <span className="font-bold text-slate-700 block">Preview Cover Image</span>
-                    <span className="font-mono text-slate-400">{articleForm.coverImage}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Dokumentasi Galeri Foto (Multiple URLs) */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="font-bold text-slate-700">
-                    Galeri Foto Dokumentasi (Multiple URLs)
+                ) : (
+                  <label className="cursor-pointer border-2 border-dashed border-slate-300 hover:border-amber-500 hover:bg-amber-50/50 rounded-xl p-6 flex flex-col items-center justify-center text-center transition group bg-white shadow-sm">
+                    <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 group-hover:scale-110 transition-transform mb-2">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-black text-slate-900">
+                      {uploadingArticleCover ? 'Sedang Mengunggah Cover...' : '📁 Klik untuk Pilih & Upload Foto Cover'}
+                    </span>
+                    <span className="text-[11px] text-slate-500 mt-1">
+                      Pilih dari galeri foto HP atau folder laptop (Format: JPG, PNG, WebP)
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploadingArticleCover}
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploadingArticleCover(true);
+                        const url = await handleFileUpload(file, 'article-cover');
+                        setUploadingArticleCover(false);
+                        if (url) {
+                          setArticleForm((prev) => ({ ...prev, coverImage: url }));
+                        }
+                      }}
+                    />
                   </label>
-                  <span className="text-[11px] text-slate-400">
-                    {articleForm.galleryImagesText.split('\n').filter((l) => l.trim().length > 0).length} foto ditambahkan
-                  </span>
+                )}
+              </div>
+
+              {/* Galeri Foto Dokumentasi (Multiple Upload) */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="font-extrabold text-slate-900 block text-xs">
+                      Galeri Foto Dokumentasi Roadshow / Acara
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Upload foto-foto liputan langsung dari galeri HP atau laptop. Foto otomatis disimpan di server.
+                    </p>
+                  </div>
+
+                  {/* Multi Upload Button */}
+                  <label className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition shadow-sm active:scale-95 shrink-0 group">
+                    <Upload className="w-3.5 h-3.5 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
+                    <span>{uploadingArticleGallery ? 'Mengunggah Foto-Foto...' : '📁 Upload Banyak Foto Sekaligus'}</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      disabled={uploadingArticleGallery}
+                      className="hidden"
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length === 0) return;
+                        setUploadingArticleGallery(true);
+                        const uploadedUrls = await Promise.all(
+                          files.map((f) => handleFileUpload(f, 'article-gallery'))
+                        );
+                        setUploadingArticleGallery(false);
+                        const validUrls = uploadedUrls.filter(Boolean) as string[];
+                        if (validUrls.length > 0) {
+                          const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
+                          setArticleForm((prev) => ({
+                            ...prev,
+                            galleryImagesText: existing + validUrls.join('\n'),
+                          }));
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
-                <textarea
-                  rows={3}
-                  value={articleForm.galleryImagesText}
-                  onChange={(e) => setArticleForm({ ...articleForm, galleryImagesText: e.target.value })}
-                  placeholder="Masukkan 1 URL foto per baris. Contoh:&#10;https://images.unsplash.com/photo-1&#10;https://images.unsplash.com/photo-2"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none font-mono text-xs"
-                />
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Foto-foto ini akan otomatis ditampilkan dalam grid galeri interaktif di halaman artikel.
-                </p>
+
+                {/* Live Gallery Thumbnail Grid */}
+                {(() => {
+                  const galleryUrls = articleForm.galleryImagesText
+                    .split('\n')
+                    .map((l) => l.trim())
+                    .filter((l) => l.length > 0);
+
+                  return (
+                    <div className="space-y-3">
+                      {galleryUrls.length > 0 ? (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-bold text-slate-700">
+                              📸 {galleryUrls.length} Foto Dokumentasi Terpasang
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setArticleForm((prev) => ({ ...prev, galleryImagesText: '' }))}
+                              className="text-[11px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 transition"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>Hapus Semua Foto</span>
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+                            {galleryUrls.map((url, gIdx) => (
+                              <div
+                                key={gIdx}
+                                className="relative aspect-video rounded-xl overflow-hidden border border-slate-300 bg-slate-900 shadow-sm group"
+                              >
+                                <img
+                                  src={url}
+                                  alt={`Galeri ${gIdx + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e: any) => (e.target.style.display = 'none')}
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const filtered = galleryUrls.filter((_, idx) => idx !== gIdx);
+                                      setArticleForm((prev) => ({
+                                        ...prev,
+                                        galleryImagesText: filtered.join('\n'),
+                                      }));
+                                    }}
+                                    className="p-1.5 rounded-lg bg-red-600 text-white font-bold text-[10px] flex items-center gap-1 shadow-lg hover:bg-red-700 transition"
+                                    title="Hapus foto ini"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    <span>Hapus</span>
+                                  </button>
+                                </div>
+                                <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[9px] font-mono">
+                                  #{gIdx + 1}
+                                </div>
+                              </div>
+                            ))}
+
+                            {/* Add more tile */}
+                            <label className="cursor-pointer aspect-video rounded-xl border-2 border-dashed border-slate-300 hover:border-amber-500 hover:bg-amber-50/50 flex flex-col items-center justify-center text-slate-500 hover:text-amber-700 transition text-center p-2 bg-white shadow-sm">
+                              <Plus className="w-5 h-5 mb-0.5" />
+                              <span className="text-[10px] font-bold leading-tight">Tambah Foto</span>
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                disabled={uploadingArticleGallery}
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const files = Array.from(e.target.files || []);
+                                  if (files.length === 0) return;
+                                  setUploadingArticleGallery(true);
+                                  const uploadedUrls = await Promise.all(
+                                    files.map((f) => handleFileUpload(f, 'article-gallery'))
+                                  );
+                                  setUploadingArticleGallery(false);
+                                  const validUrls = uploadedUrls.filter(Boolean) as string[];
+                                  if (validUrls.length > 0) {
+                                    const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
+                                    setArticleForm((prev) => ({
+                                      ...prev,
+                                      galleryImagesText: existing + validUrls.join('\n'),
+                                    }));
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer border-2 border-dashed border-slate-300 hover:border-amber-500 hover:bg-amber-50/50 rounded-xl p-6 flex flex-col items-center justify-center text-center transition group bg-white shadow-sm">
+                          <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-amber-100 flex items-center justify-center text-slate-600 group-hover:text-amber-700 transition mb-2">
+                            <Upload className="w-5 h-5" />
+                          </div>
+                          <span className="text-xs font-black text-slate-900">
+                            {uploadingArticleGallery ? 'Sedang Mengunggah...' : '📁 Klik untuk Pilih Foto-Foto Galeri Sekaligus'}
+                          </span>
+                          <span className="text-[11px] text-slate-500 mt-1">
+                            Bisa pilih banyak foto sekaligus dari HP atau laptop
+                          </span>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            disabled={uploadingArticleGallery}
+                            className="hidden"
+                            onChange={async (e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length === 0) return;
+                              setUploadingArticleGallery(true);
+                              const uploadedUrls = await Promise.all(
+                                files.map((f) => handleFileUpload(f, 'article-gallery'))
+                              );
+                              setUploadingArticleGallery(false);
+                              const validUrls = uploadedUrls.filter(Boolean) as string[];
+                              if (validUrls.length > 0) {
+                                const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
+                                setArticleForm((prev) => ({
+                                  ...prev,
+                                  galleryImagesText: existing + validUrls.join('\n'),
+                                }));
+                              }
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Ringkasan */}
