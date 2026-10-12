@@ -15,7 +15,7 @@ import { Film, Play, Ticket, Calendar, Sparkles, MapPin } from 'lucide-react';
 
 export default function HomePage() {
   const [totalQuota, setTotalQuota] = useState(500);
-  const [remainingStock, setRemainingStock] = useState(482);
+  const [remainingStock, setRemainingStock] = useState(500);
   const [countdownTarget, setCountdownTarget] = useState('2026-10-22T13:00:00+07:00');
   const [movieSettings, setMovieSettings] = useState<any>(null);
 

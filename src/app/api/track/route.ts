@@ -53,3 +53,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
+export async function DELETE() {
+  try {
+    const db = getDb();
+    db.visitors = [];
+    saveDb(db);
+    return NextResponse.json({ success: true, message: 'Semua log trafik pengunjung berhasil dibersihkan.' });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+

@@ -53,8 +53,13 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { id } = await req.json();
+    const { id, clearAll } = await req.json();
     const db = getDb();
+    if (clearAll) {
+      db.leads = [];
+      saveDb(db);
+      return NextResponse.json({ success: true, message: 'Semua lead berhasil dibersihkan.' });
+    }
     db.leads = db.leads.filter(l => l.id !== id && l.serialNumber !== id);
     saveDb(db);
     return NextResponse.json({ success: true });

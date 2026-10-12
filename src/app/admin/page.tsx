@@ -409,6 +409,24 @@ export default function AdminPage() {
     fetchLeads();
   };
 
+  const handleClearAllLeads = async () => {
+    if (!confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA data leads pendaftar? Tindakan ini tidak dapat dibatalkan.')) return;
+    await fetch('/api/admin/leads', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clearAll: true }),
+    });
+    fetchLeads();
+  };
+
+  const handleClearVisitors = async () => {
+    if (!confirm('PERINGATAN: Bersihkan semua log riwayat trafik pengunjung?')) return;
+    await fetch('/api/track', {
+      method: 'DELETE',
+    });
+    fetchVisitors();
+  };
+
   const handleExportCsv = () => {
     const headers = ['Nomor Seri', 'Nama Lengkap', 'Nomor WA', 'Email', 'Kota', 'Sumber', 'Status WA', 'Waktu Klaim'];
     const rows = leads.map(l => [
@@ -745,6 +763,17 @@ export default function AdminPage() {
                     <Download className="w-4 h-4" />
                     <span>Download CSV / Excel</span>
                   </button>
+
+                  {leads.length > 0 && (
+                    <button
+                      onClick={handleClearAllLeads}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-xs shadow-sm transition"
+                      title="Hapus semua data lead yang masuk"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <span>Hapus Semua Leads</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -3020,13 +3049,25 @@ export default function AdminPage() {
           {/* TAB 5: VISITOR ANALYTICS (CLEAN WHITE) */}
           {activeTab === 'analytics' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
-              <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-base font-black text-slate-900">
-                  Log Pengunjung & Deteksi Kota (IP Geo-Location)
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Catatan pengunjung yang mengakses website beserta asal kota dan perangkatnya.
-                </p>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 pb-3 gap-3">
+                <div>
+                  <h3 className="text-base font-black text-slate-900">
+                    Log Pengunjung & Deteksi Kota (IP Geo-Location)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Catatan pengunjung yang mengakses website beserta asal kota dan perangkatnya.
+                  </p>
+                </div>
+                {visitors.length > 0 && (
+                  <button
+                    onClick={handleClearVisitors}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-xs shadow-sm transition"
+                    title="Bersihkan seluruh log riwayat trafik"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                    <span>Bersihkan Log Trafik</span>
+                  </button>
+                )}
               </div>
 
               <div className="overflow-x-auto border border-slate-200 rounded-xl">

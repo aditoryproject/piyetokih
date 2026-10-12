@@ -26,7 +26,7 @@ export const DEFAULT_MOVIE_SETTINGS: MovieSettings = {
   tagline: 'Kisah Komedi Horor Layar Lebar Paling Koplak & Menghibur',
   posterUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80',
   backdropUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80',
-  trailerYoutubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  trailerYoutubeUrl: '',
   releaseDateText: '19 November 2026',
   synopsis: 'Mukidi yang patah hati berniat membuktikan diri dengan nekat membeli rumah tua murah untuk modal menikah. Namun di rumah tua itu, Mukidi justru jatuh cinta pada Sukma—gadis berparas ayu jelita yang ternyata bukan berasal dari dunia manusia. Bersama Pak Ndut (Gendut) dan Penyok, sahabat karibnya dari Woko Channel, petualangan kocak bercampur mistis penuh gelak tawa pun dimulai!',
   quoteDialog: 'Niat ati golek omah murah gawe rabi, malah kepincut prawan ayu sing ora tau saba awan...',
