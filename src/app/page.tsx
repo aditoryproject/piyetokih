@@ -125,17 +125,8 @@ export default function HomePage() {
       {/* 2. CINEMA PARTNERS & CERTIFICATION STRIP */}
       <CinemaPartnersStrip />
 
-      {/* 3. OFFICIAL TEASER TRAILER PLAYER (CINEMA EXPERIENCE) */}
-      <OfficialTrailerSection />
-
-      {/* 4. SINOPSIS & KISAH FILM */}
-      <MovieStorySection />
-
-      {/* 5. PEMERAN & KARAKTER RESMI (WOKO CHANNEL & DARA SARASVATI) */}
-      <CastSection />
-
-      {/* 6. WAR VOUCHER CLAIMS & COUNTDOWN (THE CORE TICKETING HUB) */}
-      <section id="war" className="relative py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-[#090d16] to-transparent">
+      {/* 3. WAR VOUCHER CLAIMS & COUNTDOWN (HIGH CONVERSION HERO FORM) */}
+      <section id="war" className="relative py-16 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-[#0b101d] to-transparent border-b border-white/5">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600/15 border border-red-500/30 text-red-400 text-xs font-black tracking-widest uppercase mb-4 shadow-sm">
             <Ticket className="w-3.5 h-3.5" />
@@ -167,6 +158,33 @@ export default function HomePage() {
           <p className="text-[11px] text-slate-400">
             🔒 Sistem terverifikasi resmi oleh Miracle Pictures • E-Voucher resmi dilengkapi nomor seri unik &amp; barcode anti-duplikasi.
           </p>
+        </div>
+      </section>
+
+      {/* 4. OFFICIAL TEASER TRAILER PLAYER (CINEMA EXPERIENCE) */}
+      <OfficialTrailerSection />
+
+      {/* 5. SINOPSIS & KISAH FILM */}
+      <MovieStorySection />
+
+      {/* 6. PEMERAN & KARAKTER RESMI (WOKO CHANNEL & DARA SARASVATI) */}
+      <CastSection />
+
+      {/* RE-ENGAGEMENT CTA: Tombol ajakan klaim bagi penonton yang sudah membaca cerita & cast */}
+      <section className="py-12 px-4 text-center bg-gradient-to-b from-transparent to-amber-950/20">
+        <div className="max-w-2xl mx-auto p-8 rounded-3xl border border-amber-500/30 bg-black/60 backdrop-blur-xl shadow-2xl space-y-4">
+          <p className="text-xs font-black uppercase tracking-widest text-amber-400">JANGAN SAMPAI KEHABISAN KUOTA TIKET</p>
+          <h3 className="text-2xl sm:text-3xl font-black text-white">Siap Tertawa Bareng Mukidi &amp; Woko Channel?</h3>
+          <p className="text-xs sm:text-sm text-slate-300">
+            Amankan voucher Buy 1 Get 1 sekarang sebelum kuota habis diserbu penonton lain!
+          </p>
+          <a
+            href="#war"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-amber-500/20 transition active:scale-95"
+          >
+            <Ticket className="w-4 h-4" />
+            <span>KLAIM VOUCHER SEKARANG</span>
+          </a>
         </div>
       </section>
 
