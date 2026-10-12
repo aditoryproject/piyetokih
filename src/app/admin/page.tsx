@@ -40,6 +40,8 @@ import {
   Lock,
   Play,
   Share2,
+  Upload,
+  FolderUp,
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -103,6 +105,33 @@ export default function AdminPage() {
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
+
+  // Media Upload states
+  const [uploadingPoster, setUploadingPoster] = useState(false);
+  const [uploadingBackdrop, setUploadingBackdrop] = useState(false);
+  const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);
+
+  const handleFileUpload = async (file: File, category: string = 'movie'): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', category);
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        return data.url;
+      } else {
+        alert(data.error || 'Gagal mengunggah file.');
+        return null;
+      }
+    } catch {
+      alert('Terjadi kesalahan koneksi saat mengunggah gambar.');
+      return null;
+    }
+  };
 
   // Email test state
   const [testEmailTo, setTestEmailTo] = useState('');
@@ -1070,38 +1099,79 @@ export default function AdminPage() {
               {/* 1. VISUAL POSTER & BACKDROP TEASER */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-5">
                 <div className="border-b border-slate-200/60 pb-3">
-                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
-                    1. Poster Resmi Film &amp; Backdrop Layar Lebar
-                  </label>
+                  <div className="flex items-center gap-2 text-slate-900 mb-1">
+                    <FolderUp className="w-4 h-4 text-amber-500" />
+                    <label className="text-xs font-black uppercase tracking-wider">
+                      1. Upload Poster Resmi Film &amp; Backdrop Layar Lebar
+                    </label>
+                  </div>
                   <p className="text-[11px] text-slate-500">
-                    Masukkan URL link gambar poster resmi (format JPG/PNG/WebP resolusi tinggi).
+                    Pilih file gambar langsung dari komputer atau HP Anda. File otomatis disimpan di server pada folder <code>/public/uploads/</code>.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Poster Input & Preview */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-700">
-                      URL Poster Utama (Tampil di Hero Banner &amp; Halaman Kota)
-                    </label>
-                    <input
-                      type="url"
-                      value={settings.movieSettings?.posterUrl || ''}
-                      onChange={e =>
-                        setSettings({
-                          ...settings,
-                          movieSettings: {
-                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
-                            posterUrl: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="https://.../poster-piye-to-kih.jpg"
-                      className="w-full bg-white border border-slate-300 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
-                    />
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-black text-slate-900">
+                        Poster Utama Film
+                      </label>
+                      <span className="text-[10px] text-slate-400 font-bold">Rasio 16:9 / Landscape</span>
+                    </div>
+
+                    {/* Direct Upload Button */}
+                    <div>
+                      <label className="cursor-pointer w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition shadow-md active:scale-95 group">
+                        <Upload className="w-4 h-4 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
+                        <span>{uploadingPoster ? 'Sedang Mengunggah Poster...' : '📁 Pilih & Upload File Poster'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingPoster}
+                          className="hidden"
+                          onChange={async e => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingPoster(true);
+                            const url = await handleFileUpload(file, 'poster');
+                            setUploadingPoster(false);
+                            if (url) {
+                              setSettings({
+                                ...settings,
+                                movieSettings: {
+                                  ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                  posterUrl: url,
+                                },
+                              });
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* URL Path Box */}
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Jalur File Gambar Aktif</span>
+                      <input
+                        type="text"
+                        value={settings.movieSettings?.posterUrl || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            movieSettings: {
+                              ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                              posterUrl: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="/uploads/poster-....jpg atau https://..."
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-[11px] text-slate-800 font-mono outline-none"
+                      />
+                    </div>
 
                     {/* Preview Box */}
-                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center">
+                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center shadow-inner">
                       {settings.movieSettings?.posterUrl ? (
                         <img
                           src={settings.movieSettings.posterUrl}
@@ -1117,35 +1187,73 @@ export default function AdminPage() {
                           <span>Preview Poster Belum Diatur</span>
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-amber-400 text-[10px] font-bold">
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
                         Live Poster Preview
                       </div>
                     </div>
                   </div>
 
                   {/* Backdrop Teaser Input & Preview */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-700">
-                      URL Backdrop Layar Teaser Player
-                    </label>
-                    <input
-                      type="url"
-                      value={settings.movieSettings?.backdropUrl || ''}
-                      onChange={e =>
-                        setSettings({
-                          ...settings,
-                          movieSettings: {
-                            ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
-                            backdropUrl: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="https://.../backdrop-teaser.jpg"
-                      className="w-full bg-white border border-slate-300 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-mono outline-none"
-                    />
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-black text-slate-900">
+                        Backdrop Layar Teaser Player
+                      </label>
+                      <span className="text-[10px] text-slate-400 font-bold">Rasio 16:9 Bioskop</span>
+                    </div>
+
+                    {/* Direct Upload Button */}
+                    <div>
+                      <label className="cursor-pointer w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition shadow-md active:scale-95 group">
+                        <Upload className="w-4 h-4 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
+                        <span>{uploadingBackdrop ? 'Sedang Mengunggah Backdrop...' : '📁 Pilih & Upload File Backdrop'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingBackdrop}
+                          className="hidden"
+                          onChange={async e => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingBackdrop(true);
+                            const url = await handleFileUpload(file, 'backdrop');
+                            setUploadingBackdrop(false);
+                            if (url) {
+                              setSettings({
+                                ...settings,
+                                movieSettings: {
+                                  ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                  backdropUrl: url,
+                                },
+                              });
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* URL Path Box */}
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Jalur File Gambar Aktif</span>
+                      <input
+                        type="text"
+                        value={settings.movieSettings?.backdropUrl || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            movieSettings: {
+                              ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                              backdropUrl: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="/uploads/backdrop-....jpg atau https://..."
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-[11px] text-slate-800 font-mono outline-none"
+                      />
+                    </div>
 
                     {/* Preview Box */}
-                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center">
+                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center shadow-inner">
                       {settings.movieSettings?.backdropUrl ? (
                         <img
                           src={settings.movieSettings.backdropUrl}
@@ -1161,7 +1269,7 @@ export default function AdminPage() {
                           <span>Preview Backdrop Teaser</span>
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-amber-400 text-[10px] font-bold">
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
                         Live Backdrop Preview
                       </div>
                     </div>
@@ -1483,11 +1591,41 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* Photo URL & Bio */}
+                      {/* Photo Upload & URL */}
                       <div className="space-y-1.5">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase block">URL Foto Aktor</span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">Foto Aktor</span>
+                          <label className="cursor-pointer text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-md flex items-center gap-1 transition">
+                            <Upload className="w-3 h-3" />
+                            <span>{uploadingCastIdx === idx ? 'Mengunggah...' : 'Upload Foto File'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploadingCastIdx === idx}
+                              className="hidden"
+                              onChange={async e => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setUploadingCastIdx(idx);
+                                const url = await handleFileUpload(file, 'cast');
+                                setUploadingCastIdx(null);
+                                if (url) {
+                                  const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
+                                  updated[idx] = { ...updated[idx], photoUrl: url };
+                                  setSettings({
+                                    ...settings,
+                                    movieSettings: {
+                                      ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                      cast: updated,
+                                    },
+                                  });
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
                         <input
-                          type="url"
+                          type="text"
                           value={c.photoUrl}
                           onChange={e => {
                             const updated = [...(settings.movieSettings?.cast || DEFAULT_MOVIE_SETTINGS.cast)];
@@ -1500,7 +1638,7 @@ export default function AdminPage() {
                               },
                             });
                           }}
-                          placeholder="https://.../foto.jpg"
+                          placeholder="/uploads/cast-....jpg atau https://..."
                           className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-[11px] font-mono text-slate-800 outline-none"
                         />
                       </div>
