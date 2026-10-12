@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090D16" />
+      <stop offset="50%" stop-color="#121826" />
+      <stop offset="100%" stop-color="#05070B" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="25" stdDeviation="35" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background Poster Card -->
+  <rect width="1200" height="1600" rx="40" fill="url(#bgGrad)" />
+  <rect x="25" y="25" width="1150" height="1550" rx="30" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.4" />
+
+  <!-- Film Header Branding -->
+  <g transform="translate(600, 150)" text-anchor="middle">
+    <!-- Badge -->
+    <rect x="-190" y="-35" width="380" height="50" rx="25" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="2"/>
+    <text x="0" y="-3" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="20" fill="#FBBF24" letter-spacing="4">
+      FILM BIOSKOP NASIONAL
+    </text>
+
+    <!-- Main Title -->
+    <text x="0" y="85" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="76" fill="#FFFFFF" letter-spacing="2">
+      PIYE TO KIH?
+    </text>
+    <text x="0" y="130" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="24" fill="#F59E0B" letter-spacing="8">
+      MIRACLE PICTURES
+    </text>
+  </g>
+
+  <!-- QR Code White Card Container -->
+  <g transform="translate(175, 420)" filter="url(#cardShadow)">
+    <rect width="850" height="850" rx="36" fill="#FFFFFF" />
+    <rect x="15" y="15" width="820" height="820" rx="28" fill="none" stroke="#E2E8F0" stroke-width="3" />
+    
+    <!-- Embedded QR Vector -->
+    <g transform="translate(35, 35)">
+      <svg width="780" height="780" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" shape-rendering="crispEdges"><path fill="#FFFFFF" d="M0 0h35v35H0z"/><path stroke="#0A0E17" d="M1 1.5h7m1 0h2m1 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m1 0h7M1 2.5h1m5 0h1m5 0h7m2 0h1m2 0h1m1 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h2m2 0h1m2 0h2m1 0h1m2 0h4m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m2 0h2m1 0h3m1 0h2m1 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m9 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m3 0h2m2 0h1m2 0h2m2 0h4m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h1m1 0h1m3 0h1m4 0h2m1 0h2M6 9.5h2m2 0h1m1 0h1m1 0h2m2 0h1m2 0h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1M3 10.5h1m1 0h2m2 0h2m2 0h1m1 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h4M2 11.5h3m1 0h2m1 0h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h2m3 0h1m1 0h1m3 0h1M3 12.5h1m1 0h1m2 0h3m2 0h1m2 0h2m1 0h2m2 0h4m1 0h1m1 0h2M3 13.5h1m2 0h2m1 0h2m3 0h2m1 0h1m1 0h1m2 0h4m1 0h1m1 0h2m1 0h2M1 14.5h4m1 0h1m1 0h1m1 0h3m4 0h2m1 0h1m1 0h3m1 0h2m3 0h1m1 0h1M2 15.5h2m1 0h3m1 0h1m1 0h1m1 0h1m2 0h2m1 0h2m2 0h1m2 0h2m2 0h3M1 16.5h1m1 0h2m3 0h3m1 0h2m1 0h1m2 0h2m4 0h1m1 0h2m1 0h1m1 0h3M1 17.5h1m1 0h3m1 0h2m5 0h1m2 0h1m1 0h1m4 0h1m3 0h4m1 0h1M1 18.5h1m1 0h4m1 0h1m1 0h7m3 0h3m1 0h2m1 0h2M4 19.5h1m1 0h3m1 0h1m1 0h5m1 0h7m3 0h4M2 20.5h4m4 0h2m1 0h1m1 0h6m2 0h3m1 0h5m1 0h1M2 21.5h3m2 0h1m2 0h1m3 0h3m1 0h2m3 0h1m2 0h5m1 0h2M1 22.5h1m1 0h1m2 0h1m2 0h5m1 0h3m1 0h1m2 0h2m1 0h1m1 0h3M1 23.5h1m1 0h7m3 0h2m2 0h1m1 0h1m1 0h3m6 0h3M1 24.5h1m1 0h1m2 0h1m7 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m3 0h3M1 25.5h4m2 0h2m1 0h3m3 0h5m1 0h8m2 0h1M9 26.5h1m2 0h1m2 0h2m5 0h1m2 0h1m3 0h1m2 0h2M1 27.5h7m4 0h6m1 0h3m1 0h3m1 0h1m1 0h4M1 28.5h1m5 0h1m1 0h1m3 0h4m3 0h1m1 0h4m3 0h4M1 29.5h1m1 0h3m1 0h1m2 0h6m1 0h1m2 0h4m1 0h5m2 0h2M1 30.5h1m1 0h3m1 0h1m2 0h1m1 0h1m3 0h3m3 0h1m3 0h1m1 0h3m1 0h1M1 31.5h1m1 0h3m1 0h1m2 0h5m1 0h1m4 0h2m6 0h2m1 0h2M1 32.5h1m5 0h1m2 0h1m1 0h1m1 0h2m4 0h2m4 0h1m3 0h1M1 33.5h7m3 0h1m1 0h1m2 0h1m1 0h2m1 0h2m1 0h2m5 0h2"/></svg>
+
+      </svg>
+    </g>
+  </g>
+
+  <!-- Call to Action Banner -->
+  <g transform="translate(600, 1370)" text-anchor="middle">
+    <rect x="-420" y="-45" width="840" height="90" rx="24" fill="url(#goldGrad)" />
+    <text x="0" y="12" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="34" fill="#0A0E17" letter-spacing="1">
+      SCAN UNTUK KLAIM TIKET &amp; INFO ROADSHOW
+    </text>
+    
+    <!-- Website URL text -->
+    <text x="0" y="95" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="28" fill="#94A3B8" letter-spacing="3">
+      piyetokihfilm.com
+    </text>
+    <text x="0" y="135" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="20" fill="#64748B">
+      Tayang Serentak di Bioskop Seluruh Indonesia • 17 Kota Roadshow
+    </text>
+  </g>
+</svg>
