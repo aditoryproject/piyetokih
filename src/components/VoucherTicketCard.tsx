@@ -206,15 +206,19 @@ export default function VoucherTicketCard({
 
         <button
           onClick={() => {
+            const shareUrl = (typeof window !== 'undefined' && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1'))
+              ? `${window.location.origin}/voucher/${serialNumber}`
+              : `https://piyetokihfilm.com/voucher/${serialNumber}`;
+
             if (navigator.share) {
               navigator.share({
                 title: 'Voucher Resmi Film Piye Toh Kih',
                 text: `Klaim voucher nonton film Piye Toh Kih kode: ${serialNumber}`,
-                url: window.location.href,
+                url: shareUrl,
               });
             } else {
-              navigator.clipboard.writeText(window.location.href);
-              alert('Link voucher berhasil disalin!');
+              navigator.clipboard.writeText(shareUrl);
+              alert('Link resmi voucher berhasil disalin!');
             }
           }}
           className="bg-white/10 hover:bg-white/20 text-white p-3 rounded-xl transition"

@@ -36,8 +36,11 @@ export async function POST(req: NextRequest) {
     const serialNumber = generateVoucherSerial();
     const leadId = `lead-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     
-    // Construct public voucher link
-    const origin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+    // Construct public voucher link (always use production domain if running on localhost)
+    const rawOrigin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+    const origin = (rawOrigin.includes('localhost') || rawOrigin.includes('127.0.0.1') || rawOrigin.includes('0.0.0.0'))
+      ? 'https://piyetokihfilm.com'
+      : rawOrigin;
     const voucherUrl = `${origin}/voucher/${serialNumber}`;
 
     // Detect city location from request or geolocation headers

@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
 
     let serialNumber = '';
     let voucherUrl = '';
-    const origin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+    const rawOrigin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+    const origin = (rawOrigin.includes('localhost') || rawOrigin.includes('127.0.0.1') || rawOrigin.includes('0.0.0.0'))
+      ? 'https://piyetokihfilm.com'
+      : rawOrigin;
 
     if (existing) {
       serialNumber = existing.serialNumber;

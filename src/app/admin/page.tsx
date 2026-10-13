@@ -2134,7 +2134,7 @@ export default function AdminPage() {
                       </label>
                       <input
                         type="date"
-                        value={settings.voucherValidEnd || '2026-11-22'}
+                        value={settings.voucherValidEnd || '2026-11-20'}
                         onChange={e => setSettings({ ...settings, voucherValidEnd: e.target.value })}
                         className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs font-bold text-slate-900 outline-none"
                       />
