@@ -43,6 +43,11 @@ import {
   Upload,
   FolderUp,
   Bell,
+  Filter,
+  RotateCcw,
+  Smartphone,
+  Monitor,
+  ShoppingCart,
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -154,8 +159,12 @@ export default function AdminPage() {
   const [testingEmail, setTestingEmail] = useState(false);
   const [testEmailResult, setTestEmailResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  // Visitors state
+  // Visitors state & filters
   const [visitors, setVisitors] = useState<any[]>([]);
+  const [visitorCityFilter, setVisitorCityFilter] = useState('all');
+  const [visitorEventFilter, setVisitorEventFilter] = useState('all');
+  const [visitorPlatformFilter, setVisitorPlatformFilter] = useState('all');
+  const [visitorSearch, setVisitorSearch] = useState('');
 
   // Copied states
   const [copiedPrompt, setCopiedPrompt] = useState(false);
@@ -506,6 +515,131 @@ export default function AdminPage() {
     });
     fetchVisitors();
   };
+
+  const handleExportVisitorsCsv = () => {
+    if (!filteredVisitors.length) {
+      alert('Tidak ada data log pengunjung untuk diexport.');
+      return;
+    }
+    const headers = ['Waktu', 'Kota Terdeteksi', 'Perangkat', 'Halaman', 'Event', 'IP Address'];
+    const rows = filteredVisitors.map(v => [
+      `"${new Date(v.timestamp).toLocaleString('id-ID')}"`,
+      `"${(v.city || '').replace(/"/g, '""')}"`,
+      `"${(v.platform || '').replace(/"/g, '""')}"`,
+      `"${(v.path || '').replace(/"/g, '""')}"`,
+      `"${(v.event || '').replace(/"/g, '""')}"`,
+      `"${(v.ip || '').replace(/"/g, '""')}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `log_pengunjung_${visitorCityFilter !== 'all' ? visitorCityFilter : 'semua'}_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Unique filter options for Visitors
+  const uniqueVisitorCities = React.useMemo(() => {
+    const set = new Set<string>();
+    visitors.forEach(v => {
+      if (v.city) set.add(v.city);
+    });
+    return Array.from(set).sort();
+  }, [visitors]);
+
+  const uniqueVisitorPlatforms = React.useMemo(() => {
+    const set = new Set<string>();
+    visitors.forEach(v => {
+      if (v.platform) set.add(v.platform);
+    });
+    return Array.from(set).sort();
+  }, [visitors]);
+
+  const uniqueVisitorEvents = React.useMemo(() => {
+    const set = new Set<string>();
+    visitors.forEach(v => {
+      if (v.event) set.add(v.event);
+    });
+    return Array.from(set).sort();
+  }, [visitors]);
+
+  // Filtered visitors list
+  const filteredVisitors = React.useMemo(() => {
+    return visitors.filter(v => {
+      // Filter Kota
+      if (visitorCityFilter !== 'all' && v.city !== visitorCityFilter) {
+        return false;
+      }
+      // Filter Perangkat
+      if (visitorPlatformFilter !== 'all') {
+        if (!v.platform?.toLowerCase().includes(visitorPlatformFilter.toLowerCase())) {
+          return false;
+        }
+      }
+      // Filter Event (Kategori atau Spesifik)
+      if (visitorEventFilter !== 'all') {
+        if (visitorEventFilter === 'AddToCart_ALL') {
+          if (!v.event?.toLowerCase().includes('addtocart')) return false;
+        } else if (visitorEventFilter === 'PageView_ALL') {
+          if (!v.event?.toLowerCase().includes('pageview')) return false;
+        } else if (visitorEventFilter === 'ViewCity_ALL') {
+          if (!v.event?.toLowerCase().includes('viewcity')) return false;
+        } else if (v.event !== visitorEventFilter) {
+          return false;
+        }
+      }
+      // Filter Pencarian Text
+      if (visitorSearch.trim()) {
+        const q = visitorSearch.toLowerCase();
+        const matchIp = (v.ip || '').toLowerCase().includes(q);
+        const matchPath = (v.path || '').toLowerCase().includes(q);
+        const matchCity = (v.city || '').toLowerCase().includes(q);
+        const matchEvent = (v.event || '').toLowerCase().includes(q);
+        const matchPlatform = (v.platform || '').toLowerCase().includes(q);
+        if (!matchIp && !matchPath && !matchCity && !matchEvent && !matchPlatform) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [visitors, visitorCityFilter, visitorPlatformFilter, visitorEventFilter, visitorSearch]);
+
+  // Dynamic statistics based on filtered visitors & overall
+  const visitorStats = React.useMemo(() => {
+    const totalDisplayed = filteredVisitors.length;
+    let add_to_cart_count = 0;
+    let page_view_count = 0;
+    let view_city_count = 0;
+    let other_count = 0;
+
+    const eventCounts: Record<string, number> = {};
+
+    filteredVisitors.forEach(v => {
+      const evt = v.event || 'PageView';
+      eventCounts[evt] = (eventCounts[evt] || 0) + 1;
+
+      if (evt.toLowerCase().includes('addtocart')) {
+        add_to_cart_count++;
+      } else if (evt.toLowerCase().includes('pageview')) {
+        page_view_count++;
+      } else if (evt.toLowerCase().includes('viewcity')) {
+        view_city_count++;
+      } else {
+        other_count++;
+      }
+    });
+
+    return {
+      totalDisplayed,
+      add_to_cart_count,
+      page_view_count,
+      view_city_count,
+      other_count,
+      eventCounts,
+    };
+  }, [filteredVisitors]);
 
   const handleExportCsv = () => {
     const headers = ['Nomor Seri', 'Nama Lengkap', 'Nomor WA', 'Email', 'Kota', 'Sumber', 'Status WA', 'Waktu Klaim'];
@@ -3407,30 +3541,289 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* TAB 5: VISITOR ANALYTICS (CLEAN WHITE) */}
+          {/* TAB 5: VISITOR ANALYTICS DENGAN FILTER KOTA, EVENT & PERANGKAT */}
           {activeTab === 'analytics' && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 pb-3 gap-3">
+              {/* Header Box */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 pb-4 gap-3">
                 <div>
-                  <h3 className="text-base font-black text-slate-900">
-                    Log Pengunjung & Deteksi Kota (IP Geo-Location)
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-amber-500" />
+                    <span>Log Pengunjung & Deteksi Kota (IP Geo-Location)</span>
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    Catatan pengunjung yang mengakses website beserta asal kota dan perangkatnya.
+                    Catatan pengunjung real-time dengan filter kota, perangkat, event (AddToCart, PageView), dan statistik total.
                   </p>
                 </div>
-                {visitors.length > 0 && (
+
+                <div className="flex flex-wrap items-center gap-2">
                   <button
-                    onClick={handleClearVisitors}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-xs shadow-sm transition"
-                    title="Bersihkan seluruh log riwayat trafik"
+                    onClick={fetchVisitors}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition shadow-sm"
+                    title="Refresh data trafik"
                   >
-                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                    <span>Bersihkan Log Trafik</span>
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Refresh</span>
                   </button>
-                )}
+
+                  <button
+                    onClick={handleExportVisitorsCsv}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition shadow-sm"
+                    title="Export data log pengunjung ke CSV"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Export CSV</span>
+                  </button>
+
+                  {visitors.length > 0 && (
+                    <button
+                      onClick={handleClearVisitors}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-bold text-xs shadow-sm transition"
+                      title="Bersihkan seluruh log riwayat trafik"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Bersihkan Log</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
+              {/* LIVE METRIC CARDS SESUAI FILTER */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {/* Total Log */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-center justify-between text-slate-400 mb-1.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Log Trafik</span>
+                    <Activity className="w-4 h-4 text-slate-600" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-slate-900">
+                    {visitorStats.totalDisplayed}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    {visitorStats.totalDisplayed === visitors.length
+                      ? `Semua log tercatat`
+                      : `Difilter dari total ${visitors.length} log`}
+                  </p>
+                </div>
+
+                {/* Total Add to Cart */}
+                <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-center justify-between text-amber-600 mb-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-800">Total Add To Cart</span>
+                    <ShoppingCart className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-600">
+                    {visitorStats.add_to_cart_count}
+                  </div>
+                  <p className="text-[11px] text-amber-700/80 mt-1 font-semibold">
+                    {visitorCityFilter !== 'all' ? `Di ${visitorCityFilter}` : `Semua kota`}
+                  </p>
+                </div>
+
+                {/* Total PageView */}
+                <div className="bg-sky-50/70 border border-sky-200 rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-center justify-between text-sky-600 mb-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-sky-800">Total PageView</span>
+                    <Eye className="w-4 h-4 text-sky-600" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-sky-600">
+                    {visitorStats.page_view_count}
+                  </div>
+                  <p className="text-[11px] text-sky-700/80 mt-1 font-semibold">
+                    {visitorCityFilter !== 'all' ? `Di ${visitorCityFilter}` : `Kunjungan halaman`}
+                  </p>
+                </div>
+
+                {/* Total ViewCity / Lainnya */}
+                <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-center justify-between text-emerald-600 mb-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800">Event Interaksi Lain</span>
+                    <MapPin className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-600">
+                    {visitorStats.view_city_count + visitorStats.other_count}
+                  </div>
+                  <p className="text-[11px] text-emerald-700/80 mt-1 font-semibold">
+                    ViewCity, Lead & Intent
+                  </p>
+                </div>
+              </div>
+
+              {/* QUICK EVENT FILTER CHIPS */}
+              <div className="space-y-2 pt-1">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Quick Filter Event:
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    onClick={() => setVisitorEventFilter('all')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                      visitorEventFilter === 'all'
+                        ? 'bg-slate-900 text-white shadow-sm'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    Semua ({visitors.length})
+                  </button>
+
+                  <button
+                    onClick={() => setVisitorEventFilter('AddToCart_ALL')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                      visitorEventFilter === 'AddToCart_ALL'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                        : 'bg-amber-100/70 hover:bg-amber-100 text-amber-900'
+                    }`}
+                  >
+                    <ShoppingCart className="w-3 h-3" />
+                    <span>Semua AddToCart ({visitors.filter(v => v.event?.toLowerCase().includes('addtocart')).length})</span>
+                  </button>
+
+                  <button
+                    onClick={() => setVisitorEventFilter('PageView_ALL')}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                      visitorEventFilter === 'PageView_ALL'
+                        ? 'bg-sky-600 text-white shadow-sm'
+                        : 'bg-sky-100/70 hover:bg-sky-100 text-sky-900'
+                    }`}
+                  >
+                    <Eye className="w-3 h-3" />
+                    <span>Semua PageView ({visitors.filter(v => v.event?.toLowerCase().includes('pageview')).length})</span>
+                  </button>
+
+                  {uniqueVisitorEvents
+                    .filter(evt => evt !== 'PageView' && !evt.startsWith('PageView'))
+                    .slice(0, 6)
+                    .map(evt => (
+                      <button
+                        key={evt}
+                        onClick={() => setVisitorEventFilter(evt)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                          visitorEventFilter === evt
+                            ? 'bg-slate-900 text-white shadow-sm'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {evt} ({visitors.filter(v => v.event === evt).length})
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* TOOLBAR FILTERS (KOTA, PERANGKAT, EVENT, SEARCH) */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* 1. Filter Kota */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    📍 Filter Kota:
+                  </label>
+                  <select
+                    value={visitorCityFilter}
+                    onChange={e => setVisitorCityFilter(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-amber-500"
+                  >
+                    <option value="all">Semua Kota ({visitors.length})</option>
+                    {uniqueVisitorCities.map(city => {
+                      const count = visitors.filter(v => v.city === city).length;
+                      return (
+                        <option key={city} value={city}>
+                          {city} ({count})
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* 2. Filter Event Dropdown */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    ⚡ Filter Event:
+                  </label>
+                  <select
+                    value={visitorEventFilter}
+                    onChange={e => setVisitorEventFilter(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-amber-500"
+                  >
+                    <option value="all">Semua Event</option>
+                    <option value="AddToCart_ALL">🛒 Semua AddToCart</option>
+                    <option value="PageView_ALL">👁 Semua PageView</option>
+                    <option value="ViewCity_ALL">📍 Semua ViewCity</option>
+                    <optgroup label="Event Spesifik">
+                      {uniqueVisitorEvents.map(evt => (
+                        <option key={evt} value={evt}>
+                          {evt} ({visitors.filter(v => v.event === evt).length})
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </div>
+
+                {/* 3. Filter Perangkat */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    💻 Filter Perangkat:
+                  </label>
+                  <select
+                    value={visitorPlatformFilter}
+                    onChange={e => setVisitorPlatformFilter(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-amber-500"
+                  >
+                    <option value="all">Semua Perangkat</option>
+                    <option value="Mobile">📱 Semua Mobile ({visitors.filter(v => v.platform?.toLowerCase().includes('mobile')).length})</option>
+                    <option value="Desktop">💻 Semua Desktop ({visitors.filter(v => v.platform?.toLowerCase().includes('desktop')).length})</option>
+                    <optgroup label="Tipe Detail">
+                      {uniqueVisitorPlatforms.map(p => (
+                        <option key={p} value={p}>
+                          {p} ({visitors.filter(v => v.platform === p).length})
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </div>
+
+                {/* 4. Pencarian */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                    🔍 Cari IP / Halaman:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Cari IP, URL..."
+                      value={visitorSearch}
+                      onChange={e => setVisitorSearch(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 outline-none focus:border-amber-500"
+                    />
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* RESET FILTER BAR (JIKA ADA FILTER AKTIF) */}
+              {(visitorCityFilter !== 'all' || visitorEventFilter !== 'all' || visitorPlatformFilter !== 'all' || visitorSearch.trim()) && (
+                <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs">
+                  <div className="text-amber-900 font-medium">
+                    Filter aktif: {visitorCityFilter !== 'all' && <span className="font-bold underline mr-2">Kota: {visitorCityFilter}</span>}
+                    {visitorEventFilter !== 'all' && <span className="font-bold underline mr-2">Event: {visitorEventFilter}</span>}
+                    {visitorPlatformFilter !== 'all' && <span className="font-bold underline mr-2">Perangkat: {visitorPlatformFilter}</span>}
+                    {visitorSearch.trim() && <span className="font-bold underline mr-2">Keyword: &quot;{visitorSearch}&quot;</span>}
+                    <span className="text-slate-500 ml-1">({filteredVisitors.length} log ditemukan)</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setVisitorCityFilter('all');
+                      setVisitorEventFilter('all');
+                      setVisitorPlatformFilter('all');
+                      setVisitorSearch('');
+                    }}
+                    className="flex items-center gap-1 text-amber-800 hover:text-black font-extrabold hover:underline"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Reset Semua Filter</span>
+                  </button>
+                </div>
+              )}
+
+              {/* TABEL LOG PENGUNJUNG TERFILTER */}
               <div className="overflow-x-auto border border-slate-200 rounded-xl">
                 <table className="w-full text-left text-xs text-slate-700">
                   <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
@@ -3444,45 +3837,85 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {visitors.length === 0 ? (
+                    {filteredVisitors.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="text-center py-8 text-slate-400">
-                          Belum ada catatan pengunjung.
+                        <td colSpan={6} className="text-center py-12 text-slate-400 space-y-2">
+                          <p className="font-semibold">Tidak ada log pengunjung yang cocok dengan filter ini.</p>
+                          {(visitorCityFilter !== 'all' || visitorEventFilter !== 'all' || visitorPlatformFilter !== 'all' || visitorSearch.trim()) && (
+                            <button
+                              onClick={() => {
+                                setVisitorCityFilter('all');
+                                setVisitorEventFilter('all');
+                                setVisitorPlatformFilter('all');
+                                setVisitorSearch('');
+                              }}
+                              className="text-amber-600 hover:underline font-bold text-xs"
+                            >
+                              Klik untuk Reset Filter
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ) : (
-                      visitors.map(v => (
-                        <tr key={v.id} className="hover:bg-slate-50/70 transition">
-                          <td className="py-3 px-4 text-slate-500">
-                            {new Date(v.timestamp).toLocaleTimeString('id-ID')}
-                          </td>
-                          <td className="py-3 px-4 font-bold text-slate-900">
-                            {v.city}
-                          </td>
-                          <td className="py-3 px-4 text-slate-600">
-                            {v.platform}
-                          </td>
-                          <td className="py-3 px-4 font-mono text-[11px] text-slate-500">
-                            {v.path}
-                          </td>
-                          <td className="py-3 px-4">
-                            <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                v.event === 'TicketIntent'
-                                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                                  : v.event === 'Lead'
-                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                  : 'bg-slate-100 text-slate-600'
-                              }`}
-                            >
-                              {v.event}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
-                            {v.ip}
-                          </td>
-                        </tr>
-                      ))
+                      filteredVisitors.map(v => {
+                        const isAddToCart = v.event?.toLowerCase().includes('addtocart');
+                        const isPageView = v.event?.toLowerCase().includes('pageview');
+                        const isViewCity = v.event?.toLowerCase().includes('viewcity');
+                        const isLead = v.event === 'Lead' || v.event === 'TicketIntent';
+
+                        return (
+                          <tr key={v.id} className="hover:bg-slate-50/70 transition">
+                            <td className="py-3 px-4 text-slate-500 whitespace-nowrap font-mono text-[11px]">
+                              {new Date(v.timestamp).toLocaleTimeString('id-ID')}
+                              <span className="block text-[10px] text-slate-400">
+                                {new Date(v.timestamp).toLocaleDateString('id-ID')}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 font-bold text-slate-900">
+                              <span className="inline-flex items-center gap-1">
+                                <MapPin className="w-3 h-3 text-amber-500 shrink-0" />
+                                <span>{v.city}</span>
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1.5">
+                                {v.platform?.toLowerCase().includes('mobile') ? (
+                                  <Smartphone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                ) : (
+                                  <Monitor className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                )}
+                                <span>{v.platform}</span>
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
+                              <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200">
+                                {v.path || '/'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
+                                  isAddToCart
+                                    ? 'bg-amber-100 text-amber-900 border-amber-300 font-black'
+                                    : isLead
+                                    ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                    : isViewCity
+                                    ? 'bg-purple-100 text-purple-900 border-purple-300'
+                                    : isPageView
+                                    ? 'bg-slate-100 text-slate-600 border-slate-200'
+                                    : 'bg-blue-100 text-blue-800 border-blue-200'
+                                }`}
+                              >
+                                {isAddToCart && <ShoppingCart className="w-3 h-3 text-amber-600" />}
+                                <span>{v.event}</span>
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
+                              {v.ip}
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

@@ -4,8 +4,8 @@ import { getDb, saveDb, VisitorLog } from '@/lib/db';
 export async function GET() {
   const db = getDb();
   return NextResponse.json({
-    visitors: db.visitors.slice(0, 50),
-    totalVisitors: db.visitors.length,
+    visitors: db.visitors || [],
+    totalVisitors: db.visitors?.length || 0,
   });
 }
 
