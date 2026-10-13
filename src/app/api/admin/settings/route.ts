@@ -55,6 +55,14 @@ export async function POST(req: NextRequest) {
     if (body.voucherValidEnd !== undefined) db.settings.voucherValidEnd = String(body.voucherValidEnd);
     if (body.voucherTermsText !== undefined) db.settings.voucherTermsText = String(body.voucherTermsText);
 
+    // Social Media Links (Editable via Dashboard)
+    if (body.socialLinks) {
+      db.settings.socialLinks = {
+        ...(db.settings.socialLinks || {}),
+        ...body.socialLinks,
+      };
+    }
+
     // BOGO Promo settings
     if (body.isBogoActive !== undefined) db.settings.isBogoActive = Boolean(body.isBogoActive);
     if (body.bogoHeadline !== undefined) db.settings.bogoHeadline = String(body.bogoHeadline);

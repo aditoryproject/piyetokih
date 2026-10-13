@@ -77,15 +77,15 @@ export async function sendVoucherEmail({
         <div class="header">
           <div class="logo-text">MIRACLE PICTURES PRESENTS</div>
           <div class="title">PIYE TO KIH?</div>
-          <div class="subtitle">OFFICIAL E-VOUCHER NONTON</div>
+          <div class="subtitle">OFFICIAL CODE VERIFIKASI</div>
         </div>
 
         <!-- BADGE PENUKARAN VOUCHER FISIK RESMI -->
         <div class="notice-box">
           <div style="font-size: 9px; color: #F59E0B; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">PENUKARAN VOUCHER FISIK RESMI</div>
-          <div style="font-size: 15px; font-weight: 900; color: #FEF08A; margin: 3px 0;">ROADSHOW &amp; MEET AND GREET DI KOTAMU</div>
-          <div style="font-size: 10px; color: #FCA5A5; font-weight: bold; margin-top: 2px;">⚠️ Voucher digital ini BUKAN bukti pembayaran tiket.</div>
-          <div style="font-size: 10px; color: #E2E8F0; margin-top: 2px; line-height: 1.4;">Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet di kotamu untuk menukarkan dengan voucher fisik resmi.</div>
+          <div style="font-size: 15px; font-weight: 900; color: #FEF08A; margin: 3px 0;">ROADSHOW &amp; MEET AND GREET KOTA ${city.toUpperCase()}</div>
+          <div style="font-size: 10px; color: #FCA5A5; font-weight: bold; margin-top: 2px;">⚠️ Code ini BUKAN bukti pembayaran tiket.</div>
+          <div style="font-size: 10px; color: #E2E8F0; margin-top: 2px; line-height: 1.4;">Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet Kota ${city} untuk menukarkan dengan voucher fisik resmi.</div>
         </div>
 
         <!-- DATA PENERIMA & STEMPEL VERIFIED SEPERTI DI MODAL -->
@@ -94,14 +94,14 @@ export async function sendVoucherEmail({
             <td style="vertical-align: top; width: 62%;">
               <!-- NAMA PENERIMA VOUCHER -->
               <div style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
-                <div style="font-size: 9px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">NAMA PENERIMA VOUCHER</div>
+                <div style="font-size: 9px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">NAMA PENERIMA</div>
                 <div style="font-size: 15px; font-weight: 900; color: #FFFFFF; margin-top: 2px;">${name}</div>
               </div>
               <!-- KOTA & TANGGAL KLAIM -->
               <table style="width: 100%; border-collapse: separate; border-spacing: 6px 0; margin-left: -6px;">
                 <tr>
                   <td style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 10px;">
-                    <div style="font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">KOTA</div>
+                    <div style="font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">KOTA ROADSHOW</div>
                     <div style="font-size: 12px; font-weight: 800; color: #FACC15; margin-top: 2px;">${city}</div>
                   </td>
                   <td style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 10px;">
@@ -129,7 +129,7 @@ export async function sendVoucherEmail({
 
         <!-- BARCODE & KODE SERIAL SECTION -->
         <div class="serial-box">
-          <div style="font-size: 9px; color: #94A3B8; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">KODE SERIAL PENUKARAN</div>
+          <div style="font-size: 9px; color: #F59E0B; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">CODE VERIFIKASI PENUKARAN</div>
           
           <!-- Barcode Visual Mock -->
           <div style="background: #ffffff; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
@@ -159,9 +159,9 @@ export async function sendVoucherEmail({
         <!-- MASA BERLAKU & PETUNJUK PENUKARAN DI BOOTH (MERAH GELAP) -->
         <div class="validity-tag">
           <div style="font-size: 9px; font-weight: 900; color: #F87171; letter-spacing: 1px; text-transform: uppercase;">LOKASI PENUKARAN VOUCHER FISIK</div>
-          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">Roadshow &amp; Meet and Greet (${validity})</div>
+          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">📍 Booth Resmi Samping Panggung Meet and Greet Kota ${city}</div>
           <div style="font-size: 9.5px; color: #CBD5E1; line-height: 1.4; margin-top: 4px;">
-            ⚠️ <b>Voucher digital ini bukan bukti pembayaran tiket.</b> Untuk penukaran voucher fisik resmi, silakan kunjungi booth resmi penukaran di samping panggung / venue Meet &amp; Greet di kotamu.
+            ⚠️ <b>Code ini bukan bukti pembayaran tiket.</b> Untuk penukaran voucher fisik resmi penayangan bioskop (${validity}), silakan kunjungi booth resmi penukaran di samping panggung / venue Meet &amp; Greet Kota ${city} dengan menunjukkan Code Verifikasi di atas.
           </div>
         </div>
 

@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { trackTicketIntent } from '@/lib/pixel';
-import CinemaPartnersStrip from '@/components/CinemaPartnersStrip';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
+import Footer from '@/components/Footer';
 import {
   Film,
   Calendar,
@@ -105,10 +105,7 @@ export default function BogoPromoPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* 1. CINEMA PARTNERS STRIP */}
-      <CinemaPartnersStrip />
-
-      {/* 2. BOGO HERO SECTION */}
+      {/* 1. BOGO HERO SECTION */}
       <section className="relative overflow-hidden pt-10 pb-16 px-4 sm:px-6">
         {/* Background ambient lighting */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[520px] bg-gradient-to-b from-red-600/20 via-amber-600/15 to-transparent blur-3xl pointer-events-none -z-10" />
@@ -292,6 +289,9 @@ export default function BogoPromoPage() {
           </a>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <Footer />
     </div>
   );
 }

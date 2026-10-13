@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
       serialNumber,
       voucherUrl,
       validDates: validityText,
-      replyMessage: `🎬 *E-VOUCHER NONTON RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota: *${cityLocation}*\nNomor Seri: *${serialNumber}*\n\nBuka & simpan voucher digital resmi kamu di sini:\n${voucherUrl}\n\n⚠️ *KETENTUAN PENUKARAN VOUCHER FISIK:*\nVoucher digital ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi dilakukan pada saat Roadshow & Meet and Greet di kotamu.\n📍 Lokasi Penukaran: Kunjungi booth resmi di samping area Meet and Greet di kotamu! Sampai jumpa lur! 🍿`,
-      instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa voucher resmi film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Kode Seri ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa voucher digital ini bukan bukti pembayaran tiket, penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet di kotamu dengan mengunjungi booth resmi di samping area Meet and Greet.`,
+      replyMessage: `🎬 *CODE VERIFIKASI RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota Roadshow: *${cityLocation}*\nCode Verifikasi: *${serialNumber}*\n\nBuka & simpan / download PDF tiket kamu di sini:\n${voucherUrl}\n\n⚠️ *KETENTUAN PENUKARAN VOUCHER FISIK:*\nCode ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi penayangan bioskop dilakukan pada saat Roadshow & Meet and Greet di kotamu.\n📍 Lokasi Penukaran: Kunjungi booth resmi di samping venue/panggung Meet and Greet Kota ${cityLocation}! Sampai jumpa lur! 🍿`,
+      instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa Code Verifikasi resmi film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Code ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa code ini bukan bukti pembayaran tiket, penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet Kota ${cityLocation} dengan mengunjungi booth resmi di samping venue/panggung Meet and Greet.`,
     });
   } catch (err: any) {
     console.error('[Wahnotif Webhook Error]:', err);

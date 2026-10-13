@@ -114,21 +114,21 @@ export async function sendWahnotifVoucher({
     cleanPhone = '62' + cleanPhone.slice(1);
   }
 
-  const message = `🎬 *SELAMAT! E-VOUCHER NONTON RESMI KAMU SUDAH AKTIF!* 🎬
+  const message = `🎬 *SELAMAT! CODE VERIFIKASI RESMI KAMU SUDAH AKTIF!* 🎬
 
 Halo *${name}*, 
-Klaim War Voucher kamu berhasil! E-Voucher digital kamu sudah resmi terverifikasi dengan nomor seri:
+Klaim Code Verifikasi kamu berhasil diterbitkan resmi oleh Miracle Pictures:
 
-🎟️ *KODE VOUCHER:* ${serialNumber}
+🎟️ *CODE VERIFIKASI:* ${serialNumber}
 ✨ *Status:* Terverifikasi & Berstempel Resmi Miracle Pictures
 
-📥 *Lihat & Simpan E-Voucher Kamu di sini:*
+📥 *Lihat & Download PDF Tiket Kamu di sini:*
 ${voucherUrl}
 
 📌 *KETENTUAN & CARA PENUKARAN VOUCHER FISIK:*
-⚠️ *PENTING:* Voucher digital ini *BUKAN BUKTI PEMBAYARAN TIKET*.
-Untuk penukaran voucher fisik resmi dilakukan pada saat *Roadshow & Meet and Greet* di kotamu.
-📍 *Lokasi Penukaran:* Silakan kunjungi *booth resmi di samping area Meet and Greet* di kotamu dengan menunjukkan barcode atau nomor seri voucher ini ke petugas kami.
+⚠️ *PENTING:* Code ini *BUKAN BUKTI PEMBAYARAN TIKET*.
+Untuk penukaran voucher fisik resmi penayangan bioskop dilakukan pada saat *Roadshow & Meet and Greet* di kotamu.
+📍 *Lokasi Penukaran:* Silakan kunjungi *booth resmi di samping venue/panggung Meet and Greet* di kotamu dengan menunjukkan Code Verifikasi ini ke petugas kami.
 
 Ajak teman, sahabat, dan keluarga semua ya lur! Sampai jumpa di Meet and Greet & Bioskop! 🍿✨
 _Miracle Pictures - Piye Toh Kih Film Official_`;

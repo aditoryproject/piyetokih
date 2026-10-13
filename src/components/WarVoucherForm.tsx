@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, CheckCircle, AlertCircle, Ticket, X, MapPin } from 'lucide-react';
 import VoucherTicketCard from './VoucherTicketCard';
 import { trackLeadSubmission } from '@/lib/pixel';
-import { CITIES_DATA } from '@/lib/cities';
 
 interface WarVoucherFormProps {
   onSuccessClaim?: (remaining: number) => void;
+  defaultCity?: string;
 }
 
-export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) {
+export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVoucherFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [cityLocation, setCityLocation] = useState('');
+  const [cityLocation, setCityLocation] = useState(defaultCity || '');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [claimedLead, setClaimedLead] = useState<{
@@ -25,6 +25,12 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
     voucherUrl: string;
     validityText?: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (defaultCity) {
+      setCityLocation(defaultCity);
+    }
+  }, [defaultCity]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +65,7 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setErrorMsg(data.error || 'Gagal mengklaim voucher. Silakan coba lagi.');
+        setErrorMsg(data.error || 'Gagal mengklaim Code Verifikasi. Silakan coba lagi.');
         setLoading(false);
         return;
       }
@@ -75,7 +81,7 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
         });
       } catch {}
 
-      // Fire Meta Pixel Lead
+      // Fire Meta Pixel Lead with City
       trackLeadSubmission(data.serialNumber, cityLocation);
 
       setClaimedLead({
@@ -104,14 +110,18 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider mb-2">
             <Ticket className="w-3.5 h-3.5 text-amber-400" />
-            <span>WAR E-VOUCHER NONTON</span>
+            <span>KLAIM CODE VERIFIKASI RESMI</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-black text-white">
-            Formulir War Voucher Nonton
+            Formulir Klaim Code Verifikasi {defaultCity ? `Kota ${defaultCity}` : ''}
           </h3>
           <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-md mx-auto">
-            Dapatkan e-voucher resmi berseri unik. <b className="text-amber-300">Voucher ini bukan bukti pembayaran tiket</b>. Penukaran voucher fisik resmi dilakukan saat <b>Roadshow &amp; Meet and Greet</b> di kotamu (kunjungi booth di samping area Meet and Greet).
+            Dapatkan Code Verifikasi resmi. <b className="text-amber-300">Bukan bukti pembayaran tiket</b>. Penukaran voucher fisik resmi dilakukan saat <b>Roadshow &amp; Meet and Greet</b> di kotamu.
           </p>
+          <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black/60 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
+            <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+            <span>Lokasi Penukaran: Booth resmi di samping venue/panggung Meet and Greet {cityLocation ? `Kota ${cityLocation}` : 'kotamu'}</span>
+          </div>
         </div>
 
         {errorMsg && (
@@ -149,7 +159,7 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
               className="w-full bg-black/60 border border-white/15 focus:border-gold-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder:text-gray-600"
             />
             <span className="block text-[11px] text-gray-400 mt-1">
-              *PDF voucher ber-barcode akan otomatis dikirimkan ke nomor ini.
+              *Code Verifikasi &amp; petunjuk penukaran akan otomatis dikirimkan ke nomor WhatsApp ini.
             </span>
           </div>
 
@@ -169,51 +179,28 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5 flex items-center justify-between">
-              <span>Kota Domisili / Kota Menonton <span className="text-red-500">*</span></span>
-              <span className="text-[10px] text-gray-400 font-normal">Ketik kota Anda</span>
+              <span>Kota Roadshow / Kota Menonton <span className="text-red-500">*</span></span>
+              {defaultCity ? (
+                <span className="text-[10px] text-amber-400 font-bold">Terkunci untuk Kota {defaultCity}</span>
+              ) : (
+                <span className="text-[10px] text-gray-400 font-normal">Pilih kota Anda</span>
+              )}
             </label>
             <div className="relative">
               <input
                 type="text"
                 required
-                list="indonesia-cities"
+                readOnly={Boolean(defaultCity)}
                 value={cityLocation}
                 onChange={e => setCityLocation(e.target.value)}
-                placeholder="Contoh: Solo, Semarang, Surabaya, Jakarta, Bandung, dll"
-                className="w-full bg-black/60 border border-white/15 focus:border-gold-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder:text-gray-600"
+                placeholder="Contoh: Solo, Semarang, Yogyakarta, Surabaya, dll"
+                className={`w-full bg-black/60 border border-white/15 focus:border-gold-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder:text-gray-600 ${
+                  defaultCity ? 'cursor-not-allowed bg-black/80 text-amber-300 font-bold' : ''
+                }`}
               />
-              <datalist id="indonesia-cities">
-                <option value="Surakarta (Solo)" />
-                <option value="Semarang" />
-                <option value="Yogyakarta" />
-                <option value="Surabaya" />
-                <option value="Malang" />
-                <option value="Madiun" />
-                <option value="Sidoarjo" />
-                <option value="Magelang" />
-                <option value="Kediri" />
-                <option value="Gresik" />
-                <option value="Mojokerto" />
-                <option value="Nganjuk" />
-                <option value="Ngawi" />
-                <option value="Ponorogo" />
-                <option value="Sragen" />
-                <option value="Blitar" />
-                <option value="Tulungagung" />
-                <option value="Jakarta" />
-                <option value="Bandung" />
-                <option value="Bekasi" />
-                <option value="Tangerang" />
-                <option value="Depok" />
-                <option value="Bogor" />
-                <option value="Medan" />
-                <option value="Makassar" />
-                <option value="Denpasar (Bali)" />
-                <option value="Palembang" />
-              </datalist>
             </div>
             <span className="block text-[11px] text-gray-400 mt-1">
-              *Membantu kami melihat potensi dan animo penonton di kota Anda.
+              *Penukaran voucher fisik dilakukan di booth samping panggung Meet and Greet Kota {cityLocation || 'pilihan'}.
             </span>
           </div>
 
@@ -225,19 +212,19 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
             {loading ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Memproses E-Voucher...
+                Menerbitkan Code Verifikasi...
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <Send className="w-4 h-4" />
-                KLAIM E-VOUCHER NONTON
+                KLAIM CODE VERIFIKASI RESMI
               </span>
             )}
           </button>
         </form>
       </div>
 
-      {/* POPUP / MODAL SUKSES TIKET VOUCHER */}
+      {/* POPUP / MODAL SUKSES CODE VERIFIKASI */}
       {claimedLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
           <div className="relative w-full max-w-md my-8 animate-in fade-in zoom-in duration-200">
@@ -250,13 +237,21 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
             </button>
 
             <div className="mb-4 text-center">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold mb-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold mb-2">
                 <CheckCircle className="w-4 h-4" />
-                E-VOUCHER BERHASIL DIKLAIM!
+                CODE VERIFIKASI BERHASIL DITERBITKAN!
               </div>
-              <p className="text-xs text-amber-300 font-medium">
-                ⚠️ Voucher ini bukan bukti pembayaran tiket. Penukaran voucher fisik resmi pada saat Roadshow &amp; Meet and Greet di kotamu (kunjungi booth di samping area Meet and Greet).
-              </p>
+              <div className="bg-amber-950/60 border border-amber-500/50 rounded-2xl p-3 text-left space-y-1">
+                <span className="text-[10px] uppercase font-black text-amber-400 tracking-wider block">
+                  PETUNJUK PENUKARAN VOUCHER FISIK:
+                </span>
+                <p className="text-xs text-white font-medium">
+                  ⚠️ Code ini <b>BUKAN bukti pembayaran tiket</b>.
+                </p>
+                <p className="text-xs text-amber-300 font-bold">
+                  📍 Lokasi Penukaran: Kunjungi booth resmi di samping venue/panggung Meet and Greet Kota {claimedLead.cityLocation || 'terkait'}!
+                </p>
+              </div>
             </div>
 
             <VoucherTicketCard

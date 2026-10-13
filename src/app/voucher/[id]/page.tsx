@@ -95,10 +95,10 @@ export default function VoucherDetailPage() {
         <div>
           <div className="text-center mb-6">
             <h1 className="text-2xl font-black text-white">
-              E-VOUCHER NONTON RESMI
+              CODE VERIFIKASI RESMI
             </h1>
             <p className="text-xs text-amber-300 font-bold mt-1">
-              Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan.
+              Tukarkan Code Verifikasi ini di booth resmi samping panggung Meet &amp; Greet Kota {lead.cityLocation || 'terkait'} untuk mendapatkan voucher fisik resmi.
             </p>
           </div>
 

@@ -5,10 +5,11 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCityBySlug } from '@/lib/cities';
 import { trackTicketIntent, trackCityCustomEvent } from '@/lib/pixel';
-import CinemaPartnersStrip from '@/components/CinemaPartnersStrip';
+import WarVoucherForm from '@/components/WarVoucherForm';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
+import Footer from '@/components/Footer';
 import {
   Calendar,
   Clock,
@@ -75,10 +76,7 @@ export default function CityRoadshowPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* 1. CINEMA STRIP TOP */}
-      <CinemaPartnersStrip />
-
-      {/* 2. CITY ROADSHOW HERO */}
+      {/* 1. CITY ROADSHOW HERO */}
       <section className="relative pt-10 pb-16 px-4 sm:px-6 overflow-hidden">
         {/* Glow Ambient */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[450px] bg-red-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -133,13 +131,18 @@ export default function CityRoadshowPage() {
             </div>
           </div>
 
+          {/* 2. FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
+          <div className="max-w-xl mx-auto mb-16">
+            <WarVoucherForm defaultCity={city.name} />
+          </div>
+
           {/* 3. LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
           <div className="max-w-2xl mx-auto text-left mb-16">
             <div className="text-center mb-8">
               <span className="text-xs font-black uppercase tracking-widest text-amber-400">PRESALE TIKET RESMI BIOSKOP</span>
               <h2 className="text-2xl sm:text-4xl font-black text-white uppercase mt-1">Pilih Bioskop di Kota {city.name}</h2>
               <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
-                Pilih bioskop mitra di bawah ini untuk langsung memesan tiket presale resmi dan mengamankan nomor kursi studio Anda sebelum kehabisan.
+                Pilih bioskop mitra di bawah ini untuk memesan tiket presale resmi dan mengamankan nomor kursi studio Anda sebelum kehabisan.
               </p>
             </div>
 
@@ -211,19 +214,8 @@ export default function CityRoadshowPage() {
       {/* 6. CAST & PEMERAN WOKO CHANNEL (GLOBAL INHERITANCE) */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* 7. FOOTER CREDITS */}
-      <section className="py-12 px-4 border-t border-white/10 text-center text-xs text-slate-400 bg-black/80">
-        <div className="max-w-4xl mx-auto space-y-4">
-          <p className="text-slate-500 text-[11px]">
-            © 2026 Miracle Pictures. Roadshow Resmi Film Bioskop &quot;PIYE TO KIH?&quot; Kota {city.name}.
-          </p>
-          <div className="flex items-center justify-center gap-4 pt-1">
-            <Link href="/" className="text-amber-400 hover:text-amber-300 font-bold">
-              Lihat Seluruh Jadwal 17 Kota ➔
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* 7. FOOTER RESMI DENGAN MITRA BIOSKOP 27+ LOKASI & SOSMED */}
+      <Footer />
     </div>
   );
 }

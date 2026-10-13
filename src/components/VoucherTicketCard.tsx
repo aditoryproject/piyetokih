@@ -89,7 +89,7 @@ export default function VoucherTicketCard({
             PIYE TO KIH?
           </h2>
           <p className="text-[11px] text-amber-300 font-extrabold tracking-wide uppercase">
-            OFFICIAL E-VOUCHER NONTON
+            OFFICIAL CODE VERIFIKASI
           </p>
         </div>
 
@@ -99,13 +99,13 @@ export default function VoucherTicketCard({
             PENUKARAN VOUCHER FISIK RESMI
           </div>
           <div className="text-sm sm:text-base font-black text-amber-300 tracking-tight leading-snug my-0.5">
-            ROADSHOW &amp; MEET AND GREET DI KOTAMU
+            ROADSHOW &amp; MEET AND GREET {cityLocation ? `KOTA ${cityLocation.toUpperCase()}` : 'DI KOTAMU'}
           </div>
           <div className="text-[10px] text-red-300 font-extrabold mt-1">
             ⚠️ Voucher digital ini BUKAN bukti pembayaran tiket
           </div>
           <div className="text-[9px] text-gray-300 mt-0.5 leading-tight">
-            Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet untuk menukarkan dengan voucher fisik resmi.
+            Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet Kota {cityLocation || 'terkait'} untuk menukarkan dengan voucher fisik resmi.
           </div>
         </div>
 
@@ -123,7 +123,7 @@ export default function VoucherTicketCard({
           <div className="grid grid-cols-2 gap-2.5 text-xs">
             <div className="bg-black/50 border border-white/10 rounded-xl px-3.5 py-2.5">
               <span className="block text-[9px] uppercase font-bold text-gray-400 mb-1">
-                KOTA
+                KOTA ROADSHOW
               </span>
               <span className="font-bold text-gold-400 block leading-normal break-words">
                 {cityLocation || 'Nasional'}
@@ -168,8 +168,8 @@ export default function VoucherTicketCard({
 
         {/* Barcode & Serial Section */}
         <div className="text-center bg-black/60 border border-white/10 rounded-2xl p-4 relative z-10">
-          <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">
-            KODE SERIAL PENUKARAN
+          <div className="text-[10px] text-amber-400 font-black uppercase tracking-wider mb-2">
+            CODE VERIFIKASI PENUKARAN
           </div>
 
           {/* Barcode Mock Graphic */}
@@ -194,10 +194,10 @@ export default function VoucherTicketCard({
             LOKASI PENUKARAN VOUCHER FISIK
           </span>
           <span className="font-black text-amber-300 text-xs block mt-0.5 tracking-tight">
-            Roadshow &amp; Meet and Greet ({validityText})
+            📍 Booth Resmi Samping Venue Meet &amp; Greet {cityLocation ? `Kota ${cityLocation}` : ''}
           </span>
           <span className="text-gray-300 text-[9px] block mt-1 leading-snug">
-            Voucher digital ini bukan bukti pembayaran. Kunjungi booth penukaran resmi di samping panggung / venue Meet &amp; Greet di kotamu untuk menukarkan dengan voucher fisik resmi.
+            Tunjukkan Code Verifikasi ini di booth resmi samping panggung Meet &amp; Greet untuk mendapatkan voucher fisik resmi penayangan bioskop ({validityText}).
           </span>
         </div>
 

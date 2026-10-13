@@ -61,6 +61,14 @@ export interface AppSettings {
     tixid?: string;
   };
 
+  // Social Media Links (Editable via Dashboard)
+  socialLinks?: {
+    instagram?: string;
+    tiktok?: string;
+    facebook?: string; // fanspage
+    youtube?: string;
+  };
+
   // Dashboard Admin Credentials
   adminUsername?: string;
   adminPasswordHash?: string;
@@ -148,6 +156,14 @@ const DEFAULT_SETTINGS: AppSettings = {
     cgv: 'https://www.cgv.id',
     cinepolis: 'https://cinepolis.co.id',
     tixid: 'https://www.tix.id',
+  },
+
+  // Social Media Channels
+  socialLinks: {
+    instagram: 'https://www.instagram.com/piyetokihfilm.official/',
+    tiktok: 'https://www.tiktok.com/@piyetokihfilm.official',
+    facebook: 'https://www.facebook.com/piyetokihfilm.official',
+    youtube: 'https://www.youtube.com/@piyetokihfilm',
   },
 };
 

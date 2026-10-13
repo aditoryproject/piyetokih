@@ -102,6 +102,12 @@ export default function AdminPage() {
     voucherValidStart: '2026-11-19',
     voucherValidEnd: '2026-11-20',
     voucherTermsText: 'Hanya dapat ditukarkan di loket kasir bioskop mitra pada periode penayangan perdana film Piye To Kih.',
+    socialLinks: {
+      instagram: 'https://www.instagram.com/piyetokihfilm.official/',
+      tiktok: '',
+      facebook: '',
+      youtube: '',
+    },
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
@@ -2156,7 +2162,93 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* 5. KEAMANAN & KREDENSIAL LOGIN DASHBOARD */}
+              {/* 6. MEDIA SOSIAL RESMI (FOOTER SYNC) */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                <div className="border-b border-slate-200/60 pb-3">
+                  <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                    6. Link Media Sosial Resmi Film (Muncul di Footer Website)
+                  </label>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Tautkan akun media sosial resmi produksi &amp; film agar penonton dapat mengikuti update terbaru.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Instagram Official
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.socialLinks?.instagram || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          socialLinks: { ...(settings.socialLinks || {}), instagram: e.target.value },
+                        })
+                      }
+                      placeholder="https://www.instagram.com/piyetokihfilm.official/"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      TikTok Official
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.socialLinks?.tiktok || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          socialLinks: { ...(settings.socialLinks || {}), tiktok: e.target.value },
+                        })
+                      }
+                      placeholder="https://www.tiktok.com/@piyetokihfilm.official"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      Facebook Fanspage Official
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.socialLinks?.facebook || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          socialLinks: { ...(settings.socialLinks || {}), facebook: e.target.value },
+                        })
+                      }
+                      placeholder="https://www.facebook.com/piyetokihfilm.official"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                      YouTube Official
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.socialLinks?.youtube || ''}
+                      onChange={e =>
+                        setSettings({
+                          ...settings,
+                          socialLinks: { ...(settings.socialLinks || {}), youtube: e.target.value },
+                        })
+                      }
+                      placeholder="https://www.youtube.com/@piyetokihfilm"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 7. KEAMANAN & KREDENSIAL LOGIN DASHBOARD */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                 <div className="border-b border-slate-200/60 pb-3 flex items-center justify-between">
                   <div>
