@@ -110,17 +110,6 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
                 <span className="font-black text-white text-xs">{writerName}</span>
               </div>
             </div>
-
-            {/* Quick Link to Presale BOGO */}
-            <div className="pt-2">
-              <a
-                href="#presale"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 active:scale-95 transition"
-              >
-                <span>Presale Buy 1 Get 1 Bioskop</span>
-                <span>➔</span>
-              </a>
-            </div>
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
 import PresaleBogoSection from '@/components/PresaleBogoSection';
 import Footer from '@/components/Footer';
-import { Film, Play, Ticket, Calendar, Sparkles, MapPin, ArrowRight } from 'lucide-react';
+import { Film, Ticket } from 'lucide-react';
 
 export default function HomePage() {
   const [movieSettings, setMovieSettings] = useState<any>(null);
@@ -31,26 +31,6 @@ export default function HomePage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[550px] bg-gradient-to-b from-amber-600/20 via-red-600/15 to-transparent blur-[140px] pointer-events-none -z-10" />
 
         <div className="max-w-4xl mx-auto text-center">
-          {/* Quick Announcement Pill */}
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-2">
-            <a
-              href="#teaser"
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold transition shadow-lg shadow-amber-500/10"
-            >
-              <Play className="w-3.5 h-3.5 fill-amber-300" />
-              <span>Official Teaser Trailer Sudah Rilis</span>
-              <span className="text-white">➔</span>
-            </a>
-
-            <a
-              href="#roadshow"
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-bold transition shadow-sm"
-            >
-              <Ticket className="w-3.5 h-3.5 text-amber-400" />
-              <span>Jadwal Kegiatan Meet and Greet di Semarang dan 16 Kota Lainnya</span>
-            </a>
-          </div>
-
           {/* Film Studio Label */}
           <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-black/60 border border-white/10 text-gold-400 text-xs font-black tracking-widest uppercase mb-4 shadow-md">
             <Film className="w-3.5 h-3.5" />
