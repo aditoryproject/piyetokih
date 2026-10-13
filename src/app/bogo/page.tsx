@@ -71,7 +71,7 @@ export default function BogoPromoPage() {
     bogoDefaultTicketLink: 'https://m.21cineplex.com',
     bogoCinemaLinks: {},
     bogoBannerUrl: '',
-    voucherValidDatesText: '19 - 22 November 2026 (Penayangan Perdana)',
+    voucherValidDatesText: '19 - 20 November 2026 (Penayangan Perdana)',
     movieSettings: null,
   });
 
@@ -147,7 +147,7 @@ export default function BogoPromoPage() {
           {/* Dates Badge */}
           <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-200 bg-black/60 px-5 py-2 rounded-full border border-amber-500/30 mb-8 shadow-md">
             <Calendar className="w-4 h-4 text-amber-400" />
-            <span>Periode Promo: {settings.voucherValidDatesText || '19 - 22 November 2026 (Penayangan Perdana)'}</span>
+            <span>Periode Promo: {settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)'}</span>
           </div>
 
           {/* Hero Visual Card (Inherited Poster / Uploaded BOGO Banner) */}

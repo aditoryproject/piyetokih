@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       lead: newLead,
       serialNumber,
       voucherUrl,
-      validityText: db.settings.voucherValidDatesText || '19 - 22 November 2026 (Penayangan Perdana)',
+      validityText: db.settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)',
       remainingStock,
       totalQuota: db.settings.totalQuota,
       message: 'Voucher berhasil diklaim!',

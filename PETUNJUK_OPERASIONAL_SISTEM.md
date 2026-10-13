@@ -97,7 +97,7 @@ Berdasarkan Operating Handbook, penayangan perdana film *"PIYE TO KIH?"* dimulai
 * **Fleksibilitas Setting di Dashboard**:
   * Akses: **Admin Dashboard ➔ Pengaturan Voucher & Tayang ➔ Bagian 5**.
   * Dilengkapi tombol preset cepat:
-    * `19 - 22 November 2026 (Penayangan Perdana)` (Default handbook - 4 hari pembuka)
+    * `19 - 20 November 2026 (Penayangan Perdana)` (Default handbook - Penayangan Perdana)
     * `19 - 25 November 2026 (Minggu Pertama Tayang)`
     * `19 November - 02 Desember 2026 (2 Pekan Penayangan)`
   * Pengaturan tanggal ini secara otomatis tercetak pada:

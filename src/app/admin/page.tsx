@@ -98,9 +98,9 @@ export default function AdminPage() {
     smtpFrom: 'Miracle Pictures <ticket@piyetokihfilm.com>',
     emailSubject: '🎟️ E-Voucher Resmi Nonton Film PIYE TO KIH? - Miracle Pictures',
     // Premiere validity
-    voucherValidDatesText: '19 - 22 November 2026 (Penayangan Perdana)',
+    voucherValidDatesText: '19 - 20 November 2026 (Penayangan Perdana)',
     voucherValidStart: '2026-11-19',
-    voucherValidEnd: '2026-11-22',
+    voucherValidEnd: '2026-11-20',
     voucherTermsText: 'Hanya dapat ditukarkan di loket kasir bioskop mitra pada periode penayangan perdana film Piye To Kih.',
   });
   const [savingSettings, setSavingSettings] = useState(false);
@@ -2060,7 +2060,7 @@ export default function AdminPage() {
                       type="text"
                       value={settings.voucherValidDatesText || ''}
                       onChange={e => setSettings({ ...settings, voucherValidDatesText: e.target.value })}
-                      placeholder="Contoh: 19 - 22 November 2026 (Penayangan Perdana)"
+                      placeholder="Contoh: 19 - 20 November 2026 (Penayangan Perdana)"
                       className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 outline-none"
                     />
                   </div>
@@ -2076,14 +2076,14 @@ export default function AdminPage() {
                         onClick={() =>
                           setSettings({
                             ...settings,
-                            voucherValidDatesText: '19 - 22 November 2026 (Penayangan Perdana)',
+                            voucherValidDatesText: '19 - 20 November 2026 (Penayangan Perdana)',
                             voucherValidStart: '2026-11-19',
-                            voucherValidEnd: '2026-11-22',
+                            voucherValidEnd: '2026-11-20',
                           })
                         }
                         className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
                       >
-                        🎬 19 - 22 Nov 2026 (4 Hari Perdana)
+                        🎬 19 - 20 Nov 2026 (Penayangan Perdana)
                       </button>
                       <button
                         type="button"

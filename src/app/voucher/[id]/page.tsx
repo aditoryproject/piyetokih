@@ -18,7 +18,7 @@ export default function VoucherDetailPage() {
     claimedAt: string;
   } | null>(null);
 
-  const [validityText, setValidityText] = useState('19 - 22 November 2026 (Penayangan Perdana)');
+  const [validityText, setValidityText] = useState('19 - 20 November 2026 (Penayangan Perdana)');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

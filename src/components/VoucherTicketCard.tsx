@@ -18,7 +18,7 @@ export default function VoucherTicketCard({
   phone,
   cityLocation,
   claimedAt = new Date().toLocaleDateString('id-ID'),
-  validityText = '19 - 22 November 2026 (Penayangan Perdana)',
+  validityText = '19 - 20 November 2026 (Penayangan Perdana)',
 }: VoucherTicketCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);

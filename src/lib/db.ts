@@ -134,9 +134,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   emailSubject: '🎟️ E-Voucher Nonton Resmi Film PIYE TO KIH? - Miracle Pictures',
 
   // Premiere Timeline Defaults (Sesuai Operating Handbook v1.1)
-  voucherValidDatesText: '19 - 22 November 2026 (Penayangan Perdana)',
+  voucherValidDatesText: '19 - 20 November 2026 (Penayangan Perdana)',
   voucherValidStart: '2026-11-19',
-  voucherValidEnd: '2026-11-22',
+  voucherValidEnd: '2026-11-20',
   voucherTermsText: 'Voucher dapat ditukarkan di bioskop kesayangan Anda pada periode penayangan film Piye To Kih.',
 
   // BOGO Promo Defaults

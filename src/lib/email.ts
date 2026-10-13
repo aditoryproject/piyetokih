@@ -20,7 +20,7 @@ export async function sendVoucherEmail({
 }: SendVoucherEmailParams) {
   const db = getDb();
   const settings = db.settings;
-  const validity = validDatesText || settings.voucherValidDatesText || '19 - 22 November 2026 (Penayangan Perdana)';
+  const validity = validDatesText || settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
 
   // If SMTP not configured, simulate successful dispatch in logs
   if (!settings.smtpHost || !settings.smtpUser) {

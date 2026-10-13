@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
-    const validityText = db.settings.voucherValidDatesText || '19 - 22 November 2026 (Penayangan Perdana)';
+    const validityText = db.settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
     
     // Check if phone already registered
     const cleanPhone = String(phone).replace(/[^0-9]/g, '');
