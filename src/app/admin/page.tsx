@@ -42,10 +42,11 @@ import {
   Share2,
   Upload,
   FolderUp,
+  Bell,
 } from 'lucide-react';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'leads' | 'movie' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics'>('movie');
+  const [activeTab, setActiveTab] = useState<'leads' | 'movie' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics' | 'reminders'>('movie');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Articles state
@@ -80,6 +81,12 @@ export default function AdminPage() {
   const [cityBreakdown, setCityBreakdown] = useState<Record<string, number>>({});
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [loadingLeads, setLoadingLeads] = useState(true);
+
+  // BOGO Presale Reminders state
+  const [bogoReminders, setBogoReminders] = useState<any[]>([]);
+  const [loadingReminders, setLoadingReminders] = useState(false);
+  const [blastingReminder, setBlastingReminder] = useState(false);
+  const [blastResult, setBlastResult] = useState<{ total: number; sentWhatsapp: number; sentEmail: number } | null>(null);
 
   // Settings state
   const [settings, setSettings] = useState<any>({
@@ -242,11 +249,78 @@ export default function AdminPage() {
       .finally(() => setLoadingArticles(false));
   };
 
+  const fetchReminders = () => {
+    setLoadingReminders(true);
+    fetch('/api/bogo/reminder')
+      .then(r => r.json())
+      .then(data => {
+        if (data.reminders) {
+          setBogoReminders(data.reminders);
+        }
+      })
+      .catch(err => console.error('Error fetching reminders:', err))
+      .finally(() => setLoadingReminders(false));
+  };
+
+  const handleTriggerBlast = async () => {
+    const unSent = bogoReminders.filter(r => r.reminderStatus !== 'sent').length;
+    if (!confirm(`Kirim blast reminder sekarang ke ${unSent} pendaftar yang belum menerima reminder (via WhatsApp & Email)?`)) {
+      return;
+    }
+    setBlastingReminder(true);
+    setBlastResult(null);
+    try {
+      const res = await fetch('/api/cron/bogo-reminder', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setBlastResult({
+          total: data.totalProcessed,
+          sentWhatsapp: data.sentWhatsapp,
+          sentEmail: data.sentEmail,
+        });
+        alert(`Blast notifikasi selesai!\nTotal diproses: ${data.totalProcessed}\nWA terkirim: ${data.sentWhatsapp}\nEmail terkirim: ${data.sentEmail}`);
+        fetchReminders();
+      } else {
+        alert(data.error || 'Gagal mengirim blast reminder');
+      }
+    } catch {
+      alert('Terjadi kesalahan koneksi saat mengirim blast');
+    } finally {
+      setBlastingReminder(false);
+    }
+  };
+
+  const handleExportRemindersCsv = () => {
+    if (!bogoReminders.length) {
+      alert('Belum ada data pendaftar reminder untuk diexport.');
+      return;
+    }
+    const headers = ['Nama', 'WhatsApp', 'Email', 'Kota', 'Tanggal Daftar', 'Status Kirim', 'Waktu Kirim'];
+    const rows = bogoReminders.map(r => [
+      `"${(r.name || '').replace(/"/g, '""')}"`,
+      `"${(r.phone || '').replace(/"/g, '""')}"`,
+      `"${(r.email || '').replace(/"/g, '""')}"`,
+      `"${(r.city || '').replace(/"/g, '""')}"`,
+      `"${r.createdAt || ''}"`,
+      `"${r.reminderStatus || 'pending'}"`,
+      `"${r.sentAt || '-'}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `reminder_presale_bogo_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     fetchLeads();
     fetchSettings();
     fetchVisitors();
     fetchArticles();
+    fetchReminders();
   }, [search, sourceFilter, cityFilter]);
 
   const handleOpenNewArticle = () => {
@@ -471,6 +545,7 @@ export default function AdminPage() {
 
   const menuItems = [
     { id: 'leads', label: 'Database Leads', icon: Users, badge: leads.length },
+    { id: 'reminders', label: '🔔 Reminder Presale 15 Nov', icon: Bell, badge: bogoReminders.length },
     { id: 'movie', label: '🎬 Official Film & Media', icon: Film, badge: 'Global Sync' },
     { id: 'articles', label: 'Kabar & Galeri Roadshow', icon: Newspaper, badge: articles.length },
     { id: 'settings', label: 'Pengaturan Voucher & Tayang', icon: Settings },
@@ -874,6 +949,199 @@ export default function AdminPage() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: PENDAFTAR REMINDER PRESALE BOGO (15 NOV) */}
+          {activeTab === 'reminders' && (
+            <div className="space-y-6">
+              {/* Header Box */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                      Presale Buy 1 Get 1 (15 - 18 Nov)
+                    </span>
+                    <span className="text-xs text-slate-400">•</span>
+                    <span className="text-xs text-slate-500 font-medium">Tayangan Perdana 19 Nov 2026</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    <Bell className="w-6 h-6 text-amber-500" />
+                    <span>Database Pendaftar Reminder War Presale</span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
+                    Daftar penonton yang meminta pengingat saat loket kuota Presale TIX ID (1.000 tiket) dan M-TIX (500 tiket) resmi dibuka pada 15 November 2026.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    onClick={fetchReminders}
+                    disabled={loadingReminders}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition shadow-sm"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingReminders ? 'animate-spin' : ''}`} />
+                    <span>Refresh</span>
+                  </button>
+
+                  <button
+                    onClick={handleExportRemindersCsv}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition shadow-sm"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Export CSV</span>
+                  </button>
+
+                  <button
+                    onClick={handleTriggerBlast}
+                    disabled={blastingReminder}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black shadow-md shadow-amber-500/20 transition active:scale-95 disabled:opacity-50"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${blastingReminder ? 'animate-pulse' : ''}`} />
+                    <span>{blastingReminder ? 'Mengirim Blast...' : '🚀 Blast Reminder (WA & Email)'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Status Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between text-slate-400 mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider">Total Pendaftar</span>
+                    <Bell className="w-5 h-5 text-amber-500" />
+                  </div>
+                  <div className="text-3xl font-black text-slate-900">{bogoReminders.length}</div>
+                  <p className="text-[11px] text-slate-400 mt-1">Calon penonton siap war presale</p>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between text-slate-400 mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider">Menunggu Reminder</span>
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                  </div>
+                  <div className="text-3xl font-black text-amber-600">
+                    {bogoReminders.filter(r => r.reminderStatus !== 'sent').length}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">Siap dikirim otomatis saat 15 Nov</p>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between text-slate-400 mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider">Berhasil Terkirim</span>
+                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  </div>
+                  <div className="text-3xl font-black text-emerald-600">
+                    {bogoReminders.filter(r => r.reminderStatus === 'sent').length}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">Notifikasi WA & Email terkirim</p>
+                </div>
+              </div>
+
+              {blastResult && (
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
+                  <div>
+                    <span className="font-bold">Laporan Blast Terakhir:</span> {blastResult.total} diproses • {blastResult.sentWhatsapp} WA Terkirim • {blastResult.sentEmail} Email Terkirim.
+                  </div>
+                  <button onClick={() => setBlastResult(null)} className="text-emerald-600 hover:text-emerald-900 font-bold ml-4">Tutup</button>
+                </div>
+              )}
+
+              {/* Table Card */}
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-800">
+                    Daftar Kontak Reminder Presale ({bogoReminders.length})
+                  </h3>
+                  <span className="text-[11px] text-slate-400">
+                    Endpoint cron: <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">POST /api/cron/bogo-reminder</code>
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="py-3 px-4">No</th>
+                        <th className="py-3 px-4">Nama Lengkap</th>
+                        <th className="py-3 px-4">No WhatsApp</th>
+                        <th className="py-3 px-4">Email</th>
+                        <th className="py-3 px-4">Kota</th>
+                        <th className="py-3 px-4">Waktu Daftar</th>
+                        <th className="py-3 px-4">Status Reminder</th>
+                        <th className="py-3 px-4 text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {loadingReminders ? (
+                        <tr>
+                          <td colSpan={8} className="text-center py-8 text-slate-400">
+                            Memuat data pendaftar reminder...
+                          </td>
+                        </tr>
+                      ) : bogoReminders.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="text-center py-8 text-slate-400">
+                            Belum ada pendaftar reminder presale buy 1 get 1.
+                          </td>
+                        </tr>
+                      ) : (
+                        bogoReminders.map((r, idx) => (
+                          <tr key={r.id || idx} className="hover:bg-slate-50/70 transition">
+                            <td className="py-3.5 px-4 font-mono text-slate-400">{idx + 1}</td>
+                            <td className="py-3.5 px-4 font-bold text-slate-900">{r.name}</td>
+                            <td className="py-3.5 px-4 font-mono text-slate-700">
+                              <a
+                                href={`https://wa.me/${r.phone?.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-amber-600 hover:underline font-bold"
+                              >
+                                {r.phone}
+                              </a>
+                            </td>
+                            <td className="py-3.5 px-4 text-slate-600">{r.email}</td>
+                            <td className="py-3.5 px-4">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                {r.city}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-slate-400 text-[11px]">
+                              {r.createdAt ? new Date(r.createdAt).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
+                            </td>
+                            <td className="py-3.5 px-4">
+                              {r.reminderStatus === 'sent' ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  <CheckCircle className="w-3 h-3 text-emerald-600" />
+                                  Terkirim ({r.sentAt ? new Date(r.sentAt).toLocaleDateString('id-ID') : 'Done'})
+                                </span>
+                              ) : r.reminderStatus === 'failed' ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
+                                  Gagal Kirim
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                                  Menunggu 15 Nov
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              <a
+                                href={`https://wa.me/${r.phone?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Halo ${r.name}, info resmi Presale Buy 1 Get 1 tiket film PIYE TO KIH? sudah dibuka!`)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] transition"
+                              >
+                                <MessageSquare className="w-3 h-3" />
+                                <span>WA</span>
+                              </a>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

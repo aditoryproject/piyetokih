@@ -104,11 +104,24 @@ export interface VisitorLog {
   event?: string;
 }
 
+export interface BogoReminderRecord {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  city: string;
+  registeredAt: string;
+  reminderStatus: 'pending' | 'sent' | 'failed';
+  whatsappSentAt?: string;
+  emailSentAt?: string;
+}
+
 export interface DatabaseSchema {
   settings: AppSettings;
   leads: LeadRecord[];
   visitors: VisitorLog[];
   articles: ArticleRecord[];
+  bogoReminders: BogoReminderRecord[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -180,6 +193,7 @@ function ensureDb(): DatabaseSchema {
       leads: [],
       visitors: [],
       articles: [],
+      bogoReminders: [],
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2));
     return initial;
@@ -222,6 +236,7 @@ function ensureDb(): DatabaseSchema {
       leads: parsed.leads || [],
       visitors: parsed.visitors || [],
       articles: Array.isArray(parsed.articles) ? parsed.articles : [],
+      bogoReminders: Array.isArray(parsed.bogoReminders) ? parsed.bogoReminders : [],
     };
 
     if (hasDateUpdate) {
@@ -237,6 +252,7 @@ function ensureDb(): DatabaseSchema {
       leads: [],
       visitors: [],
       articles: [],
+      bogoReminders: [],
     };
   }
 }

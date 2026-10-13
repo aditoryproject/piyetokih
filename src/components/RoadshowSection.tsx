@@ -239,18 +239,14 @@ export default function RoadshowSection() {
             Belum menemukan kotamu dalam jadwal roadshow?
           </h4>
           <p className="text-xs text-gray-300 max-w-lg mx-auto mb-4">
-            Isi formulir klaim War Voucher di bagian atas! Tim Miracle Pictures terus memantau antusiasme kota pendaftar untuk penambahan jadwal penayangan bioskop berikutnya.
+            Pasang pengingat War Presale Buy 1 Get 1 agar tidak kehabisan tiket penayangan perdana 19 November 2026 di kotamu!
           </p>
           <a
-            href="#top"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            href="#presale"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition shadow-lg"
           >
             <Ticket className="w-4 h-4" />
-            <span>Klaim E-Voucher Sekarang</span>
+            <span>Pasang Pengingat Presale Buy 1 Get 1</span>
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

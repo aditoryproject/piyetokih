@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { getCityBySlug } from '@/lib/cities';
 import { trackTicketIntent, trackCityCustomEvent } from '@/lib/pixel';
 import WarVoucherForm from '@/components/WarVoucherForm';
+import CountdownTimer from '@/components/CountdownTimer';
+import QuotaProgress from '@/components/QuotaProgress';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
@@ -131,7 +133,13 @@ export default function CityRoadshowPage() {
             </div>
           </div>
 
-          {/* 2. FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
+          {/* 2. ROADSHOW COUNTDOWN & KUOTA PER KOTA */}
+          <div className="max-w-xl mx-auto mb-6 space-y-4">
+            <CountdownTimer targetDate={city.dateStr || '2026-10-22T13:00:00+07:00'} />
+            <QuotaProgress totalQuota={500} remainingStock={499} />
+          </div>
+
+          {/* 3. FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
           <div className="max-w-xl mx-auto mb-16">
             <WarVoucherForm defaultCity={city.name} />
           </div>

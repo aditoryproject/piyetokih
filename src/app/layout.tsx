@@ -41,7 +41,7 @@ export default function RootLayout({
             <div className="flex items-center gap-2 sm:gap-3">
               <Link
                 href="/#roadshow"
-                className="hidden sm:inline-flex px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+                className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
               >
                 Roadshow 17 Kota
               </Link>
@@ -49,13 +49,13 @@ export default function RootLayout({
                 href="/artikel"
                 className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-amber-300 hover:bg-white/5 font-semibold text-xs transition"
               >
-                Kabar & Galeri
+                Kabar &amp; Galeri
               </Link>
               <Link
-                href="/#war"
-                className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition active:scale-95"
+                href="/#presale"
+                className="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-extrabold text-xs transition active:scale-95"
               >
-                Klaim E-Voucher
+                Presale Buy 1 Get 1
               </Link>
             </div>
           </div>
@@ -63,25 +63,6 @@ export default function RootLayout({
 
         {/* Main Content */}
         <main className="min-h-screen">{children}</main>
-
-        {/* Minimal Footer */}
-        <footer className="border-t border-white/10 bg-black/90 py-8 px-4 text-center text-xs text-gray-500">
-          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-gray-400">
-              PIYE TO KIH? THE MOVIE • Miracle Pictures
-            </p>
-            <div className="flex items-center gap-4 text-gray-400">
-              <a
-                href="https://www.instagram.com/piyetokihfilm.official/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gold-400 transition"
-              >
-                @piyetokihfilm.official
-              </a>
-            </div>
-          </div>
-        </footer>
       </body>
     </html>
   );
