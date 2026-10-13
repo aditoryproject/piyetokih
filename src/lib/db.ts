@@ -173,24 +173,49 @@ function ensureDb(): DatabaseSchema {
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
     const parsed = JSON.parse(raw);
-    return {
-      settings: {
-        ...DEFAULT_SETTINGS,
-        ...parsed.settings,
-        movieSettings: {
-          ...DEFAULT_MOVIE_SETTINGS,
-          ...(parsed.settings?.movieSettings || {}),
-          cast:
-            Array.isArray(parsed.settings?.movieSettings?.cast) &&
-            parsed.settings.movieSettings.cast.length > 0
-              ? parsed.settings.movieSettings.cast
-              : DEFAULT_MOVIE_SETTINGS.cast,
-        },
+    const settings: AppSettings = {
+      ...DEFAULT_SETTINGS,
+      ...parsed.settings,
+      movieSettings: {
+        ...DEFAULT_MOVIE_SETTINGS,
+        ...(parsed.settings?.movieSettings || {}),
+        cast:
+          Array.isArray(parsed.settings?.movieSettings?.cast) &&
+          parsed.settings.movieSettings.cast.length > 0
+            ? parsed.settings.movieSettings.cast
+            : DEFAULT_MOVIE_SETTINGS.cast,
       },
+    };
+
+    // Auto-migrate legacy 22 November to 20 November
+    let hasDateUpdate = false;
+    if (settings.voucherValidDatesText && settings.voucherValidDatesText.includes('22 November')) {
+      settings.voucherValidDatesText = settings.voucherValidDatesText.replace(/22 November/g, '20 November');
+      hasDateUpdate = true;
+    }
+    if (settings.voucherValidEnd === '2026-11-22') {
+      settings.voucherValidEnd = '2026-11-20';
+      hasDateUpdate = true;
+    }
+    if (settings.voucherTermsText && settings.voucherTermsText.includes('22 November')) {
+      settings.voucherTermsText = settings.voucherTermsText.replace(/22 November/g, '20 November');
+      hasDateUpdate = true;
+    }
+
+    const currentDb: DatabaseSchema = {
+      settings,
       leads: parsed.leads || [],
       visitors: parsed.visitors || [],
       articles: Array.isArray(parsed.articles) ? parsed.articles : [],
     };
+
+    if (hasDateUpdate) {
+      try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(currentDb, null, 2));
+      } catch {}
+    }
+
+    return currentDb;
   } catch {
     return {
       settings: DEFAULT_SETTINGS,

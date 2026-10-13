@@ -20,7 +20,9 @@ export async function sendVoucherEmail({
 }: SendVoucherEmailParams) {
   const db = getDb();
   const settings = db.settings;
-  const validity = validDatesText || settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
+  const rawValidity = validDatesText || settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
+  const validity = rawValidity.replace(/22 November/g, '20 November');
+  const todayClaim = new Date().toLocaleDateString('id-ID');
 
   // If SMTP not configured, simulate successful dispatch in logs
   if (!settings.smtpHost || !settings.smtpUser) {
@@ -57,74 +59,80 @@ export async function sendVoucherEmail({
       <title>E-Voucher Resmi Piye To Kih</title>
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #070A0F; color: #ffffff; margin: 0; padding: 20px; }
-        .card { max-width: 520px; margin: 0 auto; background: linear-gradient(180deg, #161D2B 0%, #0E131E 100%); border: 2px solid #D97706; border-radius: 24px; overflow: hidden; padding: 28px 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); position: relative; }
-        .header { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 20px; }
-        .logo-text { font-size: 11px; letter-spacing: 2.5px; color: #F59E0B; font-weight: 800; text-transform: uppercase; }
-        .title { font-size: 28px; font-weight: 900; color: #ffffff; margin: 6px 0 2px; letter-spacing: -0.5px; }
-        .subtitle { font-size: 12px; color: #FBBF24; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-        .notice-box { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 14px 16px; margin: 18px 0; text-align: center; }
-        .info-grid { width: 100%; border-collapse: separate; border-spacing: 8px 0; margin: 16px 0; }
-        .info-cell { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 14px; }
-        .serial-box { background: #070A0F; border: 2px dashed #F59E0B; border-radius: 16px; text-align: center; padding: 18px; margin: 18px 0; }
-        .serial-code { font-family: 'Courier New', Courier, monospace; font-size: 26px; font-weight: 900; color: #FCD34D; letter-spacing: 4px; }
-        .validity-tag { background: #3B1219; border: 1px solid #DC2626; color: #FCA5A5; font-size: 12px; font-weight: bold; padding: 12px 16px; border-radius: 12px; margin-top: 16px; text-align: center; }
-        .btn { display: block; text-align: center; background: linear-gradient(90deg, #DC2626 0%, #EA580C 50%, #D97706 100%); color: #ffffff !important; text-decoration: none; font-weight: 900; font-size: 15px; padding: 16px 20px; border-radius: 14px; margin: 24px 0 12px; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4); }
-        .footer { text-align: center; font-size: 11px; color: #64748B; margin-top: 24px; border-top: 1px solid #1E293B; padding-top: 16px; line-height: 1.6; }
+        .card { max-width: 440px; margin: 0 auto; background: #0E131E; border: 2px solid rgba(234, 179, 8, 0.45); border-radius: 24px; overflow: hidden; padding: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); position: relative; }
+        .header { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 16px; }
+        .logo-text { font-size: 10px; letter-spacing: 2px; color: #FACC15; font-weight: 800; text-transform: uppercase; }
+        .title { font-size: 26px; font-weight: 900; color: #ffffff; margin: 4px 0 2px; letter-spacing: -0.5px; }
+        .subtitle { font-size: 11px; color: #FDE047; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        .notice-box { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 16px; padding: 12px 14px; margin: 14px 0; text-align: center; }
+        .serial-box { background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; text-align: center; padding: 16px; margin: 16px 0; }
+        .serial-code { font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: 900; color: #FACC15; letter-spacing: 4px; }
+        .validity-tag { background: rgba(80, 7, 15, 0.65); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 14px; padding: 12px 14px; margin-top: 14px; text-align: center; }
+        .footer { text-align: center; font-size: 11px; color: #64748B; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; line-height: 1.6; }
       </style>
     </head>
     <body>
       <div class="card">
-        <!-- HEADER -->
+        <!-- HEADER KARTU (PERSIS SEPERTI MODAL TIKET WEB) -->
         <div class="header">
           <div class="logo-text">MIRACLE PICTURES PRESENTS</div>
           <div class="title">PIYE TO KIH?</div>
-          <div class="subtitle">OFFICIAL E-VOUCHER TIKET NONTON</div>
+          <div class="subtitle">OFFICIAL E-VOUCHER NONTON</div>
         </div>
 
-        <p style="font-size: 14px; color: #E2E8F0; line-height: 1.6; margin: 0 0 16px;">
-          Halo <b>${name}</b>, klaim voucher nonton resmi film <i>Piye Toh Kih</i> kamu telah berhasil! Simpan email ini sebagai bukti kepemilikan voucher resmi.
-        </p>
-
-        <!-- INFO PENUKARAN -->
+        <!-- BADGE PENUKARAN DI BIOSKOP -->
         <div class="notice-box">
-          <div style="font-size: 10px; color: #F59E0B; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">PENUKARAN DI BIOSKOP</div>
-          <div style="font-size: 16px; font-weight: 900; color: #FDE68A; margin: 4px 0;">DAPAT DITUKARKAN DI BIOSKOP KESAYANGAN ANDA</div>
-          <div style="font-size: 11px; color: #CBD5E1;">Tunjukkan tautan e-voucher digital ini langsung ke kasir loket bioskop mitra.</div>
+          <div style="font-size: 9px; color: #F59E0B; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">PENUKARAN DI BIOSKOP</div>
+          <div style="font-size: 15px; font-weight: 900; color: #FEF08A; margin: 3px 0;">DAPAT DITUKAR DI BIOSKOP KESAYANGAN ANDA</div>
+          <div style="font-size: 10px; color: #E2E8F0;">Tunjukkan barcode ini langsung ke kasir loket bioskop</div>
         </div>
 
-        <!-- STAMP & PENERIMA ROW -->
-        <table style="width: 100%; margin: 16px 0; border-collapse: collapse;">
+        <!-- DATA PENERIMA & STEMPEL VERIFIED SEPERTI DI MODAL -->
+        <table style="width: 100%; margin: 14px 0; border-collapse: collapse;">
           <tr>
             <td style="vertical-align: top; width: 62%;">
-              <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;">
-                <div style="font-size: 9px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">NAMA PENERIMA</div>
-                <div style="font-size: 14px; font-weight: 900; color: #FFFFFF; margin-top: 2px;">${name}</div>
+              <!-- NAMA PENERIMA VOUCHER -->
+              <div style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
+                <div style="font-size: 9px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">NAMA PENERIMA VOUCHER</div>
+                <div style="font-size: 15px; font-weight: 900; color: #FFFFFF; margin-top: 2px;">${name}</div>
               </div>
-              <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px;">
-                <div style="font-size: 9px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">KOTA DOMISILI</div>
-                <div style="font-size: 13px; font-weight: 800; color: #FBBF24; margin-top: 2px;">${city}</div>
-              </div>
+              <!-- KOTA & TANGGAL KLAIM -->
+              <table style="width: 100%; border-collapse: separate; border-spacing: 6px 0; margin-left: -6px;">
+                <tr>
+                  <td style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 10px;">
+                    <div style="font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">KOTA</div>
+                    <div style="font-size: 12px; font-weight: 800; color: #FACC15; margin-top: 2px;">${city}</div>
+                  </td>
+                  <td style="background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 10px;">
+                    <div style="font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase;">TANGGAL KLAIM</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #E2E8F0; margin-top: 2px;">${todayClaim}</div>
+                  </td>
+                </tr>
+              </table>
             </td>
-            <td style="vertical-align: middle; text-align: center; width: 38%; padding-left: 12px;">
-              <!-- OFFICIAL VERIFIED STAMP (SAMA PERSIS SEPERTI DI TIKET PDF) -->
-              <div style="display: inline-block; width: 100px; height: 100px; border: 3px dashed #EF4444; border-radius: 50%; padding: 6px; text-align: center; background-color: rgba(239, 68, 68, 0.08); box-sizing: border-box;">
-                <div style="font-size: 8px; font-weight: 900; letter-spacing: 1.5px; color: #F87171; text-transform: uppercase; margin-top: 6px;">★ OFFICIAL ★</div>
-                <div style="font-size: 13px; font-weight: 900; color: #EF4444; letter-spacing: 0.5px; margin: 2px 0;">VERIFIED</div>
-                <div style="font-size: 7px; font-weight: 800; letter-spacing: 1px; color: #FCA5A5; text-transform: uppercase;">MIRACLE PICTURES</div>
-                <div style="height: 1px; background-color: #EF4444; margin: 3px auto; width: 45px;"></div>
-                <div style="font-size: 7.5px; font-weight: 800; color: #FECACA;">PIYE TO KIH</div>
+            <td style="vertical-align: middle; text-align: center; width: 38%; padding-left: 10px;">
+              <!-- OFFICIAL VERIFIED DIGITAL STAMP (PERSIS TIKET) -->
+              <div style="display: inline-block; width: 95px; height: 95px; border: 3px dashed #EF4444; border-radius: 50%; padding: 5px; text-align: center; background-color: rgba(239, 68, 68, 0.1); box-sizing: border-box;">
+                <div style="font-size: 7.5px; font-weight: 900; letter-spacing: 1.5px; color: #F87171; text-transform: uppercase; margin-top: 4px;">★ OFFICIAL ★</div>
+                <div style="font-size: 12px; font-weight: 900; color: #EF4444; letter-spacing: 0.5px; margin: 2px 0;">VERIFIED</div>
+                <div style="font-size: 6.5px; font-weight: 800; letter-spacing: 1px; color: #FCA5A5; text-transform: uppercase;">MIRACLE PICTURES</div>
+                <div style="height: 1px; background-color: #EF4444; margin: 2px auto; width: 40px;"></div>
+                <div style="font-size: 7px; font-weight: 800; color: #FECACA;">PIYE TO KIH</div>
               </div>
             </td>
           </tr>
         </table>
 
-        <!-- BARCODE & SERIAL SECTION -->
+        <!-- PERFORATION LINE -->
+        <div style="border-top: 2px dashed rgba(100, 116, 139, 0.5); margin: 16px 0;"></div>
+
+        <!-- BARCODE & KODE SERIAL SECTION -->
         <div class="serial-box">
-          <div style="font-size: 10px; color: #94A3B8; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">KODE SERIAL PENUKARAN RESMI</div>
+          <div style="font-size: 9px; color: #94A3B8; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;">KODE SERIAL PENUKARAN</div>
           
           <!-- Barcode Visual Mock -->
-          <div style="background: #ffffff; padding: 10px 18px; border-radius: 6px; display: inline-block; margin-bottom: 10px;">
-            <table style="border-collapse: collapse; margin: 0 auto; height: 36px;">
+          <div style="background: #ffffff; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
+            <table style="border-collapse: collapse; margin: 0 auto; height: 34px;">
               <tr>
                 <td style="width: 4px; background: #000;"></td><td style="width: 2px;"></td>
                 <td style="width: 2px; background: #000;"></td><td style="width: 3px;"></td>
@@ -147,27 +155,39 @@ export async function sendVoucherEmail({
           <div class="serial-code">${serialNumber}</div>
         </div>
 
-        <!-- MASA BERLAKU -->
+        <!-- MASA BERLAKU REDEEM BIOSKOP (MERAH GELAP) -->
         <div class="validity-tag">
-          ⚠️ <b>MASA BERLAKU PENUKARAN DI BIOSKOP:</b><br>
-          <span style="font-size: 14px; color: #FFFFFF; font-weight: 900; display: inline-block; margin-top: 4px;">${validity}</span>
+          <div style="font-size: 9px; font-weight: 900; color: #F87171; letter-spacing: 1px; text-transform: uppercase;">MASA BERLAKU REDEEM BIOSKOP</div>
+          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">${validity}</div>
+          <div style="font-size: 9.5px; color: #CBD5E1; line-height: 1.4; margin-top: 4px;">
+            Tunjukkan kode & barcode ini ke kasir tiket bioskop. Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan.
+          </div>
         </div>
 
-        <p style="font-size: 12px; color: #94A3B8; line-height: 1.6; margin-top: 18px; text-align: left;">
-          📌 <b>PETUNJUK PENUKARAN DI KASIR BIOSKOP:</b><br>
-          Voucher dapat ditukarkan di bioskop kesayangan Anda. Cukup tunjukkan tautan e-voucher digital ber-barcode melalui tombol di bawah ini ke kasir loket bioskop mitra saat hendak menonton pada periode penayangan di atas. Tidak perlu dicetak kertas!
-        </p>
-
-        <!-- CTA BUTTON KE DOMAIN RESMI -->
-        <a href="${cleanVoucherUrl}" class="btn" target="_blank">
-          🎟️ BUKA & SIMPAN E-VOUCHER DIGITAL
-        </a>
-        <div style="text-align: center; font-size: 11px; color: #94A3B8; margin-top: -4px;">
-          Tautan resmi: <a href="${cleanVoucherUrl}" style="color: #FBBF24; text-decoration: underline;">${cleanVoucherUrl}</a>
+        <!-- VERIFIKASI RESMI -->
+        <div style="text-align: center; margin-top: 14px; font-size: 10px; font-weight: 800; color: #4ADE80;">
+          ✔ TERVERIFIKASI RESMI MIRACLE PICTURES
         </div>
+
+        <!-- TOMBOL DOWNLOAD PDF (TOMBOL KUNING PERSIS MODAL WEB) -->
+        <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+          <tr>
+            <td style="padding-bottom: 10px;">
+              <a href="${cleanVoucherUrl}?download=1" style="display: block; width: 100%; box-sizing: border-box; background: linear-gradient(90deg, #FACC15 0%, #D97706 100%); color: #000000 !important; text-align: center; text-decoration: none; font-weight: 900; font-size: 14px; padding: 14px 18px; border-radius: 14px; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.4);" target="_blank">
+                📥 Download PDF Tiket
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="${cleanVoucherUrl}" style="display: block; width: 100%; box-sizing: border-box; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #FFFFFF !important; text-align: center; text-decoration: none; font-weight: 700; font-size: 12px; padding: 11px 16px; border-radius: 12px;" target="_blank">
+                🎟️ Tampilkan di Layar HP (Web)
+              </a>
+            </td>
+          </tr>
+        </table>
 
         <div class="footer">
-          ✅ <b>TERVERIFIKASI RESMI OLEH MIRACLE PICTURES</b><br>
           © ${new Date().getFullYear()} Miracle Pictures. Seluruh hak cipta dilindungi undang-undang.<br>
           Official Instagram: @piyetokihfilm.official
         </div>
@@ -176,10 +196,13 @@ export async function sendVoucherEmail({
     </html>
     `;
 
+    const baseSubject = settings.emailSubject || '🎟️ E-Voucher Nonton Resmi Film PIYE TO KIH? - Miracle Pictures';
+    const emailSubject = baseSubject.includes(serialNumber) ? baseSubject : `${baseSubject} [Kode: ${serialNumber}]`;
+
     await transporter.sendMail({
       from: settings.smtpFrom || 'Miracle Pictures <ticket@piyetokihfilm.com>',
       to: email,
-      subject: settings.emailSubject || '🎟️ E-Voucher Nonton Resmi Film PIYE TO KIH? - Miracle Pictures',
+      subject: emailSubject,
       html: htmlContent,
     });
 

@@ -54,6 +54,19 @@ export default function VoucherTicketCard({
     }
   };
 
+  // Auto trigger download if URL contains ?download=1
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const search = window.location.search;
+      if (search && (search.includes('download=1') || search.includes('download=true'))) {
+        const timer = setTimeout(() => {
+          handleDownloadPdf();
+        }, 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center w-full max-w-sm mx-auto">
       {/* TICKET CONTAINER */}
