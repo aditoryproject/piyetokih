@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Clock,
 } from 'lucide-react';
+import { trackCityCustomEvent } from '@/lib/pixel';
 
 export default function RoadshowSection() {
   const [activeTab, setActiveTab] = useState<'all' | 'jateng' | 'jatim'>('all');
@@ -212,46 +213,20 @@ export default function RoadshowSection() {
                   </div>
 
                   {/* City Title */}
-                  <h4 className="text-xl font-black text-white group-hover:text-amber-300 transition-colors mb-2">
+                  <h4 className="text-xl font-black text-white group-hover:text-amber-300 transition-colors mb-4">
                     {city.name}
                   </h4>
-
-                  {/* Cinema Venues List */}
-                  <div className="space-y-1.5 mb-5">
-                    {city.cinemas.map((cinema, cIdx) => (
-                      <div
-                        key={cIdx}
-                        className="bg-black/40 border border-white/5 rounded-xl p-2.5 text-xs"
-                      >
-                        <div className="flex items-center justify-between mb-0.5">
-                          <span className="font-bold text-gray-200 truncate">
-                            {cinema.name}
-                          </span>
-                          <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-white/10 text-amber-300">
-                            {cinema.chain}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                          <span>{cinema.studio}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-0.5">
-                            <Clock className="w-2.5 h-2.5 text-gray-400" />
-                            {cinema.showTimes[0]}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
 
-                {/* Direct Link to City Page */}
+                {/* Direct Link to City Page (HANYA BUTTON SESUAI REVISI GAMBAR 4) */}
                 <Link
                   href={`/city/${city.slug}`}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-600 text-white hover:text-black font-extrabold text-xs transition-all duration-200 shadow-md group-hover:bg-amber-500 group-hover:text-black"
+                  onClick={() => trackCityCustomEvent(city.name, 'AddToCart', { source: 'main_page_button' })}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 hover:from-amber-500 hover:to-orange-500 border border-amber-500/40 text-amber-300 hover:text-black font-black text-xs transition-all duration-200 shadow-lg group-hover:border-amber-400 group-hover:bg-amber-500 group-hover:text-black text-center"
                 >
-                  <Ticket className="w-3.5 h-3.5" />
-                  <span>Jadwal & Beli Tiket {city.name}</span>
-                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <Ticket className="w-3.5 h-3.5 shrink-0" />
+                  <span>Jadwal Kegiatan Meet and Greet di {city.name}</span>
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
             ))}

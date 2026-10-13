@@ -56,10 +56,10 @@ export default function HomePage() {
 
             <a
               href="#roadshow"
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold transition"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-bold transition shadow-sm"
             >
-              <MapPin className="w-3.5 h-3.5 text-red-400" />
-              <span>Jadwal Roadshow 17 Kota</span>
+              <Ticket className="w-3.5 h-3.5 text-amber-400" />
+              <span>Jadwal Kegiatan Meet and Greet di Semarang dan 16 Kota Lainnya</span>
             </a>
           </div>
 
@@ -77,54 +77,27 @@ export default function HomePage() {
             </span>
           </h1>
 
-          {/* Tagline & Synopsis Teaser */}
-          <p className="text-sm sm:text-lg text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed font-medium">
-            Karya Sutradara <b className="text-white">Ito Mavin</b> bersama para bintang legendaris <b className="text-amber-400">Woko Channel</b> (Mukidi, Gendut, Penyok) &amp; Dara Sarasvati. Tayang serentak di bioskop seluruh Indonesia <b className="text-white">19 November 2026</b>!
-          </p>
-
-          {/* Hero Action CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-12">
-            <a
-              href="#war"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-amber-500/25 active:scale-95 transition"
-            >
-              <Ticket className="w-4 h-4" />
-              <span>KLAIM WAR VOUCHER BIOSKOP</span>
-            </a>
-
-            <a
-              href="#teaser"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-sm backdrop-blur-md transition active:scale-95"
-            >
-              <Play className="w-4 h-4 fill-white" />
-              <span>NONTON TEASER TRAILER</span>
-            </a>
-          </div>
-
-          {/* Featured Poster Visual Banner */}
-          <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black aspect-[16/9] max-w-3xl mx-auto shadow-amber-500/10 group">
-            <img
-              src={movieSettings?.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80'}
-              alt="Official Poster Piye To Kih Miracle Pictures"
-              className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
-            <div className="absolute bottom-5 left-0 right-0 text-center px-4">
-              <span className="inline-block px-3 py-1 rounded-full bg-red-600/90 text-[10px] font-black uppercase tracking-widest text-white mb-1.5 shadow-md">
-                OFFICIAL CINEMA RELEASE
+          {/* TAYANG PERDANA STRIP (DARI GAMBAR 3, DI BAWAH JUDUL HEADLINE, TANPA LSF) */}
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-black/70 border border-amber-500/30 backdrop-blur-md mb-4 shadow-xl">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold shrink-0">
+              <Film className="w-4 h-4" />
+            </div>
+            <div className="text-left">
+              <span className="text-[11px] sm:text-xs text-amber-400 font-black uppercase tracking-widest block leading-tight">
+                TAYANG PERDANA 19 NOVEMBER 2026
               </span>
-              <p className="text-lg sm:text-2xl font-black text-amber-300 drop-shadow-md">
-                TAYANG PERDANA {movieSettings?.releaseDateText?.toUpperCase() || '19 NOVEMBER 2026'}
-              </p>
-              <p className="text-xs text-slate-300 font-medium">
-                Voucher resmi dapat ditukarkan di bioskop kesayangan Anda (Cinema XXI, CGV, Cinépolis)
-              </p>
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-300 block leading-tight">
+                SERENTAK DI SELURUH JARINGAN BIOSKOP INDONESIA
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. CINEMA PARTNERS & CERTIFICATION STRIP */}
+      {/* 2. SINOPSIS & KISAH FILM (GAMBAR 1: DIPINDAHKAN KE PALING ATAS) */}
+      <MovieStorySection movieSettings={movieSettings || undefined} />
+
+      {/* 3. CINEMA PARTNERS STRIP */}
       <CinemaPartnersStrip />
 
       {/* 3. WAR VOUCHER CLAIMS & COUNTDOWN (HIGH CONVERSION HERO FORM) */}
@@ -166,10 +139,7 @@ export default function HomePage() {
       {/* 4. OFFICIAL TEASER TRAILER PLAYER (CINEMA EXPERIENCE) */}
       <OfficialTrailerSection movieSettings={movieSettings || undefined} />
 
-      {/* 5. SINOPSIS & KISAH FILM */}
-      <MovieStorySection movieSettings={movieSettings || undefined} />
-
-      {/* 6. PEMERAN & KARAKTER RESMI (WOKO CHANNEL & DARA SARASVATI) */}
+      {/* 5. PEMERAN & KARAKTER RESMI (WOKO CHANNEL & DARA SARASVATI) */}
       <CastSection castList={movieSettings?.cast} />
 
       {/* RE-ENGAGEMENT CTA: Tombol ajakan klaim bagi penonton yang sudah membaca cerita & cast */}

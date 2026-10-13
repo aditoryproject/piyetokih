@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
       serialNumber,
       voucherUrl,
       validDates: validityText,
-      replyMessage: `🎬 *E-VOUCHER NONTON RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota: *${cityLocation}*\nNomor Seri: *${serialNumber}*\n\nBuka & simpan voucher digital resmi kamu di sini:\n${voucherUrl}\n\n⚠️ *MASA BERLAKU DI BIOSKOP:*\n*${validityText}*\n\n📌 *PETUNJUK PENUKARAN:*\nVoucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan di atas lur. Cukup tunjukkan barcode di link HP tersebut ke kasir loket bioskop. Tanpa perlu cetak kertas! Sampai jumpa di bioskop! 🍿`,
-      instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa voucher resmi nonton film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Kode Seri ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan (${validityText}) dengan cukup menunjukkan barcode tiket ke kasir bioskop. Jangan menggunakan embel-embel kata gratis yang berlebihan.`,
+      replyMessage: `🎬 *E-VOUCHER NONTON RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota: *${cityLocation}*\nNomor Seri: *${serialNumber}*\n\nBuka & simpan voucher digital resmi kamu di sini:\n${voucherUrl}\n\n⚠️ *KETENTUAN PENUKARAN VOUCHER FISIK:*\nVoucher digital ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi dilakukan pada saat Roadshow & Meet and Greet di kotamu.\n📍 Lokasi Penukaran: Kunjungi booth resmi di samping area Meet and Greet di kotamu! Sampai jumpa lur! 🍿`,
+      instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa voucher resmi film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Kode Seri ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa voucher digital ini bukan bukti pembayaran tiket, penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet di kotamu dengan mengunjungi booth resmi di samping area Meet and Greet.`,
     });
   } catch (err: any) {
     console.error('[Wahnotif Webhook Error]:', err);

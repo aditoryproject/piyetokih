@@ -93,16 +93,19 @@ export default function VoucherTicketCard({
           </p>
         </div>
 
-        {/* PENUKARAN BIOSKOP BADGE */}
-        <div className="bg-amber-500/15 border border-amber-500/40 rounded-2xl p-2.5 text-center mb-4 relative z-10">
-          <div className="text-[9px] uppercase font-bold text-amber-400 tracking-wider">
-            PENUKARAN DI BIOSKOP
+        {/* PENUKARAN ROADSHOW & MEET AND GREET BADGE */}
+        <div className="bg-amber-500/15 border border-amber-500/40 rounded-2xl p-3 text-center mb-4 relative z-10">
+          <div className="text-[9px] uppercase font-extrabold text-amber-400 tracking-wider">
+            PENUKARAN VOUCHER FISIK RESMI
           </div>
-          <div className="text-base font-black text-amber-300 tracking-tight">
-            DAPAT DITUKAR DI BIOSKOP KESAYANGAN ANDA
+          <div className="text-sm sm:text-base font-black text-amber-300 tracking-tight leading-snug my-0.5">
+            ROADSHOW &amp; MEET AND GREET DI KOTAMU
           </div>
-          <div className="text-[9px] text-gray-300">
-            Tunjukkan barcode ini langsung ke kasir loket bioskop
+          <div className="text-[10px] text-red-300 font-extrabold mt-1">
+            ⚠️ Voucher digital ini BUKAN bukti pembayaran tiket
+          </div>
+          <div className="text-[9px] text-gray-300 mt-0.5 leading-tight">
+            Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet untuk menukarkan dengan voucher fisik resmi.
           </div>
         </div>
 
@@ -188,13 +191,13 @@ export default function VoucherTicketCard({
         {/* Notice & Premiere Validity */}
         <div className="mt-3 bg-red-950/40 border border-red-500/40 rounded-xl p-2.5 text-center text-[10px]">
           <span className="block font-black text-red-400 uppercase tracking-wider text-[9px]">
-            MASA BERLAKU REDEEM BIOSKOP
+            LOKASI PENUKARAN VOUCHER FISIK
           </span>
           <span className="font-black text-amber-300 text-xs block mt-0.5 tracking-tight">
-            {validityText}
+            Roadshow &amp; Meet and Greet ({validityText})
           </span>
-          <span className="text-gray-400 text-[9px] block mt-1 leading-snug">
-            Tunjukkan kode & barcode ini ke kasir tiket bioskop. Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan.
+          <span className="text-gray-300 text-[9px] block mt-1 leading-snug">
+            Voucher digital ini bukan bukti pembayaran. Kunjungi booth penukaran resmi di samping panggung / venue Meet &amp; Greet di kotamu untuk menukarkan dengan voucher fisik resmi.
           </span>
         </div>
 

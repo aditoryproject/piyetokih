@@ -80,11 +80,12 @@ export async function sendVoucherEmail({
           <div class="subtitle">OFFICIAL E-VOUCHER NONTON</div>
         </div>
 
-        <!-- BADGE PENUKARAN DI BIOSKOP -->
+        <!-- BADGE PENUKARAN VOUCHER FISIK RESMI -->
         <div class="notice-box">
-          <div style="font-size: 9px; color: #F59E0B; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">PENUKARAN DI BIOSKOP</div>
-          <div style="font-size: 15px; font-weight: 900; color: #FEF08A; margin: 3px 0;">DAPAT DITUKAR DI BIOSKOP KESAYANGAN ANDA</div>
-          <div style="font-size: 10px; color: #E2E8F0;">Tunjukkan barcode ini langsung ke kasir loket bioskop</div>
+          <div style="font-size: 9px; color: #F59E0B; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">PENUKARAN VOUCHER FISIK RESMI</div>
+          <div style="font-size: 15px; font-weight: 900; color: #FEF08A; margin: 3px 0;">ROADSHOW &amp; MEET AND GREET DI KOTAMU</div>
+          <div style="font-size: 10px; color: #FCA5A5; font-weight: bold; margin-top: 2px;">⚠️ Voucher digital ini BUKAN bukti pembayaran tiket.</div>
+          <div style="font-size: 10px; color: #E2E8F0; margin-top: 2px; line-height: 1.4;">Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet di kotamu untuk menukarkan dengan voucher fisik resmi.</div>
         </div>
 
         <!-- DATA PENERIMA & STEMPEL VERIFIED SEPERTI DI MODAL -->
@@ -155,12 +156,12 @@ export async function sendVoucherEmail({
           <div class="serial-code">${serialNumber}</div>
         </div>
 
-        <!-- MASA BERLAKU REDEEM BIOSKOP (MERAH GELAP) -->
+        <!-- MASA BERLAKU & PETUNJUK PENUKARAN DI BOOTH (MERAH GELAP) -->
         <div class="validity-tag">
-          <div style="font-size: 9px; font-weight: 900; color: #F87171; letter-spacing: 1px; text-transform: uppercase;">MASA BERLAKU REDEEM BIOSKOP</div>
-          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">${validity}</div>
+          <div style="font-size: 9px; font-weight: 900; color: #F87171; letter-spacing: 1px; text-transform: uppercase;">LOKASI PENUKARAN VOUCHER FISIK</div>
+          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">Roadshow &amp; Meet and Greet (${validity})</div>
           <div style="font-size: 9.5px; color: #CBD5E1; line-height: 1.4; margin-top: 4px;">
-            Tunjukkan kode & barcode ini ke kasir tiket bioskop. Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan.
+            ⚠️ <b>Voucher digital ini bukan bukti pembayaran tiket.</b> Untuk penukaran voucher fisik resmi, silakan kunjungi booth resmi penukaran di samping panggung / venue Meet &amp; Greet di kotamu.
           </div>
         </div>
 

@@ -27,6 +27,35 @@ export function trackMetaEvent(eventName: string, params: Record<string, any> = 
   logVisitorEvent(eventName, params);
 }
 
+export function trackCityCustomEvent(city: string, action: string = 'AddToCart', params: Record<string, any> = {}) {
+  if (!city) return;
+  const cleanCity = city.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+
+  if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+    // 1. Format: AddToCart_Semarang / AddToCart_Yogyakarta
+    window.fbq('trackCustom', `${action}_${cleanCity}`, {
+      city,
+      action,
+      ...params,
+    });
+
+    // 2. Format: AddToCart Semarang (dengan spasi)
+    window.fbq('trackCustom', `${action} ${city.trim()}`, {
+      city,
+      action,
+      ...params,
+    });
+
+    // 3. Format khusus Meet & Greet per kota
+    window.fbq('trackCustom', `MeetAndGreet_${cleanCity}`, {
+      city,
+      ...params,
+    });
+  }
+
+  logVisitorEvent(`${action}_${cleanCity}`, { city, ...params });
+}
+
 export function trackTicketIntent(city: string, cinema: string, url: string, price: number = 35000) {
   // 1. Meta Standard Event: AddToCart
   trackMetaEvent('AddToCart', {
@@ -50,7 +79,14 @@ export function trackTicketIntent(city: string, cinema: string, url: string, pri
     destination_url: url,
   });
 
-  // 3. Custom Event untuk Internal Analytics Dashboard
+  // 3. Custom Pixel Per Kota (contoh: AddToCart_Semarang, AddToCart Semarang, MeetAndGreet_Semarang)
+  trackCityCustomEvent(city, 'AddToCart', {
+    cinema,
+    url,
+    price,
+  });
+
+  // 4. Custom Event untuk Internal Analytics Dashboard
   trackMetaEvent('TicketIntent', {
     content_name: `Tiket ${cinema}`,
     content_category: 'Cinema Ticketing',
@@ -60,11 +96,18 @@ export function trackTicketIntent(city: string, cinema: string, url: string, pri
   });
 }
 
-export function trackLeadSubmission(serialNumber: string) {
+export function trackLeadSubmission(serialNumber: string, city: string = '') {
   trackMetaEvent('Lead', {
     content_name: 'War Voucher Claim',
     voucher_code: serialNumber,
+    city: city || undefined,
     value: 1,
     currency: 'IDR',
   });
+
+  if (city) {
+    trackCityCustomEvent(city, 'Lead', {
+      voucher_code: serialNumber,
+    });
+  }
 }

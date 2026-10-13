@@ -76,7 +76,7 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
       } catch {}
 
       // Fire Meta Pixel Lead
-      trackLeadSubmission(data.serialNumber);
+      trackLeadSubmission(data.serialNumber, cityLocation);
 
       setClaimedLead({
         serialNumber: data.serialNumber,
@@ -110,7 +110,7 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
             Formulir War Voucher Nonton
           </h3>
           <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-md mx-auto">
-            Dapatkan e-voucher resmi berseri unik. <b className="text-amber-300">Voucher dapat ditukarkan di bioskop kesayangan Anda</b> saat periode penayangan film!
+            Dapatkan e-voucher resmi berseri unik. <b className="text-amber-300">Voucher ini bukan bukti pembayaran tiket</b>. Penukaran voucher fisik resmi dilakukan saat <b>Roadshow &amp; Meet and Greet</b> di kotamu (kunjungi booth di samping area Meet and Greet).
           </p>
         </div>
 
@@ -254,8 +254,8 @@ export default function WarVoucherForm({ onSuccessClaim }: WarVoucherFormProps) 
                 <CheckCircle className="w-4 h-4" />
                 E-VOUCHER BERHASIL DIKLAIM!
               </div>
-              <p className="text-xs text-gray-300">
-                Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan film.
+              <p className="text-xs text-amber-300 font-medium">
+                ⚠️ Voucher ini bukan bukti pembayaran tiket. Penukaran voucher fisik resmi pada saat Roadshow &amp; Meet and Greet di kotamu (kunjungi booth di samping area Meet and Greet).
               </p>
             </div>
 

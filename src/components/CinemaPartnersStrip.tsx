@@ -15,10 +15,6 @@ export default function CinemaPartnersStrip() {
               <span className="text-[11px] text-amber-400 font-black uppercase tracking-widest">
                 TAYANG PERDANA 19 NOVEMBER 2026
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-red-600/20 border border-red-500/40 text-red-300 font-black text-[10px] tracking-widest inline-flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-red-400" />
-                <span>LSF 13+</span>
-              </span>
             </div>
             <span className="text-xs font-bold text-slate-300 block">
               SERENTAK DI SELURUH JARINGAN BIOSKOP INDONESIA

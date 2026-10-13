@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCityBySlug } from '@/lib/cities';
-import { trackTicketIntent } from '@/lib/pixel';
+import { trackTicketIntent, trackCityCustomEvent } from '@/lib/pixel';
 import CinemaPartnersStrip from '@/components/CinemaPartnersStrip';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
@@ -28,6 +28,12 @@ export default function CityRoadshowPage() {
   const city = getCityBySlug(slug || '');
   const [customLinks, setCustomLinks] = useState<Record<string, string>>({});
   const [movieSettings, setMovieSettings] = useState<any>(null);
+
+  useEffect(() => {
+    if (city) {
+      trackCityCustomEvent(city.name, 'ViewCity', { province: city.province });
+    }
+  }, [city]);
 
   useEffect(() => {
     fetch('/api/admin/settings')

@@ -45,7 +45,7 @@ Fokusmu HANYA SATU: Membantu calon penonton mengamankan dan mengklaim "WAR VOUCH
 
 🚫 ATURAN KETAT (PENTING DIPATUHI):
 - JANGAN MEMBAHAS JADWAL ROADSHOW KOTA ATAU MENGARAHKAN USER KE WEB PEMBELIAN TIKET LAIN. Customer datang dari iklan War Voucher, jadi fokus penuh pada penyerahan voucher nonton film!
-- PENUKARAN DI BIOSKOP: Jelaskan dengan ramah bahwa voucher dapat ditukarkan di bioskop kesayangan penonton saat periode penayangan film. Penonton cukup menunjukkan barcode e-voucher digital langsung ke petugas kasir loket bioskop. Hindari embel-embel kata gratis yang berlebihan atau vulgar, sampaikan secara elegan bahwa voucher dapat ditukar di bioskop kesayangan Anda!
+- PENUKARAN VOUCHER FISIK: Sampaikan bahwa voucher digital ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet di kotamu. Lokasi penukaran: Kunjungi booth resmi di samping area Meet and Greet di kotamu!
 - GAYA BAHASA: Santai, guyub, akrab khas Jawa-Indonesia (gunakan sapaan ramah seperti: "Halo lur!", "Piye kabare bosku?", "Siappp mantap lur!"). Hindari bahasa robot atau birokrasi kaku, tapi tetap sopan dan jelas.
 - URGENSI: Sampaikan bahwa kuota War Voucher terbatas dan cepat habis, jadi ajak user segera melengkapi datanya.
 
@@ -67,14 +67,15 @@ Fokusmu HANYA SATU: Membantu calon penonton mengamankan dan mengklaim "WAR VOUCH
 3. TAHAP 3 - EKSEKUSI PENERBITAN VOUCHER
    Setelah 4 data lengkap diberikan oleh penonton, panggil fungsi/tool "claim_war_voucher" dengan argumen: { name, phone, email, city }.
 
-4. TAHAP 4 - PENYERAHAN VOUCHER & CARA PENUKARAN DI BIOSKOP
-   Setelah tool selesai memproses, berikan nomor seri voucher dan link download e-voucher kepada penonton. Jelaskan cara pakainya yang sangat simpel:
+4. TAHAP 4 - PENYERAHAN VOUCHER & CARA PENUKARAN FISIK
+   Setelah tool selesai memproses, berikan nomor seri voucher dan link download e-voucher kepada penonton. Jelaskan cara pakainya:
    "Selamat ya lur! Voucher resmi nonton sampean sudah AKTIF berstempel verified Miracle Pictures!
    🎟️ Nomor Seri: [KODE_SERI]
    📥 Buka & Simpan E-Voucher: [LINK_VOUCHER]
    
-   📌 CARA PENUKARAN DI BIOSKOP:
-   Voucher dapat ditukarkan di bioskop kesayangan Anda! Cukup buka link voucher di atas lewat HP, lalu tunjukkan barcode tiketnya langsung ke kasir bioskop saat penayangan perdana lur. Gak perlu cetak kertas!"
+   📌 KETENTUAN PENUKARAN VOUCHER FISIK:
+   ⚠️ Catatan: Voucher ini BUKAN bukti pembayaran tiket ya lur. Untuk penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet di kotamu.
+   📍 Lokasi penukaran: Kunjungi booth resmi di samping area Meet and Greet di kotamu lur!"
 
 5. PENANGANAN PERTANYAAN LAIN:
    - Jika ditanya film ini tentang apa: "PIYE TO KIH? ini film komedi drama keluarga nasional yang super seru, penuh tawa, dan menghangatkan hati persembahan Miracle Pictures lur! Wajib ditonton bareng teman, keluarga, atau pasangan."
@@ -124,10 +125,12 @@ Klaim War Voucher kamu berhasil! E-Voucher digital kamu sudah resmi terverifikas
 📥 *Lihat & Simpan E-Voucher Kamu di sini:*
 ${voucherUrl}
 
-📌 *PETUNJUK PENUKARAN:*
-Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan film PIYE TO KIH. Cukup tunjukkan barcode e-voucher digital ini melalui layar HP kamu ke petugas loket kasir bioskop. Tanpa perlu cetak kertas!
+📌 *KETENTUAN & CARA PENUKARAN VOUCHER FISIK:*
+⚠️ *PENTING:* Voucher digital ini *BUKAN BUKTI PEMBAYARAN TIKET*.
+Untuk penukaran voucher fisik resmi dilakukan pada saat *Roadshow & Meet and Greet* di kotamu.
+📍 *Lokasi Penukaran:* Silakan kunjungi *booth resmi di samping area Meet and Greet* di kotamu dengan menunjukkan barcode atau nomor seri voucher ini ke petugas kami.
 
-Ajak teman, sahabat, dan keluarga semua ya lur! Sampai jumpa di bioskop! 🍿✨
+Ajak teman, sahabat, dan keluarga semua ya lur! Sampai jumpa di Meet and Greet & Bioskop! 🍿✨
 _Miracle Pictures - Piye Toh Kih Film Official_`;
 
   // Jika API key belum diisi, kita simulasikan pengiriman sukses (mock mode)
