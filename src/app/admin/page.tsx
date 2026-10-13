@@ -1352,7 +1352,8 @@ export default function AdminPage() {
                       <iframe
                         src={getYouTubeEmbedUrl(settings.movieSettings?.trailerYoutubeUrl, false, false)}
                         title="Live Preview Trailer"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
                         allowFullScreen
                         className="w-full h-full border-0"
                       />

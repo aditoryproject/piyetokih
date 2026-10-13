@@ -19,6 +19,10 @@ export function getYouTubeEmbedUrl(urlOrId?: string, autoplay = true, muted = fa
   if (matchShort && matchShort[1]) {
     return `https://www.youtube.com/embed/${matchShort[1]}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
   }
+  const matchShorts = trimmed.match(/youtube\.com\/shorts\/([^?&]+)/);
+  if (matchShorts && matchShorts[1]) {
+    return `https://www.youtube.com/embed/${matchShorts[1]}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
+  }
   if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
     return `https://www.youtube.com/embed/${trimmed}?autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
   }
@@ -171,7 +175,8 @@ export default function OfficialTrailerSection({ movieSettings: propSettings, ci
                 <iframe
                   src={YOUTUBE_EMBED_URL}
                   title="Official Teaser Trailer Piye To Kih Miracle Pictures"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
                   className="w-full h-full border-0"
                 />

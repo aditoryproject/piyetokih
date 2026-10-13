@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'PIYE TO KIH? - Official Movie & War Voucher',
   description: 'Landing page resmi film komedi bioskop Piye Toh Kih oleh Miracle Pictures. Klaim War Voucher spesial penayangan bioskop!',
   keywords: 'Piye To Kih, Miracle Pictures, Film Bioskop, War Voucher, Tiket Bioskop',
+  referrer: 'strict-origin-when-cross-origin',
 };
 
 export default function RootLayout({
