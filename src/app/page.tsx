@@ -36,14 +36,14 @@ export default function HomePage() {
 
           {/* Big Cinematic Movie Logotype Header */}
           <div className="flex flex-col items-center justify-center my-3 sm:my-5">
-            <h1 className="sr-only">PIYE TO KIH? THE MOVIE - KARYA TERBARU ITO MAVIN</h1>
+            <h1 className="sr-only">PIYE TO KIH? THE MOVIE</h1>
             <img
               src="/logo-ptk.png"
               alt="Logo Resmi Film PIYE TO KIH? THE MOVIE"
               className="w-72 sm:w-96 md:w-[480px] lg:w-[540px] max-w-full h-auto object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
             />
-            <div className="text-xs sm:text-sm font-black tracking-[0.3em] uppercase text-amber-400/90 mt-4 mb-4">
-              THE MOVIE • KARYA TERBARU ITO MAVIN
+            <div className="text-xs sm:text-sm font-black tracking-[0.35em] uppercase text-amber-400/90 mt-4 mb-4">
+              THE MOVIE
             </div>
           </div>
 
