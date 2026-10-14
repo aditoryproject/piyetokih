@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Play, Volume2, VolumeX, Film, Sparkles, X } from 'lucide-react';
 import { MovieSettings } from '@/lib/movie-types';

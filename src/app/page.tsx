@@ -1,7 +1,9 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { getDb } from '@/lib/db';
+import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
+import ComingSoonView from '@/components/ComingSoonView';
 import RoadshowSection from '@/components/RoadshowSection';
 import ArticlesSection from '@/components/ArticlesSection';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
@@ -11,17 +13,27 @@ import PresaleBogoSection from '@/components/PresaleBogoSection';
 import Footer from '@/components/Footer';
 import { Film, Ticket } from 'lucide-react';
 
-export default function HomePage() {
-  const [movieSettings, setMovieSettings] = useState<any>(null);
+export default async function HomePage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+  const session = await verifySessionToken(token);
+  const isAdmin = session.valid;
 
-  useEffect(() => {
-    fetch('/api/admin/settings')
-      .then(r => r.json())
-      .then(data => {
-        if (data.settings?.movieSettings) setMovieSettings(data.settings.movieSettings);
-      })
-      .catch(() => {});
-  }, []);
+  const db = getDb();
+  const isMaintenanceMode = Boolean(db.settings.isMaintenanceMode);
+
+  // Jika Mode Coming Soon aktif dan bukan admin, tampilkan Coming Soon
+  if (isMaintenanceMode && !isAdmin) {
+    return (
+      <ComingSoonView
+        headline={db.settings.maintenanceHeadline}
+        subtitle={db.settings.maintenanceSubtitle}
+        socialLinks={db.settings.socialLinks}
+      />
+    );
+  }
+
+  const movieSettings = db.settings.movieSettings;
 
   return (
     <div id="top" className="relative overflow-hidden min-h-screen">

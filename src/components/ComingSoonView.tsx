@@ -146,21 +146,11 @@ export default function ComingSoonView({
         </div>
       </div>
 
-      {/* Bottom Footer & Admin Login */}
-      <div className="w-full max-w-4xl pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left text-[11px] text-slate-500">
+      {/* Bottom Footer */}
+      <div className="w-full max-w-4xl pt-6 border-t border-white/[0.06] text-center text-[11px] text-slate-500">
         <div>
           © 2026 PT Miracle Sinema Indonesia. Seluruh hak cipta dilindungi undang-undang.
         </div>
-
-        {/* Discreet Admin Login */}
-        <Link
-          href="/admin/login"
-          className="inline-flex items-center gap-1.5 text-slate-500 hover:text-amber-400 transition font-medium px-2 py-1 rounded"
-          title="Akses Administrator"
-        >
-          <Lock className="w-3 h-3" />
-          <span>Login Administrator</span>
-        </Link>
       </div>
     </div>
   );
