@@ -22,6 +22,9 @@ export async function POST(req: NextRequest) {
 
     if (body.totalQuota !== undefined) db.settings.totalQuota = Number(body.totalQuota);
     if (body.isWarOpen !== undefined) db.settings.isWarOpen = Boolean(body.isWarOpen);
+    if (body.isMaintenanceMode !== undefined) db.settings.isMaintenanceMode = Boolean(body.isMaintenanceMode);
+    if (body.maintenanceHeadline !== undefined) db.settings.maintenanceHeadline = String(body.maintenanceHeadline);
+    if (body.maintenanceSubtitle !== undefined) db.settings.maintenanceSubtitle = String(body.maintenanceSubtitle);
     if (body.countdownTarget) db.settings.countdownTarget = String(body.countdownTarget);
     if (body.metaPixelId !== undefined) db.settings.metaPixelId = String(body.metaPixelId);
     if (body.tiktokPixelId !== undefined) db.settings.tiktokPixelId = String(body.tiktokPixelId);

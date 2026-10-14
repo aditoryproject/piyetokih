@@ -8,6 +8,11 @@ export async function middleware(req: NextRequest) {
   const userAgent = req.headers.get('user-agent') || '';
   const clientIp = getClientIp(req.headers);
 
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', pathname);
+
+  const forwardNext = () => NextResponse.next({ request: { headers: requestHeaders } });
+
   // 1. WEB APPLICATION FIREWALL (WAF) - PROBE & SCANNER BLOCKER
   if (isAttackProbe(pathname, userAgent)) {
     return new NextResponse('Access Denied: Malicious probe or unauthorized scanner pattern detected.', {
@@ -76,7 +81,7 @@ export async function middleware(req: NextRequest) {
       adminUrl.pathname = '/admin';
       return NextResponse.redirect(adminUrl);
     }
-    return NextResponse.next();
+    return forwardNext();
   }
 
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
@@ -87,13 +92,13 @@ export async function middleware(req: NextRequest) {
       loginUrl.pathname = '/admin/login';
       return NextResponse.redirect(loginUrl);
     }
-    return NextResponse.next();
+    return forwardNext();
   }
 
   // 4. ADMIN API ENDPOINT PROTECTION
   if (pathname.startsWith('/api/admin')) {
     if (pathname === '/api/admin/login' || pathname === '/api/admin/logout') {
-      return NextResponse.next();
+      return forwardNext();
     }
 
     const token = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
@@ -105,7 +110,7 @@ export async function middleware(req: NextRequest) {
         { status: 401 }
       );
     }
-    return NextResponse.next();
+    return forwardNext();
   }
 
   // 5. PROTECT SENSITIVE PUBLIC APIS (Prevent Data Scraping / Unauthorized Actions)
@@ -171,7 +176,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/kabar-galeri') ||
     pathname.includes('.')
   ) {
-    return NextResponse.next();
+    return forwardNext();
   }
 
   const hostWithoutPort = hostname.split(':')[0];
@@ -187,7 +192,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return forwardNext();
 }
 
 export const config = {

@@ -48,6 +48,8 @@ import {
   Smartphone,
   Monitor,
   ShoppingCart,
+  Power,
+  AlertTriangle,
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -109,6 +111,9 @@ export default function AdminPage() {
   const [settings, setSettings] = useState<any>({
     totalQuota: 500,
     isWarOpen: true,
+    isMaintenanceMode: true,
+    maintenanceHeadline: 'COMING SOON',
+    maintenanceSubtitle: 'Website Resmi Film PIYE TO KIH? The Movie sedang mempersiapkan sesuatu yang istimewa. Nantikan jadwal roadshow 17 kota, penayangan bioskop, dan kejutan spesial!',
     countdownTarget: '2026-10-22T13:00:00+07:00',
     metaPixelId: '',
     wahnotifApiKey: '',
@@ -522,6 +527,33 @@ export default function AdminPage() {
     }
   };
 
+  const handleQuickToggleMaintenance = async (newVal: boolean) => {
+    const confirmMsg = newVal
+      ? 'Aktifkan Mode Coming Soon? Pengunjung umum hanya akan melihat halaman Coming Soon berlogo Piye To Kih.'
+      : 'Matikan Mode Coming Soon? Seluruh landing page dan fitur roadshow akan langsung live untuk publik.';
+    if (!confirm(confirmMsg)) return;
+
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isMaintenanceMode: newVal }),
+      });
+      if (res.ok) {
+        setSettings((prev: any) => ({ ...prev, isMaintenanceMode: newVal }));
+        setSettingsSuccess(true);
+        setTimeout(() => setSettingsSuccess(false), 3000);
+      } else {
+        alert('Gagal mengubah mode.');
+      }
+    } catch {
+      alert('Terjadi kesalahan jaringan.');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const handleTestEmail = async () => {
     if (!testEmailTo) {
       alert('Masukkan alamat email penerima untuk pengujian!');
@@ -906,6 +938,68 @@ export default function AdminPage() {
 
         {/* BODY PADDING */}
         <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
+          {/* QUICK CONTROL: MODE COMING SOON / MAINTENANCE TOGGLE */}
+          <div className={`p-4 sm:p-5 rounded-2xl border transition shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+            settings.isMaintenanceMode
+              ? 'bg-amber-500/10 border-amber-500/40'
+              : 'bg-emerald-500/10 border-emerald-500/40'
+          }`}>
+            <div className="flex items-start sm:items-center gap-3">
+              <div className={`p-2.5 rounded-xl text-white shrink-0 ${
+                settings.isMaintenanceMode ? 'bg-amber-600' : 'bg-emerald-600'
+              }`}>
+                <Power className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                    Status Akses Publik Website:
+                  </h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    settings.isMaintenanceMode
+                      ? 'bg-amber-500/20 text-amber-900 border border-amber-500/40'
+                      : 'bg-emerald-500/20 text-emerald-900 border border-emerald-500/40'
+                  }`}>
+                    {settings.isMaintenanceMode ? '🟡 Mode Coming Soon Aktif' : '🟢 Website Live Penuh'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1 max-w-2xl">
+                  {settings.isMaintenanceMode
+                    ? 'Pengunjung umum hanya melihat logo film Piye To Kih dan tulisan Coming Soon. Anda sedang login sehingga tetap bisa melihat & mengedit seluruh website secara normal.'
+                    : 'Website live penuh dan dapat diakses terbuka oleh publik (halaman utama, jadwal roadshow per kota, promo BOGO, dan artikel).'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+              <Link
+                href="/"
+                target="_blank"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold transition shadow-sm"
+                title="Buka Website Preview"
+              >
+                <Eye className="w-3.5 h-3.5 text-slate-500" />
+                <span>Preview Web</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => handleQuickToggleMaintenance(!settings.isMaintenanceMode)}
+                disabled={savingSettings}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95 disabled:opacity-50 ${
+                  settings.isMaintenanceMode
+                    ? 'bg-emerald-600 hover:bg-emerald-500'
+                    : 'bg-amber-600 hover:bg-amber-500'
+                }`}
+              >
+                <Power className="w-3.5 h-3.5" />
+                <span>
+                  {settings.isMaintenanceMode ? 'Publikasikan Web (Off)' : 'Aktifkan Coming Soon (On)'}
+                </span>
+              </button>
+            </div>
+          </div>
+
           {/* STATS TILES (CLEAN WHITE) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
@@ -2691,6 +2785,87 @@ export default function AdminPage() {
                   <span className="font-bold">Pengaturan berhasil disimpan dan langsung aktif di website!</span>
                 </div>
               )}
+
+              {/* SECTION: KONTROL MODE COMING SOON / MAINTENANCE */}
+              <div className="bg-amber-500/10 border-2 border-amber-500/40 rounded-2xl p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="p-1 rounded bg-amber-600 text-white">
+                        <Power className="w-4 h-4" />
+                      </span>
+                      <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                        Mode Maintenance / Coming Soon Website
+                      </label>
+                    </div>
+                    <p className="text-[11px] text-slate-600 mt-1">
+                      Tampilkan halaman Coming Soon resmi dengan logo Piye To Kih kepada publik selagi materi/aset live dipersiapkan.
+                    </p>
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                    settings.isMaintenanceMode ? 'bg-amber-600 text-white shadow-sm' : 'bg-emerald-600 text-white shadow-sm'
+                  }`}>
+                    {settings.isMaintenanceMode ? '🟡 Sedang Aktif' : '🟢 Non-Aktif (Live)'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, isMaintenanceMode: true })}
+                    className={`flex-1 py-3 px-4 rounded-xl font-black text-xs border transition flex items-center justify-center gap-2 ${
+                      settings.isMaintenanceMode
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-md'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span>🟡 AKTIFKAN MODE COMING SOON</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, isMaintenanceMode: false })}
+                    className={`flex-1 py-3 px-4 rounded-xl font-black text-xs border transition flex items-center justify-center gap-2 ${
+                      !settings.isMaintenanceMode
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span>🟢 MATIKAN (WEBSITE LIVE PENUH)</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                      Judul Headline Coming Soon
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.maintenanceHeadline || 'COMING SOON'}
+                      onChange={e => setSettings({ ...settings, maintenanceHeadline: e.target.value })}
+                      placeholder="COMING SOON"
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-slate-900 text-xs font-bold outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                      Teks Penjelasan / Subtitle Coming Soon
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={settings.maintenanceSubtitle || ''}
+                      onChange={e => setSettings({ ...settings, maintenanceSubtitle: e.target.value })}
+                      placeholder="Website Resmi Film PIYE TO KIH? The Movie sedang mempersiapkan sesuatu yang istimewa..."
+                      className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2 text-slate-900 text-xs outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 bg-white/70 border border-amber-500/30 rounded-xl text-[11px] text-slate-600">
+                  💡 <b>Catatan Akses:</b> Meskipun mode ini aktif, Anda sebagai Admin yang sedang login tetap dapat membuka dan melihat seluruh halaman website (Landing page utama, Jadwal Roadshow Kota, dll) dengan banner preview khusus di bagian atas.
+                </div>
+              </div>
 
               {/* 1. KONTROL JUMLAH KUOTA */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">

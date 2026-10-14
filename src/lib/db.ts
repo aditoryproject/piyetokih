@@ -62,6 +62,11 @@ export interface AppSettings {
     tixid?: string;
   };
 
+  // Maintenance / Coming Soon Mode (Toggleable via Dashboard)
+  isMaintenanceMode?: boolean;
+  maintenanceHeadline?: string;
+  maintenanceSubtitle?: string;
+
   // Social Media Links (Editable via Dashboard)
   socialLinks?: {
     instagram?: string;
@@ -206,6 +211,11 @@ const DEFAULT_SETTINGS: AppSettings = {
     cinepolis: 'https://cinepolis.co.id',
     tixid: 'https://www.tix.id',
   },
+
+  // Mode Maintenance / Coming Soon (Toggleable)
+  isMaintenanceMode: true,
+  maintenanceHeadline: 'COMING SOON',
+  maintenanceSubtitle: 'Website Resmi Film PIYE TO KIH? The Movie sedang mempersiapkan sesuatu yang istimewa. Nantikan jadwal penayangan bioskop dan kejutan spesial!',
 
   // Social Media Channels
   socialLinks: {
