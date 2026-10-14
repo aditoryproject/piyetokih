@@ -26,7 +26,13 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
     }
   }, [propSettings]);
 
-  const posterImg = movieSettings.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1000&q=80';
+  const initialPoster = movieSettings.posterUrl || '/kabar-galeri-hero.jpg';
+  const [currentPoster, setCurrentPoster] = useState(initialPoster);
+
+  useEffect(() => {
+    setCurrentPoster(movieSettings.posterUrl || '/kabar-galeri-hero.jpg');
+  }, [movieSettings]);
+
   const directorName = movieSettings.director || 'Ito Mavin';
   const writerName = movieSettings.writer || 'Endik Koeswoyo & Ito Mavin';
   const quoteText = movieSettings.quoteDialog || 'Niat ati golek omah murah gawe rabi, malah kepincut prawan ayu sing ora tau saba awan...';
@@ -44,8 +50,13 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black shadow-amber-500/20 group">
               <img
-                src={posterImg}
+                src={currentPoster}
                 alt="Sinopsis Film Piye To Kih Miracle Pictures"
+                onError={() => {
+                  if (currentPoster !== '/kabar-galeri-hero.jpg') {
+                    setCurrentPoster('/kabar-galeri-hero.jpg');
+                  }
+                }}
                 className="w-full h-[480px] object-cover group-hover:scale-105 transition-transform duration-700 opacity-85"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />

@@ -2,6 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Play, Volume2, VolumeX, Film, Sparkles, X } from 'lucide-react';
 import { MovieSettings } from '@/lib/movie-types';
 
+export function getYouTubeId(urlOrId?: string): string | null {
+  if (!urlOrId || !urlOrId.trim()) return null;
+  const trimmed = urlOrId.trim();
+  const matchWatch = trimmed.match(/[?&]v=([^&]+)/);
+  if (matchWatch && matchWatch[1]) return matchWatch[1];
+  const matchShort = trimmed.match(/youtu\.be\/([^?&]+)/);
+  if (matchShort && matchShort[1]) return matchShort[1];
+  const matchShorts = trimmed.match(/youtube\.com\/shorts\/([^?&]+)/);
+  if (matchShorts && matchShorts[1]) return matchShorts[1];
+  const matchEmbed = trimmed.match(/youtube\.com\/embed\/([^?&]+)/);
+  if (matchEmbed && matchEmbed[1]) return matchEmbed[1];
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+  return null;
+}
+
 export function getYouTubeEmbedUrl(urlOrId?: string, autoplay = true, muted = false): string {
   if (!urlOrId || !urlOrId.trim()) {
     return `https://www.youtube.com/embed?listType=search&list=Piye+To+Kih+Official+Teaser+Trailer+Cinema+21&autoplay=${autoplay ? 1 : 0}&mute=${muted ? 1 : 0}&rel=0`;
@@ -39,6 +54,12 @@ export default function OfficialTrailerSection({ movieSettings: propSettings, ci
   const [isPlayingModal, setIsPlayingModal] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
+  const rawTrailerUrl = movieSettings?.trailerYoutubeUrl || '';
+  const ytId = getYouTubeId(rawTrailerUrl);
+  const ytThumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+  const initialBackdrop = movieSettings?.backdropUrl || ytThumb || movieSettings?.posterUrl || '/kabar-galeri-hero.jpg';
+  const [currentBackdrop, setCurrentBackdrop] = useState(initialBackdrop);
+
   useEffect(() => {
     if (propSettings) {
       setMovieSettings(propSettings);
@@ -54,8 +75,12 @@ export default function OfficialTrailerSection({ movieSettings: propSettings, ci
     }
   }, [propSettings]);
 
-  const rawTrailerUrl = movieSettings?.trailerYoutubeUrl || '';
-  const backdropUrl = movieSettings?.backdropUrl || movieSettings?.posterUrl || 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1600&q=80';
+  useEffect(() => {
+    const updatedYtId = getYouTubeId(movieSettings?.trailerYoutubeUrl || '');
+    const updatedYtThumb = updatedYtId ? `https://img.youtube.com/vi/${updatedYtId}/hqdefault.jpg` : '';
+    setCurrentBackdrop(movieSettings?.backdropUrl || updatedYtThumb || movieSettings?.posterUrl || '/kabar-galeri-hero.jpg');
+  }, [movieSettings]);
+
   const YOUTUBE_EMBED_URL = getYouTubeEmbedUrl(rawTrailerUrl, true, isMuted);
 
   return (
@@ -107,8 +132,15 @@ export default function OfficialTrailerSection({ movieSettings: propSettings, ci
           <div className="relative aspect-video w-full bg-slate-950 overflow-hidden">
             {/* Poster Backdrop Image */}
             <img
-              src={backdropUrl}
+              src={currentBackdrop}
               alt="Teaser Film Piye To Kih Miracle Pictures"
+              onError={() => {
+                if (ytThumb && currentBackdrop !== ytThumb) {
+                  setCurrentBackdrop(ytThumb);
+                } else if (currentBackdrop !== '/kabar-galeri-hero.jpg') {
+                  setCurrentBackdrop('/kabar-galeri-hero.jpg');
+                }
+              }}
               className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
