@@ -2064,23 +2064,27 @@ export default function AdminPage() {
                     {/* Preview Box - Real Vertical Cinema Poster Ratio 2:3 */}
                     <div className="relative aspect-[2/3] max-w-[220px] w-full mx-auto rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center shadow-md mt-3">
                       {settings.movieSettings?.posterUrl ? (
-                        <img
-                          src={settings.movieSettings.posterUrl}
-                          alt="Preview Poster Vertikal"
-                          className="w-full h-full object-cover"
-                          onError={(e: any) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
+                        <>
+                          <img
+                            key={settings.movieSettings.posterUrl}
+                            src={settings.movieSettings.posterUrl}
+                            alt="Preview Poster Vertikal"
+                            className="w-full h-full object-cover"
+                            onError={(e: any) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = '/kabar-galeri-hero.jpg';
+                            }}
+                          />
+                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
+                            Live Poster Vertikal
+                          </div>
+                        </>
                       ) : (
                         <div className="text-center p-4 text-slate-500 text-xs">
                           <Image className="w-8 h-8 mx-auto mb-1 opacity-40" />
                           <span>Preview Poster Belum Diatur</span>
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
-                        Live Poster Vertikal
-                      </div>
                     </div>
                   </div>
 
@@ -2146,23 +2150,27 @@ export default function AdminPage() {
                     {/* Preview Box */}
                     <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center shadow-inner">
                       {settings.movieSettings?.backdropUrl ? (
-                        <img
-                          src={settings.movieSettings.backdropUrl}
-                          alt="Preview Backdrop"
-                          className="w-full h-full object-cover"
-                          onError={(e: any) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
+                        <>
+                          <img
+                            key={settings.movieSettings.backdropUrl}
+                            src={settings.movieSettings.backdropUrl}
+                            alt="Preview Backdrop"
+                            className="w-full h-full object-cover"
+                            onError={(e: any) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = '/kabar-galeri-hero.jpg';
+                            }}
+                          />
+                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
+                            Live Backdrop Preview
+                          </div>
+                        </>
                       ) : (
                         <div className="text-center p-4 text-slate-500 text-xs">
                           <Image className="w-8 h-8 mx-auto mb-1 opacity-40" />
                           <span>Preview Backdrop Teaser</span>
                         </div>
                       )}
-                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
-                        Live Backdrop Preview
-                      </div>
                     </div>
                   </div>
                 </div>
