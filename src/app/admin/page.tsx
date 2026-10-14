@@ -165,6 +165,26 @@ export default function AdminPage() {
   const [uploadingArticleGallery, setUploadingArticleGallery] = useState(false);
   const [uploadingBogoBanner, setUploadingBogoBanner] = useState(false);
 
+  // Server uploads list
+  const [serverUploads, setServerUploads] = useState<Array<{ name: string; url: string; size: number; mtime: number }>>([]);
+  const [loadingUploads, setLoadingUploads] = useState(false);
+  const [copiedUploadUrl, setCopiedUploadUrl] = useState<string | null>(null);
+
+  const fetchServerUploads = async () => {
+    try {
+      setLoadingUploads(true);
+      const res = await fetch('/api/admin/upload');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.files)) {
+        setServerUploads(data.files);
+      }
+    } catch (err) {
+      console.error('Failed to fetch server uploads', err);
+    } finally {
+      setLoadingUploads(false);
+    }
+  };
+
   const handleFileUpload = async (file: File, category: string = 'movie'): Promise<string | null> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -176,6 +196,7 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success && data.url) {
+        fetchServerUploads();
         return data.url;
       } else {
         alert(data.error || 'Gagal mengunggah file.');
@@ -363,6 +384,7 @@ export default function AdminPage() {
     fetchVisitors();
     fetchArticles();
     fetchReminders();
+    fetchServerUploads();
   }, [search, sourceFilter, cityFilter]);
 
   const handleOpenNewArticle = () => {
@@ -2094,6 +2116,45 @@ export default function AdminPage() {
                   </p>
                 </div>
 
+                {/* Quick Auto-Restore Alert if Unsplash placeholder is active but real poster is on server */}
+                {(() => {
+                  const detectedPoster = serverUploads.find(f => f.name.toLowerCase().includes('poster'));
+                  const isUnsplash = settings.movieSettings?.posterUrl?.includes('images.unsplash.com');
+                  if (isUnsplash && detectedPoster) {
+                    return (
+                      <div className="p-4 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border-2 border-amber-500/50 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md animate-in fade-in">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-amber-500 text-slate-950 rounded-xl font-bold shrink-0">
+                            <AlertCircle className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-black text-slate-900">File Poster Asli Ditemukan di Server VPS!</h4>
+                            <p className="text-[11px] text-slate-600 mt-0.5">
+                              File upload Anda <strong className="text-amber-900 font-mono">{detectedPoster.name}</strong> masih tersimpan aman di server. Klik tombol di samping untuk langsung memasangnya kembali tanpa upload ulang.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSettings({
+                              ...settings,
+                              movieSettings: {
+                                ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                posterUrl: detectedPoster.url,
+                              },
+                            });
+                          }}
+                          className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-lg transition active:scale-95 shrink-0 whitespace-nowrap"
+                        >
+                          ⚡ Terapkan Poster Asli ({detectedPoster.name})
+                        </button>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Poster Vertikal Input & Preview */}
                   <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -2273,6 +2334,140 @@ export default function AdminPage() {
                       )}
                     </div>
                   </div>
+                </div>
+
+                {/* Galeri File Tersimpan di Server VPS */}
+                <div className="mt-5 pt-5 border-t border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                    <div>
+                      <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <Image className="w-4 h-4 text-amber-500" />
+                        Galeri Media di Server VPS ({serverUploads.length} File)
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        File tersimpan permanen di folder server (<code className="text-slate-700 font-mono">/public/uploads/</code> &amp; external backup). Klik untuk langsung pasang:
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={fetchServerUploads}
+                      disabled={loadingUploads}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition shadow-xs self-start sm:self-auto"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loadingUploads ? 'animate-spin' : ''}`} />
+                      <span>{loadingUploads ? 'Memuat...' : 'Segarkan File'}</span>
+                    </button>
+                  </div>
+
+                  {serverUploads.length === 0 ? (
+                    <div className="bg-white border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-500 text-xs">
+                      Belum ada file yang diunggah ke server. Gunakan tombol upload di atas untuk mengunggah poster atau backdrop.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {serverUploads.map(file => {
+                        const isCurrentPoster = settings.movieSettings?.posterUrl === file.url;
+                        const isCurrentBackdrop = settings.movieSettings?.backdropUrl === file.url;
+                        const sizeKb = Math.round(file.size / 1024);
+
+                        return (
+                          <div
+                            key={file.name}
+                            className={`group relative bg-white rounded-xl border overflow-hidden flex flex-col transition hover:shadow-md ${
+                              isCurrentPoster || isCurrentBackdrop ? 'border-amber-500 ring-2 ring-amber-400/30' : 'border-slate-200'
+                            }`}
+                          >
+                            {/* Image Thumbnail */}
+                            <div className="relative aspect-square bg-slate-950 overflow-hidden">
+                              <img
+                                src={file.url}
+                                alt={file.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                onError={(e: any) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '/kabar-galeri-hero.jpg';
+                                }}
+                              />
+                              {isCurrentPoster && (
+                                <span className="absolute top-1 left-1 bg-amber-500 text-slate-950 text-[9px] font-black px-1.5 py-0.5 rounded shadow">
+                                  POSTER AKTIF
+                                </span>
+                              )}
+                              {isCurrentBackdrop && (
+                                <span className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded shadow">
+                                  BACKDROP AKTIF
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Info & Actions */}
+                            <div className="p-2 flex-1 flex flex-col justify-between text-[10px] space-y-1.5">
+                              <div>
+                                <p className="font-mono text-slate-700 truncate font-bold text-[10px]" title={file.name}>
+                                  {file.name}
+                                </p>
+                                <p className="text-slate-400 text-[9px]">{sizeKb} KB</p>
+                              </div>
+
+                              <div className="space-y-1 pt-1 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSettings({
+                                      ...settings,
+                                      movieSettings: {
+                                        ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                        posterUrl: file.url,
+                                      },
+                                    });
+                                  }}
+                                  className={`w-full py-1 px-1.5 rounded text-[10px] font-bold text-center transition ${
+                                    isCurrentPoster
+                                      ? 'bg-amber-100 text-amber-800'
+                                      : 'bg-slate-100 hover:bg-amber-500 hover:text-slate-950 text-slate-700'
+                                  }`}
+                                >
+                                  {isCurrentPoster ? '✓ Poster Ini Aktif' : '📌 Jadi Poster'}
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSettings({
+                                      ...settings,
+                                      movieSettings: {
+                                        ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                        backdropUrl: file.url,
+                                      },
+                                    });
+                                  }}
+                                  className={`w-full py-1 px-1.5 rounded text-[10px] font-bold text-center transition ${
+                                    isCurrentBackdrop
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : 'bg-slate-100 hover:bg-slate-800 hover:text-white text-slate-700'
+                                  }`}
+                                >
+                                  {isCurrentBackdrop ? '✓ Backdrop Aktif' : '🎬 Jadi Backdrop'}
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(file.url);
+                                    setCopiedUploadUrl(file.url);
+                                    setTimeout(() => setCopiedUploadUrl(null), 2000);
+                                  }}
+                                  className="w-full py-0.5 px-1 rounded text-[9px] text-slate-400 hover:text-slate-700 text-center"
+                                >
+                                  {copiedUploadUrl === file.url ? '✓ Tersalin!' : 'Salin URL'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 

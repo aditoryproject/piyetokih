@@ -165,6 +165,14 @@ export interface DatabaseSchema {
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+const BAK_FILE = path.join(DATA_DIR, 'db.json.bak');
+const PERSIST_FILE = path.join(DATA_DIR, 'db.persist.json');
+
+// External persistent storage outside git working tree (immune to git pull/checkout/reset)
+const EXTERNAL_DIR = process.env.EXTERNAL_STORAGE_DIR || path.join(process.cwd(), '..', 'miracleweb-storage');
+const EXTERNAL_DB_FILE = path.join(EXTERNAL_DIR, 'db.json');
+const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
+const EXTERNAL_UPLOADS_DIR = path.join(EXTERNAL_DIR, 'uploads');
 
 
 
@@ -245,89 +253,181 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
 };
 
+function findLatestUploadedFile(categoryPrefix: string): string | null {
+  try {
+    const searchDirs = [UPLOADS_DIR, EXTERNAL_UPLOADS_DIR];
+    for (const dir of searchDirs) {
+      if (fs.existsSync(dir)) {
+        const files = fs
+          .readdirSync(dir)
+          .filter(f => !f.startsWith('.') && (f.startsWith(categoryPrefix) || f.includes(categoryPrefix)))
+          .map(f => {
+            try {
+              const stat = fs.statSync(path.join(dir, f));
+              return { name: f, mtime: stat.mtimeMs };
+            } catch {
+              return { name: f, mtime: 0 };
+            }
+          })
+          .sort((a, b) => b.mtime - a.mtime);
+
+        if (files.length > 0 && files[0].name) {
+          return `/uploads/${files[0].name}`;
+        }
+      }
+    }
+  } catch {}
+  return null;
+}
+
+function loadPersistentBackup(): DatabaseSchema | null {
+  const candidates = [EXTERNAL_DB_FILE, PERSIST_FILE, BAK_FILE];
+  for (const f of candidates) {
+    try {
+      if (fs.existsSync(f)) {
+        const raw = fs.readFileSync(f, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && parsed.settings) {
+          return parsed as DatabaseSchema;
+        }
+      }
+    } catch {}
+  }
+  return null;
+}
+
 function ensureDb(): DatabaseSchema {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  if (!fs.existsSync(DB_FILE)) {
-    const initial: DatabaseSchema = {
-      settings: DEFAULT_SETTINGS,
-      leads: [],
-      visitors: [],
-      articles: [],
-      bogoReminders: [],
-    };
-    fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2));
-    return initial;
+  const backup = loadPersistentBackup();
+
+  let rawDb: any = null;
+  if (fs.existsSync(DB_FILE)) {
+    try {
+      const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      rawDb = JSON.parse(raw);
+    } catch {}
   }
 
-  try {
-    const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    const parsed = JSON.parse(raw);
-    const settings: AppSettings = {
-      ...DEFAULT_SETTINGS,
-      ...parsed.settings,
-      movieSettings: {
-        ...DEFAULT_MOVIE_SETTINGS,
-        ...(parsed.settings?.movieSettings || {}),
-        cast:
-          Array.isArray(parsed.settings?.movieSettings?.cast) &&
-          parsed.settings.movieSettings.cast.length > 0
-            ? parsed.settings.movieSettings.cast
-            : DEFAULT_MOVIE_SETTINGS.cast,
-      },
-      kabarGaleriSettings: {
-        ...(DEFAULT_SETTINGS.kabarGaleriSettings || {}),
-        ...(parsed.settings?.kabarGaleriSettings || {}),
-        mediaCenter: {
-          ...(DEFAULT_SETTINGS.kabarGaleriSettings?.mediaCenter || {}),
-          ...(parsed.settings?.kabarGaleriSettings?.mediaCenter || {}),
-        },
-      },
-    };
-
-    // Auto-migrate legacy 22 November to 20 November
-    let hasDateUpdate = false;
-    if (settings.voucherValidDatesText && settings.voucherValidDatesText.includes('22 November')) {
-      settings.voucherValidDatesText = settings.voucherValidDatesText.replace(/22 November/g, '20 November');
-      hasDateUpdate = true;
-    }
-    if (settings.voucherValidEnd === '2026-11-22') {
-      settings.voucherValidEnd = '2026-11-20';
-      hasDateUpdate = true;
-    }
-    if (settings.voucherTermsText && settings.voucherTermsText.includes('22 November')) {
-      settings.voucherTermsText = settings.voucherTermsText.replace(/22 November/g, '20 November');
-      hasDateUpdate = true;
-    }
-
-    const articles = Array.isArray(parsed.articles) ? parsed.articles : [];
-
-    const currentDb: DatabaseSchema = {
-      settings,
-      leads: parsed.leads || [],
-      visitors: parsed.visitors || [],
-      articles,
-      bogoReminders: Array.isArray(parsed.bogoReminders) ? parsed.bogoReminders : [],
-    };
-
-    if (hasDateUpdate) {
-      try {
-        fs.writeFileSync(DB_FILE, JSON.stringify(currentDb, null, 2));
-      } catch {}
-    }
-
-    return currentDb;
-  } catch {
-    return {
-      settings: DEFAULT_SETTINGS,
-      leads: [],
-      visitors: [],
-      articles: [],
-      bogoReminders: [],
-    };
+  // If DB_FILE is missing or corrupted, use backup immediately
+  if (!rawDb && backup) {
+    rawDb = backup;
   }
+
+  const parsed = rawDb || {};
+  const backupSettings = backup?.settings;
+  const currentSettings = parsed.settings || {};
+
+  // Preserve custom poster: if current is default unsplash or missing, but backup has custom, PRESERVE BACKUP!
+  let posterUrl = currentSettings.movieSettings?.posterUrl;
+  if (!posterUrl || posterUrl.includes('unsplash.com')) {
+    if (backupSettings?.movieSettings?.posterUrl && !backupSettings.movieSettings.posterUrl.includes('unsplash.com')) {
+      posterUrl = backupSettings.movieSettings.posterUrl;
+    } else {
+      // Auto-scan uploaded files in uploads dir
+      const detected = findLatestUploadedFile('movie-poster') || findLatestUploadedFile('poster') || findLatestUploadedFile('movie');
+      if (detected) posterUrl = detected;
+    }
+  }
+
+  // Preserve custom backdrop:
+  let backdropUrl = currentSettings.movieSettings?.backdropUrl;
+  if (!backdropUrl || backdropUrl.includes('unsplash.com')) {
+    if (backupSettings?.movieSettings?.backdropUrl && !backupSettings.movieSettings.backdropUrl.includes('unsplash.com')) {
+      backdropUrl = backupSettings.movieSettings.backdropUrl;
+    } else {
+      const detected = findLatestUploadedFile('movie-backdrop') || findLatestUploadedFile('backdrop');
+      if (detected) backdropUrl = detected;
+    }
+  }
+
+  // Preserve custom YouTube trailer:
+  let trailerYoutubeUrl = currentSettings.movieSettings?.trailerYoutubeUrl;
+  if (!trailerYoutubeUrl && backupSettings?.movieSettings?.trailerYoutubeUrl) {
+    trailerYoutubeUrl = backupSettings.movieSettings.trailerYoutubeUrl;
+  }
+
+  const movieSettings: MovieSettings = {
+    ...DEFAULT_MOVIE_SETTINGS,
+    ...(backupSettings?.movieSettings || {}),
+    ...currentSettings.movieSettings,
+    posterUrl: posterUrl || DEFAULT_MOVIE_SETTINGS.posterUrl,
+    backdropUrl: backdropUrl || DEFAULT_MOVIE_SETTINGS.backdropUrl,
+    trailerYoutubeUrl: trailerYoutubeUrl || '',
+    cast:
+      Array.isArray(backupSettings?.movieSettings?.cast) && backupSettings.movieSettings.cast.length > 0
+        ? backupSettings.movieSettings.cast
+        : Array.isArray(currentSettings.movieSettings?.cast) && currentSettings.movieSettings.cast.length > 0
+        ? currentSettings.movieSettings.cast
+        : DEFAULT_MOVIE_SETTINGS.cast,
+  };
+
+  const settings: AppSettings = {
+    ...DEFAULT_SETTINGS,
+    ...(backupSettings || {}),
+    ...currentSettings,
+    movieSettings,
+    kabarGaleriSettings: {
+      ...(DEFAULT_SETTINGS.kabarGaleriSettings || {}),
+      ...(backupSettings?.kabarGaleriSettings || {}),
+      ...(currentSettings.kabarGaleriSettings || {}),
+      mediaCenter: {
+        ...(DEFAULT_SETTINGS.kabarGaleriSettings?.mediaCenter || {}),
+        ...(backupSettings?.kabarGaleriSettings?.mediaCenter || {}),
+        ...(currentSettings.kabarGaleriSettings?.mediaCenter || {}),
+      },
+    },
+  };
+
+  // Auto-migrate legacy 22 November to 20 November
+  if (settings.voucherValidDatesText && settings.voucherValidDatesText.includes('22 November')) {
+    settings.voucherValidDatesText = settings.voucherValidDatesText.replace(/22 November/g, '20 November');
+  }
+  if (settings.voucherValidEnd === '2026-11-22') {
+    settings.voucherValidEnd = '2026-11-20';
+  }
+  if (settings.voucherTermsText && settings.voucherTermsText.includes('22 November')) {
+    settings.voucherTermsText = settings.voucherTermsText.replace(/22 November/g, '20 November');
+  }
+
+  // Merge leads (never lose collected attendee data!)
+  let leads = Array.isArray(parsed.leads) ? parsed.leads : [];
+  if (Array.isArray(backup?.leads) && backup.leads.length > leads.length) {
+    leads = backup.leads;
+  }
+
+  // Merge bogo reminders:
+  let bogoReminders = Array.isArray(parsed.bogoReminders) ? parsed.bogoReminders : [];
+  if (Array.isArray(backup?.bogoReminders) && backup.bogoReminders.length > bogoReminders.length) {
+    bogoReminders = backup.bogoReminders;
+  }
+
+  // Merge articles:
+  let articles = Array.isArray(parsed.articles) ? parsed.articles : [];
+  if (Array.isArray(backup?.articles) && backup.articles.length > articles.length) {
+    articles = backup.articles;
+  }
+
+  // Merge visitors:
+  let visitors = Array.isArray(parsed.visitors) ? parsed.visitors : [];
+  if (Array.isArray(backup?.visitors) && backup.visitors.length > visitors.length) {
+    visitors = backup.visitors;
+  }
+
+  const currentDb: DatabaseSchema = {
+    settings,
+    leads,
+    visitors,
+    articles,
+    bogoReminders,
+  };
+
+  // Sync to all backup locations
+  saveDb(currentDb);
+
+  return currentDb;
 }
 
 export function getDb(): DatabaseSchema {
@@ -338,7 +438,33 @@ export function saveDb(data: DatabaseSchema) {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+
+  const payload = JSON.stringify(data, null, 2);
+
+  // 1. Primary DB File
+  try {
+    fs.writeFileSync(DB_FILE, payload);
+  } catch (e) {
+    console.error('Error writing DB_FILE:', e);
+  }
+
+  // 2. Local Backup File
+  try {
+    fs.writeFileSync(BAK_FILE, payload);
+  } catch {}
+
+  // 3. Local Persist File
+  try {
+    fs.writeFileSync(PERSIST_FILE, payload);
+  } catch {}
+
+  // 4. External Persist File (outside git tree - 100% immune to git pull/checkout/reset!)
+  try {
+    if (!fs.existsSync(EXTERNAL_DIR)) {
+      fs.mkdirSync(EXTERNAL_DIR, { recursive: true });
+    }
+    fs.writeFileSync(EXTERNAL_DB_FILE, payload);
+  } catch {}
 }
 
 export function generateVoucherSerial(): string {

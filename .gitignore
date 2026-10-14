@@ -33,3 +33,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# persistent data and backups
+data/*.bak
+data/*.persist.json
+data/db.backup.json
+miracleweb-storage/
+public/uploads/
+
