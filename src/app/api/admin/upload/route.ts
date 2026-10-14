@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB limit
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. Verify Admin Session
+    const token = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
+    const session = await verifySessionToken(token);
+    if (!session.valid) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Sesi admin tidak valid.' },
+        { status: 401 }
+      );
+    }
+
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const category = (formData.get('category') as string) || 'movie';
@@ -12,9 +25,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Tidak ada file yang diunggah.' }, { status: 400 });
     }
 
-    // Validate mime type
+    // 2. Check File Size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { success: false, error: 'Ukuran file melebihi batas maksimal (Maks. 10MB).' },
+        { status: 400 }
+      );
+    }
+
+    // 3. Strict MIME type whitelist (raster images only to prevent script execution)
     const mime = file.type;
-    const validMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    const validMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!validMimes.includes(mime)) {
       return NextResponse.json(
         { success: false, error: 'Format file tidak didukung. Harap gunakan file gambar JPG, PNG, atau WebP.' },
@@ -27,7 +48,6 @@ export async function POST(req: NextRequest) {
     if (mime === 'image/png') ext = 'png';
     else if (mime === 'image/webp') ext = 'webp';
     else if (mime === 'image/gif') ext = 'gif';
-    else if (mime === 'image/svg+xml') ext = 'svg';
 
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     if (!fs.existsSync(uploadsDir)) {

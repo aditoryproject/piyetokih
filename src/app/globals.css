@@ -3,32 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 11, 15, 23;
-  --background-end-rgb: 5, 8, 12;
+  --foreground-rgb: 245, 245, 247;
+  --background-start-rgb: 10, 10, 12;
+  --background-end-rgb: 5, 5, 7;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      rgb(var(--background-start-rgb)),
-      rgb(var(--background-end-rgb))
-    );
+  background-color: #0A0A0C;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 175, 55, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 50% 120%, rgba(184, 51, 42, 0.06), transparent);
   min-height: 100vh;
+  letter-spacing: -0.01em;
+}
+
+/* Subtle Theatrical Vignette */
+.cinematic-vignette {
+  background: radial-gradient(circle at center, transparent 30%, rgba(10, 10, 12, 0.85) 100%);
+}
+
+/* Authentic Theatrical Movie Credits (Billing Block) */
+.billing-block {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-stretch: ultra-condensed;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #0A0A0C;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27354E;
+  background: #23232A;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #CA8A04;
+  background: #D4AF37;
 }

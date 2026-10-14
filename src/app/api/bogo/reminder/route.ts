@@ -2,8 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, BogoReminderRecord } from '@/lib/db';
 import { sendWahnotifVoucher } from '@/lib/wahnotif';
 import nodemailer from 'nodemailer';
+import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
+import { sanitizeString, validateHumanSubmission } from '@/lib/security';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Protect PII data: only admin can view registered customer reminders
+  const token = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
+  const session = await verifySessionToken(token);
+  if (!session.valid) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized: Akses ditolak.' },
+      { status: 401 }
+    );
+  }
+
   const db = getDb();
   return NextResponse.json({
     totalReminders: db.bogoReminders.length,
@@ -14,7 +26,21 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, phone, email, city } = body;
+
+    // Bot & Honeypot Validation
+    const humanCheck = validateHumanSubmission(body.website, body._t);
+    if (!humanCheck.isHuman) {
+      // Silently return success to mislead malicious bots
+      return NextResponse.json({
+        success: true,
+        message: 'Nomor WhatsApp Anda berhasil didaftarkan.',
+      });
+    }
+
+    const name = sanitizeString(body.name, 100);
+    const phone = sanitizeString(body.phone, 30);
+    const email = sanitizeString(body.email, 120);
+    const city = sanitizeString(body.city, 60);
 
     if (!name || !phone || !email || !city) {
       return NextResponse.json(

@@ -2,11 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, generateVoucherSerial, LeadRecord } from '@/lib/db';
 import { sendWahnotifVoucher } from '@/lib/wahnotif';
 import { sendVoucherEmail } from '@/lib/email';
+import { sanitizeString, validateHumanSubmission } from '@/lib/security';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, phone, email, cityLocation } = body;
+
+    // Honeypot & human check
+    const humanCheck = validateHumanSubmission(body.website, body._t);
+    if (!humanCheck.isHuman) {
+      return NextResponse.json({
+        success: true,
+        message: 'Klaim e-voucher berhasil diproses.',
+      });
+    }
+
+    const name = sanitizeString(body.name, 100);
+    const phone = sanitizeString(body.phone, 30);
+    const email = sanitizeString(body.email, 120);
+    const cityLocation = sanitizeString(body.cityLocation, 60);
 
     if (!name || !phone || !email) {
       return NextResponse.json(
