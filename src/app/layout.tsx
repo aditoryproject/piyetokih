@@ -38,24 +38,66 @@ export default function RootLayout({
               </div>
             </Link>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden md:flex items-center gap-1 lg:gap-2">
               <Link
-                href="/#roadshow"
-                className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+                href="/"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
               >
-                Roadshow 17 Kota
+                Beranda
               </Link>
               <Link
-                href="/artikel"
-                className="px-3 py-1.5 rounded-lg text-gray-300 hover:text-amber-300 hover:bg-white/5 font-semibold text-xs transition"
+                href="/#sinopsis"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+              >
+                Tentang Film
+              </Link>
+              <Link
+                href="/#cast"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+              >
+                Pemain
+              </Link>
+              <Link
+                href="/#teaser"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+              >
+                Trailer
+              </Link>
+              <Link
+                href="/#roadshow"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+              >
+                Roadshow
+              </Link>
+              <Link
+                href="/kabar-galeri"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-white/5 font-semibold text-xs transition"
               >
                 Kabar &amp; Galeri
               </Link>
               <Link
                 href="/#presale"
-                className="px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-extrabold text-xs transition active:scale-95"
+                className="ml-2 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition active:scale-95"
               >
-                Presale Buy 1 Get 1
+                <Ticket className="w-3.5 h-3.5" />
+                <span>Tiket</span>
+              </Link>
+            </div>
+
+            {/* Mobile Nav Links */}
+            <div className="flex md:hidden items-center gap-1.5">
+              <Link
+                href="/kabar-galeri"
+                className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-amber-300 font-bold text-xs"
+              >
+                Kabar &amp; Galeri
+              </Link>
+              <Link
+                href="/#presale"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-xs"
+              >
+                <Ticket className="w-3 h-3" />
+                <span>Tiket</span>
               </Link>
             </div>
           </div>

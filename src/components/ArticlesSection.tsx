@@ -113,7 +113,7 @@ export default function ArticlesSection() {
                   </div>
 
                   <h3 className="text-base font-black text-white group-hover:text-amber-300 transition-colors line-clamp-2 mb-2 leading-snug">
-                    <Link href={`/artikel/${article.slug}`}>
+                    <Link href={`/kabar-galeri/${article.slug}`}>
                       {article.title}
                     </Link>
                   </h3>
@@ -127,7 +127,7 @@ export default function ArticlesSection() {
               {/* Bottom CTA */}
               <div className="px-5 pb-5 pt-1">
                 <Link
-                  href={`/artikel/${article.slug}`}
+                  href={`/kabar-galeri/${article.slug}`}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors group-hover:translate-x-1 transition-transform"
                 >
                   <span>Baca Selengkapnya</span>
@@ -153,7 +153,7 @@ export default function ArticlesSection() {
               </div>
 
               <Link
-                href="/artikel"
+                href="/kabar-galeri"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-300 hover:text-white px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition self-start sm:self-auto"
               >
                 <span>Lihat Semua Galeri & Kabar</span>
@@ -185,11 +185,11 @@ export default function ArticlesSection() {
         {/* VIEW ALL BUTTON */}
         <div className="text-center">
           <Link
-            href="/artikel"
+            href="/kabar-galeri"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-extrabold text-xs transition shadow-lg hover:shadow-amber-500/20 active:scale-95"
           >
             <Newspaper className="w-4 h-4" />
-            <span>Lihat Seluruh Berita & Dokumentasi Roadshow</span>
+            <span>Lihat Seluruh Kabar & Galeri Film</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

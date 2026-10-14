@@ -4004,11 +4004,14 @@ export default function AdminPage() {
                     onChange={(e) => setArticleForm({ ...articleForm, category: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none bg-white font-medium"
                   >
-                    <option value="Roadshow">Roadshow</option>
+                    <option value="Kabar Film">Kabar Film (Default)</option>
+                    <option value="Press Release">Press Release (Siaran Pers Resmi)</option>
+                    <option value="Media Coverage">Media Coverage (Liputan Media Eksternal)</option>
+                    <option value="Galeri Foto">Galeri Foto (Album Dokumentasi)</option>
+                    <option value="Galeri Video">Galeri Video (Video Trailer / BTS / Recap)</option>
+                    <option value="Roadshow">Roadshow (Tag Khusus)</option>
                     <option value="Meet & Greet">Meet & Greet</option>
-                    <option value="Kabar Film">Kabar Film</option>
                     <option value="Behind The Scene">Behind The Scene</option>
-                    <option value="Promo & Event">Promo & Event</option>
                   </select>
                 </div>
 

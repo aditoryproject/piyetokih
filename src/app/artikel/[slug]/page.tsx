@@ -14,6 +14,9 @@ import {
   Ticket,
   ChevronRight,
   Sparkles,
+  Download,
+  FileText,
+  ExternalLink,
 } from 'lucide-react';
 
 interface Props {
@@ -27,14 +30,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!article) {
     return {
-      title: 'Artikel Tidak Ditemukan - Miracle Pictures',
+      title: 'Kabar & Galeri - Miracle Pictures',
     };
   }
 
   return {
-    title: `${article.seoTitle || article.title} | Miracle Pictures`,
+    title: `${article.seoTitle || article.title} | PIYE TO KIH?`,
     description: article.seoDescription || article.summary,
-    keywords: `Film Piye To Kih, Roadshow ${article.cityTag || ''}, ${article.title}, Miracle Pictures`,
+    keywords: `Film Piye To Kih, ${article.category}, ${article.cityTag || ''}, ${article.title}, Miracle Pictures`,
     openGraph: {
       title: article.title,
       description: article.summary,
@@ -70,12 +73,10 @@ export default async function ArticleDetailPage({ params }: Props) {
     notFound();
   }
 
-  // Related articles (exclude current)
   const relatedArticles = (db.articles || [])
     .filter(a => a.slug !== slug && a.isPublished)
-    .slice(0, 2);
+    .slice(0, 3);
 
-  // Schema.org Structured Data for Google
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
@@ -94,7 +95,7 @@ export default async function ArticleDetailPage({ params }: Props) {
       name: 'Miracle Pictures',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://piyetokihfilm.com/images/logo.png',
+        url: 'https://piyetokihfilm.com/kabar-galeri-hero.jpg',
       },
     },
     mainEntityOfPage: {
@@ -104,66 +105,74 @@ export default async function ArticleDetailPage({ params }: Props) {
   };
 
   return (
-    <article className="relative min-h-screen py-10 px-4 sm:px-6">
-      {/* Inject JSON-LD Schema */}
+    <article className="min-h-screen bg-[#FDFBF7] text-slate-800 py-10 px-4 sm:px-6 antialiased">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Ambient background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[450px] bg-gradient-to-b from-red-600/10 via-amber-600/10 to-transparent blur-3xl pointer-events-none -z-10" />
-
-      <div className="max-w-3xl mx-auto">
-        {/* Navigation Breadcrumb */}
-        <div className="mb-6 flex items-center justify-between">
+      <div className="max-w-3xl mx-auto space-y-8">
+        {/* Breadcrumb Navigation */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-200 pb-4">
           <Link
-            href="/artikel"
-            className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-amber-400 transition"
+            href="/kabar-galeri"
+            className="inline-flex items-center gap-1.5 font-bold text-slate-600 hover:text-amber-700 transition"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Semua Kabar Roadshow</span>
+            <span>Kembali ke Kabar &amp; Galeri</span>
           </Link>
 
-          <span className="text-[11px] font-bold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-full uppercase">
-            {article.category}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200">
+              {article.category}
+            </span>
+            {article.tag && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700">
+                {article.tag}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Article Header */}
-        <header className="mb-8">
-          <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-4">
+        {/* Header Block */}
+        <header className="space-y-4">
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 leading-tight tracking-tight">
             {article.title}
           </h1>
 
-          {/* Metadata Row */}
-          <div className="flex flex-wrap items-center gap-4 text-xs text-gray-300 pb-6 border-b border-white/10">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pb-4 border-b border-slate-200">
             {article.cityTag && (
-              <span className="inline-flex items-center gap-1 font-bold text-amber-400 bg-black/60 px-2.5 py-1 rounded-lg border border-white/10">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+              <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                <MapPin className="w-3.5 h-3.5 text-amber-600" />
                 <span>{article.cityTag}</span>
               </span>
             )}
 
-            <span className="inline-flex items-center gap-1 text-gray-400">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>{article.publishedAt}</span>
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <span>
+                {new Date(article.publishedAt).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </span>
             </span>
 
-            <span className="inline-flex items-center gap-1 text-gray-400">
-              <Clock className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
               <span>{article.readTime || '3 menit baca'}</span>
             </span>
 
-            <span className="inline-flex items-center gap-1 text-gray-400">
-              <User className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-slate-400" />
               <span>{article.author}</span>
             </span>
           </div>
         </header>
 
-        {/* Featured Cover Image */}
-        <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl mb-8 aspect-[16/10] bg-black/80">
+        {/* Hero Image */}
+        <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-md aspect-[16/10] bg-slate-900">
           <img
             src={article.coverImage}
             alt={article.title}
@@ -171,107 +180,122 @@ export default async function ArticleDetailPage({ params }: Props) {
           />
         </div>
 
-        {/* Article Summary Lead */}
-        <p className="text-base sm:text-lg font-medium text-amber-200/90 leading-relaxed mb-8 p-4 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500">
+        {/* Article Summary Lead Block */}
+        <div className="p-5 rounded-2xl bg-amber-50/80 border-l-4 border-amber-500 text-sm sm:text-base font-semibold text-amber-950 leading-relaxed">
           {article.summary}
-        </p>
+        </div>
 
-        {/* Main Body Content */}
-        <div className="prose prose-invert max-w-none space-y-5 text-gray-200 text-sm sm:text-base leading-relaxed mb-12">
+        {/* Body Paragraphs */}
+        <div className="space-y-5 text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
           {article.content.split('\n\n').map((paragraph, idx) => (
             <p key={idx}>{paragraph}</p>
           ))}
         </div>
 
-        {/* PHOTO GALLERY SECTION */}
-        {article.galleryImages && article.galleryImages.length > 0 && (
-          <div className="my-12 p-6 sm:p-8 bg-black/50 border border-white/10 rounded-3xl">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">
-              <Camera className="w-4 h-4 text-amber-400" />
-              <span>GALERI FOTO DOKUMENTASI RESMI</span>
+        {/* Press Release Download Attachment Button if exists */}
+        {article.pdfUrl && (
+          <div className="p-5 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+            <div>
+              <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest block">
+                LAMPIRAN SIARAN PERS RESMI
+              </span>
+              <h4 className="font-extrabold text-sm sm:text-base text-white">
+                Dokumen Siaran Pers (Format PDF)
+              </h4>
             </div>
-            <h3 className="text-xl font-black text-white mb-6">
-              Dokumentasi Foto {article.cityTag ? `di ${article.cityTag}` : 'Kegiatan'}
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {article.galleryImages.map((imgUrl, imgIdx) => (
-                <div
-                  key={imgIdx}
-                  className="rounded-2xl overflow-hidden border border-white/10 aspect-[4/3] bg-black/60 group relative"
-                >
-                  <img
-                    src={imgUrl}
-                    alt={`${article.title} - Foto ${imgIdx + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      Foto #{imgIdx + 1} Miracle Pictures
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <a
+              href={article.pdfUrl}
+              download
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-md shrink-0"
+            >
+              <Download className="w-4 h-4" />
+              <span>Unduh Siaran Pers</span>
+            </a>
           </div>
         )}
 
-        {/* CALL TO ACTION VOUCHER BANNER */}
-        <div className="my-12 text-center p-8 bg-gradient-to-r from-red-950/60 via-amber-950/50 to-red-950/60 border border-amber-500/40 rounded-3xl shadow-2xl">
-          <span className="inline-block px-3 py-1 rounded-full bg-amber-500 text-black text-[10px] font-black uppercase tracking-wider mb-3">
-            KLAIM E-VOUCHER NONTON RESMI
-          </span>
-          <h3 className="text-2xl font-black text-white mb-2">
-            Mau Ikut Nobar & Tawa Bareng di Bioskop?
+        {/* Media Coverage External Source Link */}
+        {article.externalUrl && (
+          <div className="p-5 rounded-2xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                SUMBER PUBLIKASI MEDIA
+              </span>
+              <h4 className="font-extrabold text-sm sm:text-base text-slate-900">
+                Baca Liputan Asli di {article.mediaName || 'Media Partner'}
+              </h4>
+            </div>
+            <a
+              href={article.externalUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm shrink-0"
+            >
+              <span>Buka Tautan Asli</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        )}
+
+        {/* Contextual CTA: Presale BOGO */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 text-white space-y-4 shadow-xl border border-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950">
+              PRESALE BUY 1 GET 1 (15 - 18 NOV)
+            </span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-black text-white">
+            Siap Nonton Film PIYE TO KIH? di Bioskop?
           </h3>
-          <p className="text-xs sm:text-sm text-gray-300 max-w-md mx-auto mb-6">
-            Amankan kuota e-voucher resmi Anda sekarang sebelum habis! Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan film.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+            Dapatkan tiket nonton berdua hanya bayar 1 tiket untuk penayangan perdana 19 November 2026. Kuota terbatas 1.000 tiket di TIX ID dan 500 tiket di M-TIX!
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <Link
-              href="/#top"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-extrabold text-xs transition shadow-lg"
+              href="/#presale"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-md active:scale-95"
             >
               <Ticket className="w-4 h-4" />
-              <span>Klaim E-Voucher Sekarang</span>
+              <span>Pasang Reminder Presale</span>
             </Link>
+
             <Link
               href="/#roadshow"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/10"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/10"
             >
               <span>Jadwal Roadshow 17 Kota</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>➔</span>
             </Link>
           </div>
         </div>
 
-        {/* RELATED ARTICLES */}
+        {/* Related Articles */}
         {relatedArticles.length > 0 && (
-          <div className="pt-8 border-t border-white/10">
-            <h4 className="text-lg font-black text-white mb-4">
-              Kabar Roadshow Lainnya
+          <div className="space-y-4 pt-6 border-t border-slate-200">
+            <h4 className="text-base font-extrabold text-slate-900">
+              Kabar &amp; Galeri Terkait Lainnya
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {relatedArticles.map((rel) => (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {relatedArticles.map(rel => (
                 <Link
                   key={rel.id}
-                  href={`/artikel/${rel.slug}`}
-                  className="bg-black/40 border border-white/10 hover:border-amber-500/40 rounded-2xl p-4 flex gap-3 transition group"
+                  href={`/kabar-galeri/${rel.slug}`}
+                  className="bg-white border border-slate-200 hover:border-amber-400 rounded-xl p-3 space-y-2 shadow-sm transition group"
                 >
-                  <img
-                    src={rel.coverImage}
-                    alt={rel.title}
-                    className="w-20 h-20 rounded-xl object-cover shrink-0"
-                  />
-                  <div className="overflow-hidden">
-                    <span className="text-[10px] font-bold text-amber-400 block mb-1">
-                      {rel.cityTag || rel.category}
-                    </span>
-                    <h5 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors line-clamp-2 leading-snug">
-                      {rel.title}
-                    </h5>
+                  <div className="aspect-[16/10] rounded-lg overflow-hidden bg-slate-100">
+                    <img
+                      src={rel.coverImage}
+                      alt={rel.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
                   </div>
+                  <span className="text-[10px] font-black text-amber-700 uppercase block">
+                    {rel.tag || rel.category}
+                  </span>
+                  <h5 className="text-xs font-bold text-slate-900 group-hover:text-amber-600 line-clamp-2 leading-snug">
+                    {rel.title}
+                  </h5>
                 </Link>
               ))}
             </div>
