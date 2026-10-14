@@ -16,6 +16,7 @@ export interface LeadRecord {
   whatsappStatus: 'sent' | 'pending' | 'failed';
   emailStatus: 'sent' | 'pending' | 'failed';
   cityLocation?: string;
+  venueLocation?: string;
 }
 
 export interface AppSettings {

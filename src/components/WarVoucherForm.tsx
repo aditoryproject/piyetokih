@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Send, CheckCircle, AlertCircle, Ticket, X, MapPin } from 'lucide-react';
+import { Send, CheckCircle, AlertCircle, Ticket, X, MapPin, Building2 } from 'lucide-react';
 import VoucherTicketCard from './VoucherTicketCard';
 import { trackLeadSubmission } from '@/lib/pixel';
+import { getCityByNameOrSlug } from '@/lib/cities';
 
 interface WarVoucherFormProps {
   onSuccessClaim?: (remaining: number) => void;
@@ -15,6 +16,7 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [cityLocation, setCityLocation] = useState(defaultCity || '');
+  const [venueLocation, setVenueLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [claimedLead, setClaimedLead] = useState<{
@@ -22,9 +24,13 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
     name: string;
     phone: string;
     cityLocation?: string;
+    venueLocation?: string;
     voucherUrl: string;
     validityText?: string;
   } | null>(null);
+
+  const activeCity = getCityByNameOrSlug(cityLocation || defaultCity);
+  const venues = activeCity?.cinemas?.map(c => c.name) || [];
 
   useEffect(() => {
     if (defaultCity) {
@@ -59,7 +65,7 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
       const res = await fetch('/api/vouchers/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, email, cityLocation }),
+        body: JSON.stringify({ name, phone, email, cityLocation, venueLocation }),
       });
 
       const data = await res.json();
@@ -89,6 +95,7 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
         name,
         phone,
         cityLocation,
+        venueLocation: venueLocation || (venues.length === 1 ? venues[0] : undefined),
         voucherUrl: data.voucherUrl,
         validityText: data.validityText,
       });
@@ -118,9 +125,30 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
           <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-md mx-auto">
             Dapatkan Code Verifikasi resmi. <b className="text-amber-300">Bukan bukti pembayaran tiket</b>. Penukaran voucher fisik resmi dilakukan saat <b>Roadshow &amp; Meet and Greet</b> di kotamu.
           </p>
-          <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black/60 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
-            <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
-            <span>Lokasi Penukaran: Booth resmi di samping venue/panggung Meet and Greet {cityLocation ? `Kota ${cityLocation}` : 'kotamu'}</span>
+
+          {/* LOKASI PENUKARAN DI BOOTH SAMPING MEET AND GREET + MALL BIOSKOP */}
+          <div className="mt-3.5 p-3.5 rounded-2xl bg-black/60 border border-amber-500/30 text-left">
+            <div className="flex items-center gap-1.5 text-amber-300 text-xs font-black mb-1">
+              <MapPin className="w-4 h-4 text-red-500 shrink-0" />
+              <span>Lokasi Penukaran Voucher Fisik ({activeCity ? `Kota ${activeCity.name}` : 'Roadshow'}):</span>
+            </div>
+            <p className="text-[11px] text-gray-300 leading-relaxed mb-2">
+              Penukaran dilakukan di <b>booth resmi samping panggung Meet &amp; Greet</b> di mall / bioskop berikut:
+            </p>
+            {venues.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {venues.map((vName, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-[#121824] border border-white/10 rounded-xl px-3 py-2 text-xs">
+                    <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="font-bold text-white text-[11px] leading-snug">{vName}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[11px] text-amber-300 font-bold">
+                Booth resmi di samping venue / panggung Meet and Greet Kota {cityLocation || 'kotamu'}.
+              </div>
+            )}
           </div>
         </div>
 
@@ -204,6 +232,33 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
             </span>
           </div>
 
+          {/* RENCANA LOKASI MALL / BIOSKOP PENUKARAN */}
+          {venues.length > 0 && (
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1.5 flex items-center justify-between">
+                <span>Rencana Lokasi Penukaran (Mall / Bioskop)</span>
+                <span className="text-[10px] text-amber-400 font-bold">Booth Meet &amp; Greet</span>
+              </label>
+              <div className="relative">
+                <select
+                  value={venueLocation}
+                  onChange={e => setVenueLocation(e.target.value)}
+                  className="w-full bg-black/60 border border-white/15 focus:border-gold-500 rounded-xl px-4 py-3 text-white text-sm outline-none transition cursor-pointer"
+                >
+                  <option value="">Semua Lokasi Booth Meet &amp; Greet di Kota {activeCity?.name}</option>
+                  {venues.map((v, i) => (
+                    <option key={i} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <span className="block text-[11px] text-gray-400 mt-1">
+                *Pilih mall tempat Anda berencana hadir di booth samping panggung Meet &amp; Greet.
+              </span>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -249,7 +304,11 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
                   ⚠️ Code ini <b>BUKAN bukti pembayaran tiket</b>.
                 </p>
                 <p className="text-xs text-amber-300 font-bold">
-                  📍 Lokasi Penukaran: Kunjungi booth resmi di samping venue/panggung Meet and Greet Kota {claimedLead.cityLocation || 'terkait'}!
+                  📍 Lokasi Penukaran: Booth resmi di samping panggung Meet &amp; Greet di{' '}
+                  <span className="text-white underline">
+                    {claimedLead.venueLocation || (venues.length > 0 ? venues.join(' & ') : `Kota ${claimedLead.cityLocation || 'terkait'}`)}
+                  </span>
+                  !
                 </p>
               </div>
             </div>
@@ -259,6 +318,7 @@ export default function WarVoucherForm({ onSuccessClaim, defaultCity }: WarVouch
               name={claimedLead.name}
               phone={claimedLead.phone}
               cityLocation={claimedLead.cityLocation}
+              venueLocation={claimedLead.venueLocation}
               validityText={claimedLead.validityText}
             />
           </div>

@@ -15,6 +15,7 @@ export default function VoucherDetailPage() {
     name: string;
     phone: string;
     cityLocation?: string;
+    venueLocation?: string;
     claimedAt: string;
   } | null>(null);
 
@@ -107,6 +108,7 @@ export default function VoucherDetailPage() {
             name={lead.name}
             phone={lead.phone}
             cityLocation={lead.cityLocation}
+            venueLocation={lead.venueLocation}
             claimedAt={lead.claimedAt ? new Date(lead.claimedAt).toLocaleDateString('id-ID') : undefined}
             validityText={validityText}
           />

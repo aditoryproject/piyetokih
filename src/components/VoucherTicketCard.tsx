@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Download, Share2, CheckCircle2, Film } from 'lucide-react';
+import { Download, Share2, CheckCircle2, Film, MapPin, Building2 } from 'lucide-react';
+import { getCityByNameOrSlug } from '@/lib/cities';
 
 interface VoucherTicketCardProps {
   serialNumber: string;
   name: string;
   phone: string;
   cityLocation?: string;
+  venueLocation?: string;
   claimedAt?: string;
   validityText?: string;
 }
@@ -17,6 +19,7 @@ export default function VoucherTicketCard({
   name,
   phone,
   cityLocation,
+  venueLocation,
   claimedAt = new Date().toLocaleDateString('id-ID'),
   validityText = '19 - 20 November 2026 (Penayangan Perdana)',
 }: VoucherTicketCardProps) {
@@ -67,6 +70,10 @@ export default function VoucherTicketCard({
     }
   }, []);
 
+  const cityData = getCityByNameOrSlug(cityLocation);
+  const cityVenues = cityData?.cinemas?.map(c => c.name) || [];
+  const displayVenue = venueLocation || (cityVenues.length === 1 ? cityVenues[0] : null);
+
   return (
     <div className="flex flex-col items-center w-full max-w-sm mx-auto">
       {/* TICKET CONTAINER */}
@@ -104,9 +111,34 @@ export default function VoucherTicketCard({
           <div className="text-[10px] text-red-300 font-extrabold mt-1">
             ⚠️ Voucher digital ini BUKAN bukti pembayaran tiket
           </div>
-          <div className="text-[9px] text-gray-300 mt-0.5 leading-tight">
-            Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet Kota {cityLocation || 'terkait'} untuk menukarkan dengan voucher fisik resmi.
+          <div className="text-[9.5px] text-gray-300 mt-1 leading-tight">
+            Kunjungi booth resmi di samping venue / panggung Meet &amp; Greet untuk menukarkan dengan voucher fisik resmi.
           </div>
+
+          {/* LOKASI MALL & BIOSKOP PENUKARAN */}
+          {(displayVenue || cityVenues.length > 0) && (
+            <div className="mt-2.5 pt-2 border-t border-amber-500/30 text-left bg-black/40 rounded-xl p-2.5">
+              <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <Building2 className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                <span>LOKASI PENUKARAN (MALL &amp; BIOSKOP):</span>
+              </div>
+              {displayVenue ? (
+                <div className="text-white font-extrabold text-[11px] leading-tight flex items-start gap-1.5">
+                  <span className="text-amber-400 font-bold">•</span>
+                  <span>{displayVenue}</span>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {cityVenues.map((v, i) => (
+                    <div key={i} className="text-white font-extrabold text-[10.5px] leading-tight flex items-start gap-1.5">
+                      <span className="text-amber-400 font-bold">•</span>
+                      <span>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Attendee Info */}
@@ -194,8 +226,13 @@ export default function VoucherTicketCard({
             LOKASI PENUKARAN VOUCHER FISIK
           </span>
           <span className="font-black text-amber-300 text-xs block mt-0.5 tracking-tight">
-            📍 Booth Resmi Samping Venue Meet &amp; Greet {cityLocation ? `Kota ${cityLocation}` : ''}
+            📍 Booth Resmi Samping Panggung Meet &amp; Greet {cityLocation ? `Kota ${cityLocation}` : ''}
           </span>
+          {(displayVenue || cityVenues.length > 0) && (
+            <div className="my-1.5 py-1 px-2.5 bg-black/70 rounded-lg border border-red-500/30 text-[9.5px] text-amber-200 font-bold text-center">
+              {displayVenue ? `Lokasi: ${displayVenue}` : `Lokasi Mall: ${cityVenues.join(' • ')}`}
+            </div>
+          )}
           <span className="text-gray-300 text-[9px] block mt-1 leading-snug">
             Tunjukkan Code Verifikasi ini di booth resmi samping panggung Meet &amp; Greet untuk mendapatkan voucher fisik resmi penayangan bioskop ({validityText}).
           </span>

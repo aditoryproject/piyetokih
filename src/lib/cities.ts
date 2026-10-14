@@ -350,3 +350,20 @@ export function getCityBySlug(slug: string): CityData | undefined {
   const normalized = slug.toLowerCase().replace(/[^a-z0-9]/g, '');
   return CITIES_DATA.find(c => c.slug.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized);
 }
+
+export function getCityByNameOrSlug(query?: string): CityData | undefined {
+  if (!query) return undefined;
+  const q = query.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return CITIES_DATA.find(c => {
+    const slugNorm = c.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const nameNorm = c.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return (
+      slugNorm === q ||
+      nameNorm === q ||
+      slugNorm.includes(q) ||
+      q.includes(slugNorm) ||
+      nameNorm.includes(q) ||
+      q.includes(nameNorm)
+    );
+  });
+}

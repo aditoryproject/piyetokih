@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     const phone = sanitizeString(body.phone, 30);
     const email = sanitizeString(body.email, 120);
     const cityLocation = sanitizeString(body.cityLocation, 60);
+    const venueLocation = body.venueLocation ? sanitizeString(body.venueLocation, 120) : undefined;
 
     if (!name || !phone || !email) {
       return NextResponse.json(
@@ -114,6 +115,7 @@ export async function POST(req: NextRequest) {
       whatsappStatus: waResult.success ? 'sent' : 'failed',
       emailStatus,
       cityLocation: detectedCity,
+      venueLocation,
     };
 
     db.leads.unshift(newLead);
@@ -125,6 +127,7 @@ export async function POST(req: NextRequest) {
       success: true,
       lead: newLead,
       serialNumber,
+      venueLocation,
       voucherUrl,
       validityText: db.settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)',
       remainingStock,

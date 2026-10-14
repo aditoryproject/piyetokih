@@ -711,13 +711,14 @@ export default function AdminPage() {
   }, [filteredVisitors]);
 
   const handleExportCsv = () => {
-    const headers = ['Nomor Seri', 'Nama Lengkap', 'Nomor WA', 'Email', 'Kota', 'Sumber', 'Status WA', 'Waktu Klaim'];
+    const headers = ['Nomor Seri', 'Nama Lengkap', 'Nomor WA', 'Email', 'Kota', 'Lokasi Mall Penukaran', 'Sumber', 'Status WA', 'Waktu Klaim'];
     const rows = leads.map(l => [
       `"${l.serialNumber}"`,
       `"${l.name}"`,
       `"${l.phone}"`,
       `"${l.email}"`,
       `"${l.cityLocation || 'Nasional'}"`,
+      `"${(l as any).venueLocation || '-'}"`,
       `"${l.source}"`,
       `"${l.whatsappStatus}"`,
       `"${l.claimedAt}"`,
@@ -1112,9 +1113,14 @@ export default function AdminPage() {
                             {l.email}
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[11px]">
+                            <span className="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[11px] inline-block">
                               {l.cityLocation || 'Nasional'}
                             </span>
+                            {(l as any).venueLocation && (
+                              <div className="text-[10px] text-slate-500 font-semibold mt-1 truncate max-w-[140px]" title={(l as any).venueLocation}>
+                                📍 {(l as any).venueLocation}
+                              </div>
+                            )}
                           </td>
                           <td className="py-3.5 px-4">
                             <span
