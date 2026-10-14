@@ -72,10 +72,6 @@ export default function CityRoadshowPage() {
     trackTicketIntent(city.name, cinemaName, url);
   };
 
-  const posterImage =
-    movieSettings?.posterUrl ||
-    'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80';
-
   return (
     <div className="relative min-h-screen">
       {/* 1. CITY ROADSHOW HERO */}
@@ -118,119 +114,114 @@ export default function CityRoadshowPage() {
           </div>
 
           {/* Date & Location Pill */}
-          <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200 bg-black/60 px-5 py-2 rounded-full border border-white/10 mb-8 shadow-md">
+          <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200 bg-black/60 px-5 py-2 rounded-full border border-white/10 mb-6 shadow-md">
             <Calendar className="w-4 h-4 text-amber-400" />
             <span>Jadwal Penayangan &amp; Roadshow: <b>{city.dateStr}</b></span>
           </div>
 
-          {/* City Poster Visual with Floating Badge */}
-          <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black aspect-[16/9] max-w-3xl mx-auto mb-12 group shadow-amber-500/10">
-            <img
-              src={posterImage}
-              alt={`Official Poster Roadshow Piye To Kih Kota ${city.name}`}
-              className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-            <div className="absolute bottom-5 left-0 right-0 px-4 text-center">
-              <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 block mb-1">
-                MIRACLE PICTURES PRESENTS
-              </span>
-              <p className="text-base sm:text-2xl font-black text-white drop-shadow-md">
-                Tayang di Bioskop Mitra Kota {city.name}
-              </p>
-            </div>
-          </div>
-
-          {/* 2. ROADSHOW COUNTDOWN & KUOTA PER KOTA */}
-          <div className="max-w-xl mx-auto mb-6 space-y-4">
-            <CountdownTimer targetDate={city.dateStr || '2026-10-22T13:00:00+07:00'} />
-            <QuotaProgress totalQuota={500} remainingStock={499} />
-          </div>
-
-          {/* 3. FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
-          <div className="max-w-xl mx-auto mb-16">
-            <WarVoucherForm defaultCity={city.name} />
-          </div>
-
-          {/* 3. LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
-          <div className="max-w-2xl mx-auto text-left mb-16">
-            <div className="text-center mb-8">
-              <span className="text-xs font-black uppercase tracking-widest text-amber-400">PRESALE TIKET RESMI BIOSKOP</span>
-              <h2 className="text-2xl sm:text-4xl font-black text-white uppercase mt-1">Pilih Bioskop di Kota {city.name}</h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
-                Pilih bioskop mitra di bawah ini untuk memesan tiket presale resmi dan mengamankan nomor kursi studio Anda sebelum kehabisan.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {city.cinemas.map((cinema, idx) => {
-                const overrideKey = `${city.slug}_${idx}`;
-                const targetUrl = customLinks[overrideKey] || cinema.ticketUrl;
-
-                return (
-                  <div
-                    key={idx}
-                    className="bg-gradient-to-b from-[#182133] to-[#0E1522] border border-white/15 hover:border-amber-500/40 rounded-3xl p-6 shadow-xl transition-all"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="px-3 py-1 rounded-lg bg-black/70 border border-white/10 text-xs font-black text-amber-400 uppercase tracking-wider">
-                        {cinema.chain}
-                      </span>
-                      <span className="text-xs text-slate-400 flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{cinema.seats} Kursi ({cinema.studio})</span>
-                      </span>
-                    </div>
-
-                    <h3 className="text-xl font-black text-white mb-2">
-                      {cinema.name}
-                    </h3>
-
-                    <div className="flex items-center gap-2 text-xs text-slate-300 mb-5 flex-wrap">
-                      <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span className="text-slate-400">Jam Tayang:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {cinema.showTimes.map((st, sIdx) => (
-                          <span
-                            key={sIdx}
-                            className="bg-black/60 px-2.5 py-1 rounded-md font-mono font-bold text-amber-300 text-xs border border-white/10"
-                          >
-                            {st}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Direct CTA Button with Pixel AddToCart */}
-                    <a
-                      href={targetUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => handleTicketClick(cinema.name, targetUrl)}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 hover:text-white font-black text-sm py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-95 group"
-                    >
-                      <Ticket className="w-4 h-4" />
-                      <span>BELI TIKET PRESALE {cinema.chain.toUpperCase()}</span>
-                      <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
+          {/* Cinema Network Badges (Theatrical Authenticity) */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+            <span className="hover:text-amber-300 transition-colors">CINEMA XXI</span>
+            <span className="text-white/20">•</span>
+            <span className="hover:text-amber-300 transition-colors">CGV CINEMAS</span>
+            <span className="text-white/20">•</span>
+            <span className="hover:text-amber-300 transition-colors">CINÉPOLIS</span>
+            <span className="text-white/20">•</span>
+            <span className="hover:text-amber-300 transition-colors">TIX ID</span>
           </div>
         </div>
       </section>
 
-      {/* 4. OFFICIAL TEASER TRAILER PLAYER (GLOBAL INHERITANCE) */}
-      <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
-
-      {/* 5. SINOPSIS & KISAH FILM (GLOBAL INHERITANCE) */}
+      {/* 2. SINOPSIS & KISAH FILM (POSTER VERTIKAL DI SAMPING SINOPSIS PERSIS SEPERTI DI MAIN PAGE) */}
       <MovieStorySection movieSettings={movieSettings || undefined} />
 
-      {/* 6. CAST & PEMERAN WOKO CHANNEL (GLOBAL INHERITANCE) */}
+      {/* 3. OFFICIAL TEASER TRAILER PLAYER (PERSIS SEPERTI DI MAIN PAGE) */}
+      <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
+
+      {/* 4. FORM VOUCHER & KUOTA ROADSHOW PER KOTA */}
+      <section className="py-12 px-4 sm:px-6">
+        <div className="max-w-xl mx-auto mb-6 space-y-4">
+          <CountdownTimer targetDate={city.dateStr || '2026-10-22T13:00:00+07:00'} />
+          <QuotaProgress totalQuota={500} remainingStock={499} />
+        </div>
+
+        {/* FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
+        <div className="max-w-xl mx-auto mb-16">
+          <WarVoucherForm defaultCity={city.name} />
+        </div>
+
+        {/* LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
+        <div className="max-w-2xl mx-auto text-left mb-16">
+          <div className="text-center mb-8">
+            <span className="text-xs font-black uppercase tracking-widest text-amber-400">PRESALE TIKET RESMI BIOSKOP</span>
+            <h2 className="text-2xl sm:text-4xl font-black text-white uppercase mt-1">Pilih Bioskop di Kota {city.name}</h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
+              Pilih bioskop mitra di bawah ini untuk memesan tiket presale resmi dan mengamankan nomor kursi studio Anda sebelum kehabisan.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {city.cinemas.map((cinema, idx) => {
+              const overrideKey = `${city.slug}_${idx}`;
+              const targetUrl = customLinks[overrideKey] || cinema.ticketUrl;
+
+              return (
+                <div
+                  key={idx}
+                  className="bg-gradient-to-b from-[#182133] to-[#0E1522] border border-white/15 hover:border-amber-500/40 rounded-3xl p-6 shadow-xl transition-all"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="px-3 py-1 rounded-lg bg-black/70 border border-white/10 text-xs font-black text-amber-400 uppercase tracking-wider">
+                      {cinema.chain}
+                    </span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{cinema.seats} Kursi ({cinema.studio})</span>
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-black text-white mb-2">
+                    {cinema.name}
+                  </h3>
+
+                  <div className="flex items-center gap-2 text-xs text-slate-300 mb-5 flex-wrap">
+                    <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="text-slate-400">Jam Tayang:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {cinema.showTimes.map((st, sIdx) => (
+                        <span
+                          key={sIdx}
+                          className="bg-black/60 px-2.5 py-1 rounded-md font-mono font-bold text-amber-300 text-xs border border-white/10"
+                        >
+                          {st}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Direct CTA Button with Pixel AddToCart */}
+                  <a
+                    href={targetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handleTicketClick(cinema.name, targetUrl)}
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 hover:text-white font-black text-sm py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-95 group"
+                  >
+                    <Ticket className="w-4 h-4" />
+                    <span>BELI TIKET PRESALE {cinema.chain.toUpperCase()}</span>
+                    <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. CAST & PEMERAN WOKO CHANNEL (GLOBAL INHERITANCE) */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* 7. FOOTER RESMI DENGAN MITRA BIOSKOP 27+ LOKASI & SOSMED */}
+      {/* 6. FOOTER RESMI DENGAN MITRA BIOSKOP 27+ LOKASI & SOSMED */}
       <Footer />
     </div>
   );
