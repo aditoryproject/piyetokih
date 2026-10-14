@@ -57,13 +57,14 @@ export default function AdminPage() {
   // Articles state
   const [articles, setArticles] = useState<any[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(false);
+  const [articleCategoryFilter, setArticleCategoryFilter] = useState('Semua');
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<any>(null);
   const [articleForm, setArticleForm] = useState({
     id: '',
     title: '',
     slug: '',
-    category: 'Roadshow',
+    category: 'Kabar Film',
     cityTag: '',
     publishedAt: new Date().toISOString().split('T')[0],
     readTime: '3 menit baca',
@@ -75,6 +76,17 @@ export default function AdminPage() {
     isPublished: true,
     seoTitle: '',
     seoDescription: '',
+    tag: '',
+    featured: false,
+    ctaText: '',
+    ctaLink: '',
+    pdfUrl: '',
+    externalUrl: '',
+    mediaName: '',
+    videoUrl: '',
+    videoDuration: '',
+    photoCount: '',
+    location: '',
   });
   const [savingArticle, setSavingArticle] = useState(false);
 
@@ -120,6 +132,21 @@ export default function AdminPage() {
       facebook: '',
       youtube: '',
     },
+    kabarGaleriSettings: {
+      heroCategory: 'KABAR & GALERI',
+      heroTitle: 'PIYE TO KIH? RESMI RILIS OFFICIAL POSTER & TRAILER',
+      heroQuote: '“Tentang kita, yang selalu mencari jalan pulang.”',
+      heroExcerpt: 'Film PIYE TO KIH? akhirnya merilis official poster dan trailer perdana yang memperlihatkan kisah penuh makna tentang persahabatan, keluarga, dan pencarian jati diri di tanah Jawa.',
+      heroCoverImage: '',
+      heroCtaText: 'Baca Selengkapnya',
+      heroCtaLink: '#kabar-film',
+      mediaKitPosterUrl: '',
+      mediaKitPressReleasePdfUrl: '',
+      mediaKitStillsZipUrl: '',
+      mediaKitFactSheetPdfUrl: '',
+      mediaKitContactEmail: 'pr@miraclepictures.id',
+      mediaKitContactWa: '6281234567890',
+    },
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
@@ -127,6 +154,7 @@ export default function AdminPage() {
   // Media Upload states
   const [uploadingPoster, setUploadingPoster] = useState(false);
   const [uploadingBackdrop, setUploadingBackdrop] = useState(false);
+  const [uploadingHeroCover, setUploadingHeroCover] = useState(false);
   const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);
   const [uploadingArticleCover, setUploadingArticleCover] = useState(false);
   const [uploadingArticleGallery, setUploadingArticleGallery] = useState(false);
@@ -338,7 +366,7 @@ export default function AdminPage() {
       id: '',
       title: '',
       slug: '',
-      category: 'Roadshow',
+      category: 'Kabar Film',
       cityTag: '',
       publishedAt: new Date().toISOString().split('T')[0],
       readTime: '3 menit baca',
@@ -350,6 +378,17 @@ export default function AdminPage() {
       isPublished: true,
       seoTitle: '',
       seoDescription: '',
+      tag: '',
+      featured: false,
+      ctaText: '',
+      ctaLink: '',
+      pdfUrl: '',
+      externalUrl: '',
+      mediaName: '',
+      videoUrl: '',
+      videoDuration: '',
+      photoCount: '',
+      location: '',
     });
     setIsArticleModalOpen(true);
   };
@@ -360,7 +399,7 @@ export default function AdminPage() {
       id: art.id,
       title: art.title,
       slug: art.slug,
-      category: art.category || 'Roadshow',
+      category: art.category || 'Kabar Film',
       cityTag: art.cityTag || '',
       publishedAt: art.publishedAt || new Date().toISOString().split('T')[0],
       readTime: art.readTime || '3 menit baca',
@@ -372,6 +411,17 @@ export default function AdminPage() {
       isPublished: art.isPublished !== undefined ? art.isPublished : true,
       seoTitle: art.seoTitle || '',
       seoDescription: art.seoDescription || '',
+      tag: art.tag || '',
+      featured: !!art.featured,
+      ctaText: art.ctaText || '',
+      ctaLink: art.ctaLink || '',
+      pdfUrl: art.pdfUrl || '',
+      externalUrl: art.externalUrl || '',
+      mediaName: art.mediaName || '',
+      videoUrl: art.videoUrl || '',
+      videoDuration: art.videoDuration || '',
+      photoCount: art.photoCount || '',
+      location: art.location || '',
     });
     setIsArticleModalOpen(true);
   };
@@ -379,7 +429,7 @@ export default function AdminPage() {
   const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!articleForm.title.trim()) {
-      alert('Judul artikel wajib diisi!');
+      alert('Judul konten wajib diisi!');
       return;
     }
     setSavingArticle(true);
@@ -406,7 +456,7 @@ export default function AdminPage() {
         setIsArticleModalOpen(false);
         fetchArticles();
       } else {
-        alert(data.error || 'Gagal menyimpan artikel');
+        alert(data.error || 'Gagal menyimpan konten');
       }
     } catch (err: any) {
       alert('Terjadi kesalahan jaringan: ' + err.message);
@@ -416,7 +466,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteArticle = async (id: string, title: string) => {
-    if (!confirm(`Hapus artikel "${title}"?`)) return;
+    if (!confirm(`Hapus konten "${title}"?`)) return;
 
     try {
       const res = await fetch(`/api/articles?id=${encodeURIComponent(id)}`, {
@@ -426,7 +476,26 @@ export default function AdminPage() {
       if (data.success) {
         fetchArticles();
       } else {
-        alert(data.error || 'Gagal menghapus artikel');
+        alert(data.error || 'Gagal menghapus');
+      }
+    } catch (err: any) {
+      alert('Terjadi kesalahan jaringan: ' + err.message);
+    }
+  };
+
+  const handleDeleteAllArticles = async () => {
+    if (!confirm('PERHATIAN: Apakah Anda yakin ingin MENGHAPUS SEMUA artikel, liputan, dan galeri dummy?\n\nTindakan ini akan mengosongkan semua data agar live website Anda benar-benar bersih (Clean Mode).')) return;
+
+    try {
+      const res = await fetch('/api/articles?deleteAll=true', {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Semua data berhasil dibersihkan! Dashboard dan website Anda kini dalam mode bersih.');
+        fetchArticles();
+      } else {
+        alert(data.error || 'Gagal membersihkan data');
       }
     } catch (err: any) {
       alert('Terjadi kesalahan jaringan: ' + err.message);
@@ -681,7 +750,7 @@ export default function AdminPage() {
     { id: 'leads', label: 'Database Leads', icon: Users, badge: leads.length },
     { id: 'reminders', label: '🔔 Reminder Presale 15 Nov', icon: Bell, badge: bogoReminders.length },
     { id: 'movie', label: '🎬 Official Film & Media', icon: Film, badge: 'Global Sync' },
-    { id: 'articles', label: 'Kabar & Galeri Roadshow', icon: Newspaper, badge: articles.length },
+    { id: 'articles', label: '📰 Kabar & Galeri Hub', icon: Newspaper, badge: articles.length },
     { id: 'settings', label: 'Pengaturan Voucher & Tayang', icon: Settings },
     { id: 'bogo', label: 'Promo Buy 1 Get 1 (BOGO)', icon: Ticket, badge: 'Promo' },
     { id: 'email', label: 'Pengaturan Email Gateway', icon: Mail },
@@ -1280,7 +1349,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* TAB: KABAR & GALERI ROADSHOW */}
+          {/* TAB: KABAR & GALERI HUB */}
           {activeTab === 'articles' && (
             <div className="space-y-6">
               {/* Header Box */}
@@ -1288,79 +1357,407 @@ export default function AdminPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
-                      SEO & CMS Roadshow
+                      CMS Kabar & Galeri Hub
                     </span>
-                    <span className="text-xs text-slate-400">• Terindeks Google & Dynamic Sitemap</span>
+                    <span className="text-xs text-slate-400">• Live Production Ready</span>
                   </div>
                   <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                    Kabar & Dokumentasi Roadshow 17 Kota
+                    Pusat Pengelolaan Kabar & Galeri
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
-                    Kelola artikel liputan, rilis berita resmi, galeri foto keseruan roadshow, dan meet & greet pemain. Setiap artikel otomatis dilengkapi Schema.org JSON-LD agar mudah tampil di halaman 1 Google.
+                    Kelola berita film, rilis pers resmi, liputan media nasional, galeri foto dokumentasi, dan video resmi film PIYE TO KIH. Atur juga spotlight hero dan download aset media kit.
                   </p>
                 </div>
-                <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                   <Link
-                    href="/artikel"
+                    href="/kabar-galeri"
                     target="_blank"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 hover:bg-slate-100 text-xs font-bold transition"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-700 bg-slate-50 hover:bg-slate-100 text-xs font-bold transition"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Lihat di Web</span>
                   </Link>
                   <button
+                    onClick={handleDeleteAllArticles}
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 text-xs font-bold transition active:scale-95"
+                    title="Kosongkan semua data dummy agar live web clean"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Bersihkan Semua Dummy</span>
+                  </button>
+                  <button
                     onClick={handleOpenNewArticle}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition active:scale-95"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition active:scale-95"
                   >
                     <Plus className="w-4 h-4 stroke-[3]" />
-                    <span>Tulis Kabar Baru</span>
+                    <span>Tulis Konten Baru</span>
                   </button>
                 </div>
               </div>
 
               {/* Stats Overview */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                  <span className="text-xs font-bold text-slate-400 block mb-1">Total Artikel Terbit</span>
+                  <span className="text-[11px] font-bold text-slate-400 block mb-1">Total Konten Terbit</span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-black text-slate-900">{articles.length}</span>
-                    <span className="text-xs text-emerald-600 font-bold">Terpublikasi & SEO Ready</span>
+                    <span className="text-xs text-emerald-600 font-bold">Live</span>
                   </div>
                 </div>
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                  <span className="text-xs font-bold text-slate-400 block mb-1">Total Galeri Dokumentasi</span>
+                  <span className="text-[11px] font-bold text-slate-400 block mb-1">Galeri Foto</span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-black text-slate-900">
-                      {articles.reduce((acc, a) => acc + (a.galleryImages?.length || 0), 0)}
+                      {articles.filter(a => a.category === 'Galeri Foto').length}
                     </span>
-                    <span className="text-xs text-amber-600 font-bold">Foto Tersimpan</span>
+                    <span className="text-xs text-amber-600 font-bold">Album</span>
                   </div>
                 </div>
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                  <span className="text-xs font-bold text-slate-400 block mb-1">Status Sitemap & Google Index</span>
+                  <span className="text-[11px] font-bold text-slate-400 block mb-1">Galeri Video</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-black text-emerald-600 flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" /> /sitemap.xml Aktif
+                    <span className="text-2xl font-black text-slate-900">
+                      {articles.filter(a => a.category === 'Galeri Video').length}
                     </span>
+                    <span className="text-xs text-blue-600 font-bold">Video</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <span className="text-[11px] font-bold text-slate-400 block mb-1">Press & Media</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-slate-900">
+                      {articles.filter(a => a.category === 'Press Release' || a.category === 'Media Coverage').length}
+                    </span>
+                    <span className="text-xs text-purple-600 font-bold">Rilis/Liputan</span>
                   </div>
                 </div>
               </div>
 
-              {/* Articles Table */}
+              {/* PENGATURAN HERO SPOTLIGHT & MEDIA CENTER */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+                  <div>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-900 text-amber-400">
+                      Setting Tampilan
+                    </span>
+                    <h4 className="text-base font-black text-slate-900 mt-1">
+                      Hero Spotlight & Media Center Kit
+                    </h4>
+                    <p className="text-xs text-slate-500">
+                      Pengaturan banner utama di halaman /kabar-galeri dan tautan download aset pers untuk wartawan/media.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleSaveSettings}
+                    disabled={savingSettings}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-xs shadow-sm transition active:scale-95 shrink-0"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>{savingSettings ? 'Menyimpan...' : 'Simpan Pengaturan Hero & Media Kit'}</span>
+                  </button>
+                </div>
+
+                {/* Sub-form: Hero Utama */}
+                <div className="space-y-4">
+                  <h5 className="text-xs font-black uppercase tracking-wider text-amber-600 flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5" /> 1. Spotlight Hero Banner (Bagian Teratas)
+                  </h5>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Sub-Judul / Label Atas
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.heroCategory || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            heroCategory: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: KABAR & GALERI"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Kutipan Puitis / Quote (Kanan Atas)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.heroQuote || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            heroQuote: e.target.value
+                          }
+                        })}
+                        placeholder='“Tentang kita, yang selalu mencari jalan pulang.”'
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs italic font-medium focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Judul Besar Hero Utama
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.kabarGaleriSettings?.heroTitle || ''}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        kabarGaleriSettings: {
+                          ...settings.kabarGaleriSettings,
+                          heroTitle: e.target.value
+                        }
+                      })}
+                      placeholder="PIYE TO KIH? RESMI RILIS OFFICIAL POSTER & TRAILER"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-black focus:border-amber-500 outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Deskripsi Ringkas Hero
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={settings.kabarGaleriSettings?.heroExcerpt || ''}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        kabarGaleriSettings: {
+                          ...settings.kabarGaleriSettings,
+                          heroExcerpt: e.target.value
+                        }
+                      })}
+                      placeholder="Cuplikan ringkasan yang tampil di bawah judul hero..."
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:border-amber-500 outline-none"
+                    />
+                  </div>
+
+                  {/* Hero Cover Image Upload */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Foto Background Banner Hero
+                    </label>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.heroCoverImage || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            heroCoverImage: e.target.value
+                          }
+                        })}
+                        placeholder="URL Foto Banner atau Upload langsung di samping ->"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                      <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs whitespace-nowrap transition active:scale-95 shadow-sm">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{uploadingHeroCover ? 'Mengunggah...' : 'Upload Foto'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingHeroCover}
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingHeroCover(true);
+                            const url = await handleFileUpload(file, 'hero-cover');
+                            setUploadingHeroCover(false);
+                            if (url) {
+                              setSettings((prev: any) => ({
+                                ...prev,
+                                kabarGaleriSettings: {
+                                  ...prev.kabarGaleriSettings,
+                                  heroCoverImage: url,
+                                },
+                              }));
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {settings.kabarGaleriSettings?.heroCoverImage && (
+                      <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-900">
+                        <img
+                          src={settings.kabarGaleriSettings.heroCoverImage}
+                          alt="Hero Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Sub-form: Media Center Kit */}
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <h5 className="text-xs font-black uppercase tracking-wider text-purple-600 flex items-center gap-1.5">
+                    <Download className="w-3.5 h-3.5" /> 2. Media Kit & Press Center (Download Aset untuk Media/Wartawan)
+                  </h5>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Download Official Poster (High-Res)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitPosterUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitPosterUrl: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: https://... atau /uploads/poster-hires.jpg"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Download Siaran Pers Resmi (PDF)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitPressReleasePdfUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitPressReleasePdfUrl: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: /docs/press-release-piye-to-kih.pdf"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Download Foto Produksi & Still Cut (ZIP)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitStillsZipUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitStillsZipUrl: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: Google Drive / Dropbox / ZIP link"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Download Fact Sheet & Sinopsis Lengkap (PDF)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitFactSheetPdfUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitFactSheetPdfUrl: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: /docs/fact-sheet-piye-to-kih.pdf"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Email Kontak PR / Media Relations
+                      </label>
+                      <input
+                        type="email"
+                        value={settings.kabarGaleriSettings?.mediaKitContactEmail || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitContactEmail: e.target.value
+                          }
+                        })}
+                        placeholder="pr@miraclepictures.id"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        WhatsApp Kontak PR / Media Relations
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitContactWa || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitContactWa: e.target.value
+                          }
+                        })}
+                        placeholder="6281234567890"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* DAFTAR ARTIKEL & KONTEN */}
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Newspaper className="w-4 h-4 text-amber-500" />
-                    <h4 className="text-sm font-black text-slate-900">Daftar Liputan & Artikel</h4>
+                    <h4 className="text-sm font-black text-slate-900">Daftar Konten & Galeri</h4>
                   </div>
                   <button
                     onClick={fetchArticles}
                     disabled={loadingArticles}
-                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition"
+                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition self-start sm:self-auto"
                     title="Refresh data"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${loadingArticles ? 'animate-spin text-amber-500' : ''}`} />
                   </button>
+                </div>
+
+                {/* Category Filter Tabs */}
+                <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto text-xs">
+                  {['Semua', 'Kabar Film', 'Press Release', 'Media Coverage', 'Galeri Foto', 'Galeri Video'].map((cat) => {
+                    const count = cat === 'Semua' ? articles.length : articles.filter(a => a.category === cat).length;
+                    const isActive = articleCategoryFilter === cat;
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setArticleCategoryFilter(cat)}
+                        className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
+                          isActive
+                            ? 'bg-amber-500 text-slate-950 shadow-sm'
+                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                        }`}
+                      >
+                        <span>{cat}</span>
+                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                          isActive ? 'bg-black/20 text-slate-950 font-black' : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="overflow-x-auto">
@@ -1368,9 +1765,9 @@ export default function AdminPage() {
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-black uppercase tracking-wider text-slate-500">
                         <th className="py-3 px-4">Cover & Judul</th>
-                        <th className="py-3 px-4">Kategori & Kota</th>
+                        <th className="py-3 px-4">Kategori & Tag</th>
                         <th className="py-3 px-4">Waktu Terbit</th>
-                        <th className="py-3 px-4">Galeri</th>
+                        <th className="py-3 px-4">Detail Konten</th>
                         <th className="py-3 px-4">Status</th>
                         <th className="py-3 px-4 text-right">Aksi</th>
                       </tr>
@@ -1379,25 +1776,38 @@ export default function AdminPage() {
                       {loadingArticles ? (
                         <tr>
                           <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
-                            Memuat daftar artikel...
+                            Memuat daftar konten...
                           </td>
                         </tr>
-                      ) : articles.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="py-16 text-center">
-                            <Newspaper className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                            <p className="text-slate-600 font-bold mb-1">Belum ada artikel atau liputan roadshow</p>
-                            <p className="text-slate-400 text-xs mb-4">Mulai publikasikan keseruan roadshow untuk menarik penonton dan media.</p>
-                            <button
-                              onClick={handleOpenNewArticle}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs"
-                            >
-                              <Plus className="w-4 h-4" /> Tambah Artikel Baru
-                            </button>
-                          </td>
-                        </tr>
-                      ) : (
-                        articles.map((art) => (
+                      ) : (() => {
+                        const filtered = articles.filter(art => {
+                          if (articleCategoryFilter === 'Semua') return true;
+                          return art.category === articleCategoryFilter;
+                        });
+
+                        if (filtered.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan={6} className="py-16 text-center">
+                                <Newspaper className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                                <p className="text-slate-600 font-bold mb-1">
+                                  Belum ada konten untuk kategori {articleCategoryFilter}
+                                </p>
+                                <p className="text-slate-400 text-xs mb-4">
+                                  Klik tombol di bawah untuk menambahkan rilis resmi, liputan, galeri foto, atau video baru.
+                                </p>
+                                <button
+                                  onClick={handleOpenNewArticle}
+                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs"
+                                >
+                                  <Plus className="w-4 h-4" /> Tambah Konten Baru
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return filtered.map((art) => (
                           <tr key={art.id} className="hover:bg-slate-50/80 transition-colors">
                             <td className="py-3.5 px-4">
                               <div className="flex items-center gap-3 max-w-md">
@@ -1411,6 +1821,11 @@ export default function AdminPage() {
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center text-slate-300">
                                       <Image className="w-4 h-4" />
+                                    </div>
+                                  )}
+                                  {art.featured && (
+                                    <div className="absolute top-0.5 right-0.5 bg-amber-500 text-slate-950 text-[9px] px-1 font-black rounded">
+                                      ★
                                     </div>
                                   )}
                                 </div>
@@ -1431,9 +1846,24 @@ export default function AdminPage() {
                             </td>
                             <td className="py-3.5 px-4 whitespace-nowrap">
                               <div className="flex flex-col gap-1 items-start">
-                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                  {art.category || 'Roadshow'}
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  art.category === 'Galeri Video'
+                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                    : art.category === 'Galeri Foto'
+                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                    : art.category === 'Press Release'
+                                    ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                                    : art.category === 'Media Coverage'
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-slate-100 text-slate-700 border border-slate-200'
+                                }`}>
+                                  {art.category || 'Kabar Film'}
                                 </span>
+                                {art.tag && (
+                                  <span className="text-[10px] text-amber-600 font-semibold">
+                                    #{art.tag}
+                                  </span>
+                                )}
                                 {art.cityTag && (
                                   <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 flex items-center gap-1">
                                     <MapPin className="w-2.5 h-2.5 text-amber-500" />
@@ -1447,10 +1877,24 @@ export default function AdminPage() {
                               <span className="text-[11px] text-slate-400">{art.author || 'Tim Media'}</span>
                             </td>
                             <td className="py-3.5 px-4 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
-                                <Image className="w-3 h-3 text-slate-400" />
-                                {art.galleryImages?.length || 0} Foto
-                              </span>
+                              {art.category === 'Galeri Video' ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700">
+                                  🎬 {art.videoDuration || 'Video'}
+                                </span>
+                              ) : art.category === 'Media Coverage' ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                                  📰 {art.mediaName || 'Media'}
+                                </span>
+                              ) : art.category === 'Press Release' ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700">
+                                  📄 {art.pdfUrl ? 'PDF Ready' : 'Press Kit'}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+                                  <Image className="w-3 h-3 text-slate-400" />
+                                  {art.galleryImages?.length || 0} Foto
+                                </span>
+                              )}
                             </td>
                             <td className="py-3.5 px-4 whitespace-nowrap">
                               {art.isPublished ? (
@@ -1476,22 +1920,22 @@ export default function AdminPage() {
                                 <button
                                   onClick={() => handleOpenEditArticle(art)}
                                   className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
-                                  title="Edit Artikel"
+                                  title="Edit Konten"
                                 >
                                   <Edit className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteArticle(art.id, art.title)}
                                   className="p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition"
-                                  title="Hapus Artikel"
+                                  title="Hapus Konten"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </td>
                           </tr>
-                        ))
-                      )}
+                        ));
+                      })()}
                     </tbody>
                   </table>
                 </div>
@@ -3998,20 +4442,17 @@ export default function AdminPage() {
               {/* Kategori, Kota, Tanggal, Read Time */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Kategori</label>
+                  <label className="block font-bold text-slate-700 mb-1">Kategori Konten</label>
                   <select
                     value={articleForm.category}
                     onChange={(e) => setArticleForm({ ...articleForm, category: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none bg-white font-medium"
                   >
-                    <option value="Kabar Film">Kabar Film (Default)</option>
+                    <option value="Kabar Film">Kabar Film (Berita / Rilis Artikel)</option>
                     <option value="Press Release">Press Release (Siaran Pers Resmi)</option>
-                    <option value="Media Coverage">Media Coverage (Liputan Media Eksternal)</option>
+                    <option value="Media Coverage">Media Coverage (Liputan Media Luar)</option>
                     <option value="Galeri Foto">Galeri Foto (Album Dokumentasi)</option>
-                    <option value="Galeri Video">Galeri Video (Video Trailer / BTS / Recap)</option>
-                    <option value="Roadshow">Roadshow (Tag Khusus)</option>
-                    <option value="Meet & Greet">Meet & Greet</option>
-                    <option value="Behind The Scene">Behind The Scene</option>
+                    <option value="Galeri Video">Galeri Video (Trailer / Video Teaser / BTS)</option>
                   </select>
                 </div>
 
@@ -4042,7 +4483,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Waktu Baca</label>
+                  <label className="block font-bold text-slate-700 mb-1">Waktu Baca / Label</label>
                   <input
                     type="text"
                     value={articleForm.readTime}
@@ -4053,17 +4494,154 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Penulis / Sumber */}
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Penulis / Sumber Berita</label>
-                <input
-                  type="text"
-                  value={articleForm.author}
-                  onChange={(e) => setArticleForm({ ...articleForm, author: e.target.value })}
-                  placeholder="Tim Media Miracle Pictures"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-amber-500 outline-none text-slate-900 text-xs font-semibold"
-                />
+              {/* Tag Label, Penulis, & Featured Toggle */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Tag / Label Badge</label>
+                  <input
+                    type="text"
+                    value={articleForm.tag}
+                    onChange={(e) => setArticleForm({ ...articleForm, tag: e.target.value })}
+                    placeholder="Contoh: OFFICIAL, EXCLUSIVE, ROADSHOW"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none text-slate-900 text-xs font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Penulis / Sumber Berita</label>
+                  <input
+                    type="text"
+                    value={articleForm.author}
+                    onChange={(e) => setArticleForm({ ...articleForm, author: e.target.value })}
+                    placeholder="Tim Media Miracle Pictures"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-amber-500 outline-none text-slate-900 text-xs font-semibold"
+                  />
+                </div>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl border border-amber-200 bg-amber-50/60">
+                  <input
+                    type="checkbox"
+                    id="featuredCheck"
+                    checked={articleForm.featured}
+                    onChange={(e) => setArticleForm({ ...articleForm, featured: e.target.checked })}
+                    className="w-4 h-4 rounded border-amber-300 text-amber-500 focus:ring-amber-500"
+                  />
+                  <label htmlFor="featuredCheck" className="text-xs font-bold text-amber-900 cursor-pointer select-none">
+                    ⭐ Sorotan / Berita Utama
+                  </label>
+                </div>
               </div>
+
+              {/* FIELD KHUSUS BERDASARKAN KATEGORI */}
+              {articleForm.category === 'Galeri Video' && (
+                <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-3">
+                  <div className="flex items-center gap-2 text-blue-900 font-bold">
+                    <Film className="w-4 h-4" />
+                    <span>Pengaturan Khusus Video</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2">
+                      <label className="block font-bold text-slate-700 mb-1">URL Video YouTube</label>
+                      <input
+                        type="text"
+                        value={articleForm.videoUrl}
+                        onChange={(e) => setArticleForm({ ...articleForm, videoUrl: e.target.value })}
+                        placeholder="Contoh: https://www.youtube.com/watch?v=..."
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-blue-500 outline-none font-mono text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Durasi Video</label>
+                      <input
+                        type="text"
+                        value={articleForm.videoDuration}
+                        onChange={(e) => setArticleForm({ ...articleForm, videoDuration: e.target.value })}
+                        placeholder="02:15"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-blue-500 outline-none text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {articleForm.category === 'Media Coverage' && (
+                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+                  <div className="flex items-center gap-2 text-emerald-900 font-bold">
+                    <Newspaper className="w-4 h-4" />
+                    <span>Pengaturan Liputan Media Luar</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Nama Media Pers</label>
+                      <input
+                        type="text"
+                        value={articleForm.mediaName}
+                        onChange={(e) => setArticleForm({ ...articleForm, mediaName: e.target.value })}
+                        placeholder="Contoh: Kompas.com, DetikHot, Liputan6"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-emerald-500 outline-none text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">URL Link Berita Asli</label>
+                      <input
+                        type="text"
+                        value={articleForm.externalUrl}
+                        onChange={(e) => setArticleForm({ ...articleForm, externalUrl: e.target.value })}
+                        placeholder="https://..."
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-emerald-500 outline-none font-mono text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {articleForm.category === 'Press Release' && (
+                <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-3">
+                  <div className="flex items-center gap-2 text-purple-900 font-bold">
+                    <Download className="w-4 h-4" />
+                    <span>Dokumen Press Release</span>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Link File PDF Siaran Pers Resmi</label>
+                    <input
+                      type="text"
+                      value={articleForm.pdfUrl}
+                      onChange={(e) => setArticleForm({ ...articleForm, pdfUrl: e.target.value })}
+                      placeholder="Contoh: /docs/siaran-pers-piyetokih-01.pdf atau link Google Drive"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-purple-500 outline-none font-mono text-xs"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {articleForm.category === 'Galeri Foto' && (
+                <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
+                  <div className="flex items-center gap-2 text-amber-900 font-bold">
+                    <Image className="w-4 h-4" />
+                    <span>Pengaturan Album Galeri Foto</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Lokasi Foto</label>
+                      <input
+                        type="text"
+                        value={articleForm.location}
+                        onChange={(e) => setArticleForm({ ...articleForm, location: e.target.value })}
+                        placeholder="Contoh: Solo & Jogja, Bioskop XXI Paragon"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-amber-500 outline-none text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Keterangan Jumlah Foto</label>
+                      <input
+                        type="text"
+                        value={articleForm.photoCount}
+                        onChange={(e) => setArticleForm({ ...articleForm, photoCount: e.target.value })}
+                        placeholder="Contoh: 24 Foto Dokumentasi"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-amber-500 outline-none text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Cover Foto Utama Artikel (Direct Upload) */}
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">

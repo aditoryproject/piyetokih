@@ -59,12 +59,24 @@ export async function POST(req: NextRequest) {
       content: body.content || '',
       coverImage:
         body.coverImage ||
-        'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+        '/kabar-galeri-hero.jpg',
       galleryImages: Array.isArray(body.galleryImages)
         ? body.galleryImages.filter((img: string) => img && img.trim())
         : [],
       cityTag: body.cityTag || '',
-      category: body.category || 'Roadshow',
+      category: body.category || 'Kabar Film',
+      tag: body.tag || '',
+      tags: Array.isArray(body.tags) ? body.tags : (body.tag ? [body.tag] : []),
+      featured: Boolean(body.featured),
+      ctaText: body.ctaText || '',
+      ctaLink: body.ctaLink || '',
+      pdfUrl: body.pdfUrl || '',
+      externalUrl: body.externalUrl || '',
+      mediaName: body.mediaName || '',
+      videoUrl: body.videoUrl || '',
+      videoDuration: body.videoDuration || '',
+      photoCount: body.photoCount ? Number(body.photoCount) : (Array.isArray(body.galleryImages) ? body.galleryImages.length : 0),
+      location: body.location || '',
       author: body.author || 'Tim Media Miracle Pictures',
       publishedAt: body.publishedAt || new Date().toISOString().split('T')[0],
       readTime: body.readTime || '3 menit baca',
@@ -95,14 +107,21 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const deleteAll = searchParams.get('deleteAll') === 'true';
     const id = searchParams.get('id');
+
+    const db = getDb();
+    if (!db.articles) db.articles = [];
+
+    if (deleteAll) {
+      db.articles = [];
+      saveDb(db);
+      return NextResponse.json({ success: true, message: 'Semua artikel berhasil dibersihkan' });
+    }
 
     if (!id) {
       return NextResponse.json({ success: false, error: 'ID artikel wajib disertakan' }, { status: 400 });
     }
-
-    const db = getDb();
-    if (!db.articles) db.articles = [];
 
     db.articles = db.articles.filter(a => a.id !== id);
     saveDb(db);

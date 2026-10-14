@@ -70,6 +70,18 @@ export async function POST(req: NextRequest) {
     if (body.bogoDefaultTicketLink !== undefined) db.settings.bogoDefaultTicketLink = String(body.bogoDefaultTicketLink);
     if (body.bogoCinemaLinks !== undefined) db.settings.bogoCinemaLinks = { ...db.settings.bogoCinemaLinks, ...body.bogoCinemaLinks };
 
+    // Kabar & Galeri + Media Center Global Settings
+    if (body.kabarGaleriSettings) {
+      db.settings.kabarGaleriSettings = {
+        ...(db.settings.kabarGaleriSettings || {}),
+        ...body.kabarGaleriSettings,
+        mediaCenter: {
+          ...(db.settings.kabarGaleriSettings?.mediaCenter || {}),
+          ...(body.kabarGaleriSettings?.mediaCenter || {}),
+        },
+      };
+    }
+
     saveDb(db);
     return NextResponse.json({ success: true, settings: db.settings });
   } catch (err: any) {

@@ -21,5 +21,10 @@ export default function KabarGaleriPage() {
   const db = getDb();
   const articles = (db.articles || []).filter(a => a.isPublished);
 
-  return <KabarGaleriHub initialArticles={articles} />;
+  return (
+    <KabarGaleriHub
+      initialArticles={articles}
+      kabarGaleriSettings={db.settings.kabarGaleriSettings}
+    />
+  );
 }

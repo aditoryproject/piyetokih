@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArticleRecord } from '@/lib/db';
+import { ArticleRecord, KabarGaleriSettings } from '@/lib/db';
 import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
 import {
   Calendar,
@@ -32,9 +32,13 @@ import {
 
 interface KabarGaleriHubProps {
   initialArticles?: ArticleRecord[];
+  kabarGaleriSettings?: KabarGaleriSettings;
 }
 
-export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubProps) {
+export default function KabarGaleriHub({
+  initialArticles = [],
+  kabarGaleriSettings,
+}: KabarGaleriHubProps) {
   const [activeTab, setActiveTab] = useState<
     'kabar-film' | 'press-release' | 'media-coverage' | 'galeri-foto' | 'galeri-video'
   >('kabar-film');
@@ -50,7 +54,7 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Articles classification
-  const featuredArticle = initialArticles.find(a => a.featured) || initialArticles[0];
+  const featuredArticle = initialArticles.find(a => a.featured) || (initialArticles.length > 0 ? initialArticles[0] : null);
 
   const kabarFilmArticles = initialArticles.filter(
     a => a.category === 'Kabar Film' && a.id !== featuredArticle?.id
@@ -72,6 +76,36 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
     a => a.category === 'Galeri Video'
   );
 
+  // Dynamic Hero values from settings or featured article
+  const heroCoverImage =
+    featuredArticle?.coverImage ||
+    kabarGaleriSettings?.heroCoverImage ||
+    '/kabar-galeri-hero.jpg';
+
+  const heroQuote =
+    kabarGaleriSettings?.heroQuote ||
+    '“Tentang kita, yang selalu mencari jalan pulang.”';
+
+  const heroBadge =
+    kabarGaleriSettings?.heroTaglineBadge ||
+    'KABAR & GALERI';
+
+  const heroTitle =
+    featuredArticle?.title ||
+    kabarGaleriSettings?.heroTitle ||
+    'PIYE TO KIH? Resmi Rilis Official Poster & Trailer';
+
+  const heroExcerpt =
+    featuredArticle?.summary ||
+    kabarGaleriSettings?.heroExcerpt ||
+    'Film komedi drama PIYE TO KIH? persembahan Miracle Pictures. Simak kabar terkini, galeri dokumentasi foto, dan video perjalanan menuju penayangan bioskop.';
+
+  const heroCtaLink = featuredArticle?.slug
+    ? `/kabar-galeri/${featuredArticle.slug}`
+    : kabarGaleriSettings?.heroCtaLink || '/kabar-galeri';
+
+  const heroCtaText = kabarGaleriSettings?.heroCtaText || 'Baca Selengkapnya';
+
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-slate-800 antialiased">
       {/* 1. CINEMATIC HERO SPOTLIGHT / FEATURED STORY */}
@@ -80,7 +114,7 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
           style={{
-            backgroundImage: `url(${featuredArticle?.coverImage || '/kabar-galeri-hero.jpg'})`,
+            backgroundImage: `url(${heroCoverImage})`,
           }}
         />
 
@@ -89,36 +123,35 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
 
         {/* Top-Right Cinematic Tagline Quote */}
-        <div className="absolute top-6 sm:top-10 right-6 sm:right-12 max-w-xs sm:max-w-sm text-right pointer-events-none hidden sm:block">
-          <p className="font-serif italic text-amber-200/90 text-sm sm:text-base lg:text-lg drop-shadow-md leading-relaxed">
-            &ldquo;Tentang kita, <br />
-            yang selalu mencari <br />
-            jalan pulang.&rdquo;
-          </p>
-        </div>
+        {heroQuote && (
+          <div className="absolute top-6 sm:top-10 right-6 sm:right-12 max-w-xs sm:max-w-sm text-right pointer-events-none hidden sm:block">
+            <p className="font-serif italic text-amber-200/90 text-sm sm:text-base lg:text-lg drop-shadow-md leading-relaxed whitespace-pre-line">
+              {heroQuote}
+            </p>
+          </div>
+        )}
 
         {/* Hero Left Content Overlay */}
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-8 flex flex-col justify-end pb-8 sm:pb-12">
           <div className="max-w-2xl space-y-3">
             <span className="inline-block text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400">
-              KABAR &amp; GALERI
+              {heroBadge}
             </span>
 
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white uppercase tracking-tight leading-tight drop-shadow-xl">
-              {featuredArticle?.title || 'PIYE TO KIH? Resmi Rilis Official Poster & Trailer'}
+              {heroTitle}
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-200/90 line-clamp-3 leading-relaxed max-w-xl font-normal">
-              {featuredArticle?.summary ||
-                'Film PIYE TO KIH? akhirnya merilis official poster dan trailer perdana yang memperlihatkan kisah penuh makna tentang persahabatan, keluarga, dan pencarian jati diri di tanah Jawa.'}
+              {heroExcerpt}
             </p>
 
             <div className="pt-2">
               <Link
-                href={`/kabar-galeri/${featuredArticle?.slug || 'resmi-rilis-official-poster-trailer-perdana'}`}
+                href={heroCtaLink}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm tracking-wide shadow-xl shadow-amber-500/25 transition-transform active:scale-95"
               >
-                <span>Baca Selengkapnya</span>
+                <span>{heroCtaText}</span>
                 <span>➔</span>
               </Link>
             </div>
@@ -226,51 +259,61 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                 </div>
 
                 {/* 4 Cards in 1 Row / Responsive Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                  {kabarFilmArticles.slice(0, 4).map(article => (
-                    <Link
-                      key={article.id}
-                      href={`/kabar-galeri/${article.slug}`}
-                      className="group bg-white rounded-2xl border border-slate-200 hover:border-amber-400 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between"
-                    >
-                      <div>
-                        {/* Thumbnail with Badge */}
-                        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                          <img
-                            src={article.coverImage}
-                            alt={article.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-md bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow">
-                            {article.tag || article.cityTag || 'BERITA'}
-                          </span>
-                        </div>
-
-                        {/* Title & Metadata */}
-                        <div className="p-3.5 space-y-2">
-                          <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-amber-600 transition-colors line-clamp-2 leading-snug">
-                            {article.title}
-                          </h3>
-
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                            <Calendar className="w-3 h-3 text-slate-400" />
-                            <span>
-                              {new Date(article.publishedAt).toLocaleDateString('id-ID', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric',
-                              })}
+                {kabarFilmArticles.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {kabarFilmArticles.slice(0, 4).map(article => (
+                      <Link
+                        key={article.id}
+                        href={`/kabar-galeri/${article.slug}`}
+                        className="group bg-white rounded-2xl border border-slate-200 hover:border-amber-400 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                      >
+                        <div>
+                          {/* Thumbnail with Badge */}
+                          <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                            <img
+                              src={article.coverImage}
+                              alt={article.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-md bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow">
+                              {article.tag || article.cityTag || 'BERITA'}
                             </span>
                           </div>
 
-                          <p className="text-[11px] text-slate-600 line-clamp-3 leading-relaxed">
-                            {article.summary}
-                          </p>
+                          {/* Title & Metadata */}
+                          <div className="p-3.5 space-y-2">
+                            <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-amber-600 transition-colors line-clamp-2 leading-snug">
+                              {article.title}
+                            </h3>
+
+                            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                              <Calendar className="w-3 h-3 text-slate-400" />
+                              <span>
+                                {new Date(article.publishedAt).toLocaleDateString('id-ID', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                            </div>
+
+                            <p className="text-[11px] text-slate-600 line-clamp-3 leading-relaxed">
+                              {article.summary}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-2 shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <p className="font-extrabold text-xs sm:text-sm text-slate-800">Belum ada artikel kabar yang diterbitkan</p>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">Rilis berita dan pengumuman resmi film akan segera hadir di sini.</p>
+                  </div>
+                )}
               </div>
 
               {/* Right Column: Media Center Card (25%) */}
@@ -334,35 +377,42 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                 </div>
 
                 {/* 3 Photo Album Cards */}
-                <div className="grid grid-cols-3 gap-3">
-                  {photoAlbums.slice(0, 3).map((album, idx) => (
-                    <div
-                      key={album.id || idx}
-                      onClick={() => {
-                        setActiveAlbum(album);
-                        setLightboxIndex(0);
-                      }}
-                      className="group cursor-pointer relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-sm hover:shadow-md"
-                    >
-                      <img
-                        src={album.coverImage}
-                        alt={album.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                {photoAlbums.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-3">
+                    {photoAlbums.slice(0, 3).map((album, idx) => (
+                      <div
+                        key={album.id || idx}
+                        onClick={() => {
+                          setActiveAlbum(album);
+                          setLightboxIndex(0);
+                        }}
+                        className="group cursor-pointer relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-sm hover:shadow-md"
+                      >
+                        <img
+                          src={album.coverImage}
+                          alt={album.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-                      <div className="absolute bottom-2 left-2 right-2 space-y-0.5">
-                        <span className="block text-[10px] sm:text-xs font-black text-white truncate leading-tight">
-                          {album.title}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-300">
-                          <Camera className="w-2.5 h-2.5" />
-                          <span>{album.photoCount || 24} Foto</span>
-                        </span>
+                        <div className="absolute bottom-2 left-2 right-2 space-y-0.5">
+                          <span className="block text-[10px] sm:text-xs font-black text-white truncate leading-tight">
+                            {album.title}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-300">
+                            <Camera className="w-2.5 h-2.5" />
+                            <span>{album.photoCount || (album.galleryImages ? album.galleryImages.length : 1)} Foto</span>
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-1 shadow-sm">
+                    <Camera className="w-6 h-6 text-slate-300 mx-auto" />
+                    <p className="text-xs font-bold text-slate-600">Belum ada album foto tersimpan</p>
+                  </div>
+                )}
               </div>
 
               {/* Right Side: Galeri Video (55%) */}
@@ -387,48 +437,55 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                 </div>
 
                 {/* 4 Video Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {videoArticles.slice(0, 4).map(video => (
-                    <div
-                      key={video.id}
-                      onClick={() =>
-                        setActiveVideo({
-                          title: video.title,
-                          url: video.videoUrl || 'https://www.youtube.com/watch?v=kYJv8Pj328Q',
-                        })
-                      }
-                      className="group cursor-pointer bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between"
-                    >
-                      {/* Video Thumbnail */}
-                      <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                        <img
-                          src={video.coverImage}
-                          alt={video.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                        />
-                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition" />
+                {videoArticles.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {videoArticles.slice(0, 4).map(video => (
+                      <div
+                        key={video.id}
+                        onClick={() =>
+                          setActiveVideo({
+                            title: video.title,
+                            url: video.videoUrl || 'https://www.youtube.com/watch?v=kYJv8Pj328Q',
+                          })
+                        }
+                        className="group cursor-pointer bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between"
+                      >
+                        {/* Video Thumbnail */}
+                        <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                          <img
+                            src={video.coverImage}
+                            alt={video.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                          />
+                          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition" />
 
-                        {/* Play Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-black/60 border border-white/40 text-white flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-black transition shadow-lg">
-                            <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                          {/* Play Icon */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-black/60 border border-white/40 text-white flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-black transition shadow-lg">
+                              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                            </div>
                           </div>
+
+                          {/* Duration */}
+                          <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-[9px] font-mono font-bold text-white">
+                            {video.videoDuration || '2:24'}
+                          </span>
                         </div>
 
-                        {/* Duration */}
-                        <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-[9px] font-mono font-bold text-white">
-                          {video.videoDuration || '2:24'}
-                        </span>
+                        <div className="p-2">
+                          <span className="block text-[11px] font-bold text-slate-900 group-hover:text-amber-600 line-clamp-1 leading-snug">
+                            {video.title}
+                          </span>
+                        </div>
                       </div>
-
-                      <div className="p-2">
-                        <span className="block text-[11px] font-bold text-slate-900 group-hover:text-amber-600 line-clamp-1 leading-snug">
-                          {video.title}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-1 shadow-sm">
+                    <Play className="w-6 h-6 text-slate-300 mx-auto" />
+                    <p className="text-xs font-bold text-slate-600">Belum ada video arsip tersimpan</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -457,56 +514,66 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {pressReleaseArticles.map(pr => (
-                <div
-                  key={pr.id}
-                  className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-sm hover:shadow-md transition"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-800 border border-red-200">
-                      PRESS RELEASE
-                    </span>
-                    <span className="text-xs text-slate-400 font-medium">
-                      {new Date(pr.publishedAt).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
+            {pressReleaseArticles.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {pressReleaseArticles.map(pr => (
+                  <div
+                    key={pr.id}
+                    className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-sm hover:shadow-md transition"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-800 border border-red-200">
+                        PRESS RELEASE
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">
+                        {new Date(pr.publishedAt).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
 
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug hover:text-amber-600 transition">
-                    <Link href={`/kabar-galeri/${pr.slug}`}>{pr.title}</Link>
-                  </h3>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug hover:text-amber-600 transition">
+                      <Link href={`/kabar-galeri/${pr.slug}`}>{pr.title}</Link>
+                    </h3>
 
-                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
-                    {pr.summary}
-                  </p>
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                      {pr.summary}
+                    </p>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <Link
-                      href={`/kabar-galeri/${pr.slug}`}
-                      className="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1"
-                    >
-                      <span>Baca Siaran Pers Lengkap</span>
-                      <span>➔</span>
-                    </Link>
-
-                    {pr.pdfUrl && (
-                      <a
-                        href={pr.pdfUrl}
-                        download
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <Link
+                        href={`/kabar-galeri/${pr.slug}`}
+                        className="text-xs font-bold text-amber-600 hover:underline flex items-center gap-1"
                       >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Unduh PDF</span>
-                      </a>
-                    )}
+                        <span>Baca Siaran Pers Lengkap</span>
+                        <span>➔</span>
+                      </Link>
+
+                      {pr.pdfUrl && (
+                        <a
+                          href={pr.pdfUrl}
+                          download
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Unduh PDF</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                  <Newspaper className="w-6 h-6" />
                 </div>
-              ))}
-            </div>
+                <h4 className="font-extrabold text-sm text-slate-900">Belum Ada Siaran Pers Resmi</h4>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">Siaran pers dan materi rilis resmi akan diterbitkan segera oleh Miracle Pictures.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -523,55 +590,65 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {mediaCoverageArticles.map(mc => (
-                <div
-                  key={mc.id}
-                  className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-sm hover:shadow-md transition flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-black text-xs text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md">
-                        {mc.mediaName || 'Media Nasional'}
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                        {mc.tag || 'LIPUTAN'}
-                      </span>
+            {mediaCoverageArticles.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {mediaCoverageArticles.map(mc => (
+                  <div
+                    key={mc.id}
+                    className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-black text-xs text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md">
+                          {mc.mediaName || 'Media Nasional'}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                          {mc.tag || 'LIPUTAN'}
+                        </span>
+                      </div>
+
+                      <h3 className="font-extrabold text-sm text-slate-900 leading-snug line-clamp-2">
+                        {mc.title}
+                      </h3>
+
+                      <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                        {mc.summary}
+                      </p>
                     </div>
 
-                    <h3 className="font-extrabold text-sm text-slate-900 leading-snug line-clamp-2">
-                      {mc.title}
-                    </h3>
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] text-slate-400">
+                        {new Date(mc.publishedAt).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </span>
 
-                    <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
-                      {mc.summary}
-                    </p>
+                      {mc.externalUrl && (
+                        <a
+                          href={mc.externalUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-800 transition"
+                        >
+                          <span>Lihat Liputan</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400">
-                      {new Date(mc.publishedAt).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-
-                    {mc.externalUrl && (
-                      <a
-                        href={mc.externalUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-800 transition"
-                      >
-                        <span>Lihat Liputan</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
-                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                  <Megaphone className="w-6 h-6" />
                 </div>
-              ))}
-            </div>
+                <h4 className="font-extrabold text-sm text-slate-900">Belum Ada Liputan Media Terdaftar</h4>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">Liputan dan pemberitaan media massa mengenai film akan diperbarui secara berkala.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -588,47 +665,57 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {photoAlbums.map((album, idx) => (
-                <div
-                  key={album.id || idx}
-                  onClick={() => {
-                    setActiveAlbum(album);
-                    setLightboxIndex(0);
-                  }}
-                  className="group cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                    <img
-                      src={album.coverImage}
-                      alt={album.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            {photoAlbums.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {photoAlbums.map((album, idx) => (
+                  <div
+                    key={album.id || idx}
+                    onClick={() => {
+                      setActiveAlbum(album);
+                      setLightboxIndex(0);
+                    }}
+                    className="group cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                      <img
+                        src={album.coverImage}
+                        alt={album.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-                    <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-white text-[11px] font-bold inline-flex items-center gap-1.5">
-                      <Camera className="w-3.5 h-3.5 text-amber-400" />
-                      <span>{album.photoCount || 24} Foto</span>
-                    </span>
-
-                    {album.location && (
-                      <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase">
-                        {album.location}
+                      <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-white text-[11px] font-bold inline-flex items-center gap-1.5">
+                        <Camera className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{album.photoCount || (album.galleryImages ? album.galleryImages.length : 1)} Foto</span>
                       </span>
-                    )}
-                  </div>
 
-                  <div className="p-4 space-y-1.5">
-                    <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-amber-600 transition">
-                      {album.title}
-                    </h3>
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                      {album.summary}
-                    </p>
+                      {album.location && (
+                        <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase">
+                          {album.location}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="p-4 space-y-1.5">
+                      <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-amber-600 transition">
+                        {album.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                        {album.summary}
+                      </p>
+                    </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                  <Camera className="w-6 h-6" />
                 </div>
-              ))}
-            </div>
+                <h4 className="font-extrabold text-sm text-slate-900">Belum Ada Album Foto Tersimpan</h4>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">Dokumentasi foto resmi akan diunggah dan dapat dilihat langsung di sini.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -645,48 +732,58 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {videoArticles.map(video => (
-                <div
-                  key={video.id}
-                  onClick={() =>
-                    setActiveVideo({
-                      title: video.title,
-                      url: video.videoUrl || 'https://www.youtube.com/watch?v=kYJv8Pj328Q',
-                    })
-                  }
-                  className="group cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col justify-between"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                    <img
-                      src={video.coverImage}
-                      alt={video.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                    />
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition" />
+            {videoArticles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {videoArticles.map(video => (
+                  <div
+                    key={video.id}
+                    onClick={() =>
+                      setActiveVideo({
+                        title: video.title,
+                        url: video.videoUrl || 'https://www.youtube.com/watch?v=kYJv8Pj328Q',
+                      })
+                    }
+                    className="group cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col justify-between"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                      <img
+                        src={video.coverImage}
+                        alt={video.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                      />
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition" />
 
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center group-hover:scale-110 shadow-xl transition">
-                        <Play className="w-4 h-4 fill-current ml-0.5" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center group-hover:scale-110 shadow-xl transition">
+                          <Play className="w-4 h-4 fill-current ml-0.5" />
+                        </div>
                       </div>
+
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono font-bold text-white">
+                        {video.videoDuration || '2:24'}
+                      </span>
                     </div>
 
-                    <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono font-bold text-white">
-                      {video.videoDuration || '2:24'}
-                    </span>
+                    <div className="p-3.5 space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 block">
+                        {video.tag || 'VIDEO'}
+                      </span>
+                      <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-amber-600 line-clamp-2 leading-snug">
+                        {video.title}
+                      </h3>
+                    </div>
                   </div>
-
-                  <div className="p-3.5 space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 block">
-                      {video.tag || 'VIDEO'}
-                    </span>
-                    <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-amber-600 line-clamp-2 leading-snug">
-                      {video.title}
-                    </h3>
-                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                  <Play className="w-6 h-6" />
                 </div>
-              ))}
-            </div>
+                <h4 className="font-extrabold text-sm text-slate-900">Belum Ada Video Tersimpan</h4>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">Trailer, video musik, dan rekaman behind the scenes akan segera ditambahkan.</p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -828,7 +925,7 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                   <p className="text-xs text-slate-500">Format JPG resolusi cetak 300 DPI siap tayang.</p>
                 </div>
                 <a
-                  href="/kabar-galeri-hero.jpg"
+                  href={kabarGaleriSettings?.mediaCenter?.posterDownloadUrl || '/kabar-galeri-hero.jpg'}
                   download="PIYE_TO_KIH_Official_Poster.jpg"
                   className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
                 >
@@ -845,7 +942,7 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                   <p className="text-xs text-slate-500">Rilis pers lengkap peluncuran film &amp; roadshow.</p>
                 </div>
                 <a
-                  href="/PIYE_TO_KIH_Web_Developer_Guide_Kabar_dan_Galeri_v2.pdf"
+                  href={kabarGaleriSettings?.mediaCenter?.pressReleasePdfUrl || '#'}
                   download="Press_Release_PIYE_TO_KIH_2026.pdf"
                   className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
                 >
@@ -861,16 +958,27 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                   <h4 className="font-extrabold text-sm text-slate-900">Production Stills &amp; BTS</h4>
                   <p className="text-xs text-slate-500">Kumpulan foto adegan dan keseruan syuting.</p>
                 </div>
-                <button
-                  onClick={() => {
-                    setIsMediaCenterOpen(false);
-                    setActiveTab('galeri-foto');
-                  }}
-                  className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>Buka Galeri Foto</span>
-                </button>
+                {kabarGaleriSettings?.mediaCenter?.stillsDownloadUrl && kabarGaleriSettings.mediaCenter.stillsDownloadUrl !== '#' ? (
+                  <a
+                    href={kabarGaleriSettings.mediaCenter.stillsDownloadUrl}
+                    download
+                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Unduh Paket Foto (ZIP)</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setIsMediaCenterOpen(false);
+                      setActiveTab('galeri-foto');
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>Buka Galeri Foto</span>
+                  </button>
+                )}
               </div>
 
               {/* Asset 4: Fact Sheet & Sinopsis */}
@@ -880,14 +988,25 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                   <h4 className="font-extrabold text-sm text-slate-900">Fact Sheet &amp; Sinopsis Lengkap</h4>
                   <p className="text-xs text-slate-500">Judul, genre, sutradara, produser, dan daftar cast.</p>
                 </div>
-                <Link
-                  href="/#sinopsis"
-                  onClick={() => setIsMediaCenterOpen(false)}
-                  className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition border border-slate-200"
-                >
-                  <span>Lihat Sinopsis &amp; Fakta</span>
-                  <span>➔</span>
-                </Link>
+                {kabarGaleriSettings?.mediaCenter?.factSheetPdfUrl && kabarGaleriSettings.mediaCenter.factSheetPdfUrl !== '#' ? (
+                  <a
+                    href={kabarGaleriSettings.mediaCenter.factSheetPdfUrl}
+                    download
+                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition border border-slate-200"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Unduh Fact Sheet (PDF)</span>
+                  </a>
+                ) : (
+                  <Link
+                    href="/#sinopsis"
+                    onClick={() => setIsMediaCenterOpen(false)}
+                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition border border-slate-200"
+                  >
+                    <span>Lihat Sinopsis &amp; Fakta</span>
+                    <span>➔</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -897,14 +1016,25 @@ export default function KabarGaleriHub({ initialArticles = [] }: KabarGaleriHubP
                 <span className="font-bold text-amber-900 block">Butuh Wawancara Eksklusif atau Media Partner?</span>
                 <span className="text-amber-800">Hubungi Divisi Humas &amp; Media Miracle Pictures</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <a
-                  href="mailto:press@piyetokihfilm.com"
+                  href={`mailto:${kabarGaleriSettings?.mediaCenter?.prContactEmail || 'press@piyetokihfilm.com'}`}
                   className="inline-flex items-center gap-1 font-bold text-amber-900 hover:underline"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>press@piyetokihfilm.com</span>
+                  <span>{kabarGaleriSettings?.mediaCenter?.prContactEmail || 'press@piyetokihfilm.com'}</span>
                 </a>
+                {kabarGaleriSettings?.mediaCenter?.prContactPhone && (
+                  <a
+                    href={`https://wa.me/${kabarGaleriSettings.mediaCenter.prContactPhone.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 font-bold text-emerald-800 hover:underline"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>{kabarGaleriSettings.mediaCenter.prContactPhone}</span>
+                  </a>
+                )}
               </div>
             </div>
           </div>
