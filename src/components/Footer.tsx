@@ -164,6 +164,13 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center text-center md:text-left mb-8 pb-8 border-b border-white/5">
           {/* Brand Info */}
           <div>
+            <Link href="/" className="inline-block mb-3">
+              <img
+                src="/logo-ptk.png"
+                alt="Logo Film PIYE TO KIH?"
+                className="h-10 sm:h-12 w-auto object-contain mx-auto md:mx-0 drop-shadow"
+              />
+            </Link>
             <span className="text-[10px] font-black tracking-widest text-amber-400 uppercase block mb-1">
               PRODUKSI RESMI LAYAR LEBAR
             </span>

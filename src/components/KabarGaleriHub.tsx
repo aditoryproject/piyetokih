@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArticleRecord, KabarGaleriSettings } from '@/lib/db';
 import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
@@ -43,6 +43,20 @@ export default function KabarGaleriHub({
     'kabar-film' | 'press-release' | 'media-coverage' | 'galeri-foto' | 'galeri-video'
   >('kabar-film');
 
+  // Real-time client state for articles so reset/delete dummy reflects immediately
+  const [articles, setArticles] = useState<ArticleRecord[]>(initialArticles);
+
+  useEffect(() => {
+    fetch('/api/articles?publishedOnly=true', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.articles)) {
+          setArticles(data.articles);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Media Center Modal
   const [isMediaCenterOpen, setIsMediaCenterOpen] = useState(false);
 
@@ -54,29 +68,32 @@ export default function KabarGaleriHub({
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Articles classification
-  const featuredArticle = initialArticles.find(a => a.featured) || (initialArticles.length > 0 ? initialArticles[0] : null);
+  const featuredArticle = articles.find(a => a.featured) || (articles.length > 0 ? articles[0] : null);
 
-  const kabarFilmArticles = initialArticles.filter(
+  const kabarFilmArticles = articles.filter(
     a => a.category === 'Kabar Film' && a.id !== featuredArticle?.id
   );
 
-  const pressReleaseArticles = initialArticles.filter(
+  const pressReleaseArticles = articles.filter(
     a => a.category === 'Press Release'
   );
 
-  const mediaCoverageArticles = initialArticles.filter(
+  const mediaCoverageArticles = articles.filter(
     a => a.category === 'Media Coverage'
   );
 
-  const photoAlbums = initialArticles.filter(
+  const photoAlbums = articles.filter(
     a => a.category === 'Galeri Foto'
   );
 
-  const videoArticles = initialArticles.filter(
+  const videoArticles = articles.filter(
     a => a.category === 'Galeri Video'
   );
 
   // Dynamic Hero values from settings or featured article
+  const isDefaultDummyTitle =
+    kabarGaleriSettings?.heroTitle === 'PIYE TO KIH? Resmi Rilis Official Poster & Trailer';
+
   const heroCoverImage =
     featuredArticle?.coverImage ||
     kabarGaleriSettings?.heroCoverImage ||
@@ -92,19 +109,25 @@ export default function KabarGaleriHub({
 
   const heroTitle =
     featuredArticle?.title ||
-    kabarGaleriSettings?.heroTitle ||
-    'PIYE TO KIH? Resmi Rilis Official Poster & Trailer';
+    (!isDefaultDummyTitle && kabarGaleriSettings?.heroTitle
+      ? kabarGaleriSettings.heroTitle
+      : 'Kabar & Galeri Resmi Film PIYE TO KIH?');
 
   const heroExcerpt =
     featuredArticle?.summary ||
-    kabarGaleriSettings?.heroExcerpt ||
-    'Film komedi drama PIYE TO KIH? persembahan Miracle Pictures. Simak kabar terkini, galeri dokumentasi foto, dan video perjalanan menuju penayangan bioskop.';
+    (!isDefaultDummyTitle && kabarGaleriSettings?.heroExcerpt
+      ? kabarGaleriSettings.heroExcerpt
+      : 'Pusat informasi resmi penayangan bioskop film PIYE TO KIH?: liputan roadshow, galeri foto, video cuplikan, dan siaran pers resmi.');
 
   const heroCtaLink = featuredArticle?.slug
     ? `/kabar-galeri/${featuredArticle.slug}`
-    : kabarGaleriSettings?.heroCtaLink || '/kabar-galeri';
+    : kabarGaleriSettings?.heroCtaLink && kabarGaleriSettings.heroCtaLink !== '/kabar-galeri'
+    ? kabarGaleriSettings.heroCtaLink
+    : '/#roadshow';
 
-  const heroCtaText = kabarGaleriSettings?.heroCtaText || 'Baca Selengkapnya';
+  const heroCtaText = featuredArticle
+    ? (kabarGaleriSettings?.heroCtaText || 'Baca Selengkapnya')
+    : 'Lihat Jadwal Roadshow';
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-slate-800 antialiased">

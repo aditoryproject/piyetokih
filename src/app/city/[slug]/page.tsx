@@ -101,13 +101,21 @@ export default function CityRoadshowPage() {
             <span>ROADSHOW &amp; PENAYANGAN RESMI FILM BIOSKOP</span>
           </div>
 
-          {/* City Headline */}
-          <h1 className="text-3xl sm:text-6xl font-black text-white uppercase tracking-tight mb-3">
-            PIYE TO KIH? <br />
-            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
+          {/* City Headline with Official Logotype */}
+          <div className="flex flex-col items-center justify-center mb-4">
+            <h1 className="sr-only">PIYE TO KIH? ROADSHOW KOTA {city.name.toUpperCase()}</h1>
+            <img
+              src="/logo-ptk.png"
+              alt={`Logo Resmi Film PIYE TO KIH? Kota ${city.name}`}
+              className="w-56 sm:w-72 md:w-84 max-w-full h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)] mx-auto mb-2 filter hover:scale-[1.02] transition-transform duration-300"
+            />
+            <div className="text-2xl sm:text-5xl font-black uppercase tracking-tight bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
               KOTA {city.name.toUpperCase()}
-            </span>
-          </h1>
+            </div>
+            <div className="text-[11px] sm:text-xs font-black tracking-[0.25em] uppercase text-amber-400/90 mt-1.5">
+              ROADSHOW &amp; PENAYANGAN RESMI BIOSKOP
+            </div>
+          </div>
 
           {/* Date & Location Pill */}
           <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200 bg-black/60 px-5 py-2 rounded-full border border-white/10 mb-8 shadow-md">

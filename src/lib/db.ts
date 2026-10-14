@@ -218,11 +218,11 @@ const DEFAULT_SETTINGS: AppSettings = {
   kabarGaleriSettings: {
     heroTaglineBadge: 'KABAR & GALERI',
     heroQuote: '“Tentang kita, yang selalu mencari jalan pulang.”',
-    heroTitle: 'PIYE TO KIH? Resmi Rilis Official Poster & Trailer',
-    heroExcerpt: 'Film PIYE TO KIH? akhirnya merilis official poster dan trailer perdana yang memperlihatkan kisah penuh makna tentang persahabatan, keluarga, dan pencarian jati diri di tanah Jawa.',
+    heroTitle: 'Kabar & Galeri Resmi Film PIYE TO KIH?',
+    heroExcerpt: 'Pusat informasi resmi penayangan bioskop film PIYE TO KIH?: liputan roadshow 17 kota, galeri foto, video cuplikan, dan siaran pers.',
     heroCoverImage: '/kabar-galeri-hero.jpg',
-    heroCtaText: 'Baca Selengkapnya',
-    heroCtaLink: '/kabar-galeri',
+    heroCtaText: 'Kunjungi Jadwal Roadshow',
+    heroCtaLink: '/#roadshow',
     mediaCenter: {
       posterDownloadUrl: '/kabar-galeri-hero.jpg',
       pressReleasePdfUrl: '#',

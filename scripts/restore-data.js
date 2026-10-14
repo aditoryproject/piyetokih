@@ -40,7 +40,7 @@ if (fs.existsSync(bakFile)) {
       },
       leads: Array.isArray(bak.leads) && bak.leads.length > 0 ? bak.leads : (current.leads || []),
       visitors: Array.isArray(bak.visitors) && bak.visitors.length > 0 ? bak.visitors : (current.visitors || []),
-      articles: Array.isArray(current.articles) && current.articles.length > 0 ? current.articles : (bak.articles || []),
+      articles: Array.isArray(current.articles) ? current.articles : (Array.isArray(bak.articles) ? bak.articles : []),
       bogoReminders: Array.isArray(bak.bogoReminders) && bak.bogoReminders.length > 0 ? bak.bogoReminders : (current.bogoReminders || [])
     };
 

@@ -24,15 +24,17 @@ export default function RootLayout({
         {/* Cinematic Clean Header */}
         <header className="sticky top-0 z-40 bg-[#0B0F17]/95 backdrop-blur-md border-b border-white/10">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-black font-black shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform">
-                <Film className="w-5 h-5" />
-              </div>
-              <div className="leading-tight">
-                <span className="block font-black text-sm tracking-wider text-white">
-                  PIYE TO KIH?
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-1" title="PIYE TO KIH? THE MOVIE - Miracle Pictures">
+              <img
+                src="/logo-ptk.png"
+                alt="Logo Resmi Film PIYE TO KIH?"
+                className="h-9 sm:h-11 w-auto max-w-[140px] sm:max-w-[170px] object-contain drop-shadow-md group-hover:scale-105 transition-transform"
+              />
+              <div className="leading-tight hidden sm:block border-l border-white/15 pl-2.5">
+                <span className="block font-black text-[11px] tracking-wider text-white uppercase">
+                  THE MOVIE
                 </span>
-                <span className="text-[10px] text-gold-400 font-medium tracking-widest uppercase">
+                <span className="text-[9px] text-amber-400 font-bold tracking-widest uppercase block">
                   MIRACLE PICTURES
                 </span>
               </div>

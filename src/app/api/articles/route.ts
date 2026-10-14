@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getDb, saveDb, ArticleRecord } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +22,14 @@ export async function GET(req: NextRequest) {
       list = list.filter(a => a.cityTag?.toLowerCase() === city.toLowerCase());
     }
 
-    return NextResponse.json({ success: true, articles: list });
+    return NextResponse.json(
+      { success: true, articles: list },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      }
+    );
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
@@ -98,6 +109,14 @@ export async function POST(req: NextRequest) {
 
     saveDb(db);
 
+    try {
+      revalidatePath('/kabar-galeri');
+      revalidatePath('/artikel');
+      revalidatePath(`/kabar-galeri/${slug}`);
+      revalidatePath(`/artikel/${slug}`);
+      revalidatePath('/');
+    } catch {}
+
     return NextResponse.json({ success: true, article: newArticle });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -115,7 +134,21 @@ export async function DELETE(req: NextRequest) {
 
     if (deleteAll) {
       db.articles = [];
+      // Bersihkan juga dummy hero di kabarGaleriSettings jika masih default
+      if (db.settings?.kabarGaleriSettings) {
+        db.settings.kabarGaleriSettings.heroTitle = 'Kabar & Galeri Resmi Film PIYE TO KIH?';
+        db.settings.kabarGaleriSettings.heroExcerpt = 'Pusat informasi resmi penayangan bioskop film PIYE TO KIH?: liputan roadshow, galeri dokumentasi foto, video cuplikan, dan siaran pers.';
+        db.settings.kabarGaleriSettings.heroCtaText = 'Kunjungi Jadwal Roadshow';
+        db.settings.kabarGaleriSettings.heroCtaLink = '/#roadshow';
+      }
       saveDb(db);
+
+      try {
+        revalidatePath('/kabar-galeri');
+        revalidatePath('/artikel');
+        revalidatePath('/');
+      } catch {}
+
       return NextResponse.json({ success: true, message: 'Semua artikel berhasil dibersihkan' });
     }
 
@@ -125,6 +158,12 @@ export async function DELETE(req: NextRequest) {
 
     db.articles = db.articles.filter(a => a.id !== id);
     saveDb(db);
+
+    try {
+      revalidatePath('/kabar-galeri');
+      revalidatePath('/artikel');
+      revalidatePath('/');
+    } catch {}
 
     return NextResponse.json({ success: true, message: 'Artikel berhasil dihapus' });
   } catch (err: any) {

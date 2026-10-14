@@ -128,13 +128,20 @@ export default function BogoPromoPage() {
             <span>PROMO SPESIAL NONTON BERDUA</span>
           </div>
 
-          {/* Main Title */}
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white uppercase drop-shadow-2xl mb-3">
-            BUY 1 GET 1 FREE <br />
-            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
-              PIYE TO KIH? THE MOVIE
+          {/* Main Title with Official Logotype */}
+          <div className="flex flex-col items-center justify-center mb-4">
+            <img
+              src="/logo-ptk.png"
+              alt="Logo Resmi Film PIYE TO KIH?"
+              className="w-52 sm:w-64 md:w-72 max-w-full h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)] mx-auto mb-3 filter hover:scale-[1.02] transition-transform duration-300"
+            />
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white uppercase drop-shadow-2xl">
+              BUY 1 GET 1 FREE
+            </h1>
+            <span className="text-xs sm:text-sm font-black tracking-[0.25em] uppercase text-amber-400/90 mt-1.5">
+              THE MOVIE • PROMO RESMI BIOSKOP
             </span>
-          </h1>
+          </div>
 
           <p className="text-sm sm:text-base text-gray-300 max-w-xl mx-auto mb-6 leading-relaxed">
             {settings.bogoSubtitle ||

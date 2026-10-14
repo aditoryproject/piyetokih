@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function ArticlesPage() {
   const db = getDb();
   const articles = (db.articles || []).filter(a => a.isPublished);
