@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 3005",
-    "lint": "next lint"
+    "lint": "next lint",
+    "restore:data": "node scripts/restore-data.js"
   },
   "dependencies": {
     "@types/canvas-confetti": "^1.9.0",
