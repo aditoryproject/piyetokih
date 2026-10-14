@@ -1995,71 +1995,78 @@ export default function AdminPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Poster Input & Preview */}
-                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <label className="block text-xs font-black text-slate-900">
-                        Poster Utama Film
-                      </label>
-                      <span className="text-[10px] text-slate-400 font-bold">Rasio 16:9 / Landscape</span>
-                    </div>
-
-                    {/* Direct Upload Button */}
+                  {/* Poster Vertikal Input & Preview */}
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                     <div>
-                      <label className="cursor-pointer w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition shadow-md active:scale-95 group">
-                        <Upload className="w-4 h-4 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
-                        <span>{uploadingPoster ? 'Sedang Mengunggah Poster...' : '📁 Pilih & Upload File Poster'}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-black text-slate-900">
+                          Poster Vertikal Film (Sinopsis &amp; Roadshow)
+                        </label>
+                        <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-200">
+                          Rasio 2:3 / Vertikal Portrait
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mb-3">
+                        Poster tegak resmi film bioskop yang tampil di samping sinopsis cerita film (Layar Lebar 2026) dan halaman 17 kota.
+                      </p>
+
+                      {/* Direct Upload Button */}
+                      <div>
+                        <label className="cursor-pointer w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition shadow-md active:scale-95 group">
+                          <Upload className="w-4 h-4 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
+                          <span>{uploadingPoster ? 'Sedang Mengunggah Poster...' : '📁 Pilih & Upload Poster Vertikal'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingPoster}
+                            className="hidden"
+                            onChange={async e => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setUploadingPoster(true);
+                              const url = await handleFileUpload(file, 'poster');
+                              setUploadingPoster(false);
+                              if (url) {
+                                setSettings({
+                                  ...settings,
+                                  movieSettings: {
+                                    ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                    posterUrl: url,
+                                  },
+                                });
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+
+                      {/* URL Path Box */}
+                      <div className="space-y-1 mt-3">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Jalur File Gambar Aktif</span>
                         <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingPoster}
-                          className="hidden"
-                          onChange={async e => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            setUploadingPoster(true);
-                            const url = await handleFileUpload(file, 'poster');
-                            setUploadingPoster(false);
-                            if (url) {
-                              setSettings({
-                                ...settings,
-                                movieSettings: {
-                                  ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
-                                  posterUrl: url,
-                                },
-                              });
-                            }
-                          }}
+                          type="text"
+                          value={settings.movieSettings?.posterUrl || ''}
+                          onChange={e =>
+                            setSettings({
+                              ...settings,
+                              movieSettings: {
+                                ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                posterUrl: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="/uploads/poster-....jpg atau https://..."
+                          className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-[11px] text-slate-800 font-mono outline-none"
                         />
-                      </label>
+                      </div>
                     </div>
 
-                    {/* URL Path Box */}
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">Jalur File Gambar Aktif</span>
-                      <input
-                        type="text"
-                        value={settings.movieSettings?.posterUrl || ''}
-                        onChange={e =>
-                          setSettings({
-                            ...settings,
-                            movieSettings: {
-                              ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
-                              posterUrl: e.target.value,
-                            },
-                          })
-                        }
-                        placeholder="/uploads/poster-....jpg atau https://..."
-                        className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 rounded-xl px-3 py-2 text-[11px] text-slate-800 font-mono outline-none"
-                      />
-                    </div>
-
-                    {/* Preview Box */}
-                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center shadow-inner">
+                    {/* Preview Box - Real Vertical Cinema Poster Ratio 2:3 */}
+                    <div className="relative aspect-[2/3] max-w-[220px] w-full mx-auto rounded-xl overflow-hidden border border-slate-300 bg-slate-900 flex items-center justify-center shadow-md mt-3">
                       {settings.movieSettings?.posterUrl ? (
                         <img
                           src={settings.movieSettings.posterUrl}
-                          alt="Preview Poster"
+                          alt="Preview Poster Vertikal"
                           className="w-full h-full object-cover"
                           onError={(e: any) => {
                             e.target.style.display = 'none';
@@ -2072,7 +2079,7 @@ export default function AdminPage() {
                         </div>
                       )}
                       <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 text-amber-400 text-[10px] font-bold">
-                        Live Poster Preview
+                        Live Poster Vertikal
                       </div>
                     </div>
                   </div>
