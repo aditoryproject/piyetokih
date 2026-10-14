@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import MetaPixelTracker from '@/components/MetaPixelTracker';
 import Link from 'next/link';
-import { Film, Ticket } from 'lucide-react';
+import { Film } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'PIYE TO KIH? - Official Movie & War Voucher',
@@ -38,66 +38,47 @@ export default function RootLayout({
               </div>
             </Link>
 
-            <div className="hidden md:flex items-center gap-1 lg:gap-2">
+            {/* Desktop Nav: Only Home, Jadwal Roadshow, Kabar & Galeri */}
+            <div className="hidden md:flex items-center gap-1.5 lg:gap-3">
               <Link
                 href="/"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs sm:text-sm transition"
               >
-                Beranda
-              </Link>
-              <Link
-                href="/#sinopsis"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
-              >
-                Tentang Film
-              </Link>
-              <Link
-                href="/#cast"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
-              >
-                Pemain
-              </Link>
-              <Link
-                href="/#teaser"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
-              >
-                Trailer
+                Home
               </Link>
               <Link
                 href="/#roadshow"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs transition"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs sm:text-sm transition"
               >
-                Roadshow
+                Jadwal Roadshow
               </Link>
               <Link
                 href="/kabar-galeri"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-white/5 font-semibold text-xs transition"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-white/5 font-semibold text-xs sm:text-sm transition"
               >
                 Kabar &amp; Galeri
-              </Link>
-              <Link
-                href="/#presale"
-                className="ml-2 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition active:scale-95"
-              >
-                <Ticket className="w-3.5 h-3.5" />
-                <span>Tiket</span>
               </Link>
             </div>
 
             {/* Mobile Nav Links */}
-            <div className="flex md:hidden items-center gap-1.5">
+            <div className="flex md:hidden items-center gap-1">
               <Link
-                href="/kabar-galeri"
-                className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-amber-300 font-bold text-xs"
+                href="/"
+                className="px-2 py-1 rounded-lg text-slate-300 hover:text-white font-semibold text-xs"
               >
-                Kabar &amp; Galeri
+                Home
               </Link>
               <Link
-                href="/#presale"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-xs"
+                href="/#roadshow"
+                className="px-2 py-1 rounded-lg text-slate-300 hover:text-white font-semibold text-xs"
               >
-                <Ticket className="w-3 h-3" />
-                <span>Tiket</span>
+                Jadwal Roadshow
+              </Link>
+              <Link
+                href="/kabar-galeri"
+                className="px-2 py-1 rounded-lg text-amber-300 font-semibold text-xs"
+              >
+                Kabar &amp; Galeri
               </Link>
             </div>
           </div>
