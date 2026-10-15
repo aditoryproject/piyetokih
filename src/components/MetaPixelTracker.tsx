@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Script from 'next/script';
 
 interface MetaPixelTrackerProps {
   pixelId?: string;
@@ -74,12 +73,11 @@ export default function MetaPixelTracker({
 
   return (
     <>
-      {/* 1. META PIXEL (FACEBOOK / INSTAGRAM ADS) */}
+      {/* 1. META PIXEL (FACEBOOK / INSTAGRAM ADS) - DIRECT INLINE SCRIPT UNTUK METATAG/HELPER INSTANT DETECT */}
       {pixelId && (
         <>
-          <Script
+          <script
             id="fb-pixel"
-            strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 !function(f,b,e,v,n,t,s)
@@ -109,9 +107,8 @@ export default function MetaPixelTracker({
 
       {/* 2. TIKTOK PIXEL (OPTIONAL) */}
       {tiktokPixelId && (
-        <Script
+        <script
           id="tiktok-pixel"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               !function (w, d, t) {
@@ -127,13 +124,9 @@ export default function MetaPixelTracker({
       {/* 3. GOOGLE ANALYTICS (GA4 - OPTIONAL) */}
       {gaId && (
         <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            strategy="afterInteractive"
-          />
-          <Script
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+          <script
             id="google-analytics"
-            strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 window.dataLayer = window.dataLayer || [];
