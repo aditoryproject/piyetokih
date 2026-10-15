@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
-import AdminDashboardClient from '@/components/AdminDashboardClient';
+import AdminDashboardWrapper from '@/components/AdminDashboardWrapper';
 import AdminLoginForm from '@/components/AdminLoginForm';
 
 export const dynamic = 'force-dynamic';
@@ -15,5 +15,5 @@ export default async function AdminPage() {
     return <AdminLoginForm />;
   }
 
-  return <AdminDashboardClient />;
+  return <AdminDashboardWrapper />;
 }

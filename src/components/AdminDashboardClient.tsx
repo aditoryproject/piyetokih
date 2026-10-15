@@ -58,6 +58,13 @@ export default function AdminDashboardClient() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'leads' | 'movie' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics' | 'reminders'>('movie');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [siteOrigin, setSiteOrigin] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSiteOrigin(window.location.origin);
+    }
+  }, []);
 
   // Articles state
   const [articles, setArticles] = useState<any[]>([]);
@@ -4287,12 +4294,12 @@ export default function AdminDashboardClient() {
                     </span>
                     <div className="flex items-center gap-2">
                       <code className="bg-white border border-slate-200 px-2.5 py-1.5 rounded text-slate-900 text-xs font-mono flex-1 truncate">
-                        {typeof window !== 'undefined' ? `${window.location.origin}/api/webhook/wahnotif` : '/api/webhook/wahnotif'}
+                        {siteOrigin ? `${siteOrigin}/api/webhook/wahnotif` : '/api/webhook/wahnotif'}
                       </code>
                       <button
                         onClick={() =>
                           copyToClipboard(
-                            `${window.location.origin}/api/webhook/wahnotif`,
+                            `${siteOrigin || ''}/api/webhook/wahnotif`,
                             'webhook'
                           )
                         }

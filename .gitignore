@@ -40,4 +40,5 @@ data/*.persist.json
 data/db.backup.json
 miracleweb-storage/
 public/uploads/
+cookies.txt
 
