@@ -176,7 +176,7 @@ export default function AdminDashboardClient() {
   const [uploadingBogoBanner, setUploadingBogoBanner] = useState(false);
 
   // Server uploads list
-  const [serverUploads, setServerUploads] = useState<Array<{ name: string; url: string; size: number; mtime: number }>>([]);
+  const [serverUploads, setServerUploads] = useState<Array<{ name?: string; filename?: string; url: string; size?: number; mtime?: number }>>([]);
   const [loadingUploads, setLoadingUploads] = useState(false);
   const [copiedUploadUrl, setCopiedUploadUrl] = useState<string | null>(null);
 
@@ -2135,7 +2135,8 @@ export default function AdminDashboardClient() {
 
                 {/* Quick Auto-Restore Alert if Unsplash placeholder is active but real poster is on server */}
                 {(() => {
-                  const detectedPoster = serverUploads.find(f => f.name.toLowerCase().includes('poster'));
+                  const detectedPoster = serverUploads.find(f => (f?.filename || f?.name || '').toLowerCase().includes('poster'));
+                  const posterDisplayName = detectedPoster ? (detectedPoster.filename || detectedPoster.name || '') : '';
                   const isUnsplash = settings.movieSettings?.posterUrl?.includes('images.unsplash.com');
                   if (isUnsplash && detectedPoster) {
                     return (
@@ -2147,7 +2148,7 @@ export default function AdminDashboardClient() {
                           <div>
                             <h4 className="text-xs font-black text-slate-900">File Poster Asli Ditemukan di Server VPS!</h4>
                             <p className="text-[11px] text-slate-600 mt-0.5">
-                              File upload Anda <strong className="text-amber-900 font-mono">{detectedPoster.name}</strong> masih tersimpan aman di server. Klik tombol di samping untuk langsung memasangnya kembali tanpa upload ulang.
+                              File upload Anda <strong className="text-amber-900 font-mono">{posterDisplayName}</strong> masih tersimpan aman di server. Klik tombol di samping untuk langsung memasangnya kembali tanpa upload ulang.
                             </p>
                           </div>
                         </div>
@@ -2164,7 +2165,7 @@ export default function AdminDashboardClient() {
                           }}
                           className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-lg transition active:scale-95 shrink-0 whitespace-nowrap"
                         >
-                          ⚡ Terapkan Poster Asli ({detectedPoster.name})
+                          ⚡ Terapkan Poster Asli ({posterDisplayName})
                         </button>
                       </div>
                     );
@@ -2383,13 +2384,14 @@ export default function AdminDashboardClient() {
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                       {serverUploads.map(file => {
+                        const fileName = file.filename || file.name || 'file';
                         const isCurrentPoster = settings.movieSettings?.posterUrl === file.url;
                         const isCurrentBackdrop = settings.movieSettings?.backdropUrl === file.url;
-                        const sizeKb = Math.round(file.size / 1024);
+                        const sizeKb = file.size ? Math.round(file.size / 1024) : 0;
 
                         return (
                           <div
-                            key={file.name}
+                            key={fileName}
                             className={`group relative bg-white rounded-xl border overflow-hidden flex flex-col transition hover:shadow-md ${
                               isCurrentPoster || isCurrentBackdrop ? 'border-amber-500 ring-2 ring-amber-400/30' : 'border-slate-200'
                             }`}
@@ -2398,7 +2400,7 @@ export default function AdminDashboardClient() {
                             <div className="relative aspect-square bg-slate-950 overflow-hidden">
                               <img
                                 src={file.url}
-                                alt={file.name}
+                                alt={fileName}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 onError={(e: any) => {
                                   e.currentTarget.onerror = null;
@@ -2420,8 +2422,8 @@ export default function AdminDashboardClient() {
                             {/* Info & Actions */}
                             <div className="p-2 flex-1 flex flex-col justify-between text-[10px] space-y-1.5">
                               <div>
-                                <p className="font-mono text-slate-700 truncate font-bold text-[10px]" title={file.name}>
-                                  {file.name}
+                                <p className="font-mono text-slate-700 truncate font-bold text-[10px]" title={fileName}>
+                                  {fileName}
                                 </p>
                                 <p className="text-slate-400 text-[9px]">{sizeKb} KB</p>
                               </div>

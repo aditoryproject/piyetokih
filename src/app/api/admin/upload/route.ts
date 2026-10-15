@@ -103,6 +103,7 @@ export async function GET() {
             try {
               const stat = fs.statSync(path.join(dir, f));
               fileMap.set(f, {
+                name: f,
                 filename: f,
                 url: `/uploads/${f}`,
                 size: stat.size,
