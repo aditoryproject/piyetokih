@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import AdminLoginForm from '@/components/AdminLoginForm';
 import { CITIES_DATA } from '@/lib/cities';
 import { DEFAULT_MOVIE_SETTINGS, MovieSettings, MovieCastMember } from '@/lib/movie-types';
 import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
@@ -53,6 +54,7 @@ import {
 } from 'lucide-react';
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<'leads' | 'movie' | 'articles' | 'settings' | 'bogo' | 'email' | 'cities' | 'wahnotif' | 'analytics' | 'reminders'>('movie');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -236,7 +238,7 @@ export default function AdminPage() {
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
     } finally {
-      window.location.href = '/admin/login';
+      setIsAuthenticated(false);
     }
   };
 
@@ -286,9 +288,19 @@ export default function AdminPage() {
 
   const fetchSettings = () => {
     fetch('/api/admin/settings')
-      .then(r => r.json())
+      .then(r => {
+        if (r.status === 401) {
+          setIsAuthenticated(false);
+          return null;
+        }
+        setIsAuthenticated(true);
+        return r.json();
+      })
       .then(data => {
-        if (data.settings) setSettings(data.settings);
+        if (data?.settings) setSettings(data.settings);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
       });
   };
 
@@ -813,6 +825,35 @@ export default function AdminPage() {
     { id: 'wahnotif', label: 'Wahnotif & Webhook', icon: MessageSquare },
     { id: 'analytics', label: 'Visitor Analytics', icon: Globe, badge: visitors.length },
   ];
+
+  // 1. Loading state saat cek sesi login
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-[#090D16] flex flex-col items-center justify-center text-white px-4">
+        <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest text-center">
+          Memeriksa Status Administrator...
+        </p>
+      </div>
+    );
+  }
+
+  // 2. Jika belum login, langsung tampilkan Login Form di rute ini (NOL REDIRECT!)
+  if (isAuthenticated === false) {
+    return (
+      <AdminLoginForm
+        onSuccess={() => {
+          setIsAuthenticated(true);
+          fetchSettings();
+          fetchLeads();
+          fetchVisitors();
+          fetchArticles();
+          fetchReminders();
+          fetchServerUploads();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row antialiased">

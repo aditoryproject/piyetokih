@@ -72,26 +72,8 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 3. ADMIN DASHBOARD ROUTE PROTECTION
-  if (pathname === '/admin/login') {
-    const token = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
-    const session = await verifySessionToken(token);
-    if (session.valid) {
-      const adminUrl = req.nextUrl.clone();
-      adminUrl.pathname = '/admin';
-      return NextResponse.redirect(adminUrl);
-    }
-    return forwardNext();
-  }
-
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
-    const token = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
-    const session = await verifySessionToken(token);
-    if (!session.valid) {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = '/admin/login';
-      return NextResponse.redirect(loginUrl);
-    }
+  // 3. ADMIN DASHBOARD & LOGIN ROUTE (PASS-THROUGH TANPA REDIRECT LOOP)
+  if (pathname === '/admin' || pathname === '/admin/login' || pathname.startsWith('/admin/')) {
     return forwardNext();
   }
 
@@ -170,6 +152,7 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
+    pathname.startsWith('/admin') ||
     pathname.startsWith('/voucher') ||
     pathname.startsWith('/city') ||
     pathname.startsWith('/artikel') ||
