@@ -239,7 +239,7 @@ export default function AdminDashboardClient() {
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
     } finally {
-      window.location.reload();
+      window.location.replace('/admin');
     }
   };
 
@@ -290,10 +290,7 @@ export default function AdminDashboardClient() {
   const fetchSettings = () => {
     fetch('/api/admin/settings')
       .then(r => {
-        if (r.status === 401) {
-          window.location.reload();
-          return null;
-        }
+        if (!r.ok) return null;
         return r.json();
       })
       .then(data => {

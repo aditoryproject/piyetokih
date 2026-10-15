@@ -38,10 +38,7 @@ export default function AdminLoginForm({ onSuccess }: AdminLoginFormProps) {
       if (onSuccess) {
         onSuccess();
       } else {
-        window.location.href = '/admin';
-        if (window.location.pathname === '/admin') {
-          window.location.reload();
-        }
+        window.location.replace('/admin');
       }
     } catch {
       setErrorMsg('Terjadi kesalahan jaringan atau server tidak merespons.');
