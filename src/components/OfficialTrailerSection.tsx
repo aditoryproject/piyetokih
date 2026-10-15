@@ -123,10 +123,16 @@ export default function OfficialTrailerSection({ movieSettings: propSettings, ci
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-600/30 text-[10px] font-black uppercase tracking-wider">
-                LSF 13+
+              {movieSettings?.showLsfBadge && (
+                <span className="px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-600/30 text-[10px] font-black uppercase tracking-wider">
+                  {movieSettings?.lsfRatingText || 'LSF 13+'}
+                </span>
+              )}
+              <span className="text-slate-400 text-[11px] font-bold">
+                {movieSettings?.releaseDateText
+                  ? `${movieSettings.releaseDateText.toUpperCase()} DI BIOSKOP`
+                  : '19 NOVEMBER 2026 DI BIOSKOP'}
               </span>
-              <span className="text-slate-400 text-[11px] font-bold">19 NOVEMBER 2026 DI BIOSKOP</span>
             </div>
           </div>
 

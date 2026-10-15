@@ -2617,6 +2617,69 @@ export default function AdminDashboardClient() {
                     />
                   </div>
 
+                  {/* PENGATURAN BADGE LSF (ON / OFF FITUR) */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-red-600/15 text-red-600 border border-red-600/30 text-[10px] font-black uppercase tracking-wider">
+                            {settings.movieSettings?.lsfRatingText || 'LSF 13+'}
+                          </span>
+                          <span className="text-xs font-bold text-slate-800">
+                            Badge Rating LSF (Lembaga Sensor Film)
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          Aktifkan untuk memunculkan badge klasifikasi LSF di atas trailer, atau matikan jika rating belum fix.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSettings({
+                            ...settings,
+                            movieSettings: {
+                              ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                              showLsfBadge: !settings.movieSettings?.showLsfBadge,
+                            },
+                          })
+                        }
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          settings.movieSettings?.showLsfBadge ? 'bg-emerald-500' : 'bg-slate-300'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            settings.movieSettings?.showLsfBadge ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {settings.movieSettings?.showLsfBadge && (
+                      <div className="pt-3 mt-3 border-t border-slate-200">
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Teks Label Rating LSF
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.movieSettings?.lsfRatingText || 'LSF 13+'}
+                          onChange={e =>
+                            setSettings({
+                              ...settings,
+                              movieSettings: {
+                                ...(settings.movieSettings || DEFAULT_MOVIE_SETTINGS),
+                                lsfRatingText: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="Contoh: LSF 13+, LSF SU, LSF 17+"
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold outline-none"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       Sutradara
