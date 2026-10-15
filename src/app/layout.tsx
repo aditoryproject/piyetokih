@@ -42,7 +42,11 @@ export default async function RootLayout({
   return (
     <html lang="id">
       <body className="antialiased bg-[#0B0F17] text-white selection:bg-gold-500 selection:text-black">
-        <MetaPixelTracker />
+        <MetaPixelTracker
+          pixelId={db.settings.metaPixelId}
+          tiktokPixelId={db.settings.tiktokPixelId}
+          googleAnalyticsId={db.settings.googleAnalyticsId}
+        />
 
         {/* Banner Khusus Admin saat Mode Coming Soon Aktif */}
         {isAdmin && isMaintenanceMode && !isAdminPath && (
