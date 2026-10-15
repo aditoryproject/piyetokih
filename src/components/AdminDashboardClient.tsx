@@ -834,19 +834,30 @@ export default function AdminDashboardClient() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col md:flex-row antialiased">
       {/* MOBILE HEADER BAR */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-2.5">
+      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
             <Film className="w-4 h-4" />
           </div>
-          <span className="font-extrabold text-sm text-slate-900 tracking-tight">PIYE TO KIH DASHBOARD</span>
+          <span className="font-extrabold text-xs text-slate-900 tracking-tight">PIYE TO KIH ADMIN</span>
         </div>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-        >
-          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold border border-red-200 transition"
+            title="Keluar dari sesi administrator"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Keluar</span>
+          </button>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* LEFT SIDEBAR NAVIGATION (CLEAN WHITE) */}
@@ -855,9 +866,9 @@ export default function AdminDashboardClient() {
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <div>
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* Brand header in sidebar */}
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-6 border-b border-slate-100 shrink-0">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white font-black shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
                 <Film className="w-5 h-5" />
@@ -873,8 +884,8 @@ export default function AdminDashboardClient() {
             </Link>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="p-4 space-y-1">
+          {/* Navigation Links (Scrollable) */}
+          <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
               Menu Utama
             </span>
@@ -917,8 +928,8 @@ export default function AdminDashboardClient() {
           </nav>
         </div>
 
-        {/* Bottom Sidebar Info & Logout */}
-        <div className="p-4 border-t border-slate-100 text-xs bg-slate-50/75 space-y-2">
+        {/* Bottom Sidebar Info & Logout (Always visible pinned at bottom) */}
+        <div className="p-4 border-t border-slate-100 text-xs bg-slate-50/75 space-y-2 shrink-0">
           <div className="flex items-center justify-between px-1 mb-1">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -971,6 +982,16 @@ export default function AdminDashboardClient() {
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Muat Ulang Data</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition shadow-sm shadow-red-600/20 active:scale-95"
+              title="Keluar dari sesi administrator"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Keluar (Logout)</span>
             </button>
           </div>
         </header>

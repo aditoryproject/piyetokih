@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { AlertTriangle, Settings, Eye, CheckCircle, Power } from 'lucide-react';
 
 interface AdminMaintenanceBannerProps {
@@ -11,8 +12,9 @@ interface AdminMaintenanceBannerProps {
 export default function AdminMaintenanceBanner({ isMaintenanceMode }: AdminMaintenanceBannerProps) {
   const [active, setActive] = useState(isMaintenanceMode);
   const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
 
-  if (!active) return null;
+  if (!active || pathname?.startsWith('/admin')) return null;
 
   const handleToggleOff = async () => {
     if (!confirm('Apakah Anda yakin ingin mematikan Mode Coming Soon dan mempublikasikan website secara penuh ke publik?')) {
