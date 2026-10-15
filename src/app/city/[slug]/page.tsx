@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { getCityBySlug } from '@/lib/cities';
 import { trackTicketIntent, trackCityCustomEvent } from '@/lib/pixel';
 import WarVoucherForm from '@/components/WarVoucherForm';
-import CountdownTimer from '@/components/CountdownTimer';
 import QuotaProgress from '@/components/QuotaProgress';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
@@ -31,6 +30,11 @@ export default function CityRoadshowPage() {
   const city = getCityBySlug(slug || '');
   const [customLinks, setCustomLinks] = useState<Record<string, string>>({});
   const [movieSettings, setMovieSettings] = useState<any>(null);
+  const [quotaData, setQuotaData] = useState<{ totalQuota: number; remainingStock: number; claimedCount: number }>({
+    totalQuota: 500,
+    remainingStock: 500,
+    claimedCount: 0,
+  });
 
   useEffect(() => {
     if (city) {
@@ -47,6 +51,13 @@ export default function CityRoadshowPage() {
         }
         if (data.settings?.movieSettings) {
           setMovieSettings(data.settings.movieSettings);
+        }
+        if (data.totalQuota !== undefined && data.remainingStock !== undefined) {
+          setQuotaData({
+            totalQuota: data.totalQuota,
+            remainingStock: data.remainingStock,
+            claimedCount: data.claimedCount || 0,
+          });
         }
       })
       .catch(() => {});
@@ -140,14 +151,26 @@ export default function CityRoadshowPage() {
 
       {/* 4. FORM VOUCHER & KUOTA ROADSHOW PER KOTA */}
       <section className="py-12 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto mb-6 space-y-4">
-          <CountdownTimer targetDate={city.dateStr || '2026-10-22T13:00:00+07:00'} />
-          <QuotaProgress totalQuota={500} remainingStock={499} />
+        <div className="max-w-xl mx-auto mb-8">
+          <QuotaProgress
+            totalQuota={quotaData.totalQuota}
+            remainingStock={quotaData.remainingStock}
+            cityName={city.name}
+          />
         </div>
 
         {/* FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
         <div className="max-w-xl mx-auto mb-16">
-          <WarVoucherForm defaultCity={city.name} />
+          <WarVoucherForm
+            defaultCity={city.name}
+            onSuccessClaim={(remaining) => {
+              setQuotaData(prev => ({
+                ...prev,
+                remainingStock: remaining,
+                claimedCount: prev.claimedCount + 1,
+              }));
+            }}
+          />
         </div>
 
         {/* LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
