@@ -206,6 +206,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   // Premiere Timeline Defaults (Sesuai Operating Handbook v1.1)
   voucherValidDatesText: '19 - 20 November 2026 (Penayangan Perdana)',
   voucherValidStart: '2026-11-19',
+  voucherValidEnd: '2026-11-20',
   voucherTermsText: 'Voucher digital ini bukan bukti pembayaran. Untuk penukaran voucher fisik resmi, silakan kunjungi booth di samping acara Roadshow & Meet and Greet di kotamu.',
 
   // BOGO Promo Defaults
