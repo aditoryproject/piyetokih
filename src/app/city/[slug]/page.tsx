@@ -9,6 +9,7 @@ import WarVoucherForm from '@/components/WarVoucherForm';
 import CityVoucherPickupSection from '@/components/CityVoucherPickupSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CityRundownSection from '@/components/CityRundownSection';
+import CityFaqSection from '@/components/CityFaqSection';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import CastSection from '@/components/CastSection';
 import Footer from '@/components/Footer';
@@ -88,6 +89,9 @@ export default async function CityRoadshowPage({ params }: Props) {
   const currentClaimed = db.leads.length;
   const remainingStock = Math.max(0, db.settings.totalQuota - currentClaimed);
   const shortDate = `${city.dateStr.split(' ')[0]} ${city.dateStr.split(' ')[1]?.slice(0, 3) || ''}`;
+  const defaultVenueStr = city.boothInfo
+    ? `${city.boothInfo.venue} — ${city.boothInfo.floor} (${city.boothInfo.timeStr})`
+    : undefined;
 
   return (
     <div className="relative min-h-screen">
@@ -186,12 +190,17 @@ export default async function CityRoadshowPage({ params }: Props) {
       {/* 4. FUNNEL B: BOOKING VOUCHER ROADSHOW (Gambar 3B) */}
       <WarVoucherForm
         defaultCity={city.name}
+        defaultVenue={defaultVenueStr}
         totalQuota={db.settings.totalQuota}
         remainingStock={remainingStock}
       />
 
       {/* 5. TITIK PENGAMBILAN VOUCHER FISIK (Gambar 4) */}
-      <CityVoucherPickupSection cityName={city.name} dateStr={city.dateStr} />
+      <CityVoucherPickupSection
+        cityName={city.name}
+        dateStr={city.dateStr}
+        boothInfo={city.boothInfo}
+      />
 
       {/* 6. KISAH SEKAWAN (Sinopsis Film) */}
       <MovieStorySection movieSettings={movieSettings || undefined} />
@@ -201,13 +210,16 @@ export default async function CityRoadshowPage({ params }: Props) {
         <CityRundownSection rundown={city.rundown} cityName={city.name} />
       )}
 
-      {/* 8. OFFICIAL TEASER TRAILER PLAYER */}
+      {/* 8. FAQ SINGKAT ROADSHOW & VOUCHER (Diletakkan di bawah Rundown) */}
+      <CityFaqSection />
+
+      {/* 9. OFFICIAL TEASER TRAILER PLAYER */}
       <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
 
-      {/* 9. CAST & PEMERAN WOKO CHANNEL */}
+      {/* 10. CAST & PEMERAN WOKO CHANNEL */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* 10. FOOTER RESMI */}
+      {/* 11. FOOTER RESMI */}
       <Footer />
     </div>
   );

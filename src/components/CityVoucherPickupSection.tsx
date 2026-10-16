@@ -2,13 +2,29 @@
 
 import React from 'react';
 import { Clock, MapPin, CheckCircle2, AlertTriangle, Info, Store } from 'lucide-react';
+import { BoothInfo } from '@/lib/cities';
 
 interface CityVoucherPickupSectionProps {
   cityName: string;
   dateStr: string;
+  boothInfo?: BoothInfo;
 }
 
-export default function CityVoucherPickupSection({ cityName, dateStr }: CityVoucherPickupSectionProps) {
+export default function CityVoucherPickupSection({
+  cityName,
+  dateStr,
+  boothInfo,
+}: CityVoucherPickupSectionProps) {
+  const venueTitle = boothInfo?.venue || `BOOTH ROADSHOW PIYE TO KIH? ${cityName.toUpperCase()}`;
+  const floorDetail = boothInfo?.floor || 'Area Panggung Meet & Greet / Bioskop Mitra';
+  const timeSchedule = boothInfo?.timeStr || '16.00 – 17.00 WIB';
+  const directionsText =
+    boothInfo?.directions ||
+    `Cari booth oranye dengan spanduk resmi PIYE TO KIH? di area roadshow ${cityName}.`;
+  const exclusiveNoticeText =
+    boothInfo?.exclusiveNotice ||
+    `Penukaran voucher fisik resmi hanya dilayani langsung di booth roadshow Kota ${cityName} pada jam yang telah ditentukan. Kasir bioskop tidak melayani penukaran kode booking.`;
+
   return (
     <section id="titik-pengambilan" className="py-12 px-4 sm:px-6 max-w-5xl mx-auto">
       {/* Header */}
@@ -37,10 +53,10 @@ export default function CityVoucherPickupSection({ cityName, dateStr }: CityVouc
           <div className="lg:col-span-7 space-y-5">
             <div>
               <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
-                THE PARK MALL SEMARANG
+                {venueTitle}
               </h3>
               <p className="text-amber-400 font-bold text-sm sm:text-base mt-1">
-                Lantai 2 (Area Atrium Depan Cinema XXI)
+                {floorDetail}
               </p>
             </div>
 
@@ -48,14 +64,12 @@ export default function CityVoucherPickupSection({ cityName, dateStr }: CityVouc
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>
-                  <b>16.00 – 17.00 WIB</b> (Tanggal {dateStr})
+                  <b>{timeSchedule}</b> (Tanggal {dateStr})
                 </span>
               </div>
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span className="text-slate-300">
-                  Dekat eskalator tengah, cari booth oranye dengan spanduk <b>PIYE TO KIH?</b>
-                </span>
+                <span className="text-slate-300">{directionsText}</span>
               </div>
             </div>
 
@@ -92,16 +106,12 @@ export default function CityVoucherPickupSection({ cityName, dateStr }: CityVouc
             </div>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Penukaran voucher fisik <b>hanya berada di The Park Mall Lantai 2</b> pada jam <b>16.00–17.00 WIB</b>.
-            </p>
-
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Bioskop Cinépolis Java Mall <b>bukan tempat pengambilan voucher</b>, melainkan khusus pemegang tiket Special Screening Nonton Duluan sesi malam.
+              {exclusiveNoticeText}
             </p>
 
             <div className="pt-3 border-t border-white/10 flex items-center gap-2 text-xs text-amber-300/90 font-medium">
               <Info className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Datang tepat waktu sebelum booth ditutup pukul 17.00 WIB.</span>
+              <span>Datang tepat waktu sebelum booth ditutup sesuai jadwal.</span>
             </div>
           </div>
         </div>

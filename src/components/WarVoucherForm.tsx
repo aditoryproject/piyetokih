@@ -11,6 +11,7 @@ interface WarVoucherFormProps {
   defaultCity?: string;
   totalQuota?: number;
   remainingStock?: number;
+  defaultVenue?: string;
 }
 
 export default function WarVoucherForm({
@@ -18,13 +19,15 @@ export default function WarVoucherForm({
   defaultCity = 'Semarang',
   totalQuota = 500,
   remainingStock: initialRemaining = 387,
+  defaultVenue,
 }: WarVoucherFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [cityLocation, setCityLocation] = useState(defaultCity || 'Semarang');
   const [venueLocation, setVenueLocation] = useState(
-    'The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)'
+    defaultVenue ||
+      'The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)'
   );
   const [remaining, setRemaining] = useState(initialRemaining);
   const [loading, setLoading] = useState(false);
@@ -42,13 +45,15 @@ export default function WarVoucherForm({
   useEffect(() => {
     if (defaultCity) {
       setCityLocation(defaultCity);
-      if (defaultCity.toLowerCase() === 'semarang') {
-        setVenueLocation(
-          'The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)'
-        );
-      }
     }
-  }, [defaultCity]);
+    if (defaultVenue) {
+      setVenueLocation(defaultVenue);
+    } else if (defaultCity?.toLowerCase() === 'semarang') {
+      setVenueLocation(
+        'The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)'
+      );
+    }
+  }, [defaultCity, defaultVenue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -332,8 +337,8 @@ export default function WarVoucherForm({
               onChange={(e) => setVenueLocation(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#0b0e14] border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-amber-500 transition"
             >
-              <option value="The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)">
-                The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)
+              <option value={venueLocation}>
+                {venueLocation}
               </option>
             </select>
           </div>
