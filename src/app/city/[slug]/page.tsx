@@ -7,6 +7,7 @@ import { getCityBySlug } from '@/lib/cities';
 import { trackTicketIntent, trackCityCustomEvent } from '@/lib/pixel';
 import WarVoucherForm from '@/components/WarVoucherForm';
 import QuotaProgress from '@/components/QuotaProgress';
+import CityRundownSection from '@/components/CityRundownSection';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
@@ -131,7 +132,7 @@ export default function CityRoadshowPage() {
           </div>
 
           {/* Cinema Network Badges (Theatrical Authenticity) */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-2">
             <span className="hover:text-amber-300 transition-colors">CINEMA XXI</span>
             <span className="text-white/20">•</span>
             <span className="hover:text-amber-300 transition-colors">CGV CINEMAS</span>
@@ -140,6 +141,11 @@ export default function CityRoadshowPage() {
             <span className="text-white/20">•</span>
             <span className="hover:text-amber-300 transition-colors">TIX ID</span>
           </div>
+
+          {/* RUNDOWN & JADWAL VENUE ROADSHOW KOTA */}
+          {city.rundown && (
+            <CityRundownSection rundown={city.rundown} cityName={city.name} />
+          )}
         </div>
       </section>
 
@@ -150,7 +156,7 @@ export default function CityRoadshowPage() {
       <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
 
       {/* 4. FORM VOUCHER & KUOTA ROADSHOW PER KOTA */}
-      <section className="py-12 px-4 sm:px-6">
+      <section id="form-voucher" className="py-12 px-4 sm:px-6">
         <div className="max-w-xl mx-auto mb-8">
           <QuotaProgress
             totalQuota={quotaData.totalQuota}
@@ -174,7 +180,7 @@ export default function CityRoadshowPage() {
         </div>
 
         {/* LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
-        <div className="max-w-2xl mx-auto text-left mb-16">
+        <div id="bioskop" className="max-w-2xl mx-auto text-left mb-16">
           <div className="text-center mb-8">
             <span className="text-xs font-black uppercase tracking-widest text-amber-400">PRESALE TIKET RESMI BIOSKOP</span>
             <h2 className="text-2xl sm:text-4xl font-black text-white uppercase mt-1">Pilih Bioskop di Kota {city.name}</h2>

@@ -7,12 +7,28 @@ export interface CinemaVenue {
   ticketUrl: string; // default cinema ticket booking URL
 }
 
+export interface CityRundownItem {
+  time: string;
+  category: 'Sekolah' | 'Kampus' | 'Radio' | 'Screening' | 'Mall & Meet' | 'Acara';
+  title: string;
+  venue: string;
+  note?: string;
+  isVoucherExchange?: boolean;
+}
+
+export interface CityRundown {
+  date: string;
+  voucherExchangeInfo: string;
+  items: CityRundownItem[];
+}
+
 export interface CityData {
   slug: string;
   name: string;
   province: string;
   dateStr: string;
   cinemas: CinemaVenue[];
+  rundown?: CityRundown;
 }
 
 export const CITIES_DATA: CityData[] = [
@@ -21,6 +37,56 @@ export const CITIES_DATA: CityData[] = [
     name: 'Semarang',
     province: 'Jawa Tengah',
     dateStr: '22 Oktober 2026',
+    rundown: {
+      date: 'Kamis, 22 Oktober 2026',
+      voucherExchangeInfo:
+        'Penukaran E-Voucher resmi dapat dilakukan di Booth Miracle Pictures lantai 2 The Park Mall Semarang (pukul 16.00 - 17.00 WIB) atau langsung di kasir bioskop mitra sebelum jam penayangan special screening.',
+      items: [
+        {
+          time: '08.00 - 09.00 WIB',
+          category: 'Sekolah',
+          title: 'School Visit & Temu Konco',
+          venue: 'SMA Negeri 15 Semarang',
+          note: 'Sapa siswa & guru bersama cast film',
+        },
+        {
+          time: '10.00 - 12.00 WIB',
+          category: 'Kampus',
+          title: 'Campus Roadshow & Sharing Session',
+          venue: 'Auditorium Prof. Wuryanto, Universitas Negeri Semarang (UNNES)',
+          note: 'Temu mahasiswa & sharing karya perfilman',
+        },
+        {
+          time: '14.00 - 15.00 WIB',
+          category: 'Radio',
+          title: 'Live On-Air Talkshow',
+          venue: 'Studio Jateng Radio Semarang',
+          note: 'Live interview bersama cast & sutradara',
+        },
+        {
+          time: '15.30 WIB',
+          category: 'Screening',
+          title: 'Special Screening 1 & Greeting Ending',
+          venue: 'The Park XXI Semarang (Show 2)',
+          note: 'Nonton bareng & sapa penonton di dalam studio bioskop',
+        },
+        {
+          time: '16.00 - 17.00 WIB',
+          category: 'Mall & Meet',
+          title: 'Meet & Greet Cast + Booth Penukaran Voucher',
+          venue: 'The Park Mall Semarang - 2nd Floor (Lantai 2)',
+          note: 'Titik utama penukaran E-Voucher resmi, foto bersama, & merchandise',
+          isVoucherExchange: true,
+        },
+        {
+          time: '18.00 - 19.40 WIB',
+          category: 'Screening',
+          title: 'Special Screening 2 & Greeting Ending',
+          venue: 'Java Supermall - Cinépolis (Show 3)',
+          note: 'Nonton bareng show malam bersama para pemeran',
+        },
+      ],
+    },
     cinemas: [
       {
         name: 'The Park XXI Semarang',
