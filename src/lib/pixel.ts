@@ -57,10 +57,10 @@ export function trackCityCustomEvent(city: string, action: string = 'AddToCart',
 }
 
 export function trackTicketIntent(city: string, cinema: string, url: string, price: number = 35000) {
-  // 1. Meta Standard Event: AddToCart
+  // 1. Meta Standard Event: AddToCart (Niat beli tiket bioskop presale)
   trackMetaEvent('AddToCart', {
-    content_name: `Tiket Bioskop ${cinema} - ${city}`,
-    content_category: 'Movie Ticket',
+    content_name: `Tiket Presale ${cinema} - ${city}`,
+    content_category: 'Movie Ticket Presale',
     content_ids: [`ticket-${city.toLowerCase().replace(/[^a-z0-9]/g, '-')}`],
     content_type: 'product',
     value: price,
@@ -70,17 +70,19 @@ export function trackTicketIntent(city: string, cinema: string, url: string, pri
     destination_url: url,
   });
 
-  // 2. Meta Standard Event: InitiateCheckout
-  trackMetaEvent('InitiateCheckout', {
-    content_name: `Beli Tiket ${cinema} (${city})`,
-    content_category: 'Cinema Ticketing',
-    value: price,
-    currency: 'IDR',
-    destination_url: url,
+  // 2. Meta Standard Event: FindLocation (User memilih cabang bioskop mitra di kotanya)
+  trackMetaEvent('FindLocation', {
+    content_name: cinema,
+    city: city,
   });
 
-  // 3. Custom Pixel Per Kota (contoh: AddToCart_Semarang, AddToCart Semarang, MeetAndGreet_Semarang)
+  // 3. Custom Pixel Per Kota (contoh: AddToCart_Semarang, Presale_Semarang)
   trackCityCustomEvent(city, 'AddToCart', {
+    cinema,
+    url,
+    price,
+  });
+  trackCityCustomEvent(city, 'Presale', {
     cinema,
     url,
     price,
@@ -97,17 +99,29 @@ export function trackTicketIntent(city: string, cinema: string, url: string, pri
 }
 
 export function trackLeadSubmission(serialNumber: string, city: string = '') {
+  // 1. Meta Standard Event: Lead (Data kontak masuk untuk Kode Booking Voucher)
   trackMetaEvent('Lead', {
-    content_name: 'War Voucher Claim',
+    content_name: `Booking Voucher Roadshow ${city || 'Nasional'}`,
+    content_category: 'Roadshow Voucher',
     voucher_code: serialNumber,
     city: city || undefined,
-    value: 1,
+    value: 0,
     currency: 'IDR',
   });
 
+  // 2. Meta Standard Event: CompleteRegistration
+  trackMetaEvent('CompleteRegistration', {
+    content_name: `Booking Voucher ${city || 'Nasional'}`,
+    status: true,
+  });
+
   if (city) {
+    trackCityCustomEvent(city, 'VoucherClaim', {
+      voucher_code: serialNumber,
+    });
     trackCityCustomEvent(city, 'Lead', {
       voucher_code: serialNumber,
     });
   }
 }
+

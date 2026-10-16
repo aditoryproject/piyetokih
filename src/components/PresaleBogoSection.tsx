@@ -74,12 +74,20 @@ export default function PresaleBogoSection() {
         return;
       }
 
-      // Fire Meta Pixel tracking
+      // Fire Meta Pixel tracking for BOGO Reminder Lead
       trackMetaEvent('Lead', {
-        content_name: 'BOGO_Presale_Reminder',
-        city,
+        content_name: 'Pengingat Promo BOGO 19 Nov',
+        content_category: 'BOGO Presale Reminder',
+        city: city.trim(),
+        value: 0,
+        currency: 'IDR',
       });
-      trackCityCustomEvent(city, 'BogoReminder', { name, phone });
+      trackMetaEvent('CompleteRegistration', {
+        content_name: 'Pengingat Promo BOGO 19 Nov',
+        city: city.trim(),
+        status: true,
+      });
+      trackCityCustomEvent(city, 'BogoReminder', { name, phone, city });
 
       setSuccessMsg(
         `Terima kasih ${name}! Pengingat berhasil dipasang. Kami akan mengabari Anda via WhatsApp & Email saat tiket dan promonya sudah resmi dibuka!`
@@ -127,7 +135,7 @@ export default function PresaleBogoSection() {
             href={tixidUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackMetaEvent('InitiateCheckout', { channel: 'TIX_ID', promo: 'BOGO' })}
+            onClick={() => trackMetaEvent('AddToCart', { channel: 'TIX_ID', promo: 'BOGO', content_name: 'Tiket BOGO TIX ID' })}
             className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
           >
             <div>
@@ -156,7 +164,7 @@ export default function PresaleBogoSection() {
             href={mtixUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackMetaEvent('InitiateCheckout', { channel: 'MTIX_XXI', promo: 'BOGO' })}
+            onClick={() => trackMetaEvent('AddToCart', { channel: 'MTIX_XXI', promo: 'BOGO', content_name: 'Tiket BOGO M-TIX XXI' })}
             className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
           >
             <div>

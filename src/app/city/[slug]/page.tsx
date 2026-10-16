@@ -10,6 +10,7 @@ import CityVoucherPickupSection from '@/components/CityVoucherPickupSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CityRundownSection from '@/components/CityRundownSection';
 import CityFaqSection from '@/components/CityFaqSection';
+import CityViewTracker from '@/components/CityViewTracker';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import CastSection from '@/components/CastSection';
 import Footer from '@/components/Footer';
@@ -95,6 +96,9 @@ export default async function CityRoadshowPage({ params }: Props) {
 
   return (
     <div className="relative min-h-screen">
+      {/* City Meta Pixel ViewContent Tracker */}
+      <CityViewTracker cityName={city.name} slug={city.slug} />
+
       {/* 1. CITY ROADSHOW HERO (Gambar 1) */}
       <section className="relative pt-10 pb-14 px-4 sm:px-6 overflow-hidden text-center">
         {/* Glow Ambient */}
