@@ -40,7 +40,7 @@ export const CITIES_DATA: CityData[] = [
     rundown: {
       date: 'Kamis, 22 Oktober 2026',
       voucherExchangeInfo:
-        'Penukaran E-Voucher resmi dapat dilakukan di Booth Miracle Pictures lantai 2 The Park Mall Semarang (pukul 16.00 - 17.00 WIB) atau langsung di kasir bioskop mitra sebelum jam penayangan special screening.',
+        'Penukaran E-Voucher resmi ke voucher fisik & merchandise HANYA dapat dilakukan langsung di Booth Miracle Pictures saat acara Meet & Greet berlangsung di The Park Mall Semarang (Lantai 2) pada pukul 16.00 - 17.00 WIB. Penukaran TIDAK DAPAT dilakukan di kasir bioskop.',
       items: [
         {
           time: '08.00 - 09.00 WIB',
@@ -73,9 +73,9 @@ export const CITIES_DATA: CityData[] = [
         {
           time: '16.00 - 17.00 WIB',
           category: 'Mall & Meet',
-          title: 'Meet & Greet Cast + Booth Penukaran Voucher',
+          title: 'Meet & Greet Cast + Booth Penukaran Voucher Fisik',
           venue: 'The Park Mall Semarang - 2nd Floor (Lantai 2)',
-          note: 'Titik utama penukaran E-Voucher resmi, foto bersama, & merchandise',
+          note: 'Satu-satunya titik resmi penukaran E-Voucher ke voucher fisik & merchandise saat acara berlangsung (tidak melayani penukaran di kasir bioskop)',
           isVoucherExchange: true,
         },
         {

@@ -94,16 +94,22 @@ export default function CityRundownSection({ rundown, cityName }: CityRundownSec
               <div className="p-2 rounded-xl bg-amber-500 text-slate-950 shrink-0 mt-0.5">
                 <Ticket className="w-4 h-4" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <h4 className="text-xs sm:text-sm font-black text-amber-300 uppercase tracking-wide flex items-center gap-2">
                   <span>Informasi Titik Penukaran Voucher</span>
                   <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[9px] font-bold uppercase">
                     PENTING
                   </span>
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-200 leading-relaxed">
                   {rundown.voucherExchangeInfo}
                 </p>
+                <div className="pt-1 flex items-center gap-1.5 text-[11px] font-bold text-amber-300/90">
+                  <span className="px-1.5 py-0.5 rounded bg-red-600/30 text-red-300 border border-red-500/40 text-[9px] font-black uppercase">
+                    PERHATIAN
+                  </span>
+                  <span>Penukaran voucher fisik hanya dilayani di Booth Meet &amp; Greet, tidak bisa ditukarkan di kasir bioskop.</span>
+                </div>
               </div>
             </div>
           </div>
