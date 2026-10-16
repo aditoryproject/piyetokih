@@ -68,20 +68,20 @@ export default async function HomePage() {
           </p>
 
           {/* BERANGKAT KE BIOSKOP 19 NOVEMBER 2026 */}
-          <div className="my-2 text-center">
-            <span className="text-xs sm:text-sm text-white font-extrabold uppercase tracking-[0.25em] block leading-tight">
+          <div className="my-4 text-center">
+            <span className="text-sm sm:text-lg md:text-xl text-white font-extrabold uppercase tracking-[0.25em] block leading-tight">
               BERANGKAT KE BIOSKOP
             </span>
-            <span className="text-sm sm:text-lg font-black text-emerald-400 block tracking-widest mt-0.5">
+            <span className="text-2xl sm:text-4xl md:text-5xl font-black text-emerald-400 block tracking-widest mt-1.5 drop-shadow-[0_4px_25px_rgba(52,211,153,0.35)]">
               19 NOVEMBER 2026
             </span>
             {/* LSF 13+ SENSOR RATING BADGE */}
             {(movieSettings?.showLsfBadge ?? true) && (
-              <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full bg-slate-900/90 border border-red-500/30 shadow-lg shadow-red-950/20">
-                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[10px] tracking-wider uppercase">
+              <div className="inline-flex items-center gap-2 mt-3 px-3.5 py-1 rounded-full bg-slate-900/90 border border-red-500/30 shadow-lg shadow-red-950/20">
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[11px] tracking-wider uppercase">
                   {movieSettings?.lsfRatingText || '13+'}
                 </span>
-                <span className="text-[11px] font-bold text-slate-300 tracking-wide uppercase">
+                <span className="text-xs font-bold text-slate-300 tracking-wide uppercase">
                   Lulus Sensor LSF • 13+
                 </span>
               </div>
