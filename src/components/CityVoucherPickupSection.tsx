@@ -29,23 +29,22 @@ export default function CityVoucherPickupSection({
     <section id="titik-pengambilan" className="py-12 px-4 sm:px-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400">
+        <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-400">
           LOKASI BOOTH ROADSHOW {cityName.toUpperCase()}
         </span>
         <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1 mb-2">
-          TITIK PENGAMBILAN VOUCHER FISIK 🎟️
+          TITIK PENGAMBILAN VOUCHER FISIK
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
           Tunjukkan Kode Booking Voucher Anda di booth khusus roadshow berikut untuk membayar dan menerima Voucher Fisik.
         </p>
       </div>
 
-      {/* Main Card with Amber Border */}
-      <div className="rounded-3xl border border-amber-500/40 bg-[#0e121a] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      {/* Main Card */}
+      <div className="rounded-2xl border border-amber-500/40 bg-[#0e121a] p-6 sm:p-8 shadow-2xl relative overflow-hidden">
         {/* Top Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider mb-6">
-          <Store className="w-3.5 h-3.5" />
-          <span>BOOTH KHUSUS VOUCHER FISIK (BUKAN TEMPAT MENONTON)</span>
+        <div className="inline-block px-3 py-1 rounded bg-amber-500 text-slate-950 font-mono font-bold text-[10px] sm:text-xs uppercase tracking-wider mb-6">
+          LOKASI PENUKARAN VOUCHER FISIK (BUKAN BIOSKOP)
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

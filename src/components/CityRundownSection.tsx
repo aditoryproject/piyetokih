@@ -18,14 +18,14 @@ export default function CityRundownSection({ rundown, cityName }: CityRundownSec
     <section id="rundown" className="py-12 px-4 sm:px-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-10">
-        <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400">
-          JADWAL KESERUAN ROADSHOW
+        <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-400">
+          JADWAL ACARA ROADSHOW
         </span>
         <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1 mb-2">
-          RUNDOWN ROADSHOW {cityName.toUpperCase()} 🚐💨
+          RUNDOWN ROADSHOW {cityName.toUpperCase()}
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
-          Seharian keliling {cityName} bareng cast PIYE TO KIH?. Cek jadwal dan jangan sampai kelewatan!
+          Jadwal temu pemain dan rangkaian kegiatan PIYE TO KIH? di Kota {cityName}.
         </p>
       </div>
 
@@ -48,18 +48,16 @@ export default function CityRundownSection({ rundown, cityName }: CityRundownSec
               dotColor = 'bg-amber-500 border-2 border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.5)]';
               cardBorder = 'border-amber-500/50 bg-[#131722] shadow-[0_4px_20px_rgba(245,158,11,0.06)]';
               badge = (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider">
-                  <span>🍿</span>
-                  <span>SPECIAL SCREENING</span>
+                <span className="inline-block px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/40 font-mono text-[10px] font-bold uppercase tracking-wider">
+                  SPECIAL SCREENING
                 </span>
               );
             } else if (isVoucherBooth) {
               dotColor = 'bg-emerald-400 border-2 border-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.5)]';
               cardBorder = 'border-emerald-500/50 bg-[#111922] shadow-[0_4px_20px_rgba(52,211,153,0.06)]';
               badge = (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase tracking-wider">
-                  <span>🎟️</span>
-                  <span>BOOTH VOUCHER FISIK</span>
+                <span className="inline-block px-2.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 font-mono text-[10px] font-bold uppercase tracking-wider">
+                  BOOTH VOUCHER FISIK
                 </span>
               );
             }

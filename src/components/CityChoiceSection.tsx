@@ -32,9 +32,8 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
         <div className="bg-[#121620] border border-white/10 hover:border-amber-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all">
           <div>
             {/* Tag */}
-            <div className="text-[11px] font-black uppercase tracking-wider text-amber-400 mb-4 flex items-center gap-1.5">
-              <span>🍿</span>
-              <span>NONTON DULUAN · SPECIAL SCREENING</span>
+            <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 mb-4">
+              [ 01 ] SPECIAL SCREENING · ROADSHOW
             </div>
 
             {/* Headline */}
@@ -66,7 +65,7 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
           <div>
             <a
               href="#pilihan-bioskop"
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-2xl shadow-lg transition-transform active:scale-95"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-xl shadow-lg transition-transform active:scale-95"
             >
               <span>PILIH BIOSKOP &amp; BELI TIKET</span>
               <ArrowRight className="w-4 h-4" />
@@ -81,9 +80,8 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
         <div className="bg-[#121620] border border-white/10 hover:border-amber-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all">
           <div>
             {/* Tag */}
-            <div className="text-[11px] font-black uppercase tracking-wider text-amber-400 mb-4 flex items-center gap-1.5">
-              <span>🎟️</span>
-              <span>VOUCHER 19–20 NOVEMBER · PENAYANGAN UMUM</span>
+            <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 mb-4">
+              [ 02 ] VOUCHER FISIK · PENAYANGAN SERENTAK
             </div>
 
             {/* Headline */}
@@ -103,7 +101,7 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
               </li>
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Bayar &amp; ambil Voucher Fisik di booth The Park Mall ({shortDate})</span>
+                <span>Bayar &amp; ambil Voucher Fisik di booth roadshow ({shortDate})</span>
               </li>
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
@@ -115,14 +113,13 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
           <div>
             <a
               href="#booking-voucher"
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#f1f3f5] hover:bg-white text-slate-900 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-2xl shadow-lg transition-transform active:scale-95"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#f1f3f5] hover:bg-white text-slate-900 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-xl shadow-lg transition-transform active:scale-95"
             >
               <span>DAPATKAN KODE BOOKING</span>
               <ArrowRight className="w-4 h-4" />
             </a>
-            <p className="text-[11px] text-amber-400/90 text-center mt-3 flex items-center justify-center gap-1.5">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Kode booking bukan tiket dan bukan bukti pembayaran.</span>
+            <p className="text-[11px] text-amber-400/90 text-center mt-3">
+              Kode booking bukan tiket dan bukan bukti pembayaran.
             </p>
           </div>
         </div>

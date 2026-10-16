@@ -138,16 +138,15 @@ export default async function CityRoadshowPage({ params }: Props) {
             PIYE TO KIH? mampir dulu sebelum tayang serentak 19 NOVEMBER 2026.
           </p>
 
-          {/* Date & Location Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#161c28] border border-white/15 text-xs sm:text-sm font-bold text-slate-200 shadow-sm">
-              <Calendar className="w-4 h-4 text-amber-400" />
-              <span>{city.dateStr.toUpperCase()}</span>
-            </div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#161c28] border border-white/15 text-xs sm:text-sm font-bold text-slate-200 shadow-sm">
-              <MapPin className="w-4 h-4 text-amber-400" />
-              <span>{city.name}, {city.province}</span>
-            </div>
+          {/* Date & Location - Clean Developer Typography */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 text-xs sm:text-sm font-bold">
+            <span className="px-3.5 py-1.5 rounded-lg bg-[#141923] border border-white/10 text-amber-400 font-mono tracking-wider">
+              {city.dateStr.toUpperCase()}
+            </span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="px-3.5 py-1.5 rounded-lg bg-[#141923] border border-white/10 text-slate-200">
+              {city.name}, {city.province}
+            </span>
           </div>
 
           {/* Description Paragraph */}
@@ -155,32 +154,21 @@ export default async function CityRoadshowPage({ params }: Props) {
             Ketemu cast, ikuti keseruan roadshow, dan nonton PIYE TO KIH? lebih dulu di bioskop pilihan {city.name}.
           </p>
 
-          {/* Two CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full max-w-md mb-8">
+          {/* Two CTA Buttons - Clean & High Contrast */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full max-w-md mb-4">
             <a
               href="#pilihan-bioskop"
-              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/20 transition-transform active:scale-95"
+              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-xl shadow-lg transition-transform active:scale-95"
             >
-              <span>🍿</span>
-              <span>Nonton Duluan ({shortDate})</span>
+              Nonton Duluan ({shortDate})
             </a>
             <a
               href="#booking-voucher"
-              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 bg-[#141822] hover:bg-[#1a202c] border border-white/15 text-white font-black text-xs sm:text-sm py-4 px-6 rounded-2xl transition-all"
+              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center bg-[#141822] hover:bg-[#1a202c] border border-white/15 hover:border-amber-500/40 text-white font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-xl transition-all"
             >
-              <span>🎟️</span>
-              <span>Voucher 19–20 Nov</span>
+              Voucher 19–20 Nov
             </a>
           </div>
-
-          {/* Chevron Down to Guide Scroll */}
-          <a
-            href="#pilihan-nonton"
-            className="text-slate-500 hover:text-slate-300 transition-colors animate-bounce mt-2"
-            aria-label="Gulir ke pilihan nonton"
-          >
-            <ChevronDown className="w-5 h-5" />
-          </a>
         </div>
       </section>
 

@@ -169,77 +169,66 @@ export default function WarVoucherForm({
     <section id="booking-voucher" className="py-12 px-4 sm:px-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400">
-          FUNNEL B · BOOKING VOUCHER ROADSHOW
+        <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-400">
+          VOUCHER ROADSHOW · PENAYANGAN SERENTAK
         </span>
         <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1 mb-2">
-          AMANKAN VOUCHER NONTONMU 🎟️
+          AMANKAN VOUCHER NONTONMU
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
           Isi data sebentar, dapatkan Kode Booking Voucher, lalu tunjukkan kodenya di booth PIYE TO KIH? saat roadshow {cityLocation}.
         </p>
       </div>
 
-      {/* 5-Step Progress Flow */}
-      <div className="bg-[#121620] border border-white/10 rounded-3xl p-5 sm:p-6 mb-6 shadow-xl">
+      {/* 5-Step Progress Flow - Developer Monospaced Pipeline */}
+      <div className="bg-[#121620] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 shadow-xl">
         <div className="text-center mb-4">
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
             ALUR BOOKING &amp; PENGAMBILAN VOUCHER
           </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
           {/* Step 1 */}
-          <div className="bg-[#181f2c] border border-white/5 rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-black flex items-center justify-center mb-1">
-              1
-            </span>
-            <span className="text-[11px] font-black text-white uppercase leading-tight">ISI FORM</span>
+          <div className="bg-[#181f2c] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-center items-center">
+            <span className="font-mono text-xs font-bold text-amber-400 mb-1">01</span>
+            <span className="text-[11px] font-bold text-white uppercase leading-tight">ISI FORM</span>
             <span className="text-[9.5px] text-slate-400 mt-0.5">Nama &amp; WhatsApp</span>
           </div>
 
           {/* Step 2 */}
-          <div className="bg-[#181f2c] border border-white/5 rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-black flex items-center justify-center mb-1">
-              2
-            </span>
-            <span className="text-[11px] font-black text-white uppercase leading-tight">DAPAT KODE</span>
-            <span className="text-[9.5px] text-slate-400 mt-0.5">Kode Booking SMG</span>
+          <div className="bg-[#181f2c] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-center items-center">
+            <span className="font-mono text-xs font-bold text-amber-400 mb-1">02</span>
+            <span className="text-[11px] font-bold text-white uppercase leading-tight">DAPAT KODE</span>
+            <span className="text-[9.5px] text-slate-400 mt-0.5">Kode Booking</span>
           </div>
 
           {/* Step 3 */}
-          <div className="bg-[#181f2c] border border-white/5 rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-black flex items-center justify-center mb-1">
-              3
-            </span>
-            <span className="text-[11px] font-black text-white uppercase leading-tight">DATANG KE BOOTH</span>
-            <span className="text-[9.5px] text-slate-400 mt-0.5">The Park Mall (22 Okt)</span>
+          <div className="bg-[#181f2c] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-center items-center">
+            <span className="font-mono text-xs font-bold text-amber-400 mb-1">03</span>
+            <span className="text-[11px] font-bold text-white uppercase leading-tight">DATANG KE BOOTH</span>
+            <span className="text-[9.5px] text-slate-400 mt-0.5">Booth Roadshow</span>
           </div>
 
           {/* Step 4 */}
-          <div className="bg-[#181f2c] border border-white/5 rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-black flex items-center justify-center mb-1">
-              4
-            </span>
-            <span className="text-[11px] font-black text-white uppercase leading-tight">BAYAR &amp; AMBIL</span>
-            <span className="text-[9.5px] text-slate-400 mt-0.5">Dapat Voucher Fisik</span>
+          <div className="bg-[#181f2c] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-center items-center">
+            <span className="font-mono text-xs font-bold text-amber-400 mb-1">04</span>
+            <span className="text-[11px] font-bold text-white uppercase leading-tight">BAYAR &amp; AMBIL</span>
+            <span className="text-[9.5px] text-slate-400 mt-0.5">Voucher Fisik</span>
           </div>
 
           {/* Step 5 */}
-          <div className="col-span-2 sm:col-span-1 bg-amber-500/15 border border-amber-500/50 rounded-2xl p-3 text-center flex flex-col justify-center items-center">
-            <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center mb-1">
-              5
-            </span>
-            <span className="text-[11px] font-black text-amber-300 uppercase leading-tight">NONTON 19–20 NOV</span>
+          <div className="col-span-2 sm:col-span-1 bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 text-center flex flex-col justify-center items-center">
+            <span className="font-mono text-xs font-bold text-amber-300 mb-1">05</span>
+            <span className="text-[11px] font-bold text-amber-300 uppercase leading-tight">NONTON 19–20 NOV</span>
             <span className="text-[9.5px] text-amber-400/80 mt-0.5">Tayang Serentak</span>
           </div>
         </div>
 
         {/* Warning Banner inside Step Bar */}
         <div className="mt-4 pt-3 border-t border-white/10 text-center">
-          <p className="text-[11px] text-amber-400 font-semibold flex items-center justify-center gap-1.5">
-            <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>Kode Booking bukan tiket dan bukan bukti pembayaran.</span>
+          <p className="text-[11px] text-slate-400 font-medium">
+            Perhatian: Kode Booking merupakan registrasi antrean, bukan tiket masuk dan bukan bukti pembayaran.
           </p>
         </div>
       </div>
@@ -258,30 +247,30 @@ export default function WarVoucherForm({
             </div>
           </div>
           <div>
-            <span className={`inline-block px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider ${statusBadgeClass}`}>
+            <span className={`inline-block px-2.5 py-1 rounded border text-[10px] font-mono font-bold uppercase tracking-wider ${statusBadgeClass}`}>
               {statusBadgeText}
             </span>
           </div>
         </div>
 
-        <p className="text-[11px] text-slate-400 mb-3">
-          Total kuota dialokasikan: {totalQuota} voucher untuk kota {cityLocation}
+        <p className="text-[11px] text-slate-400 mb-3 font-mono">
+          Alokasi kuota: {remaining} / {totalQuota} voucher ({cityLocation})
         </p>
 
         {/* Progress Bar */}
-        <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-emerald-500 to-amber-500 h-2 rounded-full transition-all duration-500"
+            className="bg-amber-500 h-1.5 rounded-full transition-all duration-500"
             style={{ width: `${Math.max(10, 100 - claimedPercent)}%` }}
           />
         </div>
       </div>
 
       {/* FORMULIR BOOKING VOUCHER */}
-      <div className="bg-[#121620] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl">
+      <div className="bg-[#121620] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
         <div className="mb-6">
           <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
-            FORMULIR BOOKING VOUCHER
+            FORMULIR REGISTRASI VOUCHER
           </h3>
           <p className="text-xs text-slate-300 mt-1">
             Silakan lengkapi form berikut untuk menerbitkan Kode Booking Anda.

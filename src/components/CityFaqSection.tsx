@@ -42,9 +42,8 @@ export default function CityFaqSection() {
     <section id="faq-roadshow" className="py-12 px-4 sm:px-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400 flex items-center justify-center gap-1.5 mb-1.5">
-          <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
-          <span>TANYA JAWAB</span>
+        <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-400 block mb-1.5">
+          [ FAQ ] TANYA JAWAB ROADSHOW
         </span>
         <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight uppercase mb-2">
           FAQ SINGKAT ROADSHOW &amp; VOUCHER

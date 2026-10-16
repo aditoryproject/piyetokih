@@ -28,9 +28,8 @@ export default function CityCinemaList({
     <section id="pilihan-bioskop" className="py-12 px-4 sm:px-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8 sm:mb-10">
-        <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center justify-center gap-2 flex-wrap">
-          <span>{cityName.toUpperCase()}, PILIH TEMPAT NONTON DULUANMU</span>
-          <span>🍿</span>
+        <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">
+          {cityName.toUpperCase()}, PILIH TEMPAT NONTON DULUANMU
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto mt-2">
           Gak perlu nunggu 19 November. Pilih bioskop dan amankan kursimu untuk {dateStr}.
@@ -46,17 +45,16 @@ export default function CityCinemaList({
           return (
             <div
               key={idx}
-              className="bg-[#121620] border border-white/10 hover:border-amber-500/50 rounded-3xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all group"
+              className="bg-[#121620] border border-white/10 hover:border-amber-500/50 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all group"
             >
               <div>
                 {/* Badges */}
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-amber-400">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <span>SPECIAL SCREENING + GREETING CAST</span>
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400">
+                    SPECIAL SCREENING · GREETING CAST
                   </span>
                   {cinema.remainingSeatsText && (
-                    <span className="text-[11px] font-bold text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
+                    <span className="text-[11px] font-mono font-bold text-slate-400 bg-white/5 px-2.5 py-0.5 rounded border border-white/10">
                       {cinema.remainingSeatsText}
                     </span>
                   )}
