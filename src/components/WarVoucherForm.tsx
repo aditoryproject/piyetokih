@@ -53,6 +53,25 @@ export default function WarVoucherForm({
         'The Park Mall Semarang — Lantai 2 (Area Atrium Depan Cinema XXI) (16.00 - 17.00 WIB)'
       );
     }
+
+    // Auto scroll based on ad intent query (?intent=voucher / ?intent=screening / ?intent=rundown)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const intent = params.get('intent');
+      if (intent === 'voucher') {
+        const timer = setTimeout(() => {
+          const el = document.getElementById('booking-voucher');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+        return () => clearTimeout(timer);
+      } else if (intent === 'screening') {
+        const timer = setTimeout(() => {
+          const el = document.getElementById('pilihan-bioskop');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+        return () => clearTimeout(timer);
+      }
+    }
   }, [defaultCity, defaultVenue]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,7 +147,23 @@ export default function WarVoucherForm({
     }
   };
 
-  const percentage = Math.min(100, Math.max(0, Math.round(((totalQuota - remaining) / totalQuota) * 100)));
+  const claimedPercent = Math.round(((totalQuota - remaining) / totalQuota) * 100);
+  let statusBadgeText = 'MASIH TERSEDIA';
+  let statusBadgeClass = 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400';
+
+  if (remaining <= 0) {
+    statusBadgeText = 'BOOKING DITUTUP';
+    statusBadgeClass = 'bg-slate-700/40 border-slate-600 text-slate-400';
+  } else if (claimedPercent >= 95) {
+    statusBadgeText = 'TINGGAL SEDIKIT';
+    statusBadgeClass = 'bg-red-500/20 border-red-500/50 text-red-400 animate-pulse';
+  } else if (claimedPercent >= 80) {
+    statusBadgeText = 'HAMPIR HABIS';
+    statusBadgeClass = 'bg-orange-500/20 border-orange-500/50 text-orange-400';
+  } else if (claimedPercent >= 60) {
+    statusBadgeText = 'MULAI MENIPIS';
+    statusBadgeClass = 'bg-amber-500/20 border-amber-500/50 text-amber-300';
+  }
 
   return (
     <section id="booking-voucher" className="py-12 px-4 sm:px-6 max-w-4xl mx-auto">
@@ -223,8 +258,8 @@ export default function WarVoucherForm({
             </div>
           </div>
           <div>
-            <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
-              MASIH TERSEDIA
+            <span className={`inline-block px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider ${statusBadgeClass}`}>
+              {statusBadgeText}
             </span>
           </div>
         </div>
@@ -237,7 +272,7 @@ export default function WarVoucherForm({
         <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden">
           <div
             className="bg-gradient-to-r from-emerald-500 to-amber-500 h-2 rounded-full transition-all duration-500"
-            style={{ width: `${Math.max(10, 100 - percentage)}%` }}
+            style={{ width: `${Math.max(10, 100 - claimedPercent)}%` }}
           />
         </div>
       </div>
@@ -289,9 +324,10 @@ export default function WarVoucherForm({
               placeholder="Contoh: 081234567890"
               className="w-full px-4 py-3 rounded-xl bg-[#0b0e14] border border-white/10 text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-amber-500 transition"
             />
-            <p className="text-[11px] text-slate-400 mt-1">
-              Kode booking dan informasi booth akan dikirim ke nomor ini.
-            </p>
+            <div className="text-[11px] text-slate-400 mt-1 space-y-0.5">
+              <p>Kode booking dan informasi booth akan dikirim ke nomor ini.</p>
+              <p className="text-slate-500">1 nomor WhatsApp hanya dapat membuat 1 kode booking aktif.</p>
+            </div>
           </div>
 
           {/* EMAIL */}
@@ -375,9 +411,9 @@ export default function WarVoucherForm({
                 <CheckCircle className="w-3.5 h-3.5" />
                 <span>KODE BOOKING RESMI TERBIT</span>
               </span>
-              <h3 className="text-xl font-black text-white">Selamat, Kode Booking Tersimpan!</h3>
+              <h3 className="text-xl font-black text-white">🎟️ SIAP! VOUCHERMU SUDAH DIBOOKING</h3>
               <p className="text-xs text-slate-300 mt-1">
-                Tunjukkan kode ini di booth The Park Mall (Lantai 2) pada jam 16.00–17.00 WIB untuk bayar &amp; ambil Voucher Fisik.
+                Tunjukkan kode ini di booth {claimedLead.venueLocation || cityLocation} untuk menyelesaikan pembayaran &amp; menerima Voucher Fisik 19–20 November.
               </p>
             </div>
 
