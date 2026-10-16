@@ -95,7 +95,7 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
             </div>
 
             {/* Production Metadata Cards */}
-            <div className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+            <div className="pt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Rumah Produksi</span>
                 <span className="font-black text-amber-400 text-xs">Miracle Pictures</span>
@@ -104,9 +104,13 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Sutradara</span>
                 <span className="font-black text-white text-xs">{directorName}</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 col-span-2 sm:col-span-1">
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Penulis Skenario</span>
                 <span className="font-black text-white text-xs">{writerName}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Klasifikasi Usia</span>
+                <span className="font-black text-red-400 text-xs">{movieSettings.lsfRatingText || 'LSF 13+'}</span>
               </div>
             </div>
           </div>

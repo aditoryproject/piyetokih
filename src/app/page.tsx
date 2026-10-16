@@ -75,6 +75,17 @@ export default async function HomePage() {
             <span className="text-sm sm:text-lg font-black text-emerald-400 block tracking-widest mt-0.5">
               19 NOVEMBER 2026
             </span>
+            {/* LSF 13+ SENSOR RATING BADGE */}
+            {(movieSettings?.showLsfBadge ?? true) && (
+              <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full bg-slate-900/90 border border-red-500/30 shadow-lg shadow-red-950/20">
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[10px] tracking-wider uppercase">
+                  {movieSettings?.lsfRatingText || '13+'}
+                </span>
+                <span className="text-[11px] font-bold text-slate-300 tracking-wide uppercase">
+                  Lulus Sensor LSF • 13+
+                </span>
+              </div>
+            )}
           </div>
 
           {/* CREDIT TITLE IMAGE (DI HERO SESUAI HALAMAN 2) */}
