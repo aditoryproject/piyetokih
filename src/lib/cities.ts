@@ -5,6 +5,10 @@ export interface CinemaVenue {
   seats: number;
   showTimes: string[];
   ticketUrl: string; // default cinema ticket booking URL
+  address?: string;
+  remainingSeatsText?: string;
+  doorNote?: string;
+  badgeText?: string;
 }
 
 export interface CityRundownItem {
@@ -40,68 +44,74 @@ export const CITIES_DATA: CityData[] = [
     rundown: {
       date: 'Kamis, 22 Oktober 2026',
       voucherExchangeInfo:
-        'Penukaran E-Voucher resmi ke voucher fisik & merchandise HANYA dapat dilakukan langsung di Booth Miracle Pictures saat acara Meet & Greet berlangsung di The Park Mall Semarang (Lantai 2) pada pukul 16.00 - 17.00 WIB. Penukaran TIDAK DAPAT dilakukan di kasir bioskop.',
+        'Penukaran voucher fisik resmi hanya berada di The Park Mall Lantai 2 pada jam 16.00–17.00 WIB. Tunjukkan Kode Booking Anda di booth untuk membayar dan mengambil voucher fisik.',
       items: [
         {
-          time: '08.00 - 09.00 WIB',
+          time: '08.00 – 09.00 WIB',
           category: 'Sekolah',
-          title: 'School Visit & Temu Konco',
+          title: 'PIYE TO KIH? MAMPIR KE SEKOLAH',
           venue: 'SMA Negeri 15 Semarang',
-          note: 'Sapa siswa & guru bersama cast film',
+          note: 'Sapa pagi & kuis receh bareng siswa',
         },
         {
-          time: '10.00 - 12.00 WIB',
+          time: '10.00 – 12.00 WIB',
           category: 'Kampus',
-          title: 'Campus Roadshow & Sharing Session',
-          venue: 'Auditorium Prof. Wuryanto, Universitas Negeri Semarang (UNNES)',
-          note: 'Temu mahasiswa & sharing karya perfilman',
+          title: 'NGOBROL BARENG DI KAMPUS',
+          venue: 'UNNES (Universitas Negeri Semarang)',
+          note: 'Sharing session komedi & bedah cerita',
         },
         {
-          time: '14.00 - 15.00 WIB',
+          time: '14.00 – 15.00 WIB',
           category: 'Radio',
-          title: 'Live On-Air Talkshow',
-          venue: 'Studio Jateng Radio Semarang',
-          note: 'Live interview bersama cast & sutradara',
+          title: 'PIYE TO KIH? NGUDARA',
+          venue: 'Jateng Radio FM',
+          note: 'Live on-air & bagi-bagi merchandise',
         },
         {
           time: '15.30 WIB',
           category: 'Screening',
-          title: 'Special Screening 1 & Greeting Ending',
-          venue: 'The Park XXI Semarang (Show 2)',
-          note: 'Nonton bareng & sapa penonton di dalam studio bioskop',
+          title: 'NONTON DULUAN + GREETING CAST',
+          venue: 'The Park XXI Semarang',
+          note: 'Sesi 1 Special Screening (Wajib bertiket)',
         },
         {
-          time: '16.00 - 17.00 WIB',
+          time: '16.00 – 17.00 WIB',
           category: 'Mall & Meet',
-          title: 'Meet & Greet Cast + Booth Penukaran Voucher Fisik',
-          venue: 'The Park Mall Semarang - 2nd Floor (Lantai 2)',
-          note: 'Satu-satunya titik resmi penukaran E-Voucher ke voucher fisik & merchandise saat acara berlangsung (tidak melayani penukaran di kasir bioskop)',
+          title: 'TEMU KONCO + BOOTH VOUCHER',
+          venue: 'The Park Mall Semarang — Lantai 2',
+          note: 'Titik bayar & ambil Voucher Fisik 19–20 Nov',
           isVoucherExchange: true,
         },
         {
-          time: '18.00 - 19.40 WIB',
+          time: '18.00 WIB',
           category: 'Screening',
-          title: 'Special Screening 2 & Greeting Ending',
-          venue: 'Java Supermall - Cinépolis (Show 3)',
-          note: 'Nonton bareng show malam bersama para pemeran',
+          title: 'NONTON DULUAN + GREETING CAST',
+          venue: 'Cinépolis Java Mall Semarang',
+          note: 'Sesi 2 Special Screening (Wajib bertiket)',
         },
       ],
     },
     cinemas: [
       {
-        name: 'The Park XXI Semarang',
+        name: 'THE PARK XXI SEMARANG',
         chain: 'XXI',
-        studio: 'Studio 3',
+        studio: 'Studio 1 Premiere Sound',
         seats: 180,
-        showTimes: ['15:30 WIB'],
+        remainingSeatsText: '±42 kursi tersisa',
+        doorNote: 'Pintu teater dibuka 15 mnt sebelumnya',
+        address: 'The Park Mall Semarang Lt. 3, Jl. Madukoro Raya No. 1',
+        showTimes: ['15.30 WIB'],
         ticketUrl: 'https://m.21cineplex.com/gui.schedule.php?cinema_id=SMGTPRK',
       },
       {
-        name: 'Cinépolis Java Mall Semarang',
+        name: 'CINÉPOLIS JAVA MALL SEMARANG',
         chain: 'Cinepolis',
-        studio: 'Studio 4',
+        studio: 'Audi 2 Super Screen',
         seats: 121,
-        showTimes: ['18:00 - 19:40 WIB'],
+        remainingSeatsText: '±28 kursi tersisa',
+        doorNote: 'Pintu teater dibuka 15 mnt sebelumnya',
+        address: 'Java Supermall Lt. 3, Jl. Letjen MT Haryono No. 992-994',
+        showTimes: ['18.00 WIB'],
         ticketUrl: 'https://cinepolis.co.id',
       },
     ],

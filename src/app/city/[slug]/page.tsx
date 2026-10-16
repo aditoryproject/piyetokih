@@ -3,15 +3,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getCityBySlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
+import CityChoiceSection from '@/components/CityChoiceSection';
+import CityCinemaList from '@/components/CityCinemaList';
+import WarVoucherForm from '@/components/WarVoucherForm';
+import CityVoucherPickupSection from '@/components/CityVoucherPickupSection';
+import MovieStorySection from '@/components/MovieStorySection';
 import CityRundownSection from '@/components/CityRundownSection';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
-import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
-import QuotaProgress from '@/components/QuotaProgress';
-import WarVoucherForm from '@/components/WarVoucherForm';
-import CityCinemaList from '@/components/CityCinemaList';
 import Footer from '@/components/Footer';
-import { Calendar, ChevronLeft, MapPin } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronLeft, MapPin } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -86,17 +87,18 @@ export default async function CityRoadshowPage({ params }: Props) {
   const customLinks = db.settings.cityLinkOverrides || {};
   const currentClaimed = db.leads.length;
   const remainingStock = Math.max(0, db.settings.totalQuota - currentClaimed);
+  const shortDate = `${city.dateStr.split(' ')[0]} ${city.dateStr.split(' ')[1]?.slice(0, 3) || ''}`;
 
   return (
     <div className="relative min-h-screen">
-      {/* 1. CITY ROADSHOW HERO */}
-      <section className="relative pt-10 pb-12 px-4 sm:px-6 overflow-hidden">
+      {/* 1. CITY ROADSHOW HERO (Gambar 1) */}
+      <section className="relative pt-10 pb-14 px-4 sm:px-6 overflow-hidden text-center">
         {/* Glow Ambient */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[450px] bg-red-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[480px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-3xl mx-auto flex flex-col items-center">
           {/* Back Link */}
-          <div className="mb-6 flex items-center justify-center">
+          <div className="mb-6">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold transition"
@@ -106,77 +108,106 @@ export default async function CityRoadshowPage({ params }: Props) {
             </Link>
           </div>
 
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black tracking-widest uppercase mb-4 shadow-sm">
-            <MapPin className="w-3.5 h-3.5 text-red-500" />
-            <span>ROADSHOW &amp; PENAYANGAN RESMI FILM BIOSKOP</span>
+          {/* Category Tag */}
+          <div className="text-[11px] sm:text-xs font-black tracking-[0.22em] uppercase text-amber-400 mb-3">
+            {city.name.toUpperCase()} · PIYE TO KIH? ROADSHOW · FILM KOMEDI
           </div>
 
-          {/* City Headline with Official Logotype */}
-          <div className="flex flex-col items-center justify-center mb-4">
-            <h1 className="sr-only">PIYE TO KIH? ROADSHOW KOTA {city.name.toUpperCase()}</h1>
-            <img
-              src="/logo-ptk.png"
-              alt={`Logo Resmi Film PIYE TO KIH? Kota ${city.name}`}
-              className="w-56 sm:w-72 md:w-84 max-w-full h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)] mx-auto mb-2 filter hover:scale-[1.02] transition-transform duration-300"
-            />
-            <div className="text-2xl sm:text-5xl font-black uppercase tracking-tight bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
-              KOTA {city.name.toUpperCase()}
+          {/* Big Headline */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight uppercase mb-4 leading-tight">
+            {city.name.toUpperCase()}, SIAP<br className="hidden sm:inline" /> KETAWA DULUAN?
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-xs sm:text-base font-semibold text-amber-200/90 mb-5 max-w-2xl">
+            PIYE TO KIH? mampir dulu sebelum tayang serentak 19 NOVEMBER 2026.
+          </p>
+
+          {/* Date & Location Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#161c28] border border-white/15 text-xs sm:text-sm font-bold text-slate-200 shadow-sm">
+              <Calendar className="w-4 h-4 text-amber-400" />
+              <span>{city.dateStr.toUpperCase()}</span>
             </div>
-            <div className="text-[11px] sm:text-xs font-black tracking-[0.25em] uppercase text-amber-400/90 mt-1.5">
-              ROADSHOW &amp; PENAYANGAN RESMI BIOSKOP
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#161c28] border border-white/15 text-xs sm:text-sm font-bold text-slate-200 shadow-sm">
+              <MapPin className="w-4 h-4 text-amber-400" />
+              <span>{city.name}, {city.province}</span>
             </div>
           </div>
 
-          {/* Date & Location Pill */}
-          <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200 bg-black/60 px-5 py-2 rounded-full border border-white/10 mb-2 shadow-md">
-            <Calendar className="w-4 h-4 text-amber-400" />
-            <span>
-              Jadwal Penayangan &amp; Roadshow: <b>{city.dateStr}</b>
-            </span>
+          {/* Description Paragraph */}
+          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mb-8 leading-relaxed">
+            Ketemu cast, ikuti keseruan roadshow, dan nonton PIYE TO KIH? lebih dulu di bioskop pilihan {city.name}.
+          </p>
+
+          {/* Two CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full max-w-md mb-8">
+            <a
+              href="#pilihan-bioskop"
+              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/20 transition-transform active:scale-95"
+            >
+              <span>🍿</span>
+              <span>Nonton Duluan ({shortDate})</span>
+            </a>
+            <a
+              href="#booking-voucher"
+              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 bg-[#141822] hover:bg-[#1a202c] border border-white/15 text-white font-black text-xs sm:text-sm py-4 px-6 rounded-2xl transition-all"
+            >
+              <span>🎟️</span>
+              <span>Voucher 19–20 Nov</span>
+            </a>
           </div>
 
-          {/* RUNDOWN & JADWAL VENUE ROADSHOW KOTA */}
-          {city.rundown && (
-            <CityRundownSection rundown={city.rundown} cityName={city.name} />
-          )}
+          {/* Chevron Down to Guide Scroll */}
+          <a
+            href="#pilihan-nonton"
+            className="text-slate-500 hover:text-slate-300 transition-colors animate-bounce mt-2"
+            aria-label="Gulir ke pilihan nonton"
+          >
+            <ChevronDown className="w-5 h-5" />
+          </a>
         </div>
       </section>
 
-      {/* 2. SINOPSIS & KISAH FILM */}
+      {/* 2. DUA PILIHAN NONTON (Gambar 2) */}
+      <div id="pilihan-nonton">
+        <CityChoiceSection cityName={city.name} dateStr={city.dateStr} />
+      </div>
+
+      {/* 3. PILIHAN TEMPAT NONTON DULUAN (Gambar 3A) */}
+      <CityCinemaList
+        cityName={city.name}
+        slug={city.slug}
+        cinemas={city.cinemas}
+        customLinks={customLinks}
+        dateStr={city.dateStr}
+      />
+
+      {/* 4. FUNNEL B: BOOKING VOUCHER ROADSHOW (Gambar 3B) */}
+      <WarVoucherForm
+        defaultCity={city.name}
+        totalQuota={db.settings.totalQuota}
+        remainingStock={remainingStock}
+      />
+
+      {/* 5. TITIK PENGAMBILAN VOUCHER FISIK (Gambar 4) */}
+      <CityVoucherPickupSection cityName={city.name} dateStr={city.dateStr} />
+
+      {/* 6. KISAH SEKAWAN (Sinopsis Film) */}
       <MovieStorySection movieSettings={movieSettings || undefined} />
 
-      {/* 3. OFFICIAL TEASER TRAILER PLAYER */}
+      {/* 7. RUNDOWN ROADSHOW (Gambar 5 - diletakkan di bawah informasi pengambilan & kisah sekawan) */}
+      {city.rundown && (
+        <CityRundownSection rundown={city.rundown} cityName={city.name} />
+      )}
+
+      {/* 8. OFFICIAL TEASER TRAILER PLAYER */}
       <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
 
-      {/* 4. FORM VOUCHER & KUOTA ROADSHOW PER KOTA */}
-      <section id="form-voucher" className="py-12 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto mb-8">
-          <QuotaProgress
-            totalQuota={db.settings.totalQuota}
-            remainingStock={remainingStock}
-            cityName={city.name}
-          />
-        </div>
-
-        {/* FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
-        <div className="max-w-xl mx-auto mb-16">
-          <WarVoucherForm defaultCity={city.name} />
-        </div>
-
-        {/* LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
-        <CityCinemaList
-          cityName={city.name}
-          slug={city.slug}
-          cinemas={city.cinemas}
-          customLinks={customLinks}
-        />
-      </section>
-
-      {/* 5. CAST & PEMERAN WOKO CHANNEL (SERVER RENDERED DARI DATABASE) */}
+      {/* 9. CAST & PEMERAN WOKO CHANNEL */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* 6. FOOTER RESMI DENGAN MITRA BIOSKOP & SOSMED */}
+      {/* 10. FOOTER RESMI */}
       <Footer />
     </div>
   );

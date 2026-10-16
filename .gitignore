@@ -43,3 +43,5 @@ public/uploads/
 cookies.txt
 
 docs/
+*.docx
+*.xlsx

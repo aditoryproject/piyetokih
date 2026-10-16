@@ -19,13 +19,13 @@ export async function POST(req: NextRequest) {
 
     const name = sanitizeString(body.name, 100);
     const phone = sanitizeString(body.phone, 30);
-    const email = sanitizeString(body.email, 120);
+    const email = body.email ? sanitizeString(body.email, 120) : '';
     const cityLocation = sanitizeString(body.cityLocation, 60);
     const venueLocation = body.venueLocation ? sanitizeString(body.venueLocation, 120) : undefined;
 
-    if (!name || !phone || !email) {
+    if (!name || !phone) {
       return NextResponse.json(
-        { success: false, error: 'Nama, Nomor WhatsApp, dan Email wajib diisi!' },
+        { success: false, error: 'Nama dan Nomor WhatsApp wajib diisi!' },
         { status: 400 }
       );
     }
@@ -86,21 +86,23 @@ export async function POST(req: NextRequest) {
       senderNumber: db.settings.wahnotifSenderNumber,
     });
 
-    // Send Email notification
+    // Send Email notification if provided
     let emailStatus: 'sent' | 'pending' | 'failed' = 'pending';
-    try {
-      const emailResult = await sendVoucherEmail({
-        name,
-        email,
-        serialNumber,
-        city: detectedCity,
-        voucherUrl,
-        validDatesText: db.settings.voucherValidDatesText,
-      });
-      emailStatus = emailResult.success ? 'sent' : 'failed';
-    } catch (e) {
-      console.error('[Email Dispatch Warning]:', e);
-      emailStatus = 'failed';
+    if (email) {
+      try {
+        const emailResult = await sendVoucherEmail({
+          name,
+          email,
+          serialNumber,
+          city: detectedCity,
+          voucherUrl,
+          validDatesText: db.settings.voucherValidDatesText,
+        });
+        emailStatus = emailResult.success ? 'sent' : 'failed';
+      } catch (e) {
+        console.error('[Email Dispatch Warning]:', e);
+        emailStatus = 'failed';
+      }
     }
 
     const newLead: LeadRecord = {
