@@ -52,6 +52,7 @@ import {
   ShoppingCart,
   Power,
   AlertTriangle,
+  Sparkles,
 } from 'lucide-react';
 
 export default function AdminDashboardClient() {
