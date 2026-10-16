@@ -83,51 +83,33 @@ export default function CastSection({ castList: propCast }: CastSectionProps) {
           </p>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Cards Grid: 14 Cast Members in Clean Cinematic Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
           {castList.map((cast, idx) => (
             <div
               key={cast.id || idx}
-              className="bg-gradient-to-b from-[#141b2a] to-[#0a0e17] border border-slate-800 hover:border-amber-500/40 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 group flex flex-col justify-between"
+              className="bg-gradient-to-b from-[#141b2a] to-[#0a0e17] border border-slate-800/80 hover:border-amber-500/40 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 group flex flex-col"
             >
               {/* Photo Container */}
               <div className="relative aspect-[4/5] overflow-hidden bg-slate-900">
                 <img
                   src={cast.photoUrl}
-                  alt={`${cast.actorName} sebagai ${cast.characterName}`}
+                  alt={`${cast.actorName} - ${cast.characterName}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e17] via-transparent to-transparent" />
-
-                {/* Badge Top Left */}
-                <div className="absolute top-3 left-3">
-                  <span className="px-2.5 py-0.5 rounded-full bg-black/75 border border-white/20 text-amber-400 text-[10px] font-black uppercase tracking-wider backdrop-blur-md">
-                    {cast.badge}
-                  </span>
-                </div>
-
-                {/* Character Name Overlay Bottom */}
-                <div className="absolute bottom-3 left-3 right-3 text-left">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">
-                    SEBAGAI
-                  </span>
-                  <h3 className="text-xl font-black text-white tracking-wide">
-                    {cast.characterName}
-                  </h3>
-                </div>
               </div>
 
-              {/* Actor Details Bottom */}
-              <div className="p-4 pt-2 text-left flex-1 flex flex-col justify-between space-y-2">
-                <div>
-                  <h4 className="text-sm font-black text-amber-400 flex items-center gap-1.5">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                    <span>{cast.actorName}</span>
-                  </h4>
-                  <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                    {cast.bio}
-                  </p>
-                </div>
+              {/* Actor & Role Details */}
+              <div className="p-3.5 text-center flex-1 flex flex-col justify-center">
+                <h3 className="text-sm sm:text-base font-black text-white group-hover:text-amber-300 transition-colors tracking-tight">
+                  {cast.actorName}
+                </h3>
+                <span className="text-[11px] sm:text-xs font-semibold text-amber-400/90 mt-0.5 block">
+                  {cast.characterName && cast.characterName !== 'Pemeran' && cast.characterName !== 'Pemeran Film'
+                    ? `sebagai ${cast.characterName}`
+                    : 'Pemeran Film'}
+                </span>
               </div>
             </div>
           ))}

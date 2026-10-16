@@ -19,63 +19,63 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-[#0B0F17]/95 backdrop-blur-md border-b border-white/10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-1" title="PIYE TO KIH? THE MOVIE - Miracle Pictures">
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-1" title="Website Resmi Film PIYE TO KIH? - Miracle Pictures">
           <img
             src="/logo-ptk.png"
             alt="Logo Resmi Film PIYE TO KIH?"
-            className="h-9 sm:h-11 w-auto max-w-[140px] sm:max-w-[170px] object-contain drop-shadow-md group-hover:scale-105 transition-transform"
+            className="h-9 sm:h-11 w-auto max-w-[130px] sm:max-w-[150px] object-contain drop-shadow-md group-hover:scale-105 transition-transform"
           />
           <div className="leading-tight hidden sm:block border-l border-white/15 pl-2.5">
-            <span className="block font-black text-[11px] tracking-wider text-white uppercase">
-              THE MOVIE
+            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
+              Website Resmi Film
             </span>
-            <span className="text-[9px] text-amber-400 font-bold tracking-widest uppercase block">
-              MIRACLE PICTURES
+            <span className="block font-black text-xs sm:text-sm tracking-wider text-white uppercase">
+              PIYE TO KIH?
             </span>
           </div>
         </Link>
 
-        {/* Desktop Nav: Only Home, Jadwal Roadshow, Kabar & Galeri */}
-        <div className="hidden md:flex items-center gap-1.5 lg:gap-3">
+        {/* Desktop Nav: HALAMAN UTAMA, JADWAL ROADSHOW, KABAR & GALERI (Uppercase) */}
+        <div className="hidden md:flex items-center gap-2 lg:gap-4 text-xs font-bold tracking-wider uppercase">
           <Link
             href="/"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs sm:text-sm transition"
+            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition"
           >
-            Home
+            HALAMAN UTAMA
           </Link>
           <Link
             href="/#roadshow"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs sm:text-sm transition"
+            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition"
           >
-            Jadwal Roadshow
+            JADWAL ROADSHOW
           </Link>
           <Link
             href="/kabar-galeri"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-white/5 font-semibold text-xs sm:text-sm transition"
+            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-white/5 transition"
           >
-            Kabar &amp; Galeri
+            KABAR &amp; GALERI
           </Link>
         </div>
 
-        {/* Mobile Nav Links */}
-        <div className="flex md:hidden items-center gap-1">
+        {/* Mobile Nav Links (Uppercase) */}
+        <div className="flex md:hidden items-center gap-1 text-[11px] font-bold tracking-wider uppercase">
           <Link
             href="/"
-            className="px-2 py-1 rounded-lg text-slate-300 hover:text-white font-semibold text-xs"
+            className="px-2 py-1 rounded-lg text-slate-300 hover:text-white"
           >
-            Home
+            HALAMAN UTAMA
           </Link>
           <Link
             href="/#roadshow"
-            className="px-2 py-1 rounded-lg text-slate-300 hover:text-white font-semibold text-xs"
+            className="px-2 py-1 rounded-lg text-slate-300 hover:text-white"
           >
-            Jadwal Roadshow
+            JADWAL ROADSHOW
           </Link>
           <Link
             href="/kabar-galeri"
-            className="px-2 py-1 rounded-lg text-amber-300 font-semibold text-xs"
+            className="px-2 py-1 rounded-lg text-amber-300"
           >
-            Kabar &amp; Galeri
+            KABAR &amp; GALERI
           </Link>
         </div>
       </div>

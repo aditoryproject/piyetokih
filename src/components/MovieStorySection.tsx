@@ -46,54 +46,42 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
 
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Left Column: Visual Poster / Scene Card */}
+          {/* Left Column: Clean Visual Poster with Sensor Classification Badge */}
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black shadow-amber-500/20 group">
               <img
                 src={currentPoster}
-                alt="Sinopsis Film Piye To Kih Miracle Pictures"
+                alt="Poster Film Piye To Kih Miracle Pictures"
                 onError={() => {
                   if (currentPoster !== '/kabar-galeri-hero.jpg') {
                     setCurrentPoster('/kabar-galeri-hero.jpg');
                   }
                 }}
-                className="w-full h-[480px] object-cover group-hover:scale-105 transition-transform duration-700 opacity-85"
+                className="w-full h-auto min-h-[480px] object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
 
-              {/* Poster Floating Badge */}
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1 rounded-full bg-red-600/90 text-white font-black text-[10px] tracking-widest uppercase shadow-lg">
-                  LAYAR LEBAR 2026
-                </span>
-              </div>
-
-              {/* Bottom Card Synopsis Highlight */}
-              <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-black/70 backdrop-blur-md border border-white/10">
-                <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
-                  <Film className="w-3.5 h-3.5" />
-                  <span>DARI KREATOR WOKO CHANNEL</span>
+              {/* Kualifikasi Sensor LSF (Dapat diaktifkan lewat Dashboard jika sudah resmi) */}
+              {movieSettings.showLsfBadge && (
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1 rounded-lg bg-red-600/90 text-white font-black text-xs tracking-wider uppercase shadow-xl border border-white/20">
+                    {movieSettings.lsfRatingText || 'LSF 13+'}
+                  </span>
                 </div>
-                <p className="text-white text-xs font-semibold leading-relaxed">
-                  Perjalanan komedi layar lebar pertama yang menyatukan kelucuan khas Kediri &amp; Jawa Timur dengan drama sinematik berkelas.
-                </p>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Right Column: Story & Production Details */}
+          {/* Right Column: SINOPSIS */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-gold-400 text-xs font-black tracking-widest uppercase shadow-sm">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>SINOPSIS RESMI CERITA FILM</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight uppercase leading-tight">
-              Patah Hati, Beli Rumah Tua, <br />
-              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
-                Lha Kok Ketemu Sukma?!
+            <div>
+              <span className="text-xs font-bold text-amber-400 tracking-[0.25em] uppercase block mb-1">
+                CERITA LAYAR LEBAR
               </span>
-            </h2>
+              <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase leading-tight">
+                SINOPSIS
+              </h2>
+            </div>
 
             {/* Quote Block */}
             <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-transparent border-l-4 border-amber-500 text-slate-300 text-xs sm:text-sm italic leading-relaxed">

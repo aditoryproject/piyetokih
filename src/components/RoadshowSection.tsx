@@ -59,38 +59,21 @@ export default function RoadshowSection() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-red-600/20 via-amber-600/20 to-red-600/20 border border-amber-500/40 text-amber-300 text-xs font-black tracking-widest uppercase mb-4 shadow-lg">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>JADWAL RESMI ROADSHOW 17 KOTA</span>
+            <span>ROADSHOW 17 KOTA • MULAI 22 OKTOBER</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase mb-3 drop-shadow-md">
-            ROADSHOW & NONTON BARENG <br />
-            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
-              FILM "PIYE TO KIH?"
-            </span>
+          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase mb-4 drop-shadow-md">
+            PIYE TO KIH? DATANG KE KOTAMU!
           </h2>
 
-          <p className="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Saksikan penayangan spesial bersama sutradara & jajaran cast di bioskop kesayangan Anda! 
-            Pilih kota Anda, cek jadwal studio, dan amankan kursi sebelum kehabisan.
+          <p className="text-sm sm:text-base text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            PIYE TO KIH? tayang serentak 19 November. Tapi buat yang nggak sabar, kamu bisa nonton lebih dulu bareng para cast di Special Screening kota roadshow. Pilih kotamu, cek jadwalnya, dan siap-siap ketemu langsung dengan para cast!
           </p>
 
-          {/* QUICK HIGHLIGHT COUNTERS */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 max-w-3xl mx-auto">
-            <div className="bg-black/50 border border-white/10 rounded-2xl p-3.5 text-center">
-              <span className="block text-2xl font-black text-amber-400">17</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Kota Roadshow</span>
-            </div>
-            <div className="bg-black/50 border border-white/10 rounded-2xl p-3.5 text-center">
-              <span className="block text-2xl font-black text-white">28+</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Layar Bioskop</span>
-            </div>
-            <div className="bg-black/50 border border-white/10 rounded-2xl p-3.5 text-center">
-              <span className="block text-2xl font-black text-amber-400">22 Okt - 8 Nov</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Periode Tur 2026</span>
-            </div>
-            <div className="bg-black/50 border border-white/10 rounded-2xl p-3.5 text-center">
-              <span className="block text-2xl font-black text-green-400">Meet & Greet</span>
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Nobar & QnA Cast</span>
+          {/* Highlight Banner / Pill */}
+          <div className="mt-6 inline-block">
+            <div className="px-5 py-2 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/25 to-red-500/20 border border-amber-500/40 text-amber-300 text-xs sm:text-sm font-black tracking-widest uppercase shadow-lg">
+              NONTON DULUAN. KETEMU CAST. SERU-SERUAN DI KOTAMU.
             </div>
           </div>
         </div>
@@ -102,11 +85,8 @@ export default function RoadshowSection() {
             <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-black text-white mb-2 group-hover:text-amber-300 transition-colors">
-              Meet & Greet Cast
-            </h3>
-            <p className="text-xs text-gray-300 leading-relaxed">
-              Kesempatan langka ngobrol langsung, sesi tanya jawab (Q&A), dan foto bersama para pemain film Piye To Kih di lobi bioskop.
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-medium">
+              Ketemu langsung, ngobrol, dan foto bareng para pemain PIYE TO KIH? saat roadshow mampir ke kotamu. Jangan lewatkan juga keseruannya di radio, sekolah, dan kampus.
             </p>
           </div>
 
@@ -115,11 +95,8 @@ export default function RoadshowSection() {
             <div className="w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/40 flex items-center justify-center text-red-400 mb-4 group-hover:scale-110 transition-transform">
               <Film className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-black text-white mb-2 group-hover:text-red-300 transition-colors">
-              Nonton Bareng Eksklusif
-            </h3>
-            <p className="text-xs text-gray-300 leading-relaxed">
-              Rasakan tawa dan keseruan nobar satu studio penuh bersama komunitas dan pecinta film komedi drama Indonesia di kotamu.
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-medium">
+              Kamu sudah bisa nonton PIYE TO KIH? lebih dulu! Ikutan Special Screening dan nonton bareng para cast sebelum tayang serentak di bioskop.
             </p>
           </div>
 
@@ -128,11 +105,8 @@ export default function RoadshowSection() {
             <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
               <Gift className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-black text-white mb-2 group-hover:text-amber-300 transition-colors">
-              Merchandise Hunt & Doorprize
-            </h3>
-            <p className="text-xs text-gray-300 leading-relaxed">
-              Bawa pulang merchandise official edisi terbatas Miracle Pictures, totebag, stiker, dan poster film resmi bertanda tangan!
+            <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-medium">
+              Ikutan keseruannya dan bawa pulang berbagai merchandise PIYE TO KIH?, hadiah, serta kejutan spesial yang cuma bisa kamu temukan selama roadshow.
             </p>
           </div>
         </div>
@@ -234,19 +208,19 @@ export default function RoadshowSection() {
         )}
 
         {/* BOTTOM CALL TO ACTION FOOTNOTE */}
-        <div className="mt-12 text-center p-6 bg-gradient-to-r from-red-950/40 via-amber-950/30 to-red-950/40 border border-amber-500/30 rounded-3xl">
-          <h4 className="text-lg font-black text-white mb-1">
-            Belum menemukan kotamu dalam jadwal roadshow?
+        <div className="mt-12 text-center p-6 sm:p-8 bg-gradient-to-r from-red-950/40 via-amber-950/30 to-red-950/40 border border-amber-500/30 rounded-3xl">
+          <h4 className="text-xl font-black text-white mb-2">
+            Kotamu belum masuk jadwal roadshow? Tenang.
           </h4>
-          <p className="text-xs text-gray-300 max-w-lg mx-auto mb-4">
-            Pasang pengingat War Presale Buy 1 Get 1 agar tidak kehabisan tiket penayangan perdana 19 November 2026 di kotamu!
+          <p className="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto mb-5 leading-relaxed">
+            PIYE TO KIH? tetap tayang serentak di bioskop mulai 19 November 2026. Pasang reminder sekarang, dan kami akan kabari kamu saat Presale dan promo Buy 1 Get 1 resmi dibuka.
           </p>
           <a
             href="#presale"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition shadow-lg active:scale-95"
           >
             <Ticket className="w-4 h-4" />
-            <span>Pasang Pengingat Presale Buy 1 Get 1</span>
+            <span>KABARI AKU SAAT TIKET TERSEDIA</span>
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

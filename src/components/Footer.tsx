@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Film, X, MapPin, ExternalLink, Sparkles, Ticket } from 'lucide-react';
-import { CITIES_DATA } from '@/lib/cities';
+import { Ticket } from 'lucide-react';
 
 interface FooterProps {
   socialLinksOverride?: {
@@ -22,8 +21,6 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
     youtube: 'https://www.youtube.com/@piyetokihfilm',
   });
 
-  const [activeCinemaModal, setActiveCinemaModal] = useState<string | null>(null);
-
   useEffect(() => {
     fetch('/api/admin/settings')
       .then(r => r.json())
@@ -38,128 +35,14 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
       .catch(() => {});
   }, []);
 
-  // Merge override if passed directly
   const activeSocials = {
     ...socialLinks,
     ...(socialLinksOverride || {}),
   };
 
-  // Cinema Brand Definitions
-  const cinemaBrands = [
-    {
-      id: 'xxi',
-      name: 'CINEMA XXI',
-      color: 'border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20',
-      tag: 'Jaringan Bioskop Terbesar',
-      description: 'Penayangan serentak di studio Cinema XXI & Premiere di 17 kota roadshow.',
-      cinemas: CITIES_DATA.flatMap(city =>
-        city.cinemas
-          .filter(c => c.chain.toUpperCase().includes('XXI'))
-          .map(c => ({ ...c, cityName: city.name, dateStr: city.dateStr, slug: city.slug }))
-      ),
-    },
-    {
-      id: 'cgv',
-      name: 'CGV CINEMAS',
-      color: 'border-red-500/40 text-red-400 bg-red-500/10 hover:bg-red-500/20',
-      tag: 'Cultureplex Cinema',
-      description: 'Pengalaman menonton komedi seru dengan audio visual terbaik di CGV Cinemas.',
-      cinemas: CITIES_DATA.flatMap(city =>
-        city.cinemas
-          .filter(c => c.chain.toUpperCase().includes('CGV'))
-          .map(c => ({ ...c, cityName: city.name, dateStr: city.dateStr, slug: city.slug }))
-      ),
-    },
-    {
-      id: 'cinepolis',
-      name: 'CINÉPOLIS',
-      color: 'border-blue-500/40 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20',
-      tag: 'Global Cinema Network',
-      description: 'Menghadirkan kenyamanan nobar film Piye To Kih di seluruh studio Cinépolis.',
-      cinemas: CITIES_DATA.flatMap(city =>
-        city.cinemas
-          .filter(c => c.chain.toUpperCase().includes('CINEPOLIS') || c.chain.toUpperCase().includes('CINÉPOLIS'))
-          .map(c => ({ ...c, cityName: city.name, dateStr: city.dateStr, slug: city.slug }))
-      ),
-    },
-    {
-      id: 'tixid',
-      name: 'TIX ID',
-      color: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20',
-      tag: 'Official Ticketing Partner',
-      description: 'Pesan tiket bioskop resmi film Piye To Kih secara praktis melalui aplikasi TIX ID.',
-      cinemas: [
-        {
-          name: 'Aplikasi TIX ID (Seluruh Indonesia)',
-          chain: 'TIX ID',
-          studio: 'Semua Jaringan Partner',
-          cityName: 'Nasional (17 Kota)',
-          dateStr: 'Mulai 19 November 2026',
-          slug: 'semarang',
-        },
-      ],
-    },
-  ];
-
-  const currentBrandData = cinemaBrands.find(b => b.id === activeCinemaModal);
-
   return (
     <footer className="w-full border-t border-white/10 bg-[#070B12] text-slate-300 relative z-20">
-      {/* 1. CINEMA PARTNERS BRAND STRIP (PINDAH KE FOOTER SESUAI GAMBAR 1) */}
-      <div className="border-b border-white/10 bg-black/60 backdrop-blur-md py-6 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-5 text-center lg:text-left">
-          {/* Label Title */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold shrink-0 shadow-sm">
-              <Film className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center justify-center lg:justify-start gap-2">
-                <span className="text-[11px] text-amber-400 font-black uppercase tracking-widest">
-                  27+ LOKASI PENAYANGAN RESMI
-                </span>
-              </div>
-              <span className="text-xs font-bold text-slate-300 block">
-                KLIK LOGO BIOSKOP UNTUK MELIHAT DAFTAR LOKASI STUDIO
-              </span>
-            </div>
-          </div>
-
-          {/* Cinema Buttons with Pop-Up Trigger */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-            {cinemaBrands.map(brand => (
-              <button
-                key={brand.id}
-                type="button"
-                onClick={() => setActiveCinemaModal(brand.id)}
-                className={`px-4 py-2 rounded-xl border font-black text-xs tracking-wider transition-all duration-200 shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5 ${brand.color}`}
-              >
-                <span>{brand.name}</span>
-                <span className="text-[10px] opacity-70">▾</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Social Media Link Pill (Instagram / Utama) */}
-          <div className="shrink-0">
-            {activeSocials.instagram && (
-              <a
-                href={activeSocials.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-amber-300 transition text-xs font-bold shadow-sm"
-              >
-                <svg className="w-4 h-4 fill-current text-pink-400" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-                <span>@piyetokihfilm.official</span>
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 2. MAIN FOOTER CONTENT & SOCIAL MEDIA CHANNELS */}
+      {/* MAIN FOOTER CONTENT & SOCIAL MEDIA CHANNELS */}
       <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center text-center md:text-left mb-8 pb-8 border-b border-white/5">
           {/* Brand Info */}
@@ -182,7 +65,7 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
             </p>
           </div>
 
-          {/* Quick Roadshow & Voucher Info */}
+          {/* Quick Roadshow Info */}
           <div className="text-center">
             <span className="text-[10px] font-black tracking-widest text-amber-400 uppercase block mb-1">
               TUR ROADSHOW &amp; MEET &amp; GREET
@@ -196,12 +79,12 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
                 className="inline-flex items-center gap-1.5 text-xs text-amber-300 hover:text-amber-200 font-bold underline underline-offset-4"
               >
                 <Ticket className="w-3.5 h-3.5" />
-                <span>Lihat Jadwal 17 Kota &amp; Klaim Code Verifikasi</span>
+                <span>Lihat Jadwal 17 Kota &amp; Detail Acara</span>
               </Link>
             </div>
           </div>
 
-          {/* Social Media Channel Icons (Instagram, TikTok, Fanspage, YouTube) */}
+          {/* Social Media Channel Icons */}
           <div className="flex flex-col items-center md:items-end">
             <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase block mb-2.5">
               OFFICIAL SOCIAL MEDIA
@@ -270,97 +153,13 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
           </div>
         </div>
 
-        {/* Production Credits */}
-        <div className="text-center space-y-3">
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-extrabold text-slate-300 text-xs tracking-wider">
-            <span>PRODUKSI: MIRACLE PICTURES</span>
-            <span>•</span>
-            <span>SUTRADARA: ITO MAVIN</span>
-            <span>•</span>
-            <span>PENULIS: ENDIK KOESWOYO</span>
-            <span>•</span>
-            <span>CAST: HERI CHANDRA • DARA SARASVATI • SUTRISNO AGUNG • EKO DUNUNG</span>
-          </div>
-
-          <p className="text-slate-500 text-[11px]">
-            © 2026 Miracle Pictures. All Rights Reserved. Film Bioskop Komedi Nasional &quot;PIYE TO KIH?&quot;.
+        {/* Legal Copyright per client revision */}
+        <div className="text-center pt-2">
+          <p className="text-slate-500 text-xs tracking-wider">
+            © 2026 PT Miracle Sinema Indonesia. Seluruh hak cipta dilindungi undang-undang.
           </p>
         </div>
       </div>
-
-      {/* 3. POP-UP MODAL: DAFTAR LOKASI BIOSKOP PER BRAND */}
-      {currentBrandData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg bg-[#0F1626] border border-amber-500/40 rounded-3xl p-6 sm:p-7 shadow-2xl max-h-[85vh] flex flex-col">
-            {/* Close Button */}
-            <button
-              onClick={() => setActiveCinemaModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Modal Header */}
-            <div className="mb-4 pr-8">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-black uppercase mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>{currentBrandData.tag}</span>
-              </div>
-              <h3 className="text-2xl font-black text-white">
-                Daftar Studio {currentBrandData.name}
-              </h3>
-              <p className="text-xs text-slate-300 mt-1">
-                {currentBrandData.description}
-              </p>
-            </div>
-
-            {/* Cinema List Scrollable */}
-            <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 my-2">
-              {currentBrandData.cinemas.map((cinema, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-2xl bg-black/50 border border-white/10 hover:border-amber-500/40 transition flex items-center justify-between gap-3"
-                >
-                  <div>
-                    <span className="block text-xs font-black text-white">
-                      {cinema.name}
-                    </span>
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
-                      <span>{cinema.cityName}</span>
-                      <span>•</span>
-                      <span>{cinema.studio}</span>
-                    </span>
-                  </div>
-
-                  <Link
-                    href={`/city/${cinema.slug}`}
-                    onClick={() => setActiveCinemaModal(null)}
-                    className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] transition flex items-center gap-1"
-                  >
-                    <span>Cek Jadwal</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                </div>
-              ))}
-            </div>
-
-            {/* Modal Footnote */}
-            <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <span className="text-[11px]">
-                Total 27+ Layar Bioskop di 17 Kota Roadshow
-              </span>
-              <button
-                type="button"
-                onClick={() => setActiveCinemaModal(null)}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition"
-              >
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </footer>
   );
 }

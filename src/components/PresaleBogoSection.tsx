@@ -27,8 +27,8 @@ export default function PresaleBogoSection() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const [tixidUrl, setTixidUrl] = useState('https://www.tix.id');
-  const [mtixUrl, setMtixUrl] = useState('https://m.21cineplex.com');
+  const [tixidUrl, setTixidUrl] = useState('https://rb.gy/l28pzj');
+  const [mtixUrl, setMtixUrl] = useState('https://m.21cineplex.com/id/movies/16PTKH');
 
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -82,7 +82,7 @@ export default function PresaleBogoSection() {
       trackCityCustomEvent(city, 'BogoReminder', { name, phone });
 
       setSuccessMsg(
-        `Terima kasih ${name}! Pengingat berhasil dipasang. Kami akan otomatis menghubungi Anda via WhatsApp & Email pada 15 November 2026 saat presale Buy 1 Get 1 resmi dibuka.`
+        `Terima kasih ${name}! Pengingat berhasil dipasang. Kami akan mengabari Anda via WhatsApp & Email saat tiket dan promonya sudah resmi dibuka!`
       );
       setName('');
       setPhone('');
@@ -103,97 +103,79 @@ export default function PresaleBogoSection() {
       <div className="max-w-4xl mx-auto text-center">
         {/* TOP BADGE */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.04] border border-amber-400/25 text-amber-300 text-[11px] font-black tracking-[0.2em] uppercase mb-4 shadow-sm">
-          <Sparkles className="w-3 h-3 text-amber-400" />
-          <span>PROMO PRESALE RESMI BIOSKOP</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>PROMO PRESALE &amp; BUY 1 GET 1</span>
         </div>
 
-        {/* HEADLINE */}
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-white uppercase tracking-tight mb-3">
-          PRESALE BUY 1 GET 1 <br />
-          <span className="text-amber-400 font-serif font-black italic">
-            FILM PIYE TO KIH?
+        {/* REVISED HEADLINE */}
+        <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight mb-2">
+          MAU NONTON BERDUA <br className="hidden sm:inline" />
+          <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
+            BAYAR SATU TIKET? BISA!
           </span>
         </h2>
 
-        {/* PERIODE PENJUALAN & TAYANG PERDANA INFO BOX */}
-        <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-[#121217] border border-white/10 rounded-2xl px-6 py-3.5 mb-8 shadow-2xl">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-            <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Periode Pembelian: <b className="text-white font-bold">15 – 18 November 2026</b></span>
-          </div>
-          <span className="hidden sm:inline text-white/20">|</span>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-            <Film className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Penayangan Perdana: <b className="text-white font-bold">19 November 2026</b></span>
-          </div>
-        </div>
-
-        <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-          Amankan tiket nonton berdua hanya seharga 1 tiket! Kuota promo ini sangat terbatas dan terbagi resmi: <b className="text-slate-200">1.000 tiket di TIX ID</b> dan <b className="text-slate-200">500 tiket di M-TIX (XXI)</b>.
+        {/* REVISED SUBTITLE */}
+        <p className="text-sm sm:text-base text-amber-300 font-bold max-w-xl mx-auto mb-10 leading-relaxed">
+          Promonya terbatas banget Jadi jangan sampai kehabisan!
         </p>
 
         {/* 2 ACTION BUTTONS: TIX ID & M-TIX */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-14">
-          {/* Tombol 1: TIX ID (1.000 Kuota) */}
+          {/* Tombol 1: TIX ID */}
           <a
             href={tixidUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackMetaEvent('InitiateCheckout', { channel: 'TIX_ID', promo: 'BOGO' })}
-            className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black flex flex-col justify-between"
+            className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                  KUOTA 1.000 TIKET
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+                  TIX ID
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 font-mono">
-                  <Clock className="w-3 h-3 text-amber-400" />
-                  <span>Buka 15 Nov</span>
+                <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1 font-mono">
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span>Promo Terbatas</span>
                 </span>
               </div>
-              <h3 className="text-lg font-black text-white group-hover:text-amber-300 transition-colors">
-                Beli Presale di TIX ID
+              <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                Beli tiket Buy 1 Get 1 di TIX ID selama persediaan masih ada.
               </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Pesan tiket promo Buy 1 Get 1 di aplikasi TIX ID untuk seluruh studio partner.
-              </p>
             </div>
 
             <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
-              <span>Buka Aplikasi TIX ID</span>
+              <span>Beli di TIX ID</span>
               <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </a>
 
-          {/* Tombol 2: M-TIX (500 Kuota) */}
+          {/* Tombol 2: M-TIX (XXI) */}
           <a
             href={mtixUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackMetaEvent('InitiateCheckout', { channel: 'MTIX_XXI', promo: 'BOGO' })}
-            className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black flex flex-col justify-between"
+            className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                  KUOTA 500 TIKET
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                  M-TIX (XXI)
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 font-mono">
-                  <Clock className="w-3 h-3 text-amber-400" />
-                  <span>Buka 15 Nov</span>
+                <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1 font-mono">
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span>Promo Terbatas</span>
                 </span>
               </div>
-              <h3 className="text-lg font-black text-white group-hover:text-amber-300 transition-colors">
-                Beli Presale di M-TIX (XXI)
+              <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                Beli tiket Buy 1 Get 1 di M-TIX selama persediaan masih ada.
               </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Pesan tiket promo Buy 1 Get 1 di aplikasi resmi M-TIX Cinema XXI seluruh Indonesia.
-              </p>
             </div>
 
             <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
-              <span>Buka M-TIX Cinema XXI</span>
+              <span>Beli di M-TIX XXI</span>
               <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </a>
@@ -206,12 +188,25 @@ export default function PresaleBogoSection() {
               <Bell className="w-3.5 h-3.5 text-amber-400" />
               <span>PENGINGAT RESMI VIA WHATSAPP &amp; EMAIL</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
-              Pasang Pengingat War Presale
+            <h3 className="text-lg sm:text-2xl font-black text-white uppercase tracking-tight">
+              TIKET PRESALE DAN BUY 1 GET 1 BELUM TERSEDIA?
             </h3>
-            <p className="text-xs text-slate-400 mt-1.5 max-w-md mx-auto leading-relaxed">
-              Daftarkan kontak Anda di bawah. Server kami otomatis mengirimkan notifikasi langsung ke WhatsApp &amp; Email Anda saat kuota Buy 1 Get 1 dibuka <b>15 November 2026</b>.
+            <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-md mx-auto leading-relaxed">
+              Tenang, isi form di bawah ini dulu. Nanti kami kabari saat tiket dan promonya sudah resmi dibuka.
             </p>
+
+            {/* JADWAL DIBUKA */}
+            <div className="mt-4 p-3 rounded-2xl bg-black/50 border border-white/10 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs text-slate-300">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                <span>Presale dibuka: <strong className="text-white">15-18 November 2026</strong></span>
+              </span>
+              <span className="hidden sm:inline text-white/20">•</span>
+              <span className="flex items-center gap-1.5">
+                <Ticket className="w-3.5 h-3.5 text-red-400" />
+                <span>Buy 1 Get 1 dibuka: <strong className="text-white">19-20 November 2026</strong></span>
+              </span>
+            </div>
           </div>
 
           {errorMsg && (

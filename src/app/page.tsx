@@ -38,118 +38,109 @@ export default async function HomePage() {
   return (
     <div id="top" className="relative overflow-hidden min-h-screen">
       {/* 1. CINEMATIC HERO SPOTLIGHT SECTION */}
-      <section className="relative pt-16 pb-20 px-4 sm:px-6 overflow-hidden text-center">
-        <div className="max-w-4xl mx-auto">
-          {/* Film Studio Label */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-amber-400 text-[11px] font-black tracking-[0.25em] uppercase mb-5 shadow-sm">
-            <Film className="w-3.5 h-3.5 text-amber-400" />
-            <span>MIRACLE PICTURES MEMPERSEMBAHKAN</span>
+      <section className="relative pt-12 pb-16 px-4 sm:px-6 overflow-hidden text-center">
+        <div className="max-w-4xl mx-auto flex flex-col items-center">
+          {/* Miracle Pictures Studio Logo */}
+          <div className="mb-2">
+            <img
+              src="/logo-miracle-pictures.png"
+              alt="Miracle Pictures"
+              className="w-40 sm:w-48 h-auto object-contain mx-auto drop-shadow-md"
+            />
+            <p className="text-[11px] sm:text-xs font-black tracking-[0.35em] text-amber-400/90 uppercase mt-2">
+              MEMPERSEMBAHKAN
+            </p>
           </div>
 
           {/* Big Cinematic Movie Logotype Header */}
-          <div className="flex flex-col items-center justify-center my-3 sm:my-5">
+          <div className="flex flex-col items-center justify-center my-2 sm:my-3">
             <h1 className="sr-only">PIYE TO KIH? THE MOVIE</h1>
             <img
               src="/logo-ptk.png"
               alt="Logo Resmi Film PIYE TO KIH? THE MOVIE"
               className="w-72 sm:w-96 md:w-[480px] lg:w-[540px] max-w-full h-auto object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
             />
-            <div className="text-xs sm:text-sm font-black tracking-[0.35em] uppercase text-amber-400/90 mt-4 mb-4">
-              THE MOVIE
-            </div>
           </div>
 
-          {/* TAYANG PERDANA STRIP */}
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#121217] border border-white/10 shadow-2xl mb-6">
-            <div className="w-8 h-8 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center font-bold shrink-0">
-              <Film className="w-4 h-4" />
-            </div>
-            <div className="text-left">
-              <span className="text-[11px] sm:text-xs text-amber-300 font-extrabold uppercase tracking-widest block leading-tight">
-                TAYANG PERDANA 19 NOVEMBER 2026
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block leading-tight mt-0.5">
-                SERENTAK DI SELURUH JARINGAN BIOSKOP INDONESIA
-              </span>
-            </div>
+          {/* BERANGKAT KE BIOSKOP 19 NOVEMBER 2026 BOX */}
+          <div className="my-4 px-6 py-3.5 rounded-2xl bg-[#12141c] border border-amber-500/30 shadow-2xl text-center">
+            <span className="text-xs sm:text-sm text-amber-400 font-extrabold uppercase tracking-[0.25em] block leading-tight">
+              BERANGKAT KE BIOSKOP
+            </span>
+            <span className="text-sm sm:text-base font-black text-white block tracking-widest mt-1">
+              19 NOVEMBER 2026
+            </span>
           </div>
 
-          {/* Cinema Network Badges (Theatrical Authenticity) */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-            <span className="hover:text-amber-300 transition-colors">CINEMA XXI</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">CGV CINEMAS</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">CINÉPOLIS</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">TIX ID</span>
+          {/* SUTRADARA TEXT */}
+          <p className="text-xs sm:text-sm font-black tracking-[0.3em] uppercase text-slate-300 mb-6">
+            KARYA SUTRADARA ITO MAVIN
+          </p>
+
+          {/* CTA BUTTON KE BUY 1 GET 1 */}
+          <div className="flex justify-center">
+            <a
+              href="#presale"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all duration-200 active:scale-95"
+            >
+              <Ticket className="w-4 h-4" />
+              <span>PRESALE &amp; BELI 1 GRATIS 1</span>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* 2. SINOPSIS & KISAH FILM (GAMBAR 1: DIPINDAHKAN KE PALING ATAS) */}
+      {/* 2. SINOPSIS & KISAH FILM */}
       <MovieStorySection movieSettings={movieSettings || undefined} />
 
-      {/* 3. PRESALE BUY 1 GET 1 (BOGO) SECTION DENGAN 2 TOMBOL KUOTA & FORM REMINDER (15-18 NOV) */}
-      <PresaleBogoSection />
-
-      {/* 4. OFFICIAL TEASER TRAILER PLAYER (CINEMA EXPERIENCE) */}
+      {/* 3. OFFICIAL TEASER TRAILER PLAYER (DIPINDAHKAN KE BAWAH SINOPSIS SESUAI HALAMAN 5) */}
       <OfficialTrailerSection movieSettings={movieSettings || undefined} />
 
-      {/* 5. PEMERAN & KARAKTER RESMI (WOKO CHANNEL & DARA SARASVATI) */}
+      {/* 4. PRESALE BUY 1 GET 1 (BOGO) SECTION DENGAN KUOTA & REMINDER */}
+      <PresaleBogoSection />
+
+      {/* 5. PEMERAN & KARAKTER RESMI (14 CAST SESUAI HALAMAN 6) */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* RE-ENGAGEMENT CTA: Ajakan Elegan ke Roadshow & Presale */}
+      {/* 6. RE-ENGAGEMENT CTA (HALAMAN 7) */}
       <section className="py-16 px-4 text-center">
         <div className="max-w-3xl mx-auto p-8 sm:p-10 rounded-3xl border border-white/10 bg-[#101217] shadow-2xl space-y-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-amber-400">KUOTA TERBATAS BIOSKOP INDONESIA</p>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-white">Siap Tertawa Bareng Mukidi &amp; Woko Channel?</h3>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Daftarkan diri Anda untuk reminder War Presale Buy 1 Get 1 atau ikuti keseruan Roadshow &amp; Meet and Greet di 17 kota bioskop!
+          <h3 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Kalau Bisa Ketawa Bareng, Kenapa Harus Sendirian?
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Jangan sampai nonton sendirian. Ajak teman, keluarga, atau komunitasmu dan bersiap nonton PIYE TO KIH? di bioskop mulai 19 November 2026.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
             <a
               href="#presale"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#E5C158] text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/10 transition active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition active:scale-95"
             >
               <Ticket className="w-4 h-4" />
-              <span>PASANG REMINDER BUY 1 GET 1</span>
-            </a>
-            <a
-              href="#roadshow"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white font-bold text-xs uppercase tracking-wider transition active:scale-95"
-            >
-              <span>JADWAL ROADSHOW 17 KOTA</span>
+              <span>Pasang Pengingat Presale &amp; Buy 1 Get 1</span>
             </a>
           </div>
         </div>
       </section>
 
-      {/* 7. ROADSHOW 17 KOTA RESMI */}
+      {/* 7. ROADSHOW 17 KOTA RESMI (HALAMAN 8 & 9) */}
       <RoadshowSection />
 
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
       <ArticlesSection />
 
-      {/* THEATRICAL CREDITS BILLING BLOCK (A24 / Warner Bros Grade Authenticity) */}
+      {/* 9. THEATRICAL CREDITS BILLING BLOCK (CREDIT TITLE RESMI GAMBAR DARI DRIVE) */}
       <section className="py-12 px-4 border-t border-white/[0.06] bg-[#070709] text-center">
-        <div className="max-w-4xl mx-auto space-y-3">
-          <div className="billing-block text-[9px] sm:text-[10px] text-slate-500 max-w-3xl mx-auto leading-relaxed font-mono">
-            MIRACLE PICTURES PRESENTS &quot;PIYE TO KIH? THE MOVIE&quot; STARRING MUKIDI • SENTUN • PAK NO • PAK GALELO • DARA SARASVATI
-            <br />
-            DIRECTED BY ITO MAVIN • SCREENPLAY BY ENDIK KOESWOYO &amp; ITO MAVIN
-            <br />
-            EXECUTIVE PRODUCER MIRACLE PICTURES • SOUND DESIGN &amp; AUDIO POST INDONESIA • MUSIC SCORE BY MIRACLE AUDIO
-            <br />
-            DISTRIBUTED IN INDONESIA TO CINEMA XXI • CGV CINEMAS • CINÉPOLIS • ONLINE TICKETING VIA TIX ID
-          </div>
-          <p className="text-[10px] text-slate-600 tracking-wider uppercase font-semibold">
-            © 2026 PT MIRACLE SINEMA INDONESIA. SELURUH HAK CIPTA DILINDUNGI UNDANG-UNDANG.
-          </p>
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center">
+          <img
+            src="/credit-title.png"
+            alt="Billing Block Credit Title PIYE TO KIH?"
+            className="max-w-2xl sm:max-w-3xl w-full h-auto object-contain opacity-85 hover:opacity-100 transition-opacity drop-shadow-md"
+          />
         </div>
       </section>
 
-      {/* 9. FOOTER RESMI DENGAN MITRA BIOSKOP 27+ LOKASI & SOSMED */}
+      {/* 10. FOOTER RESMI */}
       <Footer />
     </div>
   );
