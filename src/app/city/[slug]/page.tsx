@@ -131,17 +131,6 @@ export default function CityRoadshowPage() {
             <span>Jadwal Penayangan &amp; Roadshow: <b>{city.dateStr}</b></span>
           </div>
 
-          {/* Cinema Network Badges (Theatrical Authenticity) */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-2">
-            <span className="hover:text-amber-300 transition-colors">CINEMA XXI</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">CGV CINEMAS</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">CINÉPOLIS</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">TIX ID</span>
-          </div>
-
           {/* RUNDOWN & JADWAL VENUE ROADSHOW KOTA */}
           {city.rundown && (
             <CityRundownSection rundown={city.rundown} cityName={city.name} />
