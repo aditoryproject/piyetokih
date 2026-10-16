@@ -102,13 +102,24 @@ export default async function CityRoadshowPage({ params }: Props) {
 
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           {/* Back Link */}
-          <div className="mb-6">
+          <div className="mb-5">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold transition"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span>Kembali ke Info Film Nasional</span>
+            </Link>
+          </div>
+
+          {/* Official Movie Logo (Compact & Linked) */}
+          <div className="mb-4 flex flex-col items-center">
+            <Link href="/" title="PIYE TO KIH? THE MOVIE" className="group inline-block">
+              <img
+                src="/logo-ptk.png"
+                alt="Logo Resmi PIYE TO KIH? THE MOVIE"
+                className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform duration-200"
+              />
             </Link>
           </div>
 
