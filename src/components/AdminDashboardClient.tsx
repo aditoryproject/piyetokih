@@ -4472,7 +4472,7 @@ export default function AdminDashboardClient() {
                         System Prompt: {PIYE_TO_KIH_AI_PERSONA.name}
                       </h3>
                       <p className="text-[11px] text-emerald-600 font-semibold">
-                        ✓ 100% Khusus War Voucher (Bebas Distraksi Roadshow)
+                        ✓ Lengkap 17 Kota, Tiket Nonton Duluan, Voucher Fisik &amp; Lead Closing BOGO 19 Nov
                       </p>
                     </div>
 
