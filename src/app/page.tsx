@@ -37,7 +37,7 @@ export default async function HomePage() {
 
   return (
     <div id="top" className="relative overflow-hidden min-h-screen">
-      {/* 1. CINEMATIC HERO SPOTLIGHT SECTION */}
+      {/* 1. CINEMATIC HERO SPOTLIGHT SECTION (LAYOUT PERSIS HALAMAN 2) */}
       <section className="relative pt-12 pb-16 px-4 sm:px-6 overflow-hidden text-center">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           {/* Miracle Pictures Studio Logo */}
@@ -62,28 +62,36 @@ export default async function HomePage() {
             />
           </div>
 
-          {/* BERANGKAT KE BIOSKOP 19 NOVEMBER 2026 BOX */}
-          <div className="my-4 px-6 py-3.5 rounded-2xl bg-[#12141c] border border-amber-500/30 shadow-2xl text-center">
-            <span className="text-xs sm:text-sm text-amber-400 font-extrabold uppercase tracking-[0.25em] block leading-tight">
+          {/* SUTRADARA TEXT */}
+          <p className="text-xs sm:text-sm font-black tracking-[0.25em] uppercase text-slate-300 mt-2 mb-1">
+            KARYA SUTRADARA <span className="text-white">ITO MAVIN</span>
+          </p>
+
+          {/* BERANGKAT KE BIOSKOP 19 NOVEMBER 2026 */}
+          <div className="my-2 text-center">
+            <span className="text-xs sm:text-sm text-white font-extrabold uppercase tracking-[0.25em] block leading-tight">
               BERANGKAT KE BIOSKOP
             </span>
-            <span className="text-sm sm:text-base font-black text-white block tracking-widest mt-1">
+            <span className="text-sm sm:text-lg font-black text-emerald-400 block tracking-widest mt-0.5">
               19 NOVEMBER 2026
             </span>
           </div>
 
-          {/* SUTRADARA TEXT */}
-          <p className="text-xs sm:text-sm font-black tracking-[0.3em] uppercase text-slate-300 mb-6">
-            KARYA SUTRADARA ITO MAVIN
-          </p>
+          {/* CREDIT TITLE IMAGE (DI HERO SESUAI HALAMAN 2) */}
+          <div className="my-3 max-w-2xl sm:max-w-3xl w-full flex justify-center">
+            <img
+              src="/credit-title.png"
+              alt="Billing Block Credit Title PIYE TO KIH?"
+              className="w-full h-auto object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-md"
+            />
+          </div>
 
           {/* CTA BUTTON KE BUY 1 GET 1 */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-2">
             <a
               href="#presale"
-              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all duration-200 active:scale-95"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all duration-200 active:scale-95"
             >
-              <Ticket className="w-4 h-4" />
               <span>PRESALE &amp; BELI 1 GRATIS 1</span>
             </a>
           </div>
@@ -129,18 +137,7 @@ export default async function HomePage() {
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
       <ArticlesSection />
 
-      {/* 9. THEATRICAL CREDITS BILLING BLOCK (CREDIT TITLE RESMI GAMBAR DARI DRIVE) */}
-      <section className="py-12 px-4 border-t border-white/[0.06] bg-[#070709] text-center">
-        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center">
-          <img
-            src="/credit-title.png"
-            alt="Billing Block Credit Title PIYE TO KIH?"
-            className="max-w-2xl sm:max-w-3xl w-full h-auto object-contain opacity-85 hover:opacity-100 transition-opacity drop-shadow-md"
-          />
-        </div>
-      </section>
-
-      {/* 10. FOOTER RESMI */}
+      {/* 9. FOOTER RESMI (CONTAINER DI ATASNYA SUDAH DIHAPUS SESUAI HALAMAN 9) */}
       <Footer />
     </div>
   );
