@@ -1,68 +1,69 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getCityBySlug } from '@/lib/cities';
-import { trackTicketIntent, trackCityCustomEvent } from '@/lib/pixel';
-import WarVoucherForm from '@/components/WarVoucherForm';
-import QuotaProgress from '@/components/QuotaProgress';
+import { getDb } from '@/lib/db';
 import CityRundownSection from '@/components/CityRundownSection';
 import OfficialTrailerSection from '@/components/OfficialTrailerSection';
 import MovieStorySection from '@/components/MovieStorySection';
 import CastSection from '@/components/CastSection';
+import QuotaProgress from '@/components/QuotaProgress';
+import WarVoucherForm from '@/components/WarVoucherForm';
+import CityCinemaList from '@/components/CityCinemaList';
 import Footer from '@/components/Footer';
-import {
-  Calendar,
-  Clock,
-  ExternalLink,
-  Film,
-  Users,
-  MapPin,
-  Ticket,
-  ChevronLeft,
-  Sparkles,
-} from 'lucide-react';
+import { Calendar, ChevronLeft, MapPin } from 'lucide-react';
 
-export default function CityRoadshowPage() {
-  const params = useParams();
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const city = getCityBySlug(slug || '');
-  const [customLinks, setCustomLinks] = useState<Record<string, string>>({});
-  const [movieSettings, setMovieSettings] = useState<any>(null);
-  const [quotaData, setQuotaData] = useState<{ totalQuota: number; remainingStock: number; claimedCount: number }>({
-    totalQuota: 500,
-    remainingStock: 500,
-    claimedCount: 0,
-  });
 
-  useEffect(() => {
-    if (city) {
-      trackCityCustomEvent(city.name, 'ViewCity', { province: city.province });
-    }
-  }, [city]);
+  if (!city) {
+    return {
+      title: 'Kota Tidak Ditemukan | PIYE TO KIH? THE MOVIE',
+    };
+  }
 
-  useEffect(() => {
-    fetch('/api/admin/settings')
-      .then(r => r.json())
-      .then(data => {
-        if (data.settings?.cityLinkOverrides) {
-          setCustomLinks(data.settings.cityLinkOverrides);
-        }
-        if (data.settings?.movieSettings) {
-          setMovieSettings(data.settings.movieSettings);
-        }
-        if (data.totalQuota !== undefined && data.remainingStock !== undefined) {
-          setQuotaData({
-            totalQuota: data.totalQuota,
-            remainingStock: data.remainingStock,
-            claimedCount: data.claimedCount || 0,
-          });
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const title = `PIYE TO KIH? Roadshow Kota ${city.name} - Jadwal & Penayangan Bioskop`;
+  const description = `Jadwal resmi roadshow, temu pemain, dan penayangan film bioskop PIYE TO KIH? di Kota ${city.name} (${city.dateStr}). Cek rundown acara dan amankan tiket presale!`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'website',
+      locale: 'id_ID',
+      url: `https://piyetokihfilm.com/city/${city.slug}`,
+      siteName: 'PIYE TO KIH? THE MOVIE',
+      title,
+      description,
+      images: [
+        {
+          url: 'https://piyetokihfilm.com/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: `PIYE TO KIH? Roadshow Kota ${city.name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['https://piyetokihfilm.com/og-image.jpg'],
+    },
+  };
+}
+
+export default async function CityRoadshowPage({ params }: Props) {
+  const { slug } = await params;
+  const city = getCityBySlug(slug || '');
 
   if (!city) {
     return (
@@ -80,14 +81,16 @@ export default function CityRoadshowPage() {
     );
   }
 
-  const handleTicketClick = (cinemaName: string, url: string) => {
-    trackTicketIntent(city.name, cinemaName, url);
-  };
+  const db = getDb();
+  const movieSettings = db.settings.movieSettings;
+  const customLinks = db.settings.cityLinkOverrides || {};
+  const currentClaimed = db.leads.length;
+  const remainingStock = Math.max(0, db.settings.totalQuota - currentClaimed);
 
   return (
     <div className="relative min-h-screen">
       {/* 1. CITY ROADSHOW HERO */}
-      <section className="relative pt-10 pb-16 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-10 pb-12 px-4 sm:px-6 overflow-hidden">
         {/* Glow Ambient */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[450px] bg-red-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
 
@@ -126,9 +129,11 @@ export default function CityRoadshowPage() {
           </div>
 
           {/* Date & Location Pill */}
-          <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200 bg-black/60 px-5 py-2 rounded-full border border-white/10 mb-6 shadow-md">
+          <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200 bg-black/60 px-5 py-2 rounded-full border border-white/10 mb-2 shadow-md">
             <Calendar className="w-4 h-4 text-amber-400" />
-            <span>Jadwal Penayangan &amp; Roadshow: <b>{city.dateStr}</b></span>
+            <span>
+              Jadwal Penayangan &amp; Roadshow: <b>{city.dateStr}</b>
+            </span>
           </div>
 
           {/* RUNDOWN & JADWAL VENUE ROADSHOW KOTA */}
@@ -138,108 +143,40 @@ export default function CityRoadshowPage() {
         </div>
       </section>
 
-      {/* 2. SINOPSIS & KISAH FILM (POSTER VERTIKAL DI SAMPING SINOPSIS PERSIS SEPERTI DI MAIN PAGE) */}
+      {/* 2. SINOPSIS & KISAH FILM */}
       <MovieStorySection movieSettings={movieSettings || undefined} />
 
-      {/* 3. OFFICIAL TEASER TRAILER PLAYER (PERSIS SEPERTI DI MAIN PAGE) */}
+      {/* 3. OFFICIAL TEASER TRAILER PLAYER */}
       <OfficialTrailerSection movieSettings={movieSettings || undefined} cityContext={city.name} />
 
       {/* 4. FORM VOUCHER & KUOTA ROADSHOW PER KOTA */}
       <section id="form-voucher" className="py-12 px-4 sm:px-6">
         <div className="max-w-xl mx-auto mb-8">
           <QuotaProgress
-            totalQuota={quotaData.totalQuota}
-            remainingStock={quotaData.remainingStock}
+            totalQuota={db.settings.totalQuota}
+            remainingStock={remainingStock}
             cityName={city.name}
           />
         </div>
 
         {/* FORM KLAIM CODE VERIFIKASI RESMI KHUSUS KOTA INI */}
         <div className="max-w-xl mx-auto mb-16">
-          <WarVoucherForm
-            defaultCity={city.name}
-            onSuccessClaim={(remaining) => {
-              setQuotaData(prev => ({
-                ...prev,
-                remainingStock: remaining,
-                claimedCount: prev.claimedCount + 1,
-              }));
-            }}
-          />
+          <WarVoucherForm defaultCity={city.name} />
         </div>
 
         {/* LIST BIOSKOP DI KOTA INI (PRESALE TICKET DIRECT BUY) */}
-        <div id="bioskop" className="max-w-2xl mx-auto text-left mb-16">
-          <div className="text-center mb-8">
-            <span className="text-xs font-black uppercase tracking-widest text-amber-400">PRESALE TIKET RESMI BIOSKOP</span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white uppercase mt-1">Pilih Bioskop di Kota {city.name}</h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto">
-              Pilih bioskop mitra di bawah ini untuk memesan tiket presale resmi dan mengamankan nomor kursi studio Anda sebelum kehabisan.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {city.cinemas.map((cinema, idx) => {
-              const overrideKey = `${city.slug}_${idx}`;
-              const targetUrl = customLinks[overrideKey] || cinema.ticketUrl;
-
-              return (
-                <div
-                  key={idx}
-                  className="bg-gradient-to-b from-[#182133] to-[#0E1522] border border-white/15 hover:border-amber-500/40 rounded-3xl p-6 shadow-xl transition-all"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="px-3 py-1 rounded-lg bg-black/70 border border-white/10 text-xs font-black text-amber-400 uppercase tracking-wider">
-                      {cinema.chain}
-                    </span>
-                    <span className="text-xs text-slate-400 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{cinema.seats} Kursi ({cinema.studio})</span>
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-black text-white mb-2">
-                    {cinema.name}
-                  </h3>
-
-                  <div className="flex items-center gap-2 text-xs text-slate-300 mb-5 flex-wrap">
-                    <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span className="text-slate-400">Jam Tayang:</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {cinema.showTimes.map((st, sIdx) => (
-                        <span
-                          key={sIdx}
-                          className="bg-black/60 px-2.5 py-1 rounded-md font-mono font-bold text-amber-300 text-xs border border-white/10"
-                        >
-                          {st}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Direct CTA Button with Pixel AddToCart */}
-                  <a
-                    href={targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => handleTicketClick(cinema.name, targetUrl)}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 hover:text-white font-black text-sm py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-95 group"
-                  >
-                    <Ticket className="w-4 h-4" />
-                    <span>BELI TIKET PRESALE {cinema.chain.toUpperCase()}</span>
-                    <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <CityCinemaList
+          cityName={city.name}
+          slug={city.slug}
+          cinemas={city.cinemas}
+          customLinks={customLinks}
+        />
       </section>
 
-      {/* 5. CAST & PEMERAN WOKO CHANNEL (GLOBAL INHERITANCE) */}
+      {/* 5. CAST & PEMERAN WOKO CHANNEL (SERVER RENDERED DARI DATABASE) */}
       <CastSection castList={movieSettings?.cast} />
 
-      {/* 6. FOOTER RESMI DENGAN MITRA BIOSKOP 27+ LOKASI & SOSMED */}
+      {/* 6. FOOTER RESMI DENGAN MITRA BIOSKOP & SOSMED */}
       <Footer />
     </div>
   );

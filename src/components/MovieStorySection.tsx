@@ -26,11 +26,11 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
     }
   }, [propSettings]);
 
-  const initialPoster = movieSettings.posterUrl || '/kabar-galeri-hero.jpg';
+  const initialPoster = movieSettings.posterUrl || '/official-poster.jpg';
   const [currentPoster, setCurrentPoster] = useState(initialPoster);
 
   useEffect(() => {
-    setCurrentPoster(movieSettings.posterUrl || '/kabar-galeri-hero.jpg');
+    setCurrentPoster(movieSettings.posterUrl || '/official-poster.jpg');
   }, [movieSettings]);
 
   const directorName = movieSettings.director || 'Ito Mavin';
@@ -53,8 +53,8 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
                 src={currentPoster}
                 alt="Poster Film Piye To Kih Miracle Pictures"
                 onError={() => {
-                  if (currentPoster !== '/kabar-galeri-hero.jpg') {
-                    setCurrentPoster('/kabar-galeri-hero.jpg');
+                  if (currentPoster !== '/official-poster.jpg') {
+                    setCurrentPoster('/official-poster.jpg');
                   }
                 }}
                 className="w-full h-auto min-h-[480px] object-cover group-hover:scale-105 transition-transform duration-700"
