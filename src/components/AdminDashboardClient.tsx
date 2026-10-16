@@ -3869,35 +3869,80 @@ export default function AdminDashboardClient() {
                   />
                 </div>
 
-                {/* 4. LINK TIKET SPESIFIK PER BIOSKOP MITRA */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-                  <div>
-                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
-                      4. Link Tiket Khusus Per Bioskop Mitra (Opsional)
-                    </label>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Jika dikosongkan, kartu bioskop akan menggunakan link tiket utama di atas.
-                    </p>
+                {/* 4. LINK TIKET SPESIFIK PER BIOSKOP MITRA & TOMBOL HALAMAN UTAMA */}
+                <div className="bg-amber-500/5 border-2 border-amber-400/30 rounded-2xl p-5 space-y-4 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-900 font-black text-[10px] uppercase tracking-wider mb-1">
+                        <Sparkles className="w-3 h-3 text-amber-600" />
+                        <span>Tautan Tombol Landing Page &amp; Halaman Promo</span>
+                      </div>
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                        Link Tombol Beli Tiket BOGO (TIX ID &amp; M-TIX Cinema XXI)
+                      </h4>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Ubah tautan ini untuk mengganti tujuan link pada 2 tombol promo Buy 1 Get 1 di <b>Halaman Utama</b> dan <b>halaman /bogo</b>.
+                      </p>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
+                    {/* TIX ID */}
+                    <div className="bg-white border border-slate-300 rounded-xl p-3.5 space-y-2 shadow-sm">
                       <div className="flex items-center justify-between">
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                          Cinema XXI / m.tix URL:
+                        <label className="block text-[11px] font-black text-slate-900 uppercase">
+                          🎟️ Link Tombol TIX ID:
+                        </label>
+                        {settings.bogoCinemaLinks?.tixid && (
+                          <a
+                            href={settings.bogoCinemaLinks.tixid}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-emerald-600 hover:underline flex items-center gap-0.5 font-bold"
+                          >
+                            <span>Test Buka</span>
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500">
+                        Dipakai di tombol: <i>&quot;Beli tiket Buy 1 Get 1 di TIX ID selama persediaan masih ada&quot;</i>
+                      </p>
+                      <input
+                        type="url"
+                        value={settings.bogoCinemaLinks?.tixid || ''}
+                        onChange={e =>
+                          setSettings({
+                            ...settings,
+                            bogoCinemaLinks: { ...settings.bogoCinemaLinks, tixid: e.target.value },
+                          })
+                        }
+                        placeholder="Contoh: https://rb.gy/l28pzj atau https://www.tix.id"
+                        className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none font-mono"
+                      />
+                    </div>
+
+                    {/* M-TIX XXI */}
+                    <div className="bg-white border border-slate-300 rounded-xl p-3.5 space-y-2 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-black text-slate-900 uppercase">
+                          🎟️ Link Tombol M-TIX (Cinema XXI):
                         </label>
                         {settings.bogoCinemaLinks?.xxi && (
                           <a
                             href={settings.bogoCinemaLinks.xxi}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5 font-bold"
                           >
-                            <span>Buka</span>
+                            <span>Test Buka</span>
                             <ExternalLink className="w-2.5 h-2.5" />
                           </a>
                         )}
                       </div>
+                      <p className="text-[10px] text-slate-500">
+                        Dipakai di tombol: <i>&quot;Beli tiket Buy 1 Get 1 di M-TIX selama persediaan masih ada&quot;</i>
+                      </p>
                       <input
                         type="url"
                         value={settings.bogoCinemaLinks?.xxi || ''}
@@ -3907,22 +3952,23 @@ export default function AdminDashboardClient() {
                             bogoCinemaLinks: { ...settings.bogoCinemaLinks, xxi: e.target.value },
                           })
                         }
-                        placeholder="Contoh: https://m.21cineplex.com"
-                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
+                        placeholder="Contoh: https://m.21cineplex.com/id/movies/16PTKH"
+                        className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none font-mono"
                       />
                     </div>
 
-                    <div className="space-y-1.5">
+                    {/* CGV (Opsional untuk /bogo) */}
+                    <div className="space-y-1.5 pt-2 border-t border-slate-200 md:border-t-0">
                       <div className="flex items-center justify-between">
                         <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                          CGV Cinemas URL:
+                          CGV Cinemas URL (Khusus Halaman /bogo):
                         </label>
                         {settings.bogoCinemaLinks?.cgv && (
                           <a
                             href={settings.bogoCinemaLinks.cgv}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                            className="text-[10px] text-slate-600 hover:underline flex items-center gap-0.5"
                           >
                             <span>Buka</span>
                             <ExternalLink className="w-2.5 h-2.5" />
@@ -3943,17 +3989,18 @@ export default function AdminDashboardClient() {
                       />
                     </div>
 
-                    <div className="space-y-1.5">
+                    {/* Cinepolis (Opsional untuk /bogo) */}
+                    <div className="space-y-1.5 pt-2 border-t border-slate-200 md:border-t-0">
                       <div className="flex items-center justify-between">
                         <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                          Cinépolis Cinemas URL:
+                          Cinépolis URL (Khusus Halaman /bogo):
                         </label>
                         {settings.bogoCinemaLinks?.cinepolis && (
                           <a
                             href={settings.bogoCinemaLinks.cinepolis}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
+                            className="text-[10px] text-slate-600 hover:underline flex items-center gap-0.5"
                           >
                             <span>Buka</span>
                             <ExternalLink className="w-2.5 h-2.5" />
@@ -3970,37 +4017,6 @@ export default function AdminDashboardClient() {
                           })
                         }
                         placeholder="Contoh: https://cinepolis.co.id"
-                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
-                          TIX ID Official Partner URL:
-                        </label>
-                        {settings.bogoCinemaLinks?.tixid && (
-                          <a
-                            href={settings.bogoCinemaLinks.tixid}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5"
-                          >
-                            <span>Buka</span>
-                            <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                        )}
-                      </div>
-                      <input
-                        type="url"
-                        value={settings.bogoCinemaLinks?.tixid || ''}
-                        onChange={e =>
-                          setSettings({
-                            ...settings,
-                            bogoCinemaLinks: { ...settings.bogoCinemaLinks, tixid: e.target.value },
-                          })
-                        }
-                        placeholder="Contoh: https://www.tix.id"
                         className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none font-mono"
                       />
                     </div>
