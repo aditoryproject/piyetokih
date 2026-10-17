@@ -37,51 +37,51 @@ export default async function HomePage() {
 
   return (
     <div id="top" className="relative overflow-hidden min-h-screen">
-      {/* 1. CINEMATIC HERO SPOTLIGHT SECTION (LAYOUT PERSIS HALAMAN 2) */}
-      <section className="relative pt-12 pb-16 px-4 sm:px-6 overflow-hidden text-center">
+      {/* 1. CINEMATIC HERO SPOTLIGHT SECTION (COMPACT & PROPORTIONAL) */}
+      <section className="relative pt-8 sm:pt-12 pb-12 px-4 sm:px-6 overflow-hidden text-center">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           {/* Miracle Pictures Studio Logo */}
           <div className="mb-2">
             <img
               src="/logo-miracle-pictures.png"
               alt="Miracle Pictures"
-              className="w-40 sm:w-48 h-auto object-contain mx-auto drop-shadow-md"
+              className="w-28 sm:w-32 h-auto object-contain mx-auto drop-shadow-md"
             />
-            <p className="text-[11px] sm:text-xs font-black tracking-[0.35em] text-amber-400/90 uppercase mt-2">
+            <p className="text-[10px] sm:text-[11px] font-black tracking-[0.35em] text-amber-400/90 uppercase mt-1.5">
               MEMPERSEMBAHKAN
             </p>
           </div>
 
-          {/* Big Cinematic Movie Logotype Header */}
-          <div className="flex flex-col items-center justify-center my-2 sm:my-3">
+          {/* Compact Cinematic Movie Logotype Header */}
+          <div className="flex flex-col items-center justify-center my-1 sm:my-2">
             <h1 className="sr-only">PIYE TO KIH? THE MOVIE</h1>
             <img
               src="/logo-ptk.png"
               alt="Logo Resmi Film PIYE TO KIH? THE MOVIE"
-              className="w-72 sm:w-96 md:w-[480px] lg:w-[540px] max-w-full h-auto object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
+              className="w-48 sm:w-60 md:w-72 max-w-full h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
             />
           </div>
 
           {/* SUTRADARA TEXT */}
-          <p className="text-xs sm:text-sm font-black tracking-[0.25em] uppercase text-slate-300 mt-2 mb-1">
+          <p className="text-[11px] sm:text-xs font-black tracking-[0.25em] uppercase text-slate-300 mt-1 mb-1">
             KARYA SUTRADARA <span className="text-white">ITO MAVIN</span>
           </p>
 
           {/* BERANGKAT KE BIOSKOP 19 NOVEMBER 2026 */}
-          <div className="my-4 text-center">
-            <span className="text-sm sm:text-lg md:text-xl text-white font-extrabold uppercase tracking-[0.25em] block leading-tight">
+          <div className="my-3 text-center">
+            <span className="text-xs sm:text-base md:text-lg text-white font-extrabold uppercase tracking-[0.25em] block leading-tight">
               BERANGKAT KE BIOSKOP
             </span>
-            <span className="text-2xl sm:text-4xl md:text-5xl font-black text-emerald-400 block tracking-widest mt-1.5 drop-shadow-[0_4px_25px_rgba(52,211,153,0.35)]">
+            <span className="text-2xl sm:text-3xl md:text-4xl font-black text-amber-400 block tracking-widest mt-1 drop-shadow-[0_4px_25px_rgba(245,158,11,0.35)]">
               19 NOVEMBER 2026
             </span>
             {/* LSF 13+ SENSOR RATING BADGE */}
             {(movieSettings?.showLsfBadge ?? true) && (
-              <div className="inline-flex items-center gap-2 mt-3 px-3.5 py-1 rounded-full bg-slate-900/90 border border-red-500/30 shadow-lg shadow-red-950/20">
-                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[11px] tracking-wider uppercase">
+              <div className="inline-flex items-center gap-2 mt-2.5 px-3 py-0.5 rounded-full bg-slate-900/90 border border-red-500/30 shadow-lg shadow-red-950/20">
+                <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[10px] tracking-wider uppercase">
                   {movieSettings?.lsfRatingText || '13+'}
                 </span>
-                <span className="text-xs font-bold text-slate-300 tracking-wide uppercase">
+                <span className="text-[11px] font-bold text-slate-300 tracking-wide uppercase">
                   Lulus Sensor LSF • 13+
                 </span>
               </div>
@@ -89,7 +89,7 @@ export default async function HomePage() {
           </div>
 
           {/* CREDIT TITLE IMAGE (DI HERO SESUAI HALAMAN 2) */}
-          <div className="my-3 max-w-2xl sm:max-w-3xl w-full flex justify-center">
+          <div className="my-2 max-w-xl sm:max-w-2xl w-full flex justify-center">
             <img
               src="/credit-title.png"
               alt="Billing Block Credit Title PIYE TO KIH?"
@@ -97,13 +97,19 @@ export default async function HomePage() {
             />
           </div>
 
-          {/* CTA BUTTON KE BUY 1 GET 1 */}
-          <div className="flex justify-center mt-2">
+          {/* DUAL CTA BUTTONS SESUAI REVISI SUTRADARA (HALAMAN 4) */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-3 w-full sm:w-auto">
             <a
               href="#presale"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all duration-200 active:scale-95"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all duration-200 active:scale-95"
             >
               <span>PRESALE &amp; BELI 1 GRATIS 1</span>
+            </a>
+            <a
+              href="#roadshow"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
+            >
+              <span>JADWAL ROADSHOW &amp; NONTON DULUAN</span>
             </a>
           </div>
         </div>
@@ -148,48 +154,7 @@ export default async function HomePage() {
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
       <ArticlesSection />
 
-      {/* 9. SIGN-OFF CINEMATIC LOCKUP PER PAK SUTRADARA (TENGAH BAWAH MAIN PAGE) */}
-      <section className="py-12 sm:py-16 px-4 text-center border-t border-white/5 bg-gradient-to-b from-transparent to-[#070B12]/80">
-        <div className="max-w-md mx-auto flex flex-col items-center space-y-3">
-          {/* Production House */}
-          <div className="flex flex-col items-center">
-            <span className="text-[11px] sm:text-xs font-black tracking-[0.3em] uppercase text-white/90">
-              MIRACLE PICTURES
-            </span>
-            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 italic tracking-wider mt-0.5">
-              Mempersembahkan
-            </span>
-          </div>
-
-          {/* Logo Film PIYE TO KIH (Compact & Visible) */}
-          <div className="py-1">
-            <Link href="#top" title="Kembali ke atas" className="inline-block group">
-              <img
-                src="/logo-ptk.png"
-                alt="Logo Resmi PIYE TO KIH?"
-                className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform"
-              />
-            </Link>
-          </div>
-
-          {/* Karya Sutradara */}
-          <p className="text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase text-slate-300">
-            Karya Sutradara <span className="text-white font-black">Ito Mavin</span>
-          </p>
-
-          {/* Berangkat ke Bioskop 19 November 2026 */}
-          <div className="pt-2">
-            <span className="text-xs sm:text-sm font-black tracking-[0.25em] text-white uppercase block leading-tight">
-              BERANGKAT KE BIOSKOP
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-amber-400 block tracking-widest mt-1 drop-shadow-[0_2px_15px_rgba(245,158,11,0.3)]">
-              19 NOVEMBER 2026
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* 10. FOOTER RESMI */}
+      {/* 9. FOOTER RESMI */}
       <Footer />
     </div>
   );

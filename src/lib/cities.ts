@@ -68,7 +68,6 @@ export const CITIES_DATA: CityData[] = [
           category: 'Sekolah',
           title: 'MAMPIR KE SEKOLAH',
           venue: 'SMA Negeri 15 Semarang',
-          note: 'Seru-seruan dan foto bareng pemain, doorprize, bagi-bagi merchandise, serta booth voucher fisik.',
           isVoucherExchange: true,
         },
         {
@@ -76,7 +75,6 @@ export const CITIES_DATA: CityData[] = [
           category: 'Kampus',
           title: 'NGOBROL BARENG DI KAMPUS',
           venue: 'UNNES (Universitas Negeri Semarang)',
-          note: 'Seru-seruan dan foto bareng pemain, doorprize, bagi-bagi merchandise, serta booth voucher fisik.',
           isVoucherExchange: true,
         },
         {
@@ -84,7 +82,6 @@ export const CITIES_DATA: CityData[] = [
           category: 'Radio',
           title: 'INTERVIEW RADIO',
           venue: 'Jateng Radio FM',
-          note: 'Live on-air bareng cast film PIYE TO KIH?',
         },
         {
           time: '15.30 WIB',
@@ -96,9 +93,9 @@ export const CITIES_DATA: CityData[] = [
         {
           time: '16.00 – 17.00 WIB',
           category: 'Mall & Meet',
-          title: 'MEET & GREET MALL + BOOTH VOUCHER',
+          title: 'MEET & GREET MALL',
           venue: 'The Park Mall Semarang — Lantai 2',
-          note: 'Temu tawa, foto bareng pemain, doorprize, merchandise resmi, serta bayar & ambil Voucher Fisik.',
+          note: 'seru-seruan dan foto bareng pemain, doorprize, dan bagi-bagi merchandise, booth voucher fisik.',
           isVoucherExchange: true,
         },
         {

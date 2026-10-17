@@ -216,7 +216,7 @@ export default function WarVoucherForm({
           {/* Step 4 */}
           <div className="bg-[#181f2c] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-center items-center">
             <span className="font-mono text-xs font-bold text-amber-400 mb-1">04</span>
-            <span className="text-[11px] font-bold text-white uppercase leading-tight">BAYAR &amp; AMBIL</span>
+            <span className="text-[11px] font-bold text-white uppercase leading-tight">DAPATKAN</span>
             <span className="text-[9.5px] text-slate-400 mt-0.5">Voucher Fisik</span>
           </div>
 

@@ -78,9 +78,6 @@ export default function CastSection({ castList: propCast }: CastSectionProps) {
               FILM &quot;PIYE TO KIH?&quot;
             </span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto mt-2 leading-relaxed">
-            Reuni akbar tawa para punggawa <b className="text-amber-400">Woko Channel</b> di bioskop bersama aktris berbakat tanah air.
-          </p>
         </div>
 
         {/* Cards Grid: 14 Cast Members in Clean Cinematic Cards */}
