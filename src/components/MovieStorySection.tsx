@@ -49,23 +49,20 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
           {/* Left Column: Clean Visual Poster with Sensor Classification Badge */}
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-black shadow-amber-500/20 group">
-              <picture>
-                <source srcSet="/official-poster.webp" type="image/webp" />
-                <img
-                  src={currentPoster}
-                  alt="Poster Film Piye To Kih Miracle Pictures"
-                  loading="lazy"
-                  decoding="async"
-                  width={600}
-                  height={900}
-                  onError={() => {
-                    if (currentPoster !== '/official-poster.jpg') {
-                      setCurrentPoster('/official-poster.jpg');
-                    }
-                  }}
-                  className="w-full h-auto min-h-[480px] object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </picture>
+              <img
+                src={currentPoster}
+                alt="Poster Film Piye To Kih Miracle Pictures"
+                loading="lazy"
+                decoding="async"
+                width={600}
+                height={900}
+                onError={() => {
+                  if (currentPoster !== '/official-poster.jpg') {
+                    setCurrentPoster('/official-poster.jpg');
+                  }
+                }}
+                className="w-full h-auto min-h-[480px] object-cover group-hover:scale-105 transition-transform duration-700"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
 
               {/* Kualifikasi Sensor LSF (Dapat diaktifkan lewat Dashboard jika sudah resmi) */}
