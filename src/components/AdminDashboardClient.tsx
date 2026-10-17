@@ -4557,15 +4557,128 @@ export default function AdminDashboardClient() {
 
               {/* Script Asisten Chat & Custom AI Tool */}
               <div className="space-y-6">
-                {/* 1. Custom AI Tool Configuration */}
+                {/* Banner Panduan 4 Isian Wahnotif */}
+                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                  <div>
+                    <h4 className="font-extrabold text-sm text-amber-950 flex items-center gap-1.5">
+                      <span>🤖 4 Isian Wajib di Wahnotif (AI CS Assistant)</span>
+                    </h4>
+                    <p className="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                      Di panel Wahnotif menu <b>AI CS Assistant &gt; Persona &amp; Knowledge</b>, isi 4 kolom di bawah ini. Cukup klik tombol <b>Salin</b> di masing-masing kartu lalu paste ke Wahnotif.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href="/api/wahnotif/persona"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Buka JSON Auto-Sync API</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Grid 3 Isian Pendek: Nama, Role, Tone */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* 1. Nama Bot */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">1. Nama Bot / Asisten</span>
+                        <button
+                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.botName, 'prompt')}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>Salin</span>
+                        </button>
+                      </div>
+                      <p className="text-xs font-black text-slate-900 mt-2">{PIYE_TO_KIH_AI_PERSONA.botName}</p>
+                    </div>
+                    <p className="text-[10px] text-slate-400">Tempel di field: <b>Bot Name / Nama Asisten</b></p>
+                  </div>
+
+                  {/* 2. Role / Peran */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">2. Peran / Role Identity</span>
+                        <button
+                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.role, 'prompt')}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>Salin</span>
+                        </button>
+                      </div>
+                      <p className="text-xs font-semibold text-slate-800 mt-2 leading-snug">{PIYE_TO_KIH_AI_PERSONA.role}</p>
+                    </div>
+                    <p className="text-[10px] text-slate-400">Tempel di field: <b>Role / Peran Utama</b></p>
+                  </div>
+
+                  {/* 3. Tone of Voice */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">3. Tone of Voice</span>
+                        <button
+                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.tone, 'prompt')}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>Salin</span>
+                        </button>
+                      </div>
+                      <p className="text-xs text-slate-700 mt-2 leading-snug">{PIYE_TO_KIH_AI_PERSONA.tone}</p>
+                    </div>
+                    <p className="text-[10px] text-slate-400">Tempel di field: <b>Tone of Voice / Karakter Bicara</b></p>
+                  </div>
+                </div>
+
+                {/* 4. System Prompt & Knowledge Base A-Z */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div>
-                      <h3 className="text-sm font-black text-slate-900">
-                        Skema Custom AI Tool Wahnotif
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-black text-[10px] uppercase">Isian 4</span>
+                        <h3 className="text-sm font-black text-slate-900">
+                          System Prompt &amp; Knowledge Base (A–Z Terintegrasi)
+                        </h3>
+                      </div>
+                      <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">
+                        ✓ Filter Jadwal 17 Kota, Deteksi Tanggal Roadshow Expired vs Tayang Serentak 19 Nov, Tiket Bioskop &amp; Voucher Booth
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.systemPrompt, 'prompt')}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition shadow-sm"
+                    >
+                      <Copy className="w-4 h-4" />
+                      <span>{copiedPrompt ? 'Tersalin ke Clipboard!' : 'Salin System Prompt Lengkap'}</span>
+                    </button>
+                  </div>
+
+                  <textarea
+                    readOnly
+                    value={PIYE_TO_KIH_AI_PERSONA.systemPrompt}
+                    rows={12}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-slate-700 text-xs font-mono outline-none leading-relaxed"
+                  />
+                </div>
+
+                {/* 5. Custom AI Tool Configuration (claim_war_voucher) */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                        <span>⚡ Skema Custom AI Tool:</span>
+                        <span className="font-mono text-amber-600">claim_war_voucher</span>
                       </h3>
-                      <p className="text-[11px] text-slate-500">
-                        Menu Wahnotif: <b>AI CS Assistant &gt; Custom AI Tools</b>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Menu Wahnotif: <b>AI CS Assistant &gt; Custom AI Tools</b> (Hubungkan Webhook)
                       </p>
                     </div>
 
@@ -4582,41 +4695,38 @@ export default function AdminDashboardClient() {
                   </div>
 
                   <p className="text-xs text-slate-600">
-                    Daftarkan nama tool <b>claim_war_voucher</b> di Wahnotif agar AI otomatis menembak webhook ketika penonton memberikan Nama, WA, Email, dan Kota.
+                    Tool ini otomatis dieksekusi oleh AI saat penonton memberikan <b>Nama, No WhatsApp, Email, dan Kota</b> di chat. Webhook langsung menerbitkan kode booking resmi ber-barcode dan menyimpannya ke database dashboard secara otomatis.
                   </p>
 
-                  <pre className="bg-slate-900 text-slate-200 p-3 rounded-xl text-[10px] font-mono overflow-x-auto max-h-36">
-                    {JSON.stringify(WAHNOTIF_TOOL_SCHEMA, null, 2)}
-                  </pre>
-                </div>
-
-                {/* 2. System Prompt Asisten War Voucher */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                    <div>
-                      <h3 className="text-sm font-black text-slate-900">
-                        System Prompt: {PIYE_TO_KIH_AI_PERSONA.name}
-                      </h3>
-                      <p className="text-[11px] text-emerald-600 font-semibold">
-                        ✓ Lengkap 17 Kota, Tiket Nonton Duluan, Voucher Fisik &amp; Lead Closing BOGO 19 Nov
-                      </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Target Webhook URL</span>
+                      <div className="flex items-center justify-between gap-2">
+                        <code className="text-xs font-mono font-bold text-slate-800 truncate">
+                          {siteOrigin ? `${siteOrigin}/api/webhook/wahnotif` : 'https://piyetokihfilm.com/api/webhook/wahnotif'}
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard(`${siteOrigin || 'https://piyetokihfilm.com'}/api/webhook/wahnotif`, 'webhook')}
+                          className="shrink-0 p-1.5 rounded bg-white hover:bg-slate-200 border border-slate-300 text-slate-700 transition"
+                          title="Salin Webhook URL"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.systemPrompt, 'prompt')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shadow-sm"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{copiedPrompt ? 'Tersalin!' : 'Salin Prompt AI'}</span>
-                    </button>
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">HTTP Method &amp; Action</span>
+                      <div className="text-xs font-bold text-emerald-700 flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-emerald-100 font-mono text-[11px]">POST</span>
+                        <span>Auto Create Lead + Return Voucher Ticket</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <textarea
-                    readOnly
-                    value={PIYE_TO_KIH_AI_PERSONA.systemPrompt}
-                    rows={10}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-700 text-xs font-mono outline-none leading-relaxed"
-                  />
+                  <pre className="bg-slate-900 text-slate-200 p-3.5 rounded-xl text-[10px] font-mono overflow-x-auto max-h-40 mt-2">
+                    {JSON.stringify(WAHNOTIF_TOOL_SCHEMA, null, 2)}
+                  </pre>
                 </div>
               </div>
             </div>
