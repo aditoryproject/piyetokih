@@ -9,17 +9,24 @@ interface FooterProps {
     facebook?: string;
     youtube?: string;
   };
+  initialSocialLinks?: {
+    instagram?: string;
+    tiktok?: string;
+    facebook?: string;
+    youtube?: string;
+  };
 }
 
-export default function Footer({ socialLinksOverride }: FooterProps) {
+export default function Footer({ socialLinksOverride, initialSocialLinks }: FooterProps) {
   const [socialLinks, setSocialLinks] = useState({
-    instagram: 'https://www.instagram.com/piyetokihfilm.official/',
-    tiktok: 'https://www.tiktok.com/@piyetokihfilm.official',
-    facebook: 'https://www.facebook.com/piyetokihfilm.official',
-    youtube: 'https://www.youtube.com/@piyetokihfilm',
+    instagram: initialSocialLinks?.instagram || 'https://www.instagram.com/piyetokihfilm.official/',
+    tiktok: initialSocialLinks?.tiktok || 'https://www.tiktok.com/@piyetokihfilm.official',
+    facebook: initialSocialLinks?.facebook || 'https://www.facebook.com/piyetokihfilm.official',
+    youtube: initialSocialLinks?.youtube || 'https://www.youtube.com/@piyetokihfilm',
   });
 
   useEffect(() => {
+    if (initialSocialLinks) return; // Do not fetch if already provided by SSR
     fetch('/api/admin/settings')
       .then(r => r.json())
       .then(data => {
@@ -31,7 +38,7 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [initialSocialLinks]);
 
   const activeSocials = {
     ...socialLinks,

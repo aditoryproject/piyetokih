@@ -47,18 +47,18 @@ export default function CastSection({ castList: propCast }: CastSectionProps) {
   const [castList, setCastList] = useState<MovieCastMember[]>(propCast || FALLBACK_CAST);
 
   useEffect(() => {
-    if (propCast && propCast.length > 0) {
-      setCastList(propCast);
-    } else {
-      fetch('/api/admin/settings')
-        .then(r => r.json())
-        .then(data => {
-          if (data.settings?.movieSettings?.cast && data.settings.movieSettings.cast.length > 0) {
-            setCastList(data.settings.movieSettings.cast);
-          }
-        })
-        .catch(() => {});
+    if (propCast) {
+      if (propCast.length > 0) setCastList(propCast);
+      return;
     }
+    fetch('/api/admin/settings')
+      .then(r => r.json())
+      .then(data => {
+        if (data.settings?.movieSettings?.cast && data.settings.movieSettings.cast.length > 0) {
+          setCastList(data.settings.movieSettings.cast);
+        }
+      })
+      .catch(() => {});
   }, [propCast]);
   return (
     <section id="cast" className="relative py-20 px-4 sm:px-6 overflow-hidden">

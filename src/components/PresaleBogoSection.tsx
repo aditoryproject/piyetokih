@@ -16,7 +16,14 @@ import {
 } from 'lucide-react';
 import { trackCityCustomEvent, trackMetaEvent } from '@/lib/pixel';
 
-export default function PresaleBogoSection() {
+interface PresaleBogoSectionProps {
+  initialCinemaLinks?: {
+    tixid?: string;
+    xxi?: string;
+  };
+}
+
+export default function PresaleBogoSection({ initialCinemaLinks }: PresaleBogoSectionProps = {}) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -27,10 +34,11 @@ export default function PresaleBogoSection() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const [tixidUrl, setTixidUrl] = useState('https://rb.gy/l28pzj');
-  const [mtixUrl, setMtixUrl] = useState('https://m.21cineplex.com/id/movies/16PTKH');
+  const [tixidUrl, setTixidUrl] = useState(initialCinemaLinks?.tixid || 'https://rb.gy/l28pzj');
+  const [mtixUrl, setMtixUrl] = useState(initialCinemaLinks?.xxi || 'https://m.21cineplex.com/id/movies/16PTKH');
 
   useEffect(() => {
+    if (initialCinemaLinks) return; // Do not fetch if already provided by SSR
     fetch('/api/admin/settings')
       .then(r => r.json())
       .then(d => {
@@ -38,7 +46,7 @@ export default function PresaleBogoSection() {
         if (d.settings?.bogoCinemaLinks?.xxi) setMtixUrl(d.settings.bogoCinemaLinks.xxi);
       })
       .catch(() => {});
-  }, []);
+  }, [initialCinemaLinks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

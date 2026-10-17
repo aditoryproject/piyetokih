@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb } from '@/lib/db';
+import { revalidatePath } from 'next/cache';
 
 export async function GET() {
   const db = getDb();
@@ -86,6 +87,10 @@ export async function POST(req: NextRequest) {
     }
 
     saveDb(db);
+    try {
+      revalidatePath('/');
+      revalidatePath('/city/[slug]', 'page');
+    } catch {}
     return NextResponse.json({ success: true, settings: db.settings });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
