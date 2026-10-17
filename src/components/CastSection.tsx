@@ -92,6 +92,10 @@ export default function CastSection({ castList: propCast }: CastSectionProps) {
                 <img
                   src={cast.photoUrl}
                   alt={`${cast.actorName} - ${cast.characterName}`}
+                  loading="lazy"
+                  decoding="async"
+                  width={300}
+                  height={375}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e17] via-transparent to-transparent" />

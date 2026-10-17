@@ -135,11 +135,18 @@ export default async function CityRoadshowPage({ params }: Props) {
           {/* Official Movie Logo (Compact & Linked) */}
           <div className="mb-4 flex flex-col items-center">
             <Link href="/" title="PIYE TO KIH? THE MOVIE" className="group inline-block">
-              <img
-                src="/logo-ptk.png"
-                alt="Logo Resmi PIYE TO KIH? THE MOVIE"
-                className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform duration-200"
-              />
+              <picture>
+                <source srcSet="/logo-ptk.webp" type="image/webp" />
+                <img
+                  src="/logo-ptk.png"
+                  alt="Logo Resmi PIYE TO KIH? THE MOVIE"
+                  width={320}
+                  height={201}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform duration-200"
+                />
+              </picture>
             </Link>
           </div>
 

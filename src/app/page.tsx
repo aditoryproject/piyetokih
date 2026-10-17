@@ -42,11 +42,18 @@ export default async function HomePage() {
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           {/* Miracle Pictures Studio Logo */}
           <div className="mb-2">
-            <img
-              src="/logo-miracle-pictures.png"
-              alt="Miracle Pictures"
-              className="w-28 sm:w-32 h-auto object-contain mx-auto drop-shadow-md"
-            />
+            <picture>
+              <source srcSet="/logo-miracle-pictures.webp" type="image/webp" />
+              <img
+                src="/logo-miracle-pictures.png"
+                alt="Miracle Pictures"
+                width={256}
+                height={61}
+                fetchPriority="high"
+                decoding="async"
+                className="w-28 sm:w-32 h-auto object-contain mx-auto drop-shadow-md"
+              />
+            </picture>
             <p className="text-[10px] sm:text-[11px] font-black tracking-[0.35em] text-amber-400/90 uppercase mt-1.5">
               MEMPERSEMBAHKAN
             </p>
@@ -55,11 +62,18 @@ export default async function HomePage() {
           {/* Compact Cinematic Movie Logotype Header */}
           <div className="flex flex-col items-center justify-center my-1 sm:my-2">
             <h1 className="sr-only">PIYE TO KIH? THE MOVIE</h1>
-            <img
-              src="/logo-ptk.png"
-              alt="Logo Resmi Film PIYE TO KIH? THE MOVIE"
-              className="w-48 sm:w-60 md:w-72 max-w-full h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
-            />
+            <picture>
+              <source srcSet="/logo-ptk.webp" type="image/webp" />
+              <img
+                src="/logo-ptk.png"
+                alt="Logo Resmi Film PIYE TO KIH? THE MOVIE"
+                width={480}
+                height={302}
+                fetchPriority="high"
+                decoding="async"
+                className="w-48 sm:w-60 md:w-72 max-w-full h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
+              />
+            </picture>
           </div>
 
           {/* SUTRADARA TEXT */}
@@ -90,11 +104,18 @@ export default async function HomePage() {
 
           {/* CREDIT TITLE IMAGE (DI HERO SESUAI HALAMAN 2) */}
           <div className="my-2 max-w-xl sm:max-w-2xl w-full flex justify-center">
-            <img
-              src="/credit-title.png"
-              alt="Billing Block Credit Title PIYE TO KIH?"
-              className="w-full h-auto object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-md"
-            />
+            <picture>
+              <source srcSet="/credit-title.webp" type="image/webp" />
+              <img
+                src="/credit-title.png"
+                alt="Billing Block Credit Title PIYE TO KIH?"
+                width={1024}
+                height={144}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto object-contain opacity-90 hover:opacity-100 transition-opacity drop-shadow-md"
+              />
+            </picture>
           </div>
 
           {/* DUAL CTA BUTTONS SESUAI REVISI SUTRADARA (HALAMAN 4) */}

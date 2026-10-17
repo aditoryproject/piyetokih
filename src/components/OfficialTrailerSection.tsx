@@ -109,6 +109,10 @@ export default function OfficialTrailerSection({ movieSettings: propSettings, ci
             <img
               src={currentBackdrop}
               alt="Teaser Film Piye To Kih Miracle Pictures"
+              loading="lazy"
+              decoding="async"
+              width={1280}
+              height={720}
               onError={() => {
                 if (ytThumb && currentBackdrop !== ytThumb) {
                   setCurrentBackdrop(ytThumb);

@@ -80,6 +80,10 @@ export default function ArticlesSection() {
                   <img
                     src={article.coverImage}
                     alt={article.title}
+                    loading="lazy"
+                    decoding="async"
+                    width={480}
+                    height={300}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -171,6 +175,10 @@ export default function ArticlesSection() {
                   <img
                     src={photo}
                     alt={`Dokumentasi Roadshow ${pIdx + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

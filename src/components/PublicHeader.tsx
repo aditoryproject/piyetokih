@@ -20,11 +20,18 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
     <header className="sticky top-0 z-40 bg-[#0B0F17]/95 backdrop-blur-md border-b border-white/10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-1" title="Website Resmi Film PIYE TO KIH? - Miracle Pictures">
-          <img
-            src="/logo-ptk.png"
-            alt="Logo Resmi Film PIYE TO KIH?"
-            className="h-9 sm:h-11 w-auto max-w-[130px] sm:max-w-[150px] object-contain drop-shadow-md group-hover:scale-105 transition-transform"
-          />
+          <picture>
+            <source srcSet="/logo-ptk.webp" type="image/webp" />
+            <img
+              src="/logo-ptk.png"
+              alt="Logo Resmi Film PIYE TO KIH?"
+              width={140}
+              height={44}
+              fetchPriority="high"
+              decoding="async"
+              className="h-9 sm:h-11 w-auto max-w-[130px] sm:max-w-[150px] object-contain drop-shadow-md group-hover:scale-105 transition-transform"
+            />
+          </picture>
           <div className="leading-tight hidden sm:block border-l border-white/15 pl-2.5">
             <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
               Website Resmi Film

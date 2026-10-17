@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false, // Security: Hide technology fingerprint
+  compress: true, // Gzip / Deflate compression
   images: {
     unoptimized: true,
   },
@@ -10,6 +11,16 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        // Long-term immutable caching for static assets (images, fonts, favicons)
+        source: '/:all*(svg|jpg|jpeg|png|webp|ico|woff|woff2|ttf)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         source: '/(.*)',
         headers: [
