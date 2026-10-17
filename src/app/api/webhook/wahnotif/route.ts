@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb, saveDb, generateVoucherSerial, LeadRecord } from '@/lib/db';
+import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
+import { CITIES_DATA } from '@/lib/cities';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,8 +30,8 @@ export async function GET(req: NextRequest) {
     message: 'Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant.',
     name: 'generate_voucher_presale',
     tool_name: 'generate_voucher_presale',
-    title: 'Registrasi Presale & Nonton Duluan Piye Toh Kih',
-    description: 'Menghasilkan Code Booking verifikasi resmi dan link e-tiket voucher nonton duluan film Piye Toh Kih untuk penonton yang chat di WhatsApp. Sistem otomatis mencatat lead dan mengirimkan data tiket.',
+    title: 'Registrasi Tiket & Pengingat Promo Piye Toh Kih',
+    description: 'Mendaftarkan penonton ke sistem database resmi: (1) Untuk kota non-roadshow (Bandung, Medan, dll) atau permintaan BOGO, sistem otomatis mendaftarkan ke Pengingat Prioritas Promo Buy 1 Get 1 Bioskop 19 November (tanpa kode booking mall). (2) Untuk 17 kota roadshow (Semarang, Solo, Jogja, dll), sistem menerbitkan Kode Booking penukaran voucher fisik di booth mall.',
     url: `${effectiveOrigin}/api/webhook/wahnotif`,
     webhook_url: `${effectiveOrigin}/api/webhook/wahnotif`,
     method: 'POST',
@@ -50,20 +51,23 @@ export async function GET(req: NextRequest) {
         },
         city: {
           type: 'string',
-          description: 'Nama kota pilihan roadshow (contoh: Semarang, Yogyakarta, Solo, Surabaya, Malang, Kudus, Purwokerto, Tegal, Magelang, Salatiga, Klaten, Mojokerto, Kediri, Sidoarjo, Jember, Madiun, Jakarta)',
+          description: 'Nama kota pilihan penonton (contoh: Bandung, Semarang, Yogyakarta, Solo, Surabaya, Malang, Kudus, Jakarta, Medan, dll.)',
         },
         email: {
           type: 'string',
-          description: 'Alamat email aktif calon penonton (opsional, jika penonton ingin dikirimi tiket via email)',
+          description: 'Alamat email aktif calon penonton (opsional)',
+        },
+        type: {
+          type: 'string',
+          description: "Jenis pendaftaran: 'bogo' untuk Pengingat Promo Buy 1 Get 1 Bioskop 19 Nov, atau 'roadshow' untuk voucher fisik booth roadshow 17 kota.",
         },
       },
       required: ['phone', 'city'],
     },
-    // Compatible array format for OpenAPI / OpenAI Function Calling schemas
     tools: [
       {
         name: 'generate_voucher_presale',
-        description: 'Generate Code Booking verifikasi resmi dan link e-tiket voucher nonton duluan film Piye Toh Kih.',
+        description: 'Mendaftarkan calon penonton untuk Pengingat Promo Buy 1 Get 1 (Non-Roadshow) atau Voucher Fisik Roadshow (17 Kota).',
         url: `${effectiveOrigin}/api/webhook/wahnotif`,
         method: 'POST',
         parameters: {
@@ -71,8 +75,9 @@ export async function GET(req: NextRequest) {
           properties: {
             name: { type: 'string', description: 'Nama lengkap calon penonton' },
             phone: { type: 'string', description: 'Nomor WhatsApp calon penonton' },
-            city: { type: 'string', description: 'Nama kota roadshow pilihan penonton' },
+            city: { type: 'string', description: 'Nama kota penonton' },
             email: { type: 'string', description: 'Alamat email aktif (opsional)' },
+            type: { type: 'string', description: "Jenis: 'bogo' (reminder BOGO 19 Nov) atau 'roadshow' (voucher fisik mall 17 kota)" },
           },
           required: ['phone', 'city'],
         },
@@ -114,12 +119,84 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const db = getDb();
-    const validityText = db.settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
-    
-    // Check if phone already registered
     const cleanPhone = String(phone).replace(/[^0-9]/g, '');
-    const existing = db.leads.find(l => l.phone.replace(/[^0-9]/g, '').endsWith(cleanPhone.slice(-9)));
+    const normalizedCity = String(cityLocation).toLowerCase().trim();
+
+    // Find if the city is one of the 17 Roadshow Cities
+    const roadshowCity = CITIES_DATA.find(c => {
+      const cName = c.name.toLowerCase();
+      const cSlug = c.slug.toLowerCase();
+      return (
+        normalizedCity === cName ||
+        normalizedCity === cSlug ||
+        normalizedCity.includes(cName) ||
+        cName.includes(normalizedCity)
+      );
+    });
+
+    const isExplicitBogo =
+      args.type === 'bogo' ||
+      args.type === 'reminder' ||
+      args.is_bogo === true ||
+      args.reminder === true ||
+      args.intent === 'bogo' ||
+      args.intent === 'reminder';
+
+    // A city is a roadshow booking ONLY if it's in CITIES_DATA AND not explicitly a BOGO reminder
+    const isRoadshowBooking = Boolean(roadshowCity) && !isExplicitBogo;
+
+    const db = getDb();
+
+    // =========================================================================
+    // SCENARIO 1: NON-ROADSHOW CITY (BANDUNG, MEDAN, BALI, DLL) ATAU REMINDER BOGO
+    // =========================================================================
+    if (!isRoadshowBooking) {
+      // Check if phone already registered in bogoReminders
+      const existingReminder = db.bogoReminders.find(r =>
+        r.phone.replace(/[^0-9]/g, '').endsWith(cleanPhone.slice(-9))
+      );
+
+      if (!existingReminder) {
+        const newReminder: BogoReminderRecord = {
+          id: `bogo-wa-${Date.now()}`,
+          name: String(name),
+          phone: String(phone),
+          email: String(email),
+          city: String(cityLocation),
+          registeredAt: new Date().toISOString(),
+          reminderStatus: 'pending',
+          whatsappSentAt: new Date().toISOString(),
+        };
+        db.bogoReminders.unshift(newReminder);
+        saveDb(db);
+      }
+
+      return NextResponse.json(
+        {
+          status: 'success',
+          success: true,
+          action: 'bogo_reminder_registered',
+          category: 'pengingat_promo_bogo',
+          name,
+          city: cityLocation,
+          phone,
+          replyMessage: `🎬 *PENDAFTARAN PENGINGAT BUY 1 GET 1 BERHASIL!* 🎬\n\nNama: *${name}*\nKota Bioskop: *${cityLocation}*\nNo. WhatsApp: *${phone}*\n\nStatus: *Terdaftar di Notifikasi Prioritas Promo Presale Buy 1 Get 1 (BOGO)* 🍿\n\n📌 *INFORMASI PENAYANGAN RESMI:*\n• Tanggal Tayang Serentak: *19 NOVEMBER 2026*\n• Lokasi: Seluruh bioskop XXI, CGV, Cinépolis, dan mitra bioskop resmi di Kota ${cityLocation}.\n\n⚠️ *PENTING DIBACA:*\n1. Di Kota *${cityLocation}* *TIDAK ADA event roadshow* dan *TIDAK ADA voucher fisik* yang harus ditukar di mall.\n2. Tiket promo Buy 1 Get 1 bisa dibeli langsung melalui aplikasi resmi bioskop (M-TIX / CGV / TIX ID) saat penjualan tiket dibuka.\n3. Sistem WhatsApp kami akan otomatis mengirimkan pesan pengingat ke nomor kamu begitu penjualan presale promo dibuka di kotamu! 🎟️`,
+          instructions_for_ai: `Sampaikan ucapan terima kasih kepada ${name}. Konfirmasikan bahwa nomornya (${phone}) sudah RESMI TERDAFTAR dalam sistem Pengingat Prioritas Promo BUY 1 GET 1 untuk penayangan bioskop di Kota ${cityLocation} mulai 19 NOVEMBER 2026.\n\nPERINGATAN KERAS UNTUK AI (JANGAN SALAH):\n1. JANGAN memberikan link voucher atau kode booking penukaran tiket!\n2. JANGAN sebutkan ada booth penukaran voucher fisik di mall!\n3. JANGAN sebutkan ada acara roadshow atau meet & greet di Kota ${cityLocation}, karena di Kota ${cityLocation} TIDAK ADA acara roadshow.\n4. Jelaskan bahwa film tayang serentak mulai 19 NOVEMBER 2026 di bioskop kotanya (XXI/CGV/Cinépolis), dan sistem kami akan mengirimkan pesan pengingat via WhatsApp ke nomor ini saat tiket promo presale dibuka di aplikasi bioskop.`,
+        },
+        { status: 200, headers: corsHeaders }
+      );
+    }
+
+    // =========================================================================
+    // SCENARIO 2: 17 KOTA ROADSHOW (SEMARANG, JOGJA, SOLO, KUDUS, SURABAYA, DLL)
+    // =========================================================================
+    const matchedCity = roadshowCity!;
+    const validityText = db.settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
+
+    // Check if phone already registered in leads
+    const existingLead = db.leads.find(l =>
+      l.phone.replace(/[^0-9]/g, '').endsWith(cleanPhone.slice(-9))
+    );
 
     let serialNumber = '';
     let voucherUrl = '';
@@ -128,13 +205,13 @@ export async function POST(req: NextRequest) {
       ? 'https://piyetokihfilm.com'
       : rawOrigin;
 
-    if (existing) {
-      serialNumber = existing.serialNumber;
+    if (existingLead) {
+      serialNumber = existingLead.serialNumber;
       voucherUrl = `${origin}/voucher/${serialNumber}`;
     } else {
       serialNumber = generateVoucherSerial();
       voucherUrl = `${origin}/voucher/${serialNumber}`;
-      
+
       const newLead: LeadRecord = {
         id: `lead-wa-${Date.now()}`,
         serialNumber,
@@ -146,17 +223,16 @@ export async function POST(req: NextRequest) {
         pdfUrl: voucherUrl,
         whatsappStatus: 'sent',
         emailStatus: 'pending',
-        cityLocation: String(cityLocation),
+        cityLocation: String(matchedCity.name),
       };
 
-      // If user provided a real email during chat, send email confirmation
       if (email && !email.endsWith('@whatsapp.user') && email.includes('@')) {
         try {
           const emRes = await sendVoucherEmail({
             name: String(name),
             email: String(email),
             serialNumber,
-            city: String(cityLocation),
+            city: String(matchedCity.name),
             voucherUrl,
             validDatesText: validityText,
           });
@@ -171,19 +247,26 @@ export async function POST(req: NextRequest) {
       saveDb(db);
     }
 
-    // Response tailored for Wahnotif Custom AI Tool execution and standard webhooks
+    const boothVenue = matchedCity.boothInfo?.venue || `Mall Roadshow Resmi ${matchedCity.name}`;
+    const boothFloor = matchedCity.boothInfo?.floor || 'Ground Floor';
+    const boothTime = matchedCity.boothInfo?.timeStr || '16.00 – 18.00 WIB';
+
     return NextResponse.json(
       {
         status: 'success',
         success: true,
-        action: 'voucher_generated',
+        action: 'roadshow_voucher_generated',
+        category: 'voucher_roadshow',
         name,
-        city: cityLocation,
+        city: matchedCity.name,
         serialNumber,
         voucherUrl,
-        validDates: validityText,
-        replyMessage: `🎬 *CODE VERIFIKASI RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota Roadshow: *${cityLocation}*\nCode Verifikasi: *${serialNumber}*\n\nBuka & simpan / download PDF tiket kamu di sini:\n${voucherUrl}\n\n⚠️ *KETENTUAN PENUKARAN VOUCHER FISIK:*\nCode ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi penayangan bioskop dilakukan pada saat Roadshow & Meet and Greet di kotamu.\n📍 Lokasi Penukaran: Kunjungi booth resmi di samping venue/panggung Meet and Greet Kota ${cityLocation}! Sampai jumpa lur! 🍿`,
-        instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa Code Verifikasi resmi film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Code ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa code ini bukan bukti pembayaran tiket, penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet Kota ${cityLocation} dengan mengunjungi booth resmi di samping venue/panggung Meet and Greet.`,
+        boothVenue,
+        boothFloor,
+        boothTime,
+        dateStr: matchedCity.dateStr,
+        replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota Roadshow: *${matchedCity.name}*\nTanggal Roadshow: *${matchedCity.dateStr}*\nKode Booking: *${serialNumber}*\n\nBuka & simpan link tiket kamu di sini:\n${voucherUrl}\n\n📍 *LOKASI PENUKARAN VOUCHER FISIK RP10.000:*\n• Tempat: *${boothVenue}*\n• Lokasi: *${boothFloor}*\n• Waktu: *${boothTime}*\n\n⚠️ *KETENTUAN:* Kode ini adalah tanda bukti untuk mengambil voucher fisik resmi di booth roadshow mall. Sampai jumpa lur! 🍿`,
+        instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa Kode Booking resmi untuk Roadshow Kota ${matchedCity.name} sudah aktif dengan Kode ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa penukaran voucher fisik resmi Rp10.000 dilakukan di booth resmi ${boothVenue} (${boothFloor}) pada tanggal ${matchedCity.dateStr} jam ${boothTime}.`,
       },
       {
         status: 200,
