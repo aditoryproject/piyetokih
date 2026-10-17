@@ -103,9 +103,12 @@ export default function CastSection({ castList: propCast }: CastSectionProps) {
                   {cast.actorName}
                 </h3>
                 <span className="text-[11px] sm:text-xs font-semibold text-amber-400/90 mt-0.5 block">
-                  {cast.characterName && cast.characterName !== 'Pemeran' && cast.characterName !== 'Pemeran Film'
-                    ? `sebagai ${cast.characterName}`
-                    : 'Pemeran Film'}
+                  {(() => {
+                    const raw = cast.characterName || '';
+                    if (!raw || raw === 'Pemeran' || raw === 'Pemeran Film') return 'Pemeran Film';
+                    const cleaned = raw.replace(/Pak\s*Ndut\s*\/?\s*/gi, '').trim() || 'Gendut';
+                    return `sebagai ${cleaned}`;
+                  })()}
                 </span>
               </div>
             </div>

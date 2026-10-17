@@ -1101,21 +1101,21 @@ export default function KabarGaleriHub({
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <a
-                  href={`mailto:${kabarGaleriSettings?.mediaCenter?.prContactEmail || 'press@piyetokihfilm.com'}`}
+                  href={`mailto:${kabarGaleriSettings?.mediaKitContactEmail || kabarGaleriSettings?.mediaCenter?.prContactEmail || 'press@piyetokihfilm.com'}`}
                   className="inline-flex items-center gap-1 font-bold text-amber-900 hover:underline"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>{kabarGaleriSettings?.mediaCenter?.prContactEmail || 'press@piyetokihfilm.com'}</span>
+                  <span>{kabarGaleriSettings?.mediaKitContactEmail || kabarGaleriSettings?.mediaCenter?.prContactEmail || 'press@piyetokihfilm.com'}</span>
                 </a>
-                {kabarGaleriSettings?.mediaCenter?.prContactPhone && (
+                {(kabarGaleriSettings?.mediaKitContactWa || kabarGaleriSettings?.mediaCenter?.prContactPhone) && (
                   <a
-                    href={`https://wa.me/${kabarGaleriSettings.mediaCenter.prContactPhone.replace(/[^0-9]/g, '')}`}
+                    href={`https://wa.me/${(kabarGaleriSettings.mediaKitContactWa || kabarGaleriSettings.mediaCenter?.prContactPhone || '').replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 font-bold text-emerald-800 hover:underline"
                   >
                     <Phone className="w-3.5 h-3.5" />
-                    <span>{kabarGaleriSettings.mediaCenter.prContactPhone}</span>
+                    <span>{kabarGaleriSettings.mediaKitContactWa || kabarGaleriSettings.mediaCenter?.prContactPhone}</span>
                   </a>
                 )}
               </div>

@@ -86,12 +86,26 @@ export interface AppSettings {
 
 export interface KabarGaleriSettings {
   heroTaglineBadge?: string;
+  heroCategory?: string;
   heroQuote?: string;
   heroTitle?: string;
   heroExcerpt?: string;
   heroCoverImage?: string;
   heroCtaText?: string;
   heroCtaLink?: string;
+  mediaKitPosterUrl?: string;
+  mediaKitPressReleasePdfUrl?: string;
+  mediaKitStillsZipUrl?: string;
+  mediaKitFactSheetPdfUrl?: string;
+  mediaKitBtsZipUrl?: string;
+  mediaKitLogoPackZipUrl?: string;
+  mediaKitFilterInstagramUrl?: string;
+  mediaKitFilterTiktokUrl?: string;
+  mediaKitSoundtrackSpotifyUrl?: string;
+  mediaKitSoundtrackYoutubeUrl?: string;
+  mediaKitTrailerYoutubeUrl?: string;
+  mediaKitContactEmail?: string;
+  mediaKitContactWa?: string;
   mediaCenter?: {
     posterDownloadUrl?: string;
     pressReleasePdfUrl?: string;

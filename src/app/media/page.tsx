@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getDb } from '@/lib/db';
 import {
   Download,
   FileText,
@@ -25,7 +26,22 @@ export const metadata: Metadata = {
     'Pusat materi publikasi resmi film PIYE TO KIH? untuk rekan jurnalis dan media: unduh official poster hi-res, siaran pers PDF, production stills, BTS photos, fact sheet, cast headshots, dan brand assets.',
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function MediaCenterPage() {
+  const db = getDb();
+  const settings = db.settings.kabarGaleriSettings || {};
+  const posterUrl = settings.mediaKitPosterUrl || '/official-poster.jpg';
+  const prPdfUrl = settings.mediaKitPressReleasePdfUrl || '/PIYE_TO_KIH_Web_Developer_Guide_Kabar_dan_Galeri_v2.pdf';
+  const stillsUrl = settings.mediaKitStillsZipUrl || '/kabar-galeri?tab=galeri-foto';
+  const btsUrl = settings.mediaKitBtsZipUrl || '/kabar-galeri?tab=galeri-foto';
+  const factSheetUrl = settings.mediaKitFactSheetPdfUrl || '/#sinopsis';
+  const logoPackUrl = settings.mediaKitLogoPackZipUrl || '/logo-ptk.png';
+  const contactEmail = settings.mediaKitContactEmail || 'press@piyetokihfilm.com';
+  const contactWa = settings.mediaKitContactWa || '6281234567890';
+  const trailerUrl = settings.mediaKitTrailerYoutubeUrl || 'https://www.youtube.com/@piyetokihfilm';
+
   return (
     <div className="min-h-screen bg-[#0B0F17] text-slate-100 py-12 px-4 sm:px-6 antialiased">
       <div className="max-w-5xl mx-auto space-y-12">
@@ -93,7 +109,7 @@ export default function MediaCenterPage() {
 
             <div className="pt-2">
               <a
-                href="/official-poster.jpg"
+                href={posterUrl}
                 download="PIYE_TO_KIH_Official_Poster_HiRes.jpg"
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
@@ -137,7 +153,7 @@ export default function MediaCenterPage() {
 
             <div className="pt-2">
               <a
-                href="/PIYE_TO_KIH_Web_Developer_Guide_Kabar_dan_Galeri_v2.pdf"
+                href={prPdfUrl}
                 download="Press_Release_Resmi_PIYE_TO_KIH_2026.pdf"
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#1b2230] hover:bg-[#232c3e] border border-white/15 hover:border-amber-400/50 text-white font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
@@ -175,13 +191,15 @@ export default function MediaCenterPage() {
             </div>
 
             <div className="pt-2">
-              <Link
-                href="/kabar-galeri?tab=galeri-foto"
+              <a
+                href={stillsUrl}
+                target={stillsUrl.startsWith('http') ? '_blank' : undefined}
+                rel={stillsUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4" />
                 <span>Unduh Film Stills</span>
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -218,13 +236,15 @@ export default function MediaCenterPage() {
             </div>
 
             <div className="pt-2">
-              <Link
-                href="/kabar-galeri?tab=galeri-foto"
+              <a
+                href={btsUrl}
+                target={btsUrl.startsWith('http') ? '_blank' : undefined}
+                rel={btsUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#1b2230] hover:bg-[#232c3e] border border-white/15 hover:border-amber-400/50 text-white font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4 text-amber-400" />
                 <span>Unduh BTS Photos</span>
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -259,14 +279,16 @@ export default function MediaCenterPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Tanggal Tayang:</span>
-                  <span className="font-bold text-amber-400">19 November 2026</span>
+                  <span className="font-bold text-emerald-400">19 November 2026</span>
                 </div>
               </div>
             </div>
 
             <div className="pt-2">
               <a
-                href="/#sinopsis"
+                href={factSheetUrl}
+                target={factSheetUrl.startsWith('http') ? '_blank' : undefined}
+                rel={factSheetUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4" />
@@ -351,7 +373,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• First Look Teaser</span>
                       <a
-                        href="https://www.youtube.com/@piyetokihfilm"
+                        href={trailerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
@@ -363,7 +385,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Official Teaser Trailer</span>
                       <a
-                        href="https://www.youtube.com/@piyetokihfilm"
+                        href={trailerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
@@ -375,7 +397,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Official Main Trailer</span>
                       <a
-                        href="https://www.youtube.com/@piyetokihfilm"
+                        href={trailerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
@@ -402,7 +424,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Logo Resmi PIYE TO KIH? (PNG Transparan)</span>
                       <a
-                        href="/logo-ptk.png"
+                        href={logoPackUrl}
                         download="Logo_PIYE_TO_KIH_Transparan.png"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
                       >
@@ -413,7 +435,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Logo PT Mirakel Sinema Imaji</span>
                       <a
-                        href="/logo-ptk.png"
+                        href="/logo-miracle-pictures.png"
                         download="Logo_Miracle_Pictures.png"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
                       >
@@ -422,14 +444,15 @@ export default function MediaCenterPage() {
                       </a>
                     </li>
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
-                      <span>• Title Treatment Film (Typography Lockup)</span>
+                      <span>• Brand Pack Lengkap (ZIP)</span>
                       <a
-                        href="/logo-ptk.png"
-                        download="Title_Treatment_PTK.png"
+                        href={logoPackUrl}
+                        target={logoPackUrl.startsWith('http') ? '_blank' : undefined}
+                        rel={logoPackUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
-                        <span>Unduh PNG</span>
+                        <span>Unduh Aset Brand</span>
                       </a>
                     </li>
                   </ul>
@@ -439,7 +462,7 @@ export default function MediaCenterPage() {
 
             <div className="pt-2">
               <a
-                href="https://www.youtube.com/@piyetokihfilm"
+                href={trailerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-4 px-6 rounded-xl shadow-lg transition active:scale-95"
@@ -464,12 +487,23 @@ export default function MediaCenterPage() {
 
           <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
             <a
-              href="mailto:press@piyetokihfilm.com"
+              href={`mailto:${contactEmail}`}
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition"
             >
               <Mail className="w-3.5 h-3.5 text-amber-400" />
-              <span>press@piyetokihfilm.com</span>
+              <span>{contactEmail}</span>
             </a>
+            {contactWa && (
+              <a
+                href={`https://wa.me/${contactWa.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 transition"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>WhatsApp Media</span>
+              </a>
+            )}
           </div>
         </div>
       </div>

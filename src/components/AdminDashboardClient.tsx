@@ -1840,6 +1840,132 @@ export default function AdminDashboardClient() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Download Behind The Scene (BTS) ZIP
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitBtsZipUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitBtsZipUrl: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: Google Drive / Dropbox link arsip BTS"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Download Logo &amp; Brand Assets Pack (ZIP)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitLogoPackZipUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitLogoPackZipUrl: e.target.value
+                          }
+                        })}
+                        placeholder="Contoh: Link ZIP logo Miracle Pictures &amp; PTK"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Filter AR Instagram
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitFilterInstagramUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitFilterInstagramUrl: e.target.value
+                          }
+                        })}
+                        placeholder="https://instagram.com/ar/..."
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Filter AR TikTok
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitFilterTiktokUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitFilterTiktokUrl: e.target.value
+                          }
+                        })}
+                        placeholder="https://vm.tiktok.com/..."
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Official Soundtrack (Spotify)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitSoundtrackSpotifyUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitSoundtrackSpotifyUrl: e.target.value
+                          }
+                        })}
+                        placeholder="https://open.spotify.com/track/..."
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Official Soundtrack (YouTube)
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitSoundtrackYoutubeUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitSoundtrackYoutubeUrl: e.target.value
+                          }
+                        })}
+                        placeholder="https://youtube.com/watch?v=..."
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Link Official Trailer / Teaser YouTube
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.kabarGaleriSettings?.mediaKitTrailerYoutubeUrl || ''}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          kabarGaleriSettings: {
+                            ...settings.kabarGaleriSettings,
+                            mediaKitTrailerYoutubeUrl: e.target.value
+                          }
+                        })}
+                        placeholder="https://youtube.com/watch?v=..."
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
                         Email Kontak PR / Media Relations
                       </label>
                       <input
