@@ -36,7 +36,7 @@ const CINEMA_PARTNERS: CinemaPartner[] = [
     tagline: 'Gunakan m.tix atau beli langsung di loket kasir XXI',
     badge: 'M-TIX PARTNER',
     color: 'from-amber-600 to-yellow-500',
-    defaultUrl: 'https://m.21cineplex.com',
+    defaultUrl: 'https://m.21cineplex.com/id/movies/16PTKH',
   },
   {
     id: 'cgv',
@@ -60,7 +60,7 @@ const CINEMA_PARTNERS: CinemaPartner[] = [
     tagline: 'Beli tiket promo online di aplikasi TIX ID',
     badge: 'ONLINE TICKETING',
     color: 'from-emerald-600 to-teal-500',
-    defaultUrl: 'https://www.tix.id',
+    defaultUrl: 'https://rb.gy/l28pzj',
   },
 ];
 

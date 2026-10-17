@@ -90,9 +90,25 @@ export default async function CityRoadshowPage({ params }: Props) {
   const currentClaimed = db.leads.length;
   const remainingStock = Math.max(0, db.settings.totalQuota - currentClaimed);
   const shortDate = `${city.dateStr.split(' ')[0]} ${city.dateStr.split(' ')[1]?.slice(0, 3) || ''}`;
-  const defaultVenueStr = city.boothInfo
+  const schoolItem = city.rundown?.items?.find((it) => it.category === 'Sekolah');
+  const campusItem = city.rundown?.items?.find((it) => it.category === 'Kampus');
+  const mallItem = city.rundown?.items?.find((it) => it.category === 'Mall & Meet' || it.isVoucherExchange);
+
+  const venueOptions: string[] = [];
+  if (schoolItem) {
+    venueOptions.push(`Kunjungan Sekolah: ${schoolItem.venue} (${schoolItem.time})`);
+  }
+  if (campusItem) {
+    venueOptions.push(`Kunjungan Kampus: ${campusItem.venue} (${campusItem.time})`);
+  }
+  if (city.boothInfo) {
+    venueOptions.push(`Mall Roadshow: ${city.boothInfo.venue} — ${city.boothInfo.floor} (${city.boothInfo.timeStr})`);
+  } else if (mallItem) {
+    venueOptions.push(`Mall Roadshow: ${mallItem.venue} (${mallItem.time})`);
+  }
+  const defaultVenueStr = venueOptions[0] || (city.boothInfo
     ? `${city.boothInfo.venue} — ${city.boothInfo.floor} (${city.boothInfo.timeStr})`
-    : undefined;
+    : undefined);
 
   return (
     <div className="relative min-h-screen">
@@ -112,7 +128,7 @@ export default async function CityRoadshowPage({ params }: Props) {
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold transition"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Kembali ke Info Film Nasional</span>
+              <span>Kembali ke halaman utama</span>
             </Link>
           </div>
 
@@ -129,48 +145,40 @@ export default async function CityRoadshowPage({ params }: Props) {
 
           {/* Category Tag */}
           <div className="text-[11px] sm:text-xs font-black tracking-[0.22em] uppercase text-amber-400 mb-3">
-            {city.name.toUpperCase()} · PIYE TO KIH? ROADSHOW · FILM KOMEDI
+            FILM DRAMA KOMEDI
           </div>
 
           {/* Big Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight uppercase mb-4 leading-tight">
-            {city.name.toUpperCase()}, SIAP<br className="hidden sm:inline" /> KETAWA DULUAN?
+            {city.name.toUpperCase()}, SIAP<br className="hidden sm:inline" /> NONTON DULUAN?
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xs sm:text-base font-semibold text-amber-200/90 mb-5 max-w-2xl">
-            PIYE TO KIH? mampir dulu sebelum tayang serentak 19 NOVEMBER 2026.
-          </p>
-
-          {/* Date & Location - Clean Developer Typography */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 text-xs sm:text-sm font-bold">
-            <span className="px-3.5 py-1.5 rounded-lg bg-[#141923] border border-white/10 text-amber-400 font-mono tracking-wider">
-              {city.dateStr.toUpperCase()}
-            </span>
-            <span className="text-slate-600 hidden sm:inline">•</span>
-            <span className="px-3.5 py-1.5 rounded-lg bg-[#141923] border border-white/10 text-slate-200">
-              {city.name}, {city.province}
-            </span>
+          <div className="text-xs sm:text-base font-semibold text-amber-200/90 mb-3 max-w-2xl leading-relaxed">
+            <p>Sebelum tayang serentak 19 November 2026,</p>
+            <p>Kamu bisa nonton duluan Film &ldquo;PIYE TO KIH?&rdquo; di Kotamu</p>
           </div>
 
-          {/* Description Paragraph */}
-          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mb-8 leading-relaxed">
-            Ketemu cast, ikuti keseruan roadshow, dan nonton PIYE TO KIH? lebih dulu di bioskop pilihan {city.name}.
+          {/* Sub-keterangan */}
+          <p className="text-xs sm:text-sm text-slate-300 font-medium mb-7">
+            Tiket nonton duluan terbatas, buruan beli sebelum kehabisan.
           </p>
 
-          {/* Two CTA Buttons - Clean & High Contrast */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full max-w-md mb-4">
+          {/* Two CTA Buttons - 2 lines per button */}
+          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3.5 w-full max-w-lg mb-4">
             <a
               href="#pilihan-bioskop"
-              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-xl shadow-lg transition-transform active:scale-95"
+              className="flex-1 flex flex-col items-center justify-center bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black py-3.5 px-5 rounded-xl shadow-lg transition-transform active:scale-95 text-center"
             >
-              Nonton Duluan ({shortDate})
+              <span className="text-xs sm:text-sm uppercase tracking-wide">BELI TIKET NONTON DULUAN</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold opacity-85 mt-0.5">({city.dateStr})</span>
             </a>
             <a
               href="#booking-voucher"
-              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center bg-[#141822] hover:bg-[#1a202c] border border-white/15 hover:border-amber-500/40 text-white font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-xl transition-all"
+              className="flex-1 flex flex-col items-center justify-center bg-[#141822] hover:bg-[#1a202c] border border-white/15 hover:border-amber-500/40 text-white font-black py-3.5 px-5 rounded-xl transition-all text-center"
             >
-              Voucher 19–20 Nov
+              <span className="text-xs sm:text-sm uppercase tracking-wide">BELI VOUCHER TIKET</span>
+              <span className="text-[10px] sm:text-[11px] font-semibold text-amber-300/90 mt-0.5">(Berlaku untuk 19-20 November 2026)</span>
             </a>
           </div>
         </div>
@@ -194,6 +202,7 @@ export default async function CityRoadshowPage({ params }: Props) {
       <WarVoucherForm
         defaultCity={city.name}
         defaultVenue={defaultVenueStr}
+        venueOptions={venueOptions}
         totalQuota={db.settings.totalQuota}
         remainingStock={remainingStock}
       />
@@ -203,6 +212,8 @@ export default async function CityRoadshowPage({ params }: Props) {
         cityName={city.name}
         dateStr={city.dateStr}
         boothInfo={city.boothInfo}
+        schoolVenue={schoolItem ? `${schoolItem.venue} (${schoolItem.time})` : undefined}
+        campusVenue={campusItem ? `${campusItem.venue} (${campusItem.time})` : undefined}
       />
 
       {/* 6. KISAH SEKAWAN (Sinopsis Film) */}

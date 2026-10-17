@@ -28,11 +28,14 @@ export default function CityCinemaList({
     <section id="pilihan-bioskop" className="py-12 px-4 sm:px-6 max-w-5xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8 sm:mb-10">
-        <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">
-          {cityName.toUpperCase()}, PILIH TEMPAT NONTON DULUANMU
+        <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400">
+          PILIHAN LOKASI NONTON DULUAN
+        </span>
+        <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight mt-1 mb-2">
+          PILIH LOKASI NONTON DULUAN!
         </h2>
-        <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto mt-2">
-          Gak perlu nunggu 19 November. Pilih bioskop dan amankan kursimu untuk {dateStr}.
+        <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
+          Beli tiket sekarang dan nonton duluan di tanggal {dateStr}. Jangan sampai kehabisan, persediaan tiket terbatas!
         </p>
       </div>
 

@@ -10,24 +10,34 @@ interface FaqItem {
 
 const FAQ_LIST: FaqItem[] = [
   {
-    question: 'Kode Booking itu tiket?',
+    question: '“Kode Booking ini udah jadi tiket belum?”',
     answer:
-      'Bukan. Kode booking adalah bukti registrasi antrean kuota untuk mendapatkan voucher fisik di booth roadshow. Kode booking bukan tiket masuk bioskop dan bukan bukti pembayaran.',
+      'Belum. Kode Booking cuma buat booking Voucher Fisik. Bawa kode vouchernya ke booth PIYE TO KIH?, lakukan pembayaran, lalu ambil voucher fisikmu.',
   },
   {
-    question: 'Voucher bisa langsung dipakai saat roadshow?',
+    question: '“Vouchernya bisa langsung dipakai pas roadshow?”',
     answer:
-      'Tidak. Voucher fisik yang Anda bayar & ambil di booth roadshow berlaku untuk penayangan umum/serentak mulai tanggal 19–20 November 2026 di seluruh jaringan bioskop mitra.',
+      'Belum bisa. Voucher yang kamu ambil saat roadshow hanya bisa dipakai untuk nonton Film PIYE TO KIH? tanggal 19–20 November 2026.',
   },
   {
-    question: 'Special Screening dan Voucher sama?',
+    question: '“Tiket Nonton Duluan sama Voucher itu beda, ya?”',
     answer:
-      'Berbeda. Special Screening adalah sesi nonton duluan bersama para pemain film di tanggal roadshow kota ini dan tiketnya dibeli via loket/aplikasi resmi bioskop (XXI / Cinépolis / CGV / Platinum / NSC). Sedangkan Voucher adalah voucher fisik promo untuk penayangan serentak 19–20 November.',
+      'Beda. Tiket Nonton Duluan adalah tiket Special Screening di kota roadshow sebelum 19 November. Voucher dipakai untuk penayangan 19–20 November.',
   },
   {
-    question: 'Di mana saya membeli tiket Special Screening?',
+    question: '“Kalau mau Nonton Duluan, beli tiketnya di mana?”',
     answer:
-      'Tiket Special Screening dibeli langsung melalui platform ticketing resmi bioskop mitra terkait (seperti aplikasi M-Tix XXI, Cinépolis App, CGV App) atau langsung di loket kasir bioskop pada hari H.',
+      'Pilih bioskop di halaman ini, lalu klik Nonton Duluan. Kamu akan diarahkan ke platform ticketing resmi sesuai bioskop yang kamu pilih.',
+  },
+  {
+    question: '“Kalau udah punya kode booking, tinggal datang aja?”',
+    answer:
+      'Iya. Tunjukkan Kode Booking di booth PIYE TO KIH?, bayar Rp10.000/voucher, lalu ambil Voucher Fisikmu.',
+  },
+  {
+    question: '“Kalau gak booking online, masih bisa beli voucher di booth?”',
+    answer:
+      'Bisa, selama voucher masih tersedia. Tapi kalau sudah punya Kode Booking, proses di booth jadi lebih praktis.',
   },
 ];
 

@@ -112,7 +112,7 @@ export default function Footer({ socialLinksOverride }: FooterProps) {
         {/* Legal Copyright per client revision */}
         <div className="pt-4 border-t border-white/[0.08] w-full text-center">
           <p className="text-slate-500 text-xs tracking-wider">
-            © 2026 PT Miracle Sinema Indonesia. Seluruh hak cipta dilindungi undang-undang.
+            © 2026 PT Mirakel Sinema Imaji. Seluruh hak cipta dilindungi undang-undang.
           </p>
         </div>
       </div>

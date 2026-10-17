@@ -35,7 +35,7 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
           </div>
         </Link>
 
-        {/* Desktop Nav: HALAMAN UTAMA, JADWAL ROADSHOW, KABAR & GALERI (Uppercase) */}
+        {/* Desktop Nav: HALAMAN UTAMA, JADWAL ROADSHOW & NONTON DULUAN, KABAR & GALERI (Uppercase) */}
         <div className="hidden md:flex items-center gap-2 lg:gap-4 text-xs font-bold tracking-wider uppercase">
           <Link
             href="/"
@@ -47,7 +47,7 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
             href="/#roadshow"
             className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition"
           >
-            JADWAL ROADSHOW
+            JADWAL ROADSHOW &amp; NONTON DULUAN
           </Link>
           <Link
             href="/kabar-galeri"
@@ -69,7 +69,7 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
             href="/#roadshow"
             className="px-2 py-1 rounded-lg text-slate-300 hover:text-white"
           >
-            JADWAL ROADSHOW
+            ROADSHOW &amp; NONTON DULUAN
           </Link>
           <Link
             href="/kabar-galeri"

@@ -215,10 +215,10 @@ const DEFAULT_SETTINGS: AppSettings = {
   bogoSubtitle: 'Ajak pasangan, keluarga, atau bestie nonton film PIYE TO KIH di bioskop kesayanganmu!',
   bogoDefaultTicketLink: 'https://m.21cineplex.com',
   bogoCinemaLinks: {
-    xxi: 'https://m.21cineplex.com',
+    xxi: 'https://m.21cineplex.com/id/movies/16PTKH',
     cgv: 'https://www.cgv.id',
     cinepolis: 'https://cinepolis.co.id',
-    tixid: 'https://www.tix.id',
+    tixid: 'https://rb.gy/l28pzj',
   },
 
   // Mode Maintenance / Coming Soon (Toggleable)

@@ -148,7 +148,48 @@ export default async function HomePage() {
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
       <ArticlesSection />
 
-      {/* 9. FOOTER RESMI (CONTAINER DI ATASNYA SUDAH DIHAPUS SESUAI HALAMAN 9) */}
+      {/* 9. SIGN-OFF CINEMATIC LOCKUP PER PAK SUTRADARA (TENGAH BAWAH MAIN PAGE) */}
+      <section className="py-12 sm:py-16 px-4 text-center border-t border-white/5 bg-gradient-to-b from-transparent to-[#070B12]/80">
+        <div className="max-w-md mx-auto flex flex-col items-center space-y-3">
+          {/* Production House */}
+          <div className="flex flex-col items-center">
+            <span className="text-[11px] sm:text-xs font-black tracking-[0.3em] uppercase text-white/90">
+              MIRACLE PICTURES
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 italic tracking-wider mt-0.5">
+              Mempersembahkan
+            </span>
+          </div>
+
+          {/* Logo Film PIYE TO KIH (Compact & Visible) */}
+          <div className="py-1">
+            <Link href="#top" title="Kembali ke atas" className="inline-block group">
+              <img
+                src="/logo-ptk.png"
+                alt="Logo Resmi PIYE TO KIH?"
+                className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform"
+              />
+            </Link>
+          </div>
+
+          {/* Karya Sutradara */}
+          <p className="text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase text-slate-300">
+            Karya Sutradara <span className="text-white font-black">Ito Mavin</span>
+          </p>
+
+          {/* Berangkat ke Bioskop 19 November 2026 */}
+          <div className="pt-2">
+            <span className="text-xs sm:text-sm font-black tracking-[0.25em] text-white uppercase block leading-tight">
+              BERANGKAT KE BIOSKOP
+            </span>
+            <span className="text-xl sm:text-2xl font-black text-amber-400 block tracking-widest mt-1 drop-shadow-[0_2px_15px_rgba(245,158,11,0.3)]">
+              19 NOVEMBER 2026
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. FOOTER RESMI */}
       <Footer />
     </div>
   );

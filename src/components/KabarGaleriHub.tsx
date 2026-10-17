@@ -938,98 +938,158 @@ export default function KabarGaleriHub({
               </button>
             </div>
 
-            {/* Asset Items Grid */}
+            {/* Asset Items Grid - 7 Containers per Director's Specification */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Asset 1: Official Poster Hi-Res */}
+              {/* Kontainer 1: Poster Resmi Hi-Res */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-amber-700 uppercase">Visual Asset</span>
-                  <h4 className="font-extrabold text-sm text-slate-900">Official Movie Poster (Hi-Res)</h4>
-                  <p className="text-xs text-slate-500">Format JPG resolusi cetak 300 DPI siap tayang.</p>
+                  <span className="text-[10px] font-black text-amber-700 uppercase">[ 01 ] VISUAL ASSET</span>
+                  <h4 className="font-extrabold text-sm text-slate-900">Poster Resmi Hi-Res</h4>
+                  <p className="text-xs text-slate-500">Teaser Poster &amp; Official Poster resolusi tinggi (300 DPI) siap cetak.</p>
                 </div>
                 <a
-                  href={kabarGaleriSettings?.mediaCenter?.posterDownloadUrl || '/kabar-galeri-hero.jpg'}
-                  download="PIYE_TO_KIH_Official_Poster.jpg"
-                  className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
+                  href="/official-poster.jpg"
+                  download="PIYE_TO_KIH_Official_Poster_HiRes.jpg"
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5 text-amber-400" />
                   <span>Unduh Poster Hi-Res</span>
                 </a>
               </div>
 
-              {/* Asset 2: Press Release PDF */}
+              {/* Kontainer 2: Press Release Resmi */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-amber-700 uppercase">Dokumen Resmi</span>
-                  <h4 className="font-extrabold text-sm text-slate-900">Official Press Release (PDF)</h4>
-                  <p className="text-xs text-slate-500">Rilis pers lengkap peluncuran film &amp; roadshow.</p>
+                  <span className="text-[10px] font-black text-amber-700 uppercase">[ 02 ] DOKUMEN RESMI</span>
+                  <h4 className="font-extrabold text-sm text-slate-900">Press Release Resmi</h4>
+                  <p className="text-xs text-slate-500">Press release peluncuran trailer, poster, dan roadshow 17 kota format PDF.</p>
                 </div>
                 <a
-                  href={kabarGaleriSettings?.mediaCenter?.pressReleasePdfUrl || '#'}
-                  download="Press_Release_PIYE_TO_KIH_2026.pdf"
-                  className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
+                  href="/PIYE_TO_KIH_Web_Developer_Guide_Kabar_dan_Galeri_v2.pdf"
+                  download="Press_Release_Resmi_PIYE_TO_KIH_2026.pdf"
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Unduh Siaran Pers (PDF)</span>
+                  <span>Unduh Press Release</span>
                 </a>
               </div>
 
-              {/* Asset 3: Film Stills & Behind The Scenes */}
+              {/* Kontainer 3: Film Stills / Adegan Resmi */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-amber-700 uppercase">Foto Adegan</span>
-                  <h4 className="font-extrabold text-sm text-slate-900">Production Stills &amp; BTS</h4>
-                  <p className="text-xs text-slate-500">Kumpulan foto adegan dan keseruan syuting.</p>
+                  <span className="text-[10px] font-black text-amber-700 uppercase">[ 03 ] FOTO ADEGAN RESMI</span>
+                  <h4 className="font-extrabold text-sm text-slate-900">Film Stills / Adegan Resmi</h4>
+                  <p className="text-xs text-slate-500">Grab still non-spoiler kualitas tinggi (misal: PTK_STILL_01_MUKIDI_SUKMA.jpg).</p>
                 </div>
-                {kabarGaleriSettings?.mediaCenter?.stillsDownloadUrl && kabarGaleriSettings.mediaCenter.stillsDownloadUrl !== '#' ? (
-                  <a
-                    href={kabarGaleriSettings.mediaCenter.stillsDownloadUrl}
-                    download
-                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Unduh Paket Foto (ZIP)</span>
-                  </a>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setIsMediaCenterOpen(false);
-                      setActiveTab('galeri-foto');
-                    }}
-                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
-                  >
-                    <Camera className="w-3.5 h-3.5" />
-                    <span>Buka Galeri Foto</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    setIsMediaCenterOpen(false);
+                    setActiveTab('galeri-foto');
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Unduh Film Stills</span>
+                </button>
               </div>
 
-              {/* Asset 4: Fact Sheet & Sinopsis */}
+              {/* Kontainer 4: Behind the Scenes */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-amber-700 uppercase">Lembar Fakta</span>
-                  <h4 className="font-extrabold text-sm text-slate-900">Fact Sheet &amp; Sinopsis Lengkap</h4>
-                  <p className="text-xs text-slate-500">Judul, genre, sutradara, produser, dan daftar cast.</p>
+                  <span className="text-[10px] font-black text-amber-700 uppercase">[ 04 ] DOKUMENTASI PRODUKSI</span>
+                  <h4 className="font-extrabold text-sm text-slate-900">Behind the Scenes (BTS)</h4>
+                  <p className="text-xs text-slate-500">Foto proses syuting, sutradara &amp; crew on set, makeup, dan candid produksi.</p>
                 </div>
-                {kabarGaleriSettings?.mediaCenter?.factSheetPdfUrl && kabarGaleriSettings.mediaCenter.factSheetPdfUrl !== '#' ? (
-                  <a
-                    href={kabarGaleriSettings.mediaCenter.factSheetPdfUrl}
-                    download
-                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition border border-slate-200"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Unduh Fact Sheet (PDF)</span>
-                  </a>
-                ) : (
-                  <Link
-                    href="/#sinopsis"
-                    onClick={() => setIsMediaCenterOpen(false)}
-                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition border border-slate-200"
-                  >
-                    <span>Lihat Sinopsis &amp; Fakta</span>
-                    <span>➔</span>
-                  </Link>
-                )}
+                <button
+                  onClick={() => {
+                    setIsMediaCenterOpen(false);
+                    setActiveTab('galeri-foto');
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Unduh BTS Photos</span>
+                </button>
+              </div>
+
+              {/* Kontainer 5: Fact Sheet & Film Info */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-black text-amber-700 uppercase">[ 05 ] DATA FILM RESMI</span>
+                  <h4 className="font-extrabold text-sm text-slate-900">Fact Sheet &amp; Film Info</h4>
+                  <p className="text-xs text-slate-500">Rangkuman sinopsis, genre, PT Mirakel Sinema Imaji, sutradara, dan daftar cast.</p>
+                </div>
+                <Link
+                  href="/#sinopsis"
+                  onClick={() => setIsMediaCenterOpen(false)}
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Unduh Fact Sheet</span>
+                </Link>
+              </div>
+
+              {/* Kontainer 6: Cast & Filmmaker Photos */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-black text-amber-700 uppercase">[ 06 ] HEADSHOT &amp; POTRET</span>
+                  <h4 className="font-extrabold text-sm text-slate-900">Cast &amp; Filmmaker Photos</h4>
+                  <p className="text-xs text-slate-500">Headshot resmi 12 cast (Mukidi, Gendut, Sukma, dll.) &amp; Sutradara format nama asli-peran.</p>
+                </div>
+                <Link
+                  href="/#cast"
+                  onClick={() => setIsMediaCenterOpen(false)}
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Unduh Foto Cast &amp; Filmmaker</span>
+                </Link>
+              </div>
+
+              {/* Kontainer 7: Video & Brand Assets (Full width span) */}
+              <div className="sm:col-span-2 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <span className="text-[10px] font-black text-amber-700 uppercase">[ 07 ] MULTIMEDIA &amp; BRAND</span>
+                    <h4 className="font-extrabold text-sm text-slate-900">Video &amp; Brand Assets</h4>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">YouTube 4K • PNG Transparan</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
+                  <div className="p-3 bg-white rounded-xl border border-slate-200">
+                    <span className="font-bold text-slate-900 block mb-1">Sub-A · Video Assets</span>
+                    <p className="text-[11px] text-slate-500 mb-2">First Look, Official Teaser, &amp; Official Trailer YouTube.</p>
+                    <a
+                      href="https://www.youtube.com/@piyetokihfilm"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-700 hover:underline font-bold text-[11px] inline-flex items-center gap-1"
+                    >
+                      <span>Lihat Channel YouTube</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-slate-200">
+                    <span className="font-bold text-slate-900 block mb-1">Sub-B · Logo &amp; Brand Assets</span>
+                    <p className="text-[11px] text-slate-500 mb-2">Logo transparan PNG PIYE TO KIH? &amp; title treatment.</p>
+                    <a
+                      href="/logo-ptk.png"
+                      download="Logo_PIYE_TO_KIH.png"
+                      className="text-amber-700 hover:underline font-bold text-[11px] inline-flex items-center gap-1"
+                    >
+                      <Download className="w-3 h-3" />
+                      <span>Unduh Logo PNG</span>
+                    </a>
+                  </div>
+                </div>
+                <Link
+                  href="/media"
+                  onClick={() => setIsMediaCenterOpen(false)}
+                  className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wide transition shadow-sm"
+                >
+                  <span>Buka Video &amp; Brand Assets (Halaman Lengkap)</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
 

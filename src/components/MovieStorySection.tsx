@@ -75,9 +75,6 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
           {/* Right Column: SINOPSIS */}
           <div className="lg:col-span-7 space-y-6">
             <div>
-              <span className="text-xs font-bold text-amber-400 tracking-[0.25em] uppercase block mb-1">
-                CERITA LAYAR LEBAR
-              </span>
               <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase leading-tight">
                 SINOPSIS
               </h2>
@@ -98,7 +95,7 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
             <div className="pt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Rumah Produksi</span>
-                <span className="font-black text-amber-400 text-xs">Miracle Pictures</span>
+                <span className="font-black text-amber-400 text-xs leading-tight block">PT Mirakel Sinema Imaji</span>
               </div>
               <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
                 <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Sutradara</span>

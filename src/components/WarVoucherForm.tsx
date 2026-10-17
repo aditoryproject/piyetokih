@@ -12,6 +12,7 @@ interface WarVoucherFormProps {
   totalQuota?: number;
   remainingStock?: number;
   defaultVenue?: string;
+  venueOptions?: string[];
 }
 
 export default function WarVoucherForm({
@@ -20,6 +21,7 @@ export default function WarVoucherForm({
   totalQuota = 500,
   remainingStock: initialRemaining = 387,
   defaultVenue,
+  venueOptions,
 }: WarVoucherFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -175,8 +177,9 @@ export default function WarVoucherForm({
         <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1 mb-2">
           AMANKAN VOUCHER NONTONMU
         </h2>
-        <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-          Isi data sebentar, dapatkan Kode Booking Voucher, lalu tunjukkan kodenya di booth PIYE TO KIH? saat roadshow {cityLocation}.
+        <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+          Isi data, dapatkan Kode Booking Voucher, tunjukkan kode di booth<br className="hidden sm:inline" />
+          &ldquo;PIYE TO KIH?&rdquo; saat roadshow di {cityLocation}.
         </p>
       </div>
 
@@ -362,9 +365,11 @@ export default function WarVoucherForm({
               onChange={(e) => setVenueLocation(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#0b0e14] border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-amber-500 transition"
             >
-              <option value={venueLocation}>
-                {venueLocation}
-              </option>
+              {(venueOptions && venueOptions.length > 0 ? venueOptions : [venueLocation]).map((opt, i) => (
+                <option key={i} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -378,6 +383,10 @@ export default function WarVoucherForm({
               <span>{loading ? 'MEMPROSES KODE BOOKING...' : 'DAPATKAN KODE BOOKING'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+            <div className="text-[11px] text-slate-400 text-center mt-3 space-y-1">
+              <p>Tunjukkan kode ini ke booth PIYE TO KIH? di kotamu untuk bayar &amp; ambil voucher fisik.</p>
+              <p className="text-amber-300/90 font-medium">Voucher berlaku untuk nonton serentak 19-20 November 2026 di seluruh bioskop.</p>
+            </div>
           </div>
         </form>
       </div>

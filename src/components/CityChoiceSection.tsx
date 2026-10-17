@@ -16,48 +16,44 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
       {/* Section Header */}
       <div className="text-center mb-8 sm:mb-10">
         <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-400">
-          DUA PILIHAN NONTON
+          PILIH SESUAI RENCANAMU
         </span>
         <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1 mb-2">
-          Pilih Jalur Hiburanmu di {cityName}
+          Mau Nonton Duluan atau Amankan Voucher?
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-          Mau nonton duluan bareng cast tanggal {dateStr}, atau amankan voucher untuk tayang serentak?
+          Nonton film &ldquo;PIYE TO KIH?&rdquo; duluan saat roadshow di {cityName}, atau booking voucher untuk penayangan 19–20 November 2026.
         </p>
       </div>
 
       {/* 2 Comparison Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-        {/* CARD 1: NONTON DULUAN / SPECIAL SCREENING */}
+        {/* CARD 1: NONTON DULUAN */}
         <div className="bg-[#121620] border border-white/10 hover:border-amber-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all">
           <div>
             {/* Tag */}
             <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 mb-4">
-              [ 01 ] SPECIAL SCREENING · ROADSHOW
+              (1) NONTON DULUAN • {dateStr.toUpperCase()}
             </div>
 
             {/* Headline */}
-            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight mb-3">
-              GAK SABAR NUNGGU 19 NOVEMBER?
+            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight mb-4 leading-relaxed">
+              Yang udah gak sabar banget, kamu bisa nonton film &ldquo;PIYE TO KIH?&rdquo; duluan di bioskop yang telah ditentukan. Tiket terbatas!
             </h3>
-
-            <p className="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
-              {cityName} bisa nonton PIYE TO KIH? lebih dulu tanggal {dateStr} lewat Special Screening roadshow.
-            </p>
 
             {/* Checklist */}
             <ul className="space-y-3 mb-8">
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Tayang {dateStr} di {cityName}</span>
+                <span>Tanggal {dateStr} di {cityName}</span>
               </li>
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Greeting &amp; temu tawa langsung bareng cast film</span>
+                <span>Ketemu, Ngobrol, foto bareng sama para pemain</span>
               </li>
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Tiket resmi via XXI / Cinépolis</span>
+                <span>Tiket resmi via online</span>
               </li>
             </ul>
           </div>
@@ -76,36 +72,32 @@ export default function CityChoiceSection({ cityName, dateStr }: CityChoiceSecti
           </div>
         </div>
 
-        {/* CARD 2: VOUCHER 19-20 NOVEMBER / PENAYANGAN UMUM */}
+        {/* CARD 2: BOOKING VOUCHER */}
         <div className="bg-[#121620] border border-white/10 hover:border-amber-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all">
           <div>
             {/* Tag */}
             <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 mb-4">
-              [ 02 ] VOUCHER FISIK · PENAYANGAN SERENTAK
+              (2) BOOKING VOUCHER • 19–20 NOVEMBER
             </div>
 
             {/* Headline */}
-            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight mb-3">
-              MAU AMANKAN VOUCHER NONTON?
+            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight mb-4 leading-relaxed">
+              Gak sempet ikut nonton duluan? Booking voucher sekarang! (kuota terbatas)
             </h3>
-
-            <p className="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
-              Booking voucher sekarang, lalu datang ke booth PIYE TO KIH? di kota roadshow untuk melakukan pembayaran dan mengambil voucher fisik.
-            </p>
 
             {/* Checklist */}
             <ul className="space-y-3 mb-8">
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Booking online tanpa bayar sekarang (bebas antre kuota)</span>
+                <span>Booking online (bebas antrian)</span>
               </li>
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Bayar &amp; ambil Voucher Fisik di booth roadshow ({shortDate})</span>
+                <span>Datang ke booth dengan kode booking, dan dapatkan voucher fisiknya.</span>
               </li>
               <li className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                 <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Voucher dipakai untuk tayang serentak 19–20 November 2026</span>
+                <span>Voucher berlaku untuk penayangan 19-20 November 2026</span>
               </li>
             </ul>
           </div>

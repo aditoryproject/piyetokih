@@ -32,7 +32,7 @@ export const DEFAULT_MOVIE_SETTINGS: MovieSettings = {
   releaseDateText: '19 November 2026',
   showLsfBadge: true,
   lsfRatingText: 'LSF 13+',
-  synopsis: 'Mukidi yang patah hati berniat membuktikan diri dengan nekat membeli rumah tua murah untuk modal menikah. Namun di rumah tua itu, Mukidi justru jatuh cinta pada Sukma—gadis berparas ayu jelita yang ternyata bukan berasal dari dunia manusia. Bersama Pak Ndut (Gendut) dan Penyok, sahabat karibnya dari Woko Channel, petualangan kocak bercampur mistis penuh gelak tawa pun dimulai!',
+  synopsis: 'Mukidi yang patah hati berniat membuktikan diri dengan nekat membeli rumah tua murah untuk modal menikah. Namun di rumah tua itu, Mukidi justru jatuh cinta pada Sukma—gadis berparas ayu jelita yang ternyata bukan berasal dari dunia manusia. Bersama Gendut dan Penyok, sahabat karibnya dari Woko Channel, petualangan kocak bercampur mistis penuh gelak tawa pun dimulai!',
   quoteDialog: 'Niat ati golek omah murah gawe rabi, malah kepincut prawan ayu sing ora tau saba awan...',
   director: 'Ito Mavin',
   writer: 'Endik Koeswoyo & Ito Mavin',
@@ -64,7 +64,7 @@ export const DEFAULT_MOVIE_SETTINGS: MovieSettings = {
     {
       id: 'cast-4',
       actorName: 'Sutrisno Agung',
-      characterName: 'Pak Ndut / Gendut',
+      characterName: 'Gendut',
       badge: 'Woko Channel',
       photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
       bio: '',

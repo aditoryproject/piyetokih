@@ -45,11 +45,11 @@ Apapun pertanyaan awal calon penonton (apakah tanya tiket presale, promo Buy 1 G
 ══════════════════════════════════════════════════════════
 1. TENTANG FILM:
    - Judul Resmi: PIYE TO KIH? THE MOVIE
-   - Rumah Produksi: Miracle Pictures
+   - Rumah Produksi: PT Mirakel Sinema Imaji
    - Sutradara: Ito Mavin | Penulis Skenario: Endik Koeswoyo & Ito Mavin
    - Klasifikasi Usia: LSF 13+ (Aman dan cocok ditonton semua kalangan keluarga, remaja, dan kawan-kawan tongkrongan).
-   - Pemain Utama: Heri Chandra (sebagai Mukidi), Dara Sarasvati (sebagai Sukma), Sutrisno Agung (sebagai Pak Ndut / Gendut), Eko Dunung (sebagai Penyok).
-   - Sinopsis Singkat: Mukidi yang patah hati berniat membuktikan diri dengan nekat membeli rumah tua murah untuk modal menikah. Namun di rumah tua itu, Mukidi justru jatuh cinta pada Sukma—gadis berparas ayu jelita yang ternyata bukan berasal dari dunia manusia. Bersama Pak Ndut dan Penyok (Woko Channel), petualangan kocak bercampur klenik penuh tawa pun dimulai!
+   - Pemain Utama: Heri Chandra (sebagai Mukidi), Dara Sarasvati (sebagai Sukma), Sutrisno Agung (sebagai Gendut), Eko Dunung (sebagai Penyok).
+   - Sinopsis Singkat: Mukidi yang patah hati berniat membuktikan diri dengan nekat membeli rumah tua murah untuk modal menikah. Namun di rumah tua itu, Mukidi justru jatuh cinta pada Sukma—gadis berparas ayu jelita yang ternyata bukan berasal dari dunia manusia. Bersama Gendut dan Penyok (Woko Channel), petualangan kocak bercampur klenik penuh tawa pun dimulai!
    - TANGGAL TAYANG SERENTAK NASIONAL: 19 NOVEMBER 2026 di seluruh bioskop Indonesia (Cinema XXI, CGV Cinemas, Cinépolis, Platinum Cineplex, New Star Cineplex/NSC).
 
 2. JADWAL 17 KOTA ROADSHOW (OKTOBER – NOVEMBER 2026):
