@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { Sparkles, Film, ChevronDown, ChevronUp, Ticket } from 'lucide-react';
+import { Sparkles, Film, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ComingSoonViewProps {
   headline?: string;
@@ -16,36 +15,31 @@ interface ComingSoonViewProps {
 }
 
 const CINEMA_NETWORKS = [
-  'Dakota Cinema',
-  'Rajawali Cinema',
+  'Dakota',
+  'Rajawali',
   'Golden Theater',
   'Denpasar Cineplex',
   'Planet Cinema Bone',
-  'Ltd 9 Cinema',
-  'MSB Cinema',
-  'BES Cinema Metro',
-  'BES Cinema Pangkal Pinang',
-  'Mopic Cinemas',
-  'Movimax',
-  'Gajahmada Cinema',
-  'Hollywood Cinema',
+  'Ltd 9',
+  'MSB CINEMA',
+  'BES Metro',
+  'BES Pangkal Pinang',
+  'Mopic',
+  'Moviemax',
+  'Gajahmada',
+  'Hollywood',
   'JIG Cinema',
-  'Cinema XXI',
-  'CGV Cinemas',
-  'Cinépolis',
+  'XXI',
+  'CGV',
+  'CINEPOLIS',
   "SAM'S Studio",
   'FLIX Cinema',
-  'Kota Cinema Mall (KCM)',
-  'Platinum Cineplex',
-  'New Star Cineplex (NSC)',
+  'KOTA CINEMA MALL',
+  'PLATINUM',
+  'NSC',
   'Movieplex',
-  'Local Cinema',
-  'Surya Yudha Cinema',
-];
-
-const TICKETING_PLATFORMS = [
-  { name: 'TIX ID', desc: 'Aplikasi Pembelian Tiket Online' },
-  { name: 'M-TIX', desc: 'Aplikasi Resmi Tiket Cinema XXI' },
+  'LOCAL CINEMA',
+  'Suryayudha',
 ];
 
 export default function ComingSoonView({
@@ -109,7 +103,7 @@ export default function ComingSoonView({
           {subtitle}
         </p>
 
-        {/* Cinema Network Dropdown (25 Cinemas + Ticketing Platforms) */}
+        {/* Cinema Network Dropdown (List Bioskop Saja Tanpa Nomor & Tanpa Platform Tiket) */}
         <div className="mb-10 max-w-xl mx-auto text-center">
           <span className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2.5">
             JARINGAN BIOSKOP MITRA PENAYANGAN RESMI
@@ -125,15 +119,15 @@ export default function ComingSoonView({
               <Film className="w-4 h-4 text-amber-400 shrink-0" />
               <div className="truncate">
                 <span className="font-extrabold text-white block">
-                  Daftar 25 Jaringan Bioskop Mitra Penayangan
+                  Daftar Jaringan Bioskop Mitra Penayangan
                 </span>
                 <span className="text-[11px] text-slate-400 block truncate">
-                  XXI, CGV, Cinépolis, Platinum, NSC, Rajawali, Golden Theater &amp; mitra lainnya
+                  XXI, CGV, CINEPOLIS, PLATINUM, NSC, Rajawali, Golden Theater &amp; bioskop lainnya
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-amber-400 group-hover:bg-amber-500/20">
-              <span>{isCinemaDropdownOpen ? 'Tutup' : 'Lihat Semua (25)'}</span>
+              <span>{isCinemaDropdownOpen ? 'Tutup' : 'Lihat Bioskop'}</span>
               {isCinemaDropdownOpen ? (
                 <ChevronUp className="w-3.5 h-3.5" />
               ) : (
@@ -144,51 +138,23 @@ export default function ComingSoonView({
 
           {/* Expanded Dropdown Content */}
           {isCinemaDropdownOpen && (
-            <div className="mt-3 p-5 rounded-2xl bg-[#0F141C] border border-amber-500/30 shadow-2xl text-left space-y-5 animate-in fade-in slide-in-from-top-2 duration-200">
-              {/* 25 Cinema Networks Grid */}
-              <div>
-                <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                    <Film className="w-3.5 h-3.5" />
-                    <span>25 Jaringan Bioskop Resmi</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono">Total: 25 Mitra</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
-                  {CINEMA_NETWORKS.map((cinema, idx) => (
-                    <div
-                      key={cinema}
-                      className="px-2.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/5 hover:border-amber-500/30 text-slate-200 flex items-center gap-1.5 transition"
-                    >
-                      <span className="text-[9px] font-mono font-bold text-amber-400/80 shrink-0">
-                        {String(idx + 1).padStart(2, '0')}.
-                      </span>
-                      <span className="truncate font-semibold">{cinema}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Ticketing Platforms (Separated per Director / Client Request) */}
-              <div className="pt-3 border-t border-white/10">
-                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-2">
-                  <Ticket className="w-3.5 h-3.5" />
-                  <span>Platform Pembelian Tiket Resmi</span>
+            <div className="mt-3 p-5 rounded-2xl bg-[#0F141C] border border-amber-500/30 shadow-2xl text-left space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                  <Film className="w-3.5 h-3.5" />
+                  <span>Jaringan Bioskop Mitra Penayangan</span>
                 </span>
-                <p className="text-[11px] text-slate-400 mb-2.5 leading-relaxed">
-                  Catatan: TIX ID dan M-TIX adalah platform aplikasi pembelian tiket bioskop secara online, bukan jaringan bioskop fisik.
-                </p>
-                <div className="flex flex-wrap gap-2.5">
-                  {TICKETING_PLATFORMS.map(p => (
-                    <div
-                      key={p.name}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center gap-2"
-                    >
-                      <span className="font-extrabold text-white">{p.name}</span>
-                      <span className="text-[10px] text-emerald-400/80 font-normal">({p.desc})</span>
-                    </div>
-                  ))}
-                </div>
+                <span className="text-[10px] text-slate-400 font-mono">25 Bioskop</span>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {CINEMA_NETWORKS.map(cinema => (
+                  <span
+                    key={cinema}
+                    className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 hover:border-amber-500/40 text-slate-200 font-bold hover:text-amber-300 transition"
+                  >
+                    {cinema}
+                  </span>
+                ))}
               </div>
             </div>
           )}
