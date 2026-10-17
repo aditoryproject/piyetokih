@@ -76,6 +76,22 @@ export default function WarVoucherForm({
     }
   }, [defaultCity, defaultVenue]);
 
+  // Lock body scroll and listen for Escape key when modal is open
+  useEffect(() => {
+    if (claimedLead) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setClaimedLead(null);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [claimedLead]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -393,25 +409,32 @@ export default function WarVoucherForm({
 
       {/* POPUP / MODAL TIKET KETIKA BERHASIL MENGKLAIM */}
       {claimedLead && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto animate-fade-in">
-          <div className="relative w-full max-w-md my-8 bg-[#121620] border border-amber-500/40 rounded-3xl p-6 shadow-2xl">
-            {/* Close Button */}
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-black/85 backdrop-blur-md px-3 py-4 sm:px-4 sm:py-8 flex justify-center items-start min-h-screen animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setClaimedLead(null);
+          }}
+        >
+          <div className="relative w-full max-w-sm sm:max-w-md my-auto py-2 sm:py-4">
+            {/* Close Button floating top-right */}
             <button
               onClick={() => setClaimedLead(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition z-20"
+              className="absolute -top-2 -right-1 sm:top-1 sm:right-0 p-2 rounded-full bg-slate-900/95 border border-amber-500/50 hover:bg-amber-500 hover:text-black text-white transition z-30 shadow-2xl"
               title="Tutup"
+              aria-label="Tutup"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <div className="text-center mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-black uppercase tracking-wider mb-2">
+            {/* Notification Banner */}
+            <div className="text-center mb-2.5 sm:mb-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-1 shadow-sm">
                 <CheckCircle className="w-3.5 h-3.5" />
                 <span>KODE BOOKING RESMI TERBIT</span>
               </span>
-              <h3 className="text-xl font-black text-white">🎟️ SIAP! VOUCHERMU SUDAH DIBOOKING</h3>
-              <p className="text-xs text-slate-300 mt-1">
-                Tunjukkan kode ini di booth {claimedLead.venueLocation || cityLocation} untuk menyelesaikan pembayaran &amp; menerima Voucher Fisik 19–20 November.
+              <h3 className="text-base sm:text-lg font-black text-white">🎟️ SIAP! VOUCHER BERHASIL DIBOOKING</h3>
+              <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5 max-w-xs sm:max-w-sm mx-auto">
+                Tunjukkan kode ini di booth {claimedLead.venueLocation || cityLocation} untuk pembayaran &amp; ambil voucher fisik.
               </p>
             </div>
 
@@ -422,6 +445,7 @@ export default function WarVoucherForm({
               cityLocation={claimedLead.cityLocation}
               venueLocation={claimedLead.venueLocation}
               validityText={claimedLead.validityText}
+              onClose={() => setClaimedLead(null)}
             />
           </div>
         </div>
