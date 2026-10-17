@@ -2,6 +2,93 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, generateVoucherSerial, LeadRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+};
+
+// Handle CORS Preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+// Handle GET requests (Wahnotif "Tarik Cepat Otomatis dari Link Webhook" & Tool Definition)
+export async function GET(req: NextRequest) {
+  const origin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+  const effectiveOrigin = (origin.includes('localhost') || origin.includes('127.0.0.1'))
+    ? 'https://piyetokihfilm.com'
+    : origin;
+
+  const toolDefinition = {
+    status: 'active',
+    success: true,
+    message: 'Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant.',
+    name: 'generate_voucher_presale',
+    tool_name: 'generate_voucher_presale',
+    title: 'Registrasi Presale & Nonton Duluan Piye Toh Kih',
+    description: 'Menghasilkan Code Booking verifikasi resmi dan link e-tiket voucher nonton duluan film Piye Toh Kih untuk penonton yang chat di WhatsApp. Sistem otomatis mencatat lead dan mengirimkan data tiket.',
+    url: `${effectiveOrigin}/api/webhook/wahnotif`,
+    webhook_url: `${effectiveOrigin}/api/webhook/wahnotif`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    parameters: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Nama lengkap calon penonton',
+        },
+        phone: {
+          type: 'string',
+          description: 'Nomor WhatsApp calon penonton (format: 08xx atau 62xx)',
+        },
+        city: {
+          type: 'string',
+          description: 'Nama kota pilihan roadshow (contoh: Semarang, Yogyakarta, Solo, Surabaya, Malang, Kudus, Purwokerto, Tegal, Magelang, Salatiga, Klaten, Mojokerto, Kediri, Sidoarjo, Jember, Madiun, Jakarta)',
+        },
+        email: {
+          type: 'string',
+          description: 'Alamat email aktif calon penonton (opsional, jika penonton ingin dikirimi tiket via email)',
+        },
+      },
+      required: ['phone', 'city'],
+    },
+    // Compatible array format for OpenAPI / OpenAI Function Calling schemas
+    tools: [
+      {
+        name: 'generate_voucher_presale',
+        description: 'Generate Code Booking verifikasi resmi dan link e-tiket voucher nonton duluan film Piye Toh Kih.',
+        url: `${effectiveOrigin}/api/webhook/wahnotif`,
+        method: 'POST',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Nama lengkap calon penonton' },
+            phone: { type: 'string', description: 'Nomor WhatsApp calon penonton' },
+            city: { type: 'string', description: 'Nama kota roadshow pilihan penonton' },
+            email: { type: 'string', description: 'Alamat email aktif (opsional)' },
+          },
+          required: ['phone', 'city'],
+        },
+      },
+    ],
+  };
+
+  return NextResponse.json(toolDefinition, {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -23,7 +110,7 @@ export async function POST(req: NextRequest) {
           success: false,
           error: 'Nomor telepon pengirim tidak terdeteksi dari sesi chat.',
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -85,23 +172,29 @@ export async function POST(req: NextRequest) {
     }
 
     // Response tailored for Wahnotif Custom AI Tool execution and standard webhooks
-    return NextResponse.json({
-      status: 'success',
-      success: true,
-      action: 'voucher_generated',
-      name,
-      city: cityLocation,
-      serialNumber,
-      voucherUrl,
-      validDates: validityText,
-      replyMessage: `🎬 *CODE VERIFIKASI RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota Roadshow: *${cityLocation}*\nCode Verifikasi: *${serialNumber}*\n\nBuka & simpan / download PDF tiket kamu di sini:\n${voucherUrl}\n\n⚠️ *KETENTUAN PENUKARAN VOUCHER FISIK:*\nCode ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi penayangan bioskop dilakukan pada saat Roadshow & Meet and Greet di kotamu.\n📍 Lokasi Penukaran: Kunjungi booth resmi di samping venue/panggung Meet and Greet Kota ${cityLocation}! Sampai jumpa lur! 🍿`,
-      instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa Code Verifikasi resmi film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Code ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa code ini bukan bukti pembayaran tiket, penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet Kota ${cityLocation} dengan mengunjungi booth resmi di samping venue/panggung Meet and Greet.`,
-    });
+    return NextResponse.json(
+      {
+        status: 'success',
+        success: true,
+        action: 'voucher_generated',
+        name,
+        city: cityLocation,
+        serialNumber,
+        voucherUrl,
+        validDates: validityText,
+        replyMessage: `🎬 *CODE VERIFIKASI RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota Roadshow: *${cityLocation}*\nCode Verifikasi: *${serialNumber}*\n\nBuka & simpan / download PDF tiket kamu di sini:\n${voucherUrl}\n\n⚠️ *KETENTUAN PENUKARAN VOUCHER FISIK:*\nCode ini BUKAN bukti pembayaran tiket. Penukaran voucher fisik resmi penayangan bioskop dilakukan pada saat Roadshow & Meet and Greet di kotamu.\n📍 Lokasi Penukaran: Kunjungi booth resmi di samping venue/panggung Meet and Greet Kota ${cityLocation}! Sampai jumpa lur! 🍿`,
+        instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa Code Verifikasi resmi film Piye Toh Kih untuk Kota ${cityLocation} sudah aktif dengan Code ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa code ini bukan bukti pembayaran tiket, penukaran voucher fisik resmi dilakukan saat Roadshow & Meet and Greet Kota ${cityLocation} dengan mengunjungi booth resmi di samping venue/panggung Meet and Greet.`,
+      },
+      {
+        status: 200,
+        headers: corsHeaders,
+      }
+    );
   } catch (err: any) {
     console.error('[Wahnotif Webhook Error]:', err);
     return NextResponse.json(
       { status: 'error', success: false, error: err.message || 'Server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

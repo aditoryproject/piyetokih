@@ -154,14 +154,6 @@ export const CITIES_DATA: CityData[] = [
       "voucherExchangeInfo": "Penukaran voucher fisik resmi bertempat di Ground Floor Plaza Ambarrukmo pada jam 17.00–18.00 WIB. Tunjukkan Kode Booking Anda di booth untuk mengambil voucher fisik.",
       "items": [
         {
-          "time": "08.00 – 09.00 WIB",
-          "category": "Sekolah",
-          "title": "MAMPIR KE SEKOLAH",
-          "venue": "SMK Negeri 3 Kasihan (SMSR) Yogyakarta",
-          "note": "Sapa pagi & seru-seruan bareng pemain film",
-          "isVoucherExchange": true
-        },
-        {
           "time": "10.00 – 11.00 WIB",
           "category": "Radio",
           "title": "INTERVIEW RADIO",

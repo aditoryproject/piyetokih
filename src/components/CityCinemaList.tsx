@@ -109,7 +109,7 @@ export default function CityCinemaList({
                   className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/15 transition-all active:scale-95 group/btn"
                 >
                   <span>
-                    NONTON DULUAN DI {cinema.chain === 'XXI' ? 'THE PARK XXI' : cinema.chain.toUpperCase()}
+                    NONTON DULUAN DI {cinema.name.toUpperCase()}
                   </span>
                   <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                 </a>

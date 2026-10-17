@@ -45,67 +45,73 @@ export default function CityVoucherPickupSection({
           LOKASI PENUKARAN VOUCHER FISIK (BUKAN BIOSKOP)
         </div>
 
-        {/* 3 Categories of Booth: Sekolah, Kampus, Mall */}
-        <div className="mb-8">
-          <p className="text-xs sm:text-sm font-semibold text-amber-300 mb-3">
-            Lokasi booth penukaran voucher tidak hanya di Mall, tetapi juga tersedia saat kunjungan sekolah dan kampus:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            {/* Booth 1: Sekolah */}
-            <div className="bg-[#141a24] border border-white/10 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block mb-1">
-                  [ 01 ] KUNJUNGAN SEKOLAH
-                </span>
-                <h4 className="text-sm font-bold text-white mb-1">
-                  {schoolVenue || `SMA Negeri Terpilih ${cityName}`}
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  Booth resmi tersedia saat sesi sapa pagi &amp; bagi-bagi merchandise di sekolah.
-                </p>
-              </div>
-              <span className="text-[10px] text-emerald-400 font-mono font-semibold mt-3">
-                ✓ Bayar &amp; Ambil Voucher Rp10.000
-              </span>
-            </div>
+        {/* Categories of Booth: Sekolah, Kampus, Mall (Only render active ones) */}
+        {(() => {
+          const booths: Array<{ badge: string; title: string; desc: string; isHighlight?: boolean }> = [];
+          if (schoolVenue) {
+            booths.push({
+              badge: `[ 0${booths.length + 1} ] KUNJUNGAN SEKOLAH`,
+              title: schoolVenue,
+              desc: 'Booth resmi tersedia saat sesi sapa pagi & bagi-bagi merchandise di sekolah.',
+            });
+          }
+          if (campusVenue) {
+            booths.push({
+              badge: `[ 0${booths.length + 1} ] KUNJUNGAN KAMPUS`,
+              title: campusVenue,
+              desc: 'Booth resmi buka saat sharing session komedi & temu tawa bareng mahasiswa.',
+            });
+          }
+          booths.push({
+            badge: `[ 0${booths.length + 1} ] MALL ROADSHOW & MEET GREET`,
+            title: mallTitle,
+            desc: `${mallFloor} (${mallTime})`,
+            isHighlight: true,
+          });
 
-            {/* Booth 2: Kampus */}
-            <div className="bg-[#141a24] border border-white/10 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block mb-1">
-                  [ 02 ] KUNJUNGAN KAMPUS
-                </span>
-                <h4 className="text-sm font-bold text-white mb-1">
-                  {campusVenue || `Universitas / Kampus Mitra ${cityName}`}
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  Booth resmi buka saat sharing session komedi &amp; temu tawa bareng mahasiswa.
-                </p>
+          return (
+            <div className="mb-8">
+              <p className="text-xs sm:text-sm font-semibold text-amber-300 mb-3">
+                {booths.length > 1
+                  ? 'Lokasi booth penukaran voucher tersedia di Mall Roadshow resmi serta agenda kunjungan kota:'
+                  : 'Lokasi booth penukaran voucher resmi tersedia di Mall Roadshow kota:'}
+              </p>
+              <div
+                className={`grid grid-cols-1 ${
+                  booths.length === 2
+                    ? 'sm:grid-cols-2'
+                    : booths.length === 1
+                    ? 'max-w-md mx-auto'
+                    : 'md:grid-cols-3'
+                } gap-3.5`}
+              >
+                {booths.map((b, i) => (
+                  <div
+                    key={i}
+                    className={`bg-[#141a24] ${
+                      b.isHighlight ? 'border border-amber-500/40' : 'border border-white/10'
+                    } rounded-xl p-4 flex flex-col justify-between`}
+                  >
+                    <div>
+                      <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block mb-1">
+                        {b.badge}
+                      </span>
+                      <h4 className="text-sm font-bold text-white mb-1">
+                        {b.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        {b.desc}
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-emerald-400 font-mono font-semibold mt-3">
+                      ✓ Bayar &amp; Ambil Voucher Rp10.000
+                    </span>
+                  </div>
+                ))}
               </div>
-              <span className="text-[10px] text-emerald-400 font-mono font-semibold mt-3">
-                ✓ Bayar &amp; Ambil Voucher Rp10.000
-              </span>
             </div>
-
-            {/* Booth 3: Mall Roadshow */}
-            <div className="bg-[#141a24] border border-amber-500/40 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block mb-1">
-                  [ 03 ] MALL ROADSHOW
-                </span>
-                <h4 className="text-sm font-bold text-white mb-1">
-                  {mallTitle}
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  {mallFloor} ({mallTime})
-                </p>
-              </div>
-              <span className="text-[10px] text-emerald-400 font-mono font-semibold mt-3">
-                ✓ Bayar &amp; Ambil Voucher Rp10.000
-              </span>
-            </div>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* Checklist per Page 10 */}
         <div className="bg-[#141a24] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6">
