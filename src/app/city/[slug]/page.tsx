@@ -141,7 +141,7 @@ export default async function CityRoadshowPage({ params }: Props) {
                 height={201}
                 fetchPriority="high"
                 decoding="sync"
-                className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.7)] group-hover:scale-105 transition-transform duration-200"
+                className="w-40 sm:w-52 h-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-200"
               />
             </Link>
           </div>

@@ -26,11 +26,11 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
     }
   }, [propSettings]);
 
-  const initialPoster = movieSettings.posterUrl || '/official-poster.jpg';
+  const initialPoster = movieSettings.posterUrl || '/official-theatrical-poster.webp';
   const [currentPoster, setCurrentPoster] = useState(initialPoster);
 
   useEffect(() => {
-    setCurrentPoster(movieSettings.posterUrl || '/official-poster.jpg');
+    setCurrentPoster(movieSettings.posterUrl || '/official-theatrical-poster.webp');
   }, [movieSettings]);
 
   const directorName = movieSettings.director || 'Ito Mavin';
@@ -57,11 +57,11 @@ export default function MovieStorySection({ movieSettings: propSettings }: Movie
                 width={600}
                 height={900}
                 onError={() => {
-                  if (currentPoster !== '/official-poster.jpg') {
-                    setCurrentPoster('/official-poster.jpg');
+                  if (currentPoster !== '/official-theatrical-poster.jpg') {
+                    setCurrentPoster('/official-theatrical-poster.jpg');
                   }
                 }}
-                className="w-full h-auto min-h-[480px] object-cover group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-auto aspect-[2/3] object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
 

@@ -68,7 +68,7 @@ export default async function HomePage() {
               height={302}
               fetchPriority="high"
               decoding="sync"
-              className="w-48 sm:w-60 md:w-72 max-w-full h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)] filter hover:scale-[1.02] transition-transform duration-300"
+              className="w-48 sm:w-60 md:w-72 max-w-full h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.7)] hover:scale-[1.02] transition-transform duration-300"
             />
           </div>
 
@@ -166,7 +166,7 @@ export default async function HomePage() {
       <RoadshowSection />
 
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
-      <ArticlesSection />
+      <ArticlesSection initialArticles={(db.articles || []).filter(a => a.published)} />
 
       {/* 9. FOOTER RESMI */}
       <Footer initialSocialLinks={db.settings.socialLinks} />

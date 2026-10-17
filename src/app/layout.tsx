@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { cookies, headers } from 'next/headers';
 import MetaPixelTracker from '@/components/MetaPixelTracker';
 import Link from 'next/link';
 import { Film } from 'lucide-react';
 import { getDb } from '@/lib/db';
-import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
 import AdminMaintenanceBanner from '@/components/AdminMaintenanceBanner';
 import PublicHeader from '@/components/PublicHeader';
 
@@ -78,24 +76,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') || '';
-
-  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-  const session = await verifySessionToken(token);
-  const isAdmin = session.valid;
-
   const db = getDb();
   const isMaintenanceMode = Boolean(db.settings.isMaintenanceMode);
-
-  // If path is under /admin, we don't render the public header
-  const isAdminPath = pathname.startsWith('/admin') || pathname.includes('/admin');
-  const showHeader = (!isMaintenanceMode || isAdmin) && !isAdminPath;
 
   return (
     <html lang="id">
       <head>
+        {/* DNS prefetch for external tracking endpoints */}
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
         {/* Preload critical LCP Hero Images in WebP format */}
         <link rel="preload" as="image" href="/logo-ptk.webp" type="image/webp" fetchPriority="high" />
         <link rel="preload" as="image" href="/logo-miracle-pictures.webp" type="image/webp" fetchPriority="high" />
@@ -137,12 +128,12 @@ export default async function RootLayout({
         />
 
         {/* Banner Khusus Admin saat Mode Coming Soon Aktif */}
-        {isAdmin && isMaintenanceMode && !isAdminPath && (
+        {isMaintenanceMode && (
           <AdminMaintenanceBanner isMaintenanceMode={true} />
         )}
 
         {/* Cinematic Clean Header (Hanya tampil di halaman publik, tidak pernah di /admin) */}
-        <PublicHeader showHeader={showHeader} />
+        <PublicHeader showHeader={true} />
 
         {/* Main Content: Selalu render children agar tidak ada rute/halaman yang terblokir */}
         <main className="min-h-screen">{children}</main>

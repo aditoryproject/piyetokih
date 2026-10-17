@@ -14,11 +14,16 @@ import {
   Newspaper,
 } from 'lucide-react';
 
-export default function ArticlesSection() {
-  const [articles, setArticles] = useState<ArticleRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+interface ArticlesSectionProps {
+  initialArticles?: ArticleRecord[];
+}
+
+export default function ArticlesSection({ initialArticles }: ArticlesSectionProps = {}) {
+  const [articles, setArticles] = useState<ArticleRecord[]>(initialArticles || []);
+  const [loading, setLoading] = useState(!initialArticles);
 
   useEffect(() => {
+    if (initialArticles && initialArticles.length > 0) return;
     fetch('/api/articles?publishedOnly=true')
       .then(res => res.json())
       .then(data => {
@@ -28,7 +33,7 @@ export default function ArticlesSection() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [initialArticles]);
 
   if (!loading && articles.length === 0) {
     return null;
