@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, Film, Lock } from 'lucide-react';
+import { Sparkles, Film, ChevronDown, ChevronUp, Ticket } from 'lucide-react';
 
 interface ComingSoonViewProps {
   headline?: string;
@@ -15,11 +15,46 @@ interface ComingSoonViewProps {
   };
 }
 
+const CINEMA_NETWORKS = [
+  'Dakota Cinema',
+  'Rajawali Cinema',
+  'Golden Theater',
+  'Denpasar Cineplex',
+  'Planet Cinema Bone',
+  'Ltd 9 Cinema',
+  'MSB Cinema',
+  'BES Cinema Metro',
+  'BES Cinema Pangkal Pinang',
+  'Mopic Cinemas',
+  'Movimax',
+  'Gajahmada Cinema',
+  'Hollywood Cinema',
+  'JIG Cinema',
+  'Cinema XXI',
+  'CGV Cinemas',
+  'Cinépolis',
+  "SAM'S Studio",
+  'FLIX Cinema',
+  'Kota Cinema Mall (KCM)',
+  'Platinum Cineplex',
+  'New Star Cineplex (NSC)',
+  'Movieplex',
+  'Local Cinema',
+  'Surya Yudha Cinema',
+];
+
+const TICKETING_PLATFORMS = [
+  { name: 'TIX ID', desc: 'Aplikasi Pembelian Tiket Online' },
+  { name: 'M-TIX', desc: 'Aplikasi Resmi Tiket Cinema XXI' },
+];
+
 export default function ComingSoonView({
   headline = 'COMING SOON',
   subtitle = 'Website Resmi Film PIYE TO KIH? The Movie sedang mempersiapkan sesuatu yang istimewa. Nantikan jadwal roadshow 17 kota, penayangan bioskop, dan kejutan spesial!',
   socialLinks,
 }: ComingSoonViewProps) {
+  const [isCinemaDropdownOpen, setIsCinemaDropdownOpen] = useState(false);
+
   const instagramUrl = socialLinks?.instagram || 'https://www.instagram.com/piyetokihfilm.official/';
   const tiktokUrl = socialLinks?.tiktok || 'https://www.tiktok.com/@piyetokihfilm.official';
   const youtubeUrl = socialLinks?.youtube || 'https://www.youtube.com/@piyetokihfilm';
@@ -42,7 +77,7 @@ export default function ComingSoonView({
       </div>
 
       {/* Main Center Hero */}
-      <div className="max-w-3xl mx-auto text-center my-auto py-8 sm:py-12">
+      <div className="max-w-3xl mx-auto text-center my-auto py-8 sm:py-12 w-full">
         {/* Official 3D Logotype */}
         <div className="mb-6 sm:mb-8 relative inline-block group">
           <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 to-red-500/20 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition duration-700" />
@@ -74,20 +109,89 @@ export default function ComingSoonView({
           {subtitle}
         </p>
 
-        {/* Cinema Network Badges (Authentic Theatrical Feel) */}
-        <div className="mb-8">
+        {/* Cinema Network Dropdown (25 Cinemas + Ticketing Platforms) */}
+        <div className="mb-10 max-w-xl mx-auto text-center">
           <span className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2.5">
             JARINGAN BIOSKOP MITRA PENAYANGAN RESMI
           </span>
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-300 bg-black/40 border border-white/10 px-5 py-3 rounded-2xl max-w-lg mx-auto">
-            <span className="hover:text-amber-300 transition-colors">CINEMA XXI</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">CGV CINEMAS</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">CINÉPOLIS</span>
-            <span className="text-white/20">•</span>
-            <span className="hover:text-amber-300 transition-colors">TIX ID</span>
-          </div>
+
+          {/* Collapsible Dropdown Button */}
+          <button
+            type="button"
+            onClick={() => setIsCinemaDropdownOpen(!isCinemaDropdownOpen)}
+            className="w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-2xl bg-black/60 hover:bg-black/80 border border-white/10 hover:border-amber-500/40 transition-all text-xs text-left group shadow-lg"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Film className="w-4 h-4 text-amber-400 shrink-0" />
+              <div className="truncate">
+                <span className="font-extrabold text-white block">
+                  Daftar 25 Jaringan Bioskop Mitra Penayangan
+                </span>
+                <span className="text-[11px] text-slate-400 block truncate">
+                  XXI, CGV, Cinépolis, Platinum, NSC, Rajawali, Golden Theater &amp; mitra lainnya
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-amber-400 group-hover:bg-amber-500/20">
+              <span>{isCinemaDropdownOpen ? 'Tutup' : 'Lihat Semua (25)'}</span>
+              {isCinemaDropdownOpen ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
+            </div>
+          </button>
+
+          {/* Expanded Dropdown Content */}
+          {isCinemaDropdownOpen && (
+            <div className="mt-3 p-5 rounded-2xl bg-[#0F141C] border border-amber-500/30 shadow-2xl text-left space-y-5 animate-in fade-in slide-in-from-top-2 duration-200">
+              {/* 25 Cinema Networks Grid */}
+              <div>
+                <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5" />
+                    <span>25 Jaringan Bioskop Resmi</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">Total: 25 Mitra</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+                  {CINEMA_NETWORKS.map((cinema, idx) => (
+                    <div
+                      key={cinema}
+                      className="px-2.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/5 hover:border-amber-500/30 text-slate-200 flex items-center gap-1.5 transition"
+                    >
+                      <span className="text-[9px] font-mono font-bold text-amber-400/80 shrink-0">
+                        {String(idx + 1).padStart(2, '0')}.
+                      </span>
+                      <span className="truncate font-semibold">{cinema}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ticketing Platforms (Separated per Director / Client Request) */}
+              <div className="pt-3 border-t border-white/10">
+                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-2">
+                  <Ticket className="w-3.5 h-3.5" />
+                  <span>Platform Pembelian Tiket Resmi</span>
+                </span>
+                <p className="text-[11px] text-slate-400 mb-2.5 leading-relaxed">
+                  Catatan: TIX ID dan M-TIX adalah platform aplikasi pembelian tiket bioskop secara online, bukan jaringan bioskop fisik.
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {TICKETING_PLATFORMS.map(p => (
+                    <div
+                      key={p.name}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center gap-2"
+                    >
+                      <span className="font-extrabold text-white">{p.name}</span>
+                      <span className="text-[10px] text-emerald-400/80 font-normal">({p.desc})</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Social Media Links */}
@@ -113,8 +217,8 @@ export default function ComingSoonView({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-bold transition active:scale-95 shadow-md"
             >
-              <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .57.04.84.12V9.32a6.33 6.33 0 0 0-.84-.06 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.16 8.16 0 0 0 4.77 1.52V6.82a4.85 4.85 0 0 1-1-.13z" />
+              <svg className="w-4 h-4 fill-cyan-400" viewBox="0 0 24 24">
+                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.16 1.19 2.09 2.38 2.26.89.14 1.82-.09 2.53-.66.59-.44.97-1.12 1.06-1.85.07-1.78.04-3.57.04-5.36V.02h-.27z" />
               </svg>
               <span>TikTok</span>
             </a>
@@ -146,10 +250,10 @@ export default function ComingSoonView({
         </div>
       </div>
 
-      {/* Bottom Footer */}
+      {/* Bottom Footer - Correct Legal PT Name */}
       <div className="w-full max-w-4xl pt-6 border-t border-white/[0.06] text-center text-[11px] text-slate-500">
         <div>
-          © 2026 PT Miracle Sinema Indonesia. Seluruh hak cipta dilindungi undang-undang.
+          © 2026 PT Mirakel Sinema Imaji. Seluruh hak cipta dilindungi undang-undang.
         </div>
       </div>
     </div>

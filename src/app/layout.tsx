@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import MetaPixelTracker from '@/components/MetaPixelTracker';
-import Link from 'next/link';
-import { Film } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import AdminMaintenanceBanner from '@/components/AdminMaintenanceBanner';
 import PublicHeader from '@/components/PublicHeader';
+import ComingSoonView from '@/components/ComingSoonView';
+import { cookies, headers } from 'next/headers';
+import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://piyetokihfilm.com'),
@@ -79,6 +80,20 @@ export default async function RootLayout({
   const db = getDb();
   const isMaintenanceMode = Boolean(db.settings.isMaintenanceMode);
 
+  // Authenticate session securely (Strict Admin Verification)
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+  const session = await verifySessionToken(token);
+  const isAdmin = Boolean(session?.valid);
+
+  // Read current request path from middleware
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || '';
+  const isPublicRoute = !pathname.startsWith('/admin') && !pathname.startsWith('/api');
+
+  // Condition to show Coming Soon: maintenance mode is active, user is NOT admin, and route is public
+  const showComingSoon = isMaintenanceMode && !isAdmin && isPublicRoute;
+
   return (
     <html lang="id">
       <head>
@@ -127,16 +142,26 @@ export default async function RootLayout({
           googleAnalyticsId={db.settings.googleAnalyticsId}
         />
 
-        {/* Banner Khusus Admin saat Mode Coming Soon Aktif */}
-        {isMaintenanceMode && (
+        {/* Banner Khusus Admin saat Mode Coming Soon Aktif (HANYA DITAMPILKAN KE ADMIN YANG SAH) */}
+        {isMaintenanceMode && isAdmin && (
           <AdminMaintenanceBanner isMaintenanceMode={true} />
         )}
 
-        {/* Cinematic Clean Header (Hanya tampil di halaman publik, tidak pernah di /admin) */}
-        <PublicHeader showHeader={true} />
+        {/* Cinematic Clean Header (Hanya tampil di publik jika TIDAK dalam mode Coming Soon, atau jika Admin) */}
+        {!showComingSoon && <PublicHeader showHeader={true} />}
 
-        {/* Main Content: Selalu render children agar tidak ada rute/halaman yang terblokir */}
-        <main className="min-h-screen">{children}</main>
+        {/* Main Content: Tampilkan Coming Soon untuk seluruh rute publik jika mode Coming Soon aktif */}
+        <main className="min-h-screen">
+          {showComingSoon ? (
+            <ComingSoonView
+              headline={db.settings.maintenanceHeadline}
+              subtitle={db.settings.maintenanceSubtitle}
+              socialLinks={db.settings.socialLinks}
+            />
+          ) : (
+            children
+          )}
+        </main>
       </body>
     </html>
   );
