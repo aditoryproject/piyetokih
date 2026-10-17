@@ -174,6 +174,7 @@ export default function AdminDashboardClient() {
   const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);
   const [uploadingArticleCover, setUploadingArticleCover] = useState(false);
   const [uploadingArticleGallery, setUploadingArticleGallery] = useState(false);
+  const [galleryUploadProgress, setGalleryUploadProgress] = useState<string>('');
   const [uploadingBogoBanner, setUploadingBogoBanner] = useState(false);
 
   // Server uploads list
@@ -196,7 +197,19 @@ export default function AdminDashboardClient() {
     }
   };
 
-  const handleFileUpload = async (file: File, category: string = 'movie'): Promise<string | null> => {
+  const handleFileUpload = async (file: File, category: string = 'movie', skipRefresh: boolean = false): Promise<string | null> => {
+    // 1. Validasi Ukuran (Maks 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert(`Ukuran file "${file.name}" terlalu besar (${(file.size / (1024 * 1024)).toFixed(1)}MB). Batas maksimal adalah 10MB per foto.`);
+      return null;
+    }
+
+    // 2. Cegah upload file video mentah ke input gambar
+    if (file.type.startsWith('video/')) {
+      alert(`File "${file.name}" adalah file video. Video film ditautkan melalui Link YouTube pada tab/bidang yang tersedia, bukan diunggah langsung ke storage gambar.`);
+      return null;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('category', category);
@@ -207,7 +220,7 @@ export default function AdminDashboardClient() {
       });
       const data = await res.json();
       if (data.success && data.url) {
-        fetchServerUploads();
+        if (!skipRefresh) fetchServerUploads();
         return data.url;
       } else {
         alert(data.error || 'Gagal mengunggah file.');
@@ -216,6 +229,28 @@ export default function AdminDashboardClient() {
     } catch {
       alert('Terjadi kesalahan koneksi saat mengunggah gambar.');
       return null;
+    }
+  };
+
+  const handleUploadMultipleGallery = async (files: File[]) => {
+    if (files.length === 0) return;
+    setUploadingArticleGallery(true);
+    const validUrls: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setGalleryUploadProgress(`Mengunggah foto ${i + 1} dari ${files.length}...`);
+      const url = await handleFileUpload(file, 'article-gallery', true);
+      if (url) validUrls.push(url);
+    }
+    setGalleryUploadProgress('');
+    setUploadingArticleGallery(false);
+    fetchServerUploads();
+    if (validUrls.length > 0) {
+      const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
+      setArticleForm((prev) => ({
+        ...prev,
+        galleryImagesText: existing + validUrls.join('\n'),
+      }));
     }
   };
 
@@ -5284,6 +5319,9 @@ export default function AdminDashboardClient() {
                     <Film className="w-4 h-4" />
                     <span>Pengaturan Khusus Video</span>
                   </div>
+                  <div className="p-3 rounded-xl bg-blue-100/80 border border-blue-300 text-blue-950 text-[11px] leading-relaxed">
+                    <strong>🎬 Catatan Video:</strong> Untuk performa website cepat dan hemat bandwidth, video film (Teaser, Trailer, BTS) ditautkan via <strong>URL YouTube</strong>. Anda tidak perlu mengunggah file video mentah. Gambar cover/thumbnail video dapat diunggah pada bagian Foto Cover di bawah.
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="sm:col-span-2">
                       <label className="block font-bold text-slate-700 mb-1">URL Video YouTube</label>
@@ -5493,29 +5531,16 @@ export default function AdminDashboardClient() {
                   {/* Multi Upload Button */}
                   <label className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition shadow-sm active:scale-95 shrink-0 group">
                     <Upload className="w-3.5 h-3.5 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
-                    <span>{uploadingArticleGallery ? 'Mengunggah Foto-Foto...' : '📁 Upload Banyak Foto Sekaligus'}</span>
+                    <span>{uploadingArticleGallery ? (galleryUploadProgress || 'Mengunggah Foto-Foto...') : '📁 Upload Banyak Foto Sekaligus'}</span>
                     <input
                       type="file"
                       multiple
                       accept="image/*"
                       disabled={uploadingArticleGallery}
                       className="hidden"
-                      onChange={async (e) => {
-                        const files = Array.from(e.target.files || []);
-                        if (files.length === 0) return;
-                        setUploadingArticleGallery(true);
-                        const uploadedUrls = await Promise.all(
-                          files.map((f) => handleFileUpload(f, 'article-gallery'))
-                        );
-                        setUploadingArticleGallery(false);
-                        const validUrls = uploadedUrls.filter(Boolean) as string[];
-                        if (validUrls.length > 0) {
-                          const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
-                          setArticleForm((prev) => ({
-                            ...prev,
-                            galleryImagesText: existing + validUrls.join('\n'),
-                          }));
-                        }
+                      onChange={(e) => {
+                        handleUploadMultipleGallery(Array.from(e.target.files || []));
+                        e.target.value = '';
                       }}
                     />
                   </label>
@@ -5584,29 +5609,18 @@ export default function AdminDashboardClient() {
                             {/* Add more tile */}
                             <label className="cursor-pointer aspect-video rounded-xl border-2 border-dashed border-slate-300 hover:border-amber-500 hover:bg-amber-50/50 flex flex-col items-center justify-center text-slate-500 hover:text-amber-700 transition text-center p-2 bg-white shadow-sm">
                               <Plus className="w-5 h-5 mb-0.5" />
-                              <span className="text-[10px] font-bold leading-tight">Tambah Foto</span>
+                              <span className="text-[10px] font-bold leading-tight">
+                                {uploadingArticleGallery ? (galleryUploadProgress || 'Mengunggah...') : 'Tambah Foto'}
+                              </span>
                               <input
                                 type="file"
                                 multiple
                                 accept="image/*"
                                 disabled={uploadingArticleGallery}
                                 className="hidden"
-                                onChange={async (e) => {
-                                  const files = Array.from(e.target.files || []);
-                                  if (files.length === 0) return;
-                                  setUploadingArticleGallery(true);
-                                  const uploadedUrls = await Promise.all(
-                                    files.map((f) => handleFileUpload(f, 'article-gallery'))
-                                  );
-                                  setUploadingArticleGallery(false);
-                                  const validUrls = uploadedUrls.filter(Boolean) as string[];
-                                  if (validUrls.length > 0) {
-                                    const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
-                                    setArticleForm((prev) => ({
-                                      ...prev,
-                                      galleryImagesText: existing + validUrls.join('\n'),
-                                    }));
-                                  }
+                                onChange={(e) => {
+                                  handleUploadMultipleGallery(Array.from(e.target.files || []));
+                                  e.target.value = '';
                                 }}
                               />
                             </label>
@@ -5618,10 +5632,10 @@ export default function AdminDashboardClient() {
                             <Upload className="w-5 h-5" />
                           </div>
                           <span className="text-xs font-black text-slate-900">
-                            {uploadingArticleGallery ? 'Sedang Mengunggah...' : '📁 Klik untuk Pilih Foto-Foto Galeri Sekaligus'}
+                            {uploadingArticleGallery ? (galleryUploadProgress || 'Sedang Mengunggah...') : '📁 Klik untuk Pilih Foto-Foto Galeri Sekaligus'}
                           </span>
                           <span className="text-[11px] text-slate-500 mt-1">
-                            Bisa pilih banyak foto sekaligus dari HP atau laptop
+                            Bisa pilih banyak foto sekaligus dari HP atau laptop (Maks 10MB/foto)
                           </span>
                           <input
                             type="file"
@@ -5629,22 +5643,9 @@ export default function AdminDashboardClient() {
                             accept="image/*"
                             disabled={uploadingArticleGallery}
                             className="hidden"
-                            onChange={async (e) => {
-                              const files = Array.from(e.target.files || []);
-                              if (files.length === 0) return;
-                              setUploadingArticleGallery(true);
-                              const uploadedUrls = await Promise.all(
-                                files.map((f) => handleFileUpload(f, 'article-gallery'))
-                              );
-                              setUploadingArticleGallery(false);
-                              const validUrls = uploadedUrls.filter(Boolean) as string[];
-                              if (validUrls.length > 0) {
-                                const existing = articleForm.galleryImagesText ? articleForm.galleryImagesText.trim() + '\n' : '';
-                                setArticleForm((prev) => ({
-                                  ...prev,
-                                  galleryImagesText: existing + validUrls.join('\n'),
-                                }));
-                              }
+                            onChange={(e) => {
+                              handleUploadMultipleGallery(Array.from(e.target.files || []));
+                              e.target.value = '';
                             }}
                           />
                         </label>
