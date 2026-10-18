@@ -1833,18 +1833,13 @@ export default function AdminDashboardClient() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Kontainer 1: Poster Resmi Hi-Res */}
                       <div className="md:col-span-2 p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-slate-200/60">
-                          <div>
-                            <label className="block text-xs font-bold text-slate-800">
-                              [01] Poster Resmi Hi-Res (300 DPI)
-                            </label>
-                            <p className="text-[11px] text-slate-500">
-                              Kelola tautan unduhan masing-masing poster vertikal dan tautan folder arsip untuk tombol CTA &quot;UNDUH SEMUA&quot;.
-                            </p>
-                          </div>
-                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200 self-start sm:self-auto">
-                            TOMBOL CTA: UNDUH SEMUA
-                          </span>
+                        <div className="pb-2 border-b border-slate-200/60">
+                          <label className="block text-xs font-bold text-slate-800">
+                            [01] Poster Resmi Hi-Res (300 DPI)
+                          </label>
+                          <p className="text-[11px] text-slate-500">
+                            Kelola tautan unduhan masing-masing poster vertikal dan tautan folder arsip untuk tombol unduh semua.
+                          </p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
@@ -1894,10 +1889,10 @@ export default function AdminDashboardClient() {
                             </p>
                           </div>
 
-                          {/* 1C. Link Tombol CTA: Unduh Semua */}
+                          {/* 1C. Link Unduh Semua (Folder / ZIP) */}
                           <div className="space-y-1">
                             <label className="block text-[11px] font-semibold text-slate-700">
-                              • Tombol CTA: Unduh Semua (Folder / ZIP)
+                              • Link Unduh Semua (Folder / ZIP)
                             </label>
                             <input
                               type="text"
@@ -1921,14 +1916,9 @@ export default function AdminDashboardClient() {
 
                       {/* Kontainer 2: Press Release Resmi */}
                       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <label className="block text-xs font-bold text-slate-800">
-                            [02] Siaran Pers Resmi / Press Release (PDF / GDrive)
-                          </label>
-                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
-                            TOMBOL CTA KUNING: UNDUH PRESS RELEASE
-                          </span>
-                        </div>
+                        <label className="block text-xs font-bold text-slate-800">
+                          [02] Siaran Pers Resmi / Press Release (PDF / GDrive)
+                        </label>
                         <input
                           type="text"
                           value={settings.kabarGaleriSettings?.mediaKitPressReleasePdfUrl || ''}
@@ -1943,20 +1933,15 @@ export default function AdminDashboardClient() {
                           className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
                         />
                         <p className="text-[10px] text-slate-400">
-                          Placeholder berkas tunggal siaran pers. Tombol di web berwarna kuning seragam.
+                          Tautan berkas PDF / Google Drive siaran pers resmi.
                         </p>
                       </div>
 
                       {/* Kontainer 3: Film Stills */}
                       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <label className="block text-xs font-bold text-slate-800">
-                            [03] Foto Produksi &amp; Still Cut (Google Drive)
-                          </label>
-                          <span className="text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
-                            NON-SPOILER
-                          </span>
-                        </div>
+                        <label className="block text-xs font-bold text-slate-800">
+                          [03] Foto Produksi &amp; Still Cut (Google Drive)
+                        </label>
                         <input
                           type="text"
                           value={settings.kabarGaleriSettings?.mediaKitStillsZipUrl || ''}
@@ -1974,14 +1959,9 @@ export default function AdminDashboardClient() {
 
                       {/* Kontainer 4: Behind the Scenes */}
                       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <label className="block text-xs font-bold text-slate-800">
-                            [04] Behind The Scene / BTS Photos (Google Drive)
-                          </label>
-                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
-                            TOMBOL CTA KUNING: UNDUH BTS PHOTOS
-                          </span>
-                        </div>
+                        <label className="block text-xs font-bold text-slate-800">
+                          [04] Behind The Scene / BTS Photos (Google Drive)
+                        </label>
                         <input
                           type="text"
                           value={settings.kabarGaleriSettings?.mediaKitBtsZipUrl || ''}
@@ -1999,14 +1979,9 @@ export default function AdminDashboardClient() {
 
                       {/* Kontainer 5: Fact Sheet & Film Info */}
                       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <label className="block text-xs font-bold text-slate-800">
-                            [05] Fact Sheet &amp; Sinopsis Lengkap (PDF / GDrive)
-                          </label>
-                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
-                            TOMBOL CTA KUNING: UNDUH FACT SHEET
-                          </span>
-                        </div>
+                        <label className="block text-xs font-bold text-slate-800">
+                          [05] Fact Sheet &amp; Sinopsis Lengkap (PDF / GDrive)
+                        </label>
                         <input
                           type="text"
                           value={settings.kabarGaleriSettings?.mediaKitFactSheetPdfUrl || ''}
@@ -2024,14 +1999,9 @@ export default function AdminDashboardClient() {
 
                       {/* Kontainer 6: Foto Cast & Filmmaker */}
                       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <label className="block text-xs font-bold text-slate-800">
-                            [06] Foto Cast &amp; Filmmaker (Google Drive)
-                          </label>
-                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
-                            TOMBOL CTA KUNING: UNDUH FOTO CAST &amp; FILMMAKER
-                          </span>
-                        </div>
+                        <label className="block text-xs font-bold text-slate-800">
+                          [06] Foto Cast &amp; Filmmaker (Google Drive)
+                        </label>
                         <input
                           type="text"
                           value={settings.kabarGaleriSettings?.mediaKitCastPhotosUrl || ''}
