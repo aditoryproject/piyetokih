@@ -41,7 +41,7 @@ Setiap kota memiliki halaman khusus yang siap dijadikan tujuan iklan Meta Ads:
 
 ---
 
-## 🤖 3. Integrasi Wahnotif & AI Persona "Kang Kih"
+## 🤖 3. Integrasi Wahnotif & AI Persona "Mas Kidi"
 
 ### A. Pengiriman Pesan Otomatis (Outbound)
 Ketika user submit formulir War Voucher di web utama, sistem otomatis mengirimkan WhatsApp ke nomor peserta berisi ucapan selamat, nomor seri, dan tautan PDF voucher resmi.
@@ -55,7 +55,7 @@ Untuk iklan Meta Ads yang diarahkan ke WhatsApp bisnis Anda:
   ```
 * Setiap kali user yang chat via WA melengkapi data diri dengan AI, Wahnotif akan menembak webhook ini dan data otomatis tercatat di dashboard web!
 
-### C. System Prompt AI "Kang Kih" (Tinggal Salin ke Wahnotif AI)
+### C. System Prompt AI "Mas Kidi" (Tinggal Salin ke Wahnotif AI)
 Prompt karakter sudah tersedia dan bisa langsung disalin dengan 1 klik di Admin Dashboard:
 * **Gaya Bicara**: Santai, akrab, sedikit medok khas Jawa-Indonesia, hangat, dan menghibur.
 * **Misi**: Menjawab jadwal bioskop 17 kota dan mengumpulkan data pendaftar voucher nonton.

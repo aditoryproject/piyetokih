@@ -4770,7 +4770,7 @@ export default function AdminDashboardClient() {
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <div>
                           <span className="text-[10px] font-black uppercase text-amber-600 block">Kolom 3</span>
-                          <h4 className="text-xs font-bold text-slate-900">Persona &amp; Karakter CS (Kang Kih)</h4>
+                          <h4 className="text-xs font-bold text-slate-900">Persona &amp; Karakter CS (Mas Kidi)</h4>
                         </div>
                         <button
                           onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.karakterPersona, 'prompt')}
