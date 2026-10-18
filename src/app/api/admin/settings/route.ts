@@ -89,6 +89,8 @@ export async function POST(req: NextRequest) {
     saveDb(db);
     try {
       revalidatePath('/');
+      revalidatePath('/media');
+      revalidatePath('/kabar-galeri');
       revalidatePath('/city/[slug]', 'page');
     } catch {}
     return NextResponse.json({ success: true, settings: db.settings });

@@ -97,11 +97,19 @@ export interface KabarGaleriSettings {
   heroCtaText?: string;
   heroCtaLink?: string;
   mediaKitPosterUrl?: string;
+  mediaKitTeaserPosterUrl?: string;
+  mediaKitMainPosterUrl?: string;
   mediaKitPressReleasePdfUrl?: string;
   mediaKitStillsZipUrl?: string;
   mediaKitFactSheetPdfUrl?: string;
   mediaKitBtsZipUrl?: string;
+  mediaKitCastPhotosUrl?: string;
+  mediaKitLogoPtkUrl?: string;
+  mediaKitLogoMiracleUrl?: string;
   mediaKitLogoPackZipUrl?: string;
+  mediaKitVideoFirstLookUrl?: string;
+  mediaKitVideoTeaserUrl?: string;
+  mediaKitVideoMainTrailerUrl?: string;
   mediaKitFilterInstagramUrl?: string;
   mediaKitFilterTiktokUrl?: string;
   mediaKitSoundtrackSpotifyUrl?: string;
@@ -114,6 +122,7 @@ export interface KabarGaleriSettings {
     pressReleasePdfUrl?: string;
     stillsDownloadUrl?: string;
     factSheetPdfUrl?: string;
+    castPhotosDownloadUrl?: string;
     prContactEmail?: string;
     prContactPhone?: string;
   };
@@ -263,11 +272,33 @@ const DEFAULT_SETTINGS: AppSettings = {
     heroCoverImage: '/kabar-galeri-hero.jpg',
     heroCtaText: 'Kunjungi Jadwal Roadshow',
     heroCtaLink: '/#roadshow',
+    mediaKitPosterUrl: '/official-poster.jpg',
+    mediaKitTeaserPosterUrl: '',
+    mediaKitMainPosterUrl: '',
+    mediaKitPressReleasePdfUrl: '/PIYE_TO_KIH_Web_Developer_Guide_Kabar_dan_Galeri_v2.pdf',
+    mediaKitStillsZipUrl: '',
+    mediaKitFactSheetPdfUrl: '',
+    mediaKitBtsZipUrl: '',
+    mediaKitCastPhotosUrl: '',
+    mediaKitLogoPtkUrl: '/logo-ptk.png',
+    mediaKitLogoMiracleUrl: '/logo-miracle-pictures.png',
+    mediaKitLogoPackZipUrl: '/logo-ptk.png',
+    mediaKitVideoFirstLookUrl: 'https://www.youtube.com/@piyetokihfilm',
+    mediaKitVideoTeaserUrl: 'https://www.youtube.com/@piyetokihfilm',
+    mediaKitVideoMainTrailerUrl: 'https://www.youtube.com/@piyetokihfilm',
+    mediaKitFilterInstagramUrl: '',
+    mediaKitFilterTiktokUrl: '',
+    mediaKitSoundtrackSpotifyUrl: '',
+    mediaKitSoundtrackYoutubeUrl: '',
+    mediaKitTrailerYoutubeUrl: 'https://www.youtube.com/@piyetokihfilm',
+    mediaKitContactEmail: 'pr@miraclepictures.id',
+    mediaKitContactWa: '+6281234567890',
     mediaCenter: {
       posterDownloadUrl: '/kabar-galeri-hero.jpg',
       pressReleasePdfUrl: '#',
       stillsDownloadUrl: '#',
       factSheetPdfUrl: '#',
+      castPhotosDownloadUrl: '#',
       prContactEmail: 'press@piyetokihfilm.com',
       prContactPhone: '+62 822-1234-5678',
     },

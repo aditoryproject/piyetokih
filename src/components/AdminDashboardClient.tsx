@@ -157,9 +157,24 @@ export default function AdminDashboardClient() {
       heroCtaText: 'Baca Selengkapnya',
       heroCtaLink: '#kabar-film',
       mediaKitPosterUrl: '',
+      mediaKitTeaserPosterUrl: '',
+      mediaKitMainPosterUrl: '',
       mediaKitPressReleasePdfUrl: '',
       mediaKitStillsZipUrl: '',
       mediaKitFactSheetPdfUrl: '',
+      mediaKitBtsZipUrl: '',
+      mediaKitCastPhotosUrl: '',
+      mediaKitLogoPtkUrl: '',
+      mediaKitLogoMiracleUrl: '',
+      mediaKitLogoPackZipUrl: '',
+      mediaKitVideoFirstLookUrl: '',
+      mediaKitVideoTeaserUrl: '',
+      mediaKitVideoMainTrailerUrl: '',
+      mediaKitFilterInstagramUrl: '',
+      mediaKitFilterTiktokUrl: '',
+      mediaKitSoundtrackSpotifyUrl: '',
+      mediaKitSoundtrackYoutubeUrl: '',
+      mediaKitTrailerYoutubeUrl: '',
       mediaKitContactEmail: 'pr@miraclepictures.id',
       mediaKitContactWa: '6281234567890',
     },
@@ -1795,245 +1810,512 @@ export default function AdminDashboardClient() {
                 </div>
 
                 {/* Sub-form: Media Center Kit */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <h5 className="text-xs font-black uppercase tracking-wider text-purple-600 flex items-center gap-1.5">
-                    <Download className="w-3.5 h-3.5" /> 2. Media Kit & Press Center (Download Aset untuk Media/Wartawan)
-                  </h5>
+                <div className="space-y-6 pt-6 border-t border-slate-100">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div>
+                      <h5 className="text-xs font-black uppercase tracking-wider text-purple-600 flex items-center gap-1.5">
+                        <Download className="w-3.5 h-3.5" /> 2. Media Kit &amp; Press Center (Sinkronisasi Halaman /media)
+                      </h5>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Kelola tautan unduhan Google Drive, berkas pers, dan video resmi agar sinkron persis dengan 7 kontainer di halaman <b>/media</b>.
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-purple-50 text-purple-700 rounded border border-purple-200 self-start sm:self-auto font-bold">
+                      7 CONTAINERS SYNC
+                    </span>
+                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Download Official Poster (High-Res)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitPosterUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitPosterUrl: e.target.value
-                          }
-                        })}
-                        placeholder="Contoh: https://... atau /uploads/poster-hires.jpg"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
+                  {/* GROUP 1: KONTAINER UTAMA 01 - 06 */}
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+                      A. KONTEN UTAMA MEDIA KIT (KONTAINER 01 - 06)
+                    </span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Kontainer 1: Poster Resmi Hi-Res */}
+                      <div className="md:col-span-2 p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-slate-200/60">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-800">
+                              [01] Poster Resmi Hi-Res (300 DPI)
+                            </label>
+                            <p className="text-[11px] text-slate-500">
+                              Kelola tautan unduhan masing-masing poster vertikal dan tautan folder arsip untuk tombol CTA &quot;UNDUH SEMUA&quot;.
+                            </p>
+                          </div>
+                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200 self-start sm:self-auto">
+                            TOMBOL CTA: UNDUH SEMUA
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                          {/* 1A. Link Teaser Poster (Vertikal) */}
+                          <div className="space-y-1">
+                            <label className="block text-[11px] font-semibold text-slate-700">
+                              • Link Teaser Poster (Vertikal)
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.kabarGaleriSettings?.mediaKitTeaserPosterUrl || ''}
+                              onChange={(e) => setSettings({
+                                ...settings,
+                                kabarGaleriSettings: {
+                                  ...settings.kabarGaleriSettings,
+                                  mediaKitTeaserPosterUrl: e.target.value
+                                }
+                              })}
+                              placeholder="https://drive.google.com/file/d/.../view (Link Teaser Poster)"
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                            />
+                            <p className="text-[10px] text-slate-400">
+                              Placeholder link unduh item Teaser Poster.
+                            </p>
+                          </div>
+
+                          {/* 1B. Link Official Main Poster (Vertikal) */}
+                          <div className="space-y-1">
+                            <label className="block text-[11px] font-semibold text-slate-700">
+                              • Link Official Main Poster (Vertikal)
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.kabarGaleriSettings?.mediaKitMainPosterUrl || ''}
+                              onChange={(e) => setSettings({
+                                ...settings,
+                                kabarGaleriSettings: {
+                                  ...settings.kabarGaleriSettings,
+                                  mediaKitMainPosterUrl: e.target.value
+                                }
+                              })}
+                              placeholder="https://drive.google.com/file/d/.../view (Link Main Poster)"
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                            />
+                            <p className="text-[10px] text-slate-400">
+                              Placeholder link unduh item Official Main Poster.
+                            </p>
+                          </div>
+
+                          {/* 1C. Link Tombol CTA: Unduh Semua */}
+                          <div className="space-y-1">
+                            <label className="block text-[11px] font-semibold text-slate-700">
+                              • Tombol CTA: Unduh Semua (Folder / ZIP)
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.kabarGaleriSettings?.mediaKitPosterUrl || ''}
+                              onChange={(e) => setSettings({
+                                ...settings,
+                                kabarGaleriSettings: {
+                                  ...settings.kabarGaleriSettings,
+                                  mediaKitPosterUrl: e.target.value
+                                }
+                              })}
+                              placeholder="https://drive.google.com/drive/folders/... (Folder Semua Poster)"
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                            />
+                            <p className="text-[10px] text-slate-400">
+                              Placeholder link tombol utama &quot;UNDUH SEMUA&quot;.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Kontainer 2: Press Release Resmi */}
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-slate-800">
+                            [02] Siaran Pers Resmi / Press Release (PDF / GDrive)
+                          </label>
+                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                            TOMBOL CTA KUNING: UNDUH PRESS RELEASE
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitPressReleasePdfUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitPressReleasePdfUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://drive.google.com/file/d/.../view?usp=sharing atau /uploads/press-release.pdf"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                        />
+                        <p className="text-[10px] text-slate-400">
+                          Placeholder berkas tunggal siaran pers. Tombol di web berwarna kuning seragam.
+                        </p>
+                      </div>
+
+                      {/* Kontainer 3: Film Stills */}
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-slate-800">
+                            [03] Foto Produksi &amp; Still Cut (Google Drive)
+                          </label>
+                          <span className="text-[9px] font-mono font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
+                            NON-SPOILER
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitStillsZipUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitStillsZipUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://drive.google.com/drive/folders/... atau ZIP link"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                        />
+                      </div>
+
+                      {/* Kontainer 4: Behind the Scenes */}
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-slate-800">
+                            [04] Behind The Scene / BTS Photos (Google Drive)
+                          </label>
+                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                            TOMBOL CTA KUNING: UNDUH BTS PHOTOS
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitBtsZipUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitBtsZipUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://drive.google.com/drive/folders/... atau arsip BTS"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                        />
+                      </div>
+
+                      {/* Kontainer 5: Fact Sheet & Film Info */}
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-slate-800">
+                            [05] Fact Sheet &amp; Sinopsis Lengkap (PDF / GDrive)
+                          </label>
+                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                            TOMBOL CTA KUNING: UNDUH FACT SHEET
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitFactSheetPdfUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitFactSheetPdfUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://drive.google.com/file/d/.../view?usp=sharing"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                        />
+                      </div>
+
+                      {/* Kontainer 6: Foto Cast & Filmmaker */}
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-slate-800">
+                            [06] Foto Cast &amp; Filmmaker (Google Drive)
+                          </label>
+                          <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                            TOMBOL CTA KUNING: UNDUH FOTO CAST &amp; FILMMAKER
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitCastPhotosUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitCastPhotosUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://drive.google.com/drive/folders/... (Foto profil cast & sutradara)"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Download Siaran Pers Resmi (PDF)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitPressReleasePdfUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitPressReleasePdfUrl: e.target.value
-                          }
-                        })}
-                        placeholder="Contoh: /docs/press-release-piye-to-kih.pdf"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
+                  </div>
+
+                  {/* GROUP 2: KONTAINER 07 - VIDEO & BRAND ASSETS */}
+                  <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-200/80 pb-2.5 gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
+                        <Film className="w-4 h-4 text-amber-600" /> [07] VIDEO &amp; BRAND ASSETS (SUB-A &amp; SUB-B)
+                      </span>
+                      <span className="text-[10px] font-mono text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded font-bold self-start sm:self-auto">
+                        3 LINK VIDEO + 3 LINK BRAND ASSETS
+                      </span>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Download Foto Produksi & Still Cut (ZIP)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitStillsZipUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitStillsZipUrl: e.target.value
-                          }
-                        })}
-                        placeholder="Contoh: Google Drive / Dropbox / ZIP link"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {/* Sub-A: Video Assets */}
+                      <div className="space-y-3">
+                        <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1">
+                          <Play className="w-3.5 h-3.5 text-red-600" /> SUB-A: Tautan Video YouTube (3 Tautan)
+                        </span>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            1. First Look Teaser (YouTube)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.kabarGaleriSettings?.mediaKitVideoFirstLookUrl || ''}
+                            onChange={(e) => setSettings({
+                              ...settings,
+                              kabarGaleriSettings: {
+                                ...settings.kabarGaleriSettings,
+                                mediaKitVideoFirstLookUrl: e.target.value
+                              }
+                            })}
+                            placeholder="Contoh: https://www.youtube.com/watch?v=... (First Look Teaser)"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            2. Official Teaser Trailer (YouTube)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.kabarGaleriSettings?.mediaKitVideoTeaserUrl || ''}
+                            onChange={(e) => setSettings({
+                              ...settings,
+                              kabarGaleriSettings: {
+                                ...settings.kabarGaleriSettings,
+                                mediaKitVideoTeaserUrl: e.target.value
+                              }
+                            })}
+                            placeholder="Contoh: https://www.youtube.com/watch?v=... (Official Teaser Trailer)"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            3. Official Main Trailer (YouTube)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.kabarGaleriSettings?.mediaKitVideoMainTrailerUrl || settings.kabarGaleriSettings?.mediaKitTrailerYoutubeUrl || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setSettings({
+                                ...settings,
+                                kabarGaleriSettings: {
+                                  ...settings.kabarGaleriSettings,
+                                  mediaKitVideoMainTrailerUrl: val,
+                                  mediaKitTrailerYoutubeUrl: val,
+                                }
+                              });
+                            }}
+                            placeholder="Contoh: https://www.youtube.com/watch?v=... (Official Main Trailer)"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sub-B: Logo & Brand Assets */}
+                      <div className="space-y-3">
+                        <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1">
+                          <Image className="w-3.5 h-3.5 text-amber-600" /> SUB-B: Identitas Visual Transparan (3 Link Download)
+                        </span>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            1. Logo Resmi PIYE TO KIH? (PNG Transparan)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.kabarGaleriSettings?.mediaKitLogoPtkUrl || ''}
+                            onChange={(e) => setSettings({
+                              ...settings,
+                              kabarGaleriSettings: {
+                                ...settings.kabarGaleriSettings,
+                                mediaKitLogoPtkUrl: e.target.value
+                              }
+                            })}
+                            placeholder="Contoh: https://drive.google.com/file/d/.../view atau /logo-ptk.png"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            2. Logo PT Mirakel Sinema Imaji / Miracle Pictures (PNG Transparan)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.kabarGaleriSettings?.mediaKitLogoMiracleUrl || ''}
+                            onChange={(e) => setSettings({
+                              ...settings,
+                              kabarGaleriSettings: {
+                                ...settings.kabarGaleriSettings,
+                                mediaKitLogoMiracleUrl: e.target.value
+                              }
+                            })}
+                            placeholder="Contoh: https://drive.google.com/file/d/.../view atau /logo-miracle-pictures.png"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            3. Brand Pack Lengkap (ZIP / Google Drive Folder)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.kabarGaleriSettings?.mediaKitLogoPackZipUrl || ''}
+                            onChange={(e) => setSettings({
+                              ...settings,
+                              kabarGaleriSettings: {
+                                ...settings.kabarGaleriSettings,
+                                mediaKitLogoPackZipUrl: e.target.value
+                              }
+                            })}
+                            placeholder="Contoh: https://drive.google.com/drive/folders/... (Folder GDrive / ZIP Aset Brand)"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono bg-white focus:border-amber-500 outline-none"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Download Fact Sheet & Sinopsis Lengkap (PDF)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitFactSheetPdfUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitFactSheetPdfUrl: e.target.value
-                          }
-                        })}
-                        placeholder="Contoh: /docs/fact-sheet-piye-to-kih.pdf"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
+                  </div>
+
+                  {/* GROUP 3: PROMOSI SOSMED, FILTER AR & SOUNDTRACK */}
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+                      B. FILTER AR &amp; OFFICIAL SOUNDTRACK
+                    </span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Link Filter AR Instagram
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitFilterInstagramUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitFilterInstagramUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://instagram.com/ar/..."
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Link Filter AR TikTok
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitFilterTiktokUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitFilterTiktokUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://vm.tiktok.com/..."
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Link Official Soundtrack (Spotify)
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitSoundtrackSpotifyUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitSoundtrackSpotifyUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://open.spotify.com/track/..."
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Link Official Soundtrack (YouTube)
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitSoundtrackYoutubeUrl || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitSoundtrackYoutubeUrl: e.target.value
+                            }
+                          })}
+                          placeholder="https://www.youtube.com/@miraclepictures-r0v"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Download Behind The Scene (BTS) ZIP
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitBtsZipUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitBtsZipUrl: e.target.value
-                          }
-                        })}
-                        placeholder="Contoh: Google Drive / Dropbox link arsip BTS"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Download Logo &amp; Brand Assets Pack (ZIP)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitLogoPackZipUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitLogoPackZipUrl: e.target.value
-                          }
-                        })}
-                        placeholder="Contoh: Link ZIP logo Miracle Pictures &amp; PTK"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Filter AR Instagram
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitFilterInstagramUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitFilterInstagramUrl: e.target.value
-                          }
-                        })}
-                        placeholder="https://instagram.com/ar/..."
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Filter AR TikTok
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitFilterTiktokUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitFilterTiktokUrl: e.target.value
-                          }
-                        })}
-                        placeholder="https://vm.tiktok.com/..."
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Official Soundtrack (Spotify)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitSoundtrackSpotifyUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitSoundtrackSpotifyUrl: e.target.value
-                          }
-                        })}
-                        placeholder="https://open.spotify.com/track/..."
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Official Soundtrack (YouTube)
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitSoundtrackYoutubeUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitSoundtrackYoutubeUrl: e.target.value
-                          }
-                        })}
-                        placeholder="https://youtube.com/watch?v=..."
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Link Official Trailer / Teaser YouTube
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitTrailerYoutubeUrl || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitTrailerYoutubeUrl: e.target.value
-                          }
-                        })}
-                        placeholder="https://youtube.com/watch?v=..."
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Email Kontak PR / Media Relations
-                      </label>
-                      <input
-                        type="email"
-                        value={settings.kabarGaleriSettings?.mediaKitContactEmail || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitContactEmail: e.target.value
-                          }
-                        })}
-                        placeholder="pr@miraclepictures.id"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        WhatsApp Kontak PR / Media Relations
-                      </label>
-                      <input
-                        type="text"
-                        value={settings.kabarGaleriSettings?.mediaKitContactWa || ''}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          kabarGaleriSettings: {
-                            ...settings.kabarGaleriSettings,
-                            mediaKitContactWa: e.target.value
-                          }
-                        })}
-                        placeholder="6281234567890"
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
-                      />
+                  </div>
+
+                  {/* GROUP 4: KONTAK HUMAS & MEDIA RELATIONS */}
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+                      C. KONTAK HUBUNGAN MEDIA &amp; KEMITRAAN PERS
+                    </span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Email Kontak PR / Media Relations
+                        </label>
+                        <input
+                          type="email"
+                          value={settings.kabarGaleriSettings?.mediaKitContactEmail || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitContactEmail: e.target.value
+                            }
+                          })}
+                          placeholder="hello@miraclepictures.id"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          WhatsApp Kontak PR / Media Relations
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.kabarGaleriSettings?.mediaKitContactWa || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            kabarGaleriSettings: {
+                              ...settings.kabarGaleriSettings,
+                              mediaKitContactWa: e.target.value
+                            }
+                          })}
+                          placeholder="+62 856-9192-1764"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

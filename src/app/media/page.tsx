@@ -33,14 +33,28 @@ export default function MediaCenterPage() {
   const db = getDb();
   const settings = db.settings.kabarGaleriSettings || {};
   const posterUrl = settings.mediaKitPosterUrl || '/official-poster.jpg';
+  const teaserPosterUrl = settings.mediaKitTeaserPosterUrl || posterUrl;
+  const mainPosterUrl = settings.mediaKitMainPosterUrl || posterUrl;
   const prPdfUrl = settings.mediaKitPressReleasePdfUrl || '/PIYE_TO_KIH_Web_Developer_Guide_Kabar_dan_Galeri_v2.pdf';
   const stillsUrl = settings.mediaKitStillsZipUrl || '/kabar-galeri?tab=galeri-foto';
   const btsUrl = settings.mediaKitBtsZipUrl || '/kabar-galeri?tab=galeri-foto';
   const factSheetUrl = settings.mediaKitFactSheetPdfUrl || '/#sinopsis';
+  const castPhotosUrl = settings.mediaKitCastPhotosUrl || '/kabar-galeri?tab=galeri-foto';
+
+  // Video Assets (Sub-A)
+  const videoFirstLookUrl = settings.mediaKitVideoFirstLookUrl || settings.mediaKitTrailerYoutubeUrl || 'https://www.youtube.com/@piyetokihfilm';
+  const videoTeaserUrl = settings.mediaKitVideoTeaserUrl || settings.mediaKitTrailerYoutubeUrl || 'https://www.youtube.com/@piyetokihfilm';
+  const videoMainTrailerUrl = settings.mediaKitVideoMainTrailerUrl || settings.mediaKitTrailerYoutubeUrl || 'https://www.youtube.com/@piyetokihfilm';
+  const trailerUrl = settings.mediaKitTrailerYoutubeUrl || videoMainTrailerUrl || 'https://www.youtube.com/@piyetokihfilm';
+
+  // Logo & Brand Assets (Sub-B)
+  const logoPtkUrl = settings.mediaKitLogoPtkUrl || '/logo-ptk.png';
+  const logoMiracleUrl = settings.mediaKitLogoMiracleUrl || '/logo-miracle-pictures.png';
   const logoPackUrl = settings.mediaKitLogoPackZipUrl || '/logo-ptk.png';
-  const contactEmail = settings.mediaKitContactEmail || 'press@piyetokihfilm.com';
+  const brandAssetsHubUrl = logoPackUrl.startsWith('http') ? logoPackUrl : (trailerUrl || 'https://www.youtube.com/@piyetokihfilm');
+
+  const contactEmail = settings.mediaKitContactEmail || 'pr@miraclepictures.id';
   const contactWa = settings.mediaKitContactWa || '6281234567890';
-  const trailerUrl = settings.mediaKitTrailerYoutubeUrl || 'https://www.youtube.com/@piyetokihfilm';
 
   return (
     <div className="min-h-screen bg-[#0B0F17] text-slate-100 py-12 px-4 sm:px-6 antialiased">
@@ -63,7 +77,7 @@ export default function MediaCenterPage() {
         {/* Page Header */}
         <div className="space-y-3 text-center sm:text-left">
           <span className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-amber-400 block">
-            PT MIRAKEL SINEMA IMAJI • MEDIA HUB
+            MIRACLE PICTURES – MEDIA HUB
           </span>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase leading-tight">
             Media Center &amp; Brand Assets
@@ -95,14 +109,44 @@ export default function MediaCenterPage() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Koleksi lengkap <b>Teaser Poster</b> dan <b>Official Theatrical Poster</b> resolusi tinggi (300 DPI) siap cetak dan tayang di media cetak maupun portal digital.
               </p>
-              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1 text-xs text-slate-300">
+
+              {/* Daftar Poster (Lingkaran Hijau) */}
+              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1.5 text-xs text-slate-300">
                 <div className="flex items-center justify-between font-mono text-[11px]">
                   <span>• Teaser Poster (Vertikal)</span>
-                  <span className="text-amber-400">Tersedia</span>
+                  {teaserPosterUrl && teaserPosterUrl !== '#' ? (
+                    <a
+                      href={teaserPosterUrl}
+                      target={teaserPosterUrl.startsWith('http') ? '_blank' : undefined}
+                      rel={teaserPosterUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      download={!teaserPosterUrl.startsWith('http') ? 'Teaser_Poster_Vertikal_HiRes.jpg' : undefined}
+                      className="text-amber-400 hover:text-amber-300 hover:underline inline-flex items-center gap-1 font-bold"
+                      title="Unduh Teaser Poster (Vertikal)"
+                    >
+                      <span>Tersedia</span>
+                      <Download className="w-3 h-3" />
+                    </a>
+                  ) : (
+                    <span className="text-amber-400">Tersedia</span>
+                  )}
                 </div>
                 <div className="flex items-center justify-between font-mono text-[11px]">
                   <span>• Official Main Poster (Vertikal)</span>
-                  <span className="text-amber-400">Tersedia</span>
+                  {mainPosterUrl && mainPosterUrl !== '#' ? (
+                    <a
+                      href={mainPosterUrl}
+                      target={mainPosterUrl.startsWith('http') ? '_blank' : undefined}
+                      rel={mainPosterUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      download={!mainPosterUrl.startsWith('http') ? 'Official_Main_Poster_Vertikal_HiRes.jpg' : undefined}
+                      className="text-amber-400 hover:text-amber-300 hover:underline inline-flex items-center gap-1 font-bold"
+                      title="Unduh Official Main Poster (Vertikal)"
+                    >
+                      <span>Tersedia</span>
+                      <Download className="w-3 h-3" />
+                    </a>
+                  ) : (
+                    <span className="text-amber-400">Tersedia</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -110,11 +154,13 @@ export default function MediaCenterPage() {
             <div className="pt-2">
               <a
                 href={posterUrl}
-                download="PIYE_TO_KIH_Official_Poster_HiRes.jpg"
+                target={posterUrl.startsWith('http') ? '_blank' : undefined}
+                rel={posterUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                download={!posterUrl.startsWith('http') ? 'PIYE_TO_KIH_Official_Poster_HiRes.jpg' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4" />
-                <span>Unduh Poster Hi-Res</span>
+                <span>Unduh Semua</span>
               </a>
             </div>
           </div>
@@ -139,25 +185,17 @@ export default function MediaCenterPage() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Siaran pers resmi utama peluncuran Official Trailer &amp; Poster, serta rilis pers roadshow, Home Premiere, dan Gala Premiere yang siap dikutip rekan jurnalis.
               </p>
-              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1 text-xs text-slate-300">
-                <div className="flex items-center justify-between font-mono text-[11px]">
-                  <span>• PR Utama: Peluncuran Official Trailer</span>
-                  <span className="text-amber-400">PDF</span>
-                </div>
-                <div className="flex items-center justify-between font-mono text-[11px]">
-                  <span>• PR Roadshow &amp; Special Screening 17 Kota</span>
-                  <span className="text-amber-400">PDF</span>
-                </div>
-              </div>
             </div>
 
             <div className="pt-2">
               <a
                 href={prPdfUrl}
-                download="Press_Release_Resmi_PIYE_TO_KIH_2026.pdf"
-                className="w-full inline-flex items-center justify-center gap-2 bg-[#1b2230] hover:bg-[#232c3e] border border-white/15 hover:border-amber-400/50 text-white font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
+                target={prPdfUrl.startsWith('http') ? '_blank' : undefined}
+                rel={prPdfUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                download={!prPdfUrl.startsWith('http') ? 'Press_Release_Resmi_PIYE_TO_KIH_2026.pdf' : undefined}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
-                <Download className="w-4 h-4 text-amber-400" />
+                <Download className="w-4 h-4 text-slate-950" />
                 <span>Unduh Press Release</span>
               </a>
             </div>
@@ -183,11 +221,6 @@ export default function MediaCenterPage() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Frame grab still resmi dari adegan film berkualitas tinggi dengan penamaan file terstandar (misalnya <code>PTK_STILL_01_MUKIDI_SUKMA.jpg</code>).
               </p>
-              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1 text-xs text-slate-300 font-mono text-[11px]">
-                <div>• PTK_STILL_01_MUKIDI_SUKMA.jpg</div>
-                <div>• PTK_STILL_02_SEKAWAN_WOKO.jpg</div>
-                <div>• PTK_STILL_03_RUMAH_TUA.jpg</div>
-              </div>
             </div>
 
             <div className="pt-2">
@@ -195,6 +228,7 @@ export default function MediaCenterPage() {
                 href={stillsUrl}
                 target={stillsUrl.startsWith('http') ? '_blank' : undefined}
                 rel={stillsUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                download={!stillsUrl.startsWith('http') && stillsUrl.endsWith('.zip') ? 'Film_Stills_PIYE_TO_KIH.zip' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4" />
@@ -223,16 +257,6 @@ export default function MediaCenterPage() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Dokumentasi foto proses syuting, sutradara &amp; crew di set, cast di balik kamera, sesi rehearsal naskah, makeup karakter, pembangunan set rumah tua, dan suasana candid produksi.
               </p>
-              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1 text-xs text-slate-300">
-                <div className="flex items-center justify-between font-mono text-[11px]">
-                  <span>• Rehearsal &amp; Table Read Session</span>
-                  <span className="text-amber-400">Foto</span>
-                </div>
-                <div className="flex items-center justify-between font-mono text-[11px]">
-                  <span>• Sutradara &amp; Crew On Set Action</span>
-                  <span className="text-amber-400">Foto</span>
-                </div>
-              </div>
             </div>
 
             <div className="pt-2">
@@ -240,9 +264,10 @@ export default function MediaCenterPage() {
                 href={btsUrl}
                 target={btsUrl.startsWith('http') ? '_blank' : undefined}
                 rel={btsUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="w-full inline-flex items-center justify-center gap-2 bg-[#1b2230] hover:bg-[#232c3e] border border-white/15 hover:border-amber-400/50 text-white font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
+                download={!btsUrl.startsWith('http') && btsUrl.endsWith('.zip') ? 'Behind_The_Scenes_PIYE_TO_KIH.zip' : undefined}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
-                <Download className="w-4 h-4 text-amber-400" />
+                <Download className="w-4 h-4 text-slate-950" />
                 <span>Unduh BTS Photos</span>
               </a>
             </div>
@@ -268,20 +293,6 @@ export default function MediaCenterPage() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Rangkuman lengkap judul, tagline, logline, sinopsis pendek dan panjang, genre, durasi, klasifikasi usia (LSF 13+), tanggal tayang serentak, rumah produksi (PT Mirakel Sinema Imaji), sutradara, produser, penulis, dan daftar cast.
               </p>
-              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1.5 text-xs text-slate-300">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Rumah Produksi:</span>
-                  <span className="font-bold text-white">PT Mirakel Sinema Imaji</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Sutradara:</span>
-                  <span className="font-bold text-white">Ito Mavin</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Tanggal Tayang:</span>
-                  <span className="font-bold text-emerald-400">19 November 2026</span>
-                </div>
-              </div>
             </div>
 
             <div className="pt-2">
@@ -289,6 +300,7 @@ export default function MediaCenterPage() {
                 href={factSheetUrl}
                 target={factSheetUrl.startsWith('http') ? '_blank' : undefined}
                 rel={factSheetUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                download={!factSheetUrl.startsWith('http') && factSheetUrl.endsWith('.pdf') ? 'Fact_Sheet_PIYE_TO_KIH.pdf' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4" />
@@ -317,24 +329,18 @@ export default function MediaCenterPage() {
               <p className="text-xs text-slate-300 leading-relaxed">
                 Portrait/headshot resmi cast dan Sutradara dengan format penamaan file <b>&ldquo;Nama asli – Peran di film&rdquo;</b>.
               </p>
-              <div className="p-3 rounded-xl bg-[#171d2b] border border-white/5 space-y-1 text-xs text-slate-300 font-mono text-[11px]">
-                <div>• Heri Chandra – Mukidi</div>
-                <div>• Sutrisno Agung – Gendut</div>
-                <div>• Eko Dunung – Penyok</div>
-                <div>• Dara Sarasvati – Sukma</div>
-                <div>• Pak Nggalino, Mintul, Bunga, Bu Yeyen, Pak RT, Jotay, Bu Tinah, Bang Sadikin</div>
-                <div>• Ito Mavin – Sutradara &amp; Produser</div>
-              </div>
             </div>
 
             <div className="pt-2">
-              <Link
-                href="/kabar-galeri?tab=galeri-foto"
-                className="w-full inline-flex items-center justify-center gap-2 bg-[#1b2230] hover:bg-[#232c3e] border border-white/15 hover:border-amber-400/50 text-white font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
+              <a
+                href={castPhotosUrl}
+                target={castPhotosUrl.startsWith('http') ? '_blank' : undefined}
+                rel={castPhotosUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-3.5 px-5 rounded-xl shadow-lg transition active:scale-95"
               >
-                <Download className="w-4 h-4 text-amber-400" />
+                <Download className="w-4 h-4 text-slate-950" />
                 <span>Unduh Foto Cast &amp; Filmmaker</span>
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -373,7 +379,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• First Look Teaser</span>
                       <a
-                        href={trailerUrl}
+                        href={videoFirstLookUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
@@ -385,7 +391,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Official Teaser Trailer</span>
                       <a
-                        href={trailerUrl}
+                        href={videoTeaserUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
@@ -397,7 +403,7 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Official Main Trailer</span>
                       <a
-                        href={trailerUrl}
+                        href={videoMainTrailerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
@@ -424,8 +430,10 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Logo Resmi PIYE TO KIH? (PNG Transparan)</span>
                       <a
-                        href={logoPackUrl}
-                        download="Logo_PIYE_TO_KIH_Transparan.png"
+                        href={logoPtkUrl}
+                        target={logoPtkUrl.startsWith('http') ? '_blank' : undefined}
+                        rel={logoPtkUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        download={!logoPtkUrl.startsWith('http') ? 'Logo_PIYE_TO_KIH_Transparan.png' : undefined}
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
@@ -435,8 +443,10 @@ export default function MediaCenterPage() {
                     <li className="flex items-center justify-between p-2 rounded-lg bg-black/30 border border-white/5">
                       <span>• Logo PT Mirakel Sinema Imaji</span>
                       <a
-                        href="/logo-miracle-pictures.png"
-                        download="Logo_Miracle_Pictures.png"
+                        href={logoMiracleUrl}
+                        target={logoMiracleUrl.startsWith('http') ? '_blank' : undefined}
+                        rel={logoMiracleUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        download={!logoMiracleUrl.startsWith('http') ? 'Logo_Miracle_Pictures.png' : undefined}
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
@@ -449,6 +459,7 @@ export default function MediaCenterPage() {
                         href={logoPackUrl}
                         target={logoPackUrl.startsWith('http') ? '_blank' : undefined}
                         rel={logoPackUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        download={!logoPackUrl.startsWith('http') && logoPackUrl.endsWith('.zip') ? 'Brand_Assets_Pack.zip' : undefined}
                         className="text-amber-400 hover:underline font-mono text-[11px] inline-flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
@@ -462,9 +473,9 @@ export default function MediaCenterPage() {
 
             <div className="pt-2">
               <a
-                href={trailerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={brandAssetsHubUrl}
+                target={brandAssetsHubUrl.startsWith('http') ? '_blank' : undefined}
+                rel={brandAssetsHubUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="w-full inline-flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black text-xs uppercase tracking-wide py-4 px-6 rounded-xl shadow-lg transition active:scale-95"
               >
                 <span>Buka Video &amp; Brand Assets</span>
