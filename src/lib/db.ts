@@ -78,6 +78,9 @@ export interface AppSettings {
   // Kabar & Galeri + Media Center Global Settings
   kabarGaleriSettings?: KabarGaleriSettings;
 
+  // Roadshow Cities Expiration Override (e.g. ['semarang'])
+  expiredRoadshowCities?: string[];
+
   // Dashboard Admin Credentials
   adminUsername?: string;
   adminPasswordHash?: string;
@@ -247,6 +250,9 @@ const DEFAULT_SETTINGS: AppSettings = {
     facebook: 'https://www.facebook.com/piyetokihfilm.official',
     youtube: 'https://www.youtube.com/@piyetokihfilm',
   },
+
+  // Roadshow Cities Expiration Override
+  expiredRoadshowCities: [],
 
   // Kabar & Galeri + Media Center Global Settings
   kabarGaleriSettings: {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
-import { CITIES_DATA } from '@/lib/cities';
+import { CITIES_DATA, isCityRoadshowExpired } from '@/lib/cities';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     name: 'generate_voucher_presale',
     tool_name: 'generate_voucher_presale',
     title: 'Registrasi Tiket & Pengingat Promo Piye Toh Kih',
-    description: 'Mendaftarkan penonton ke sistem database resmi: (1) Untuk kota non-roadshow (Bandung, Medan, dll) atau permintaan BOGO, sistem otomatis mendaftarkan ke Pengingat Prioritas Promo Buy 1 Get 1 Bioskop 19 November (tanpa kode booking mall). (2) Untuk 17 kota roadshow (Semarang, Solo, Jogja, dll), sistem menerbitkan Kode Booking penukaran voucher fisik di booth mall.',
+    description: 'Mendaftarkan penonton ke sistem database resmi: (1) Untuk kota roadshow yang tanggalnya sudah terlewat (misal Semarang setelah 22 Oktober 2026), sistem otomatis menolak voucher mall dan mengalihkan penonton ke Pengingat Prioritas Promo Buy 1 Get 1 (BOGO) Bioskop 19 November. (2) Untuk kota non-roadshow (Bandung, Medan, dll), sistem mendaftarkan ke Pengingat Prioritas Promo Buy 1 Get 1 Bioskop 19 November (tanpa kode booth). (3) Untuk 17 kota roadshow aktif yang tanggalnya belum lewat, sistem menerbitkan Kode Booking penukaran voucher fisik di booth mall.',
     url: `${effectiveOrigin}/api/webhook/wahnotif`,
     webhook_url: `${effectiveOrigin}/api/webhook/wahnotif`,
     method: 'POST',
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
         },
         type: {
           type: 'string',
-          description: "Jenis pendaftaran: 'bogo' untuk Pengingat Promo Buy 1 Get 1 Bioskop 19 Nov, atau 'roadshow' untuk voucher fisik booth roadshow 17 kota.",
+          description: "Jenis pendaftaran: 'bogo' untuk Pengingat Promo Buy 1 Get 1 Bioskop 19 Nov (otomatis jika kota expired/non-roadshow), atau 'roadshow' untuk voucher fisik booth roadshow 17 kota yang masih aktif.",
         },
       },
       required: ['phone', 'city'],
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     tools: [
       {
         name: 'generate_voucher_presale',
-        description: 'Mendaftarkan calon penonton untuk Pengingat Promo Buy 1 Get 1 (Non-Roadshow) atau Voucher Fisik Roadshow (17 Kota).',
+        description: 'Mendaftarkan calon penonton untuk Pengingat Promo Buy 1 Get 1 (Expired/Non-Roadshow) atau Voucher Fisik Roadshow (17 Kota Aktif).',
         url: `${effectiveOrigin}/api/webhook/wahnotif`,
         method: 'POST',
         parameters: {
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
             phone: { type: 'string', description: 'Nomor WhatsApp calon penonton' },
             city: { type: 'string', description: 'Nama kota penonton' },
             email: { type: 'string', description: 'Alamat email aktif (opsional)' },
-            type: { type: 'string', description: "Jenis: 'bogo' (reminder BOGO 19 Nov) atau 'roadshow' (voucher fisik mall 17 kota)" },
+            type: { type: 'string', description: "Jenis: 'bogo' (reminder BOGO 19 Nov) atau 'roadshow' (voucher fisik mall 17 kota aktif)" },
           },
           required: ['phone', 'city'],
         },
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     const cleanPhone = String(phone).replace(/[^0-9]/g, '');
     const normalizedCity = String(cityLocation).toLowerCase().trim();
 
-    // Find if the city is one of the 17 Roadshow Cities
+    // 1. Find if the city is one of the 17 Roadshow Cities
     const roadshowCity = CITIES_DATA.find(c => {
       const cName = c.name.toLowerCase();
       const cSlug = c.slug.toLowerCase();
@@ -142,15 +142,31 @@ export async function POST(req: NextRequest) {
       args.intent === 'bogo' ||
       args.intent === 'reminder';
 
-    // A city is a roadshow booking ONLY if it's in CITIES_DATA AND not explicitly a BOGO reminder
-    const isRoadshowBooking = Boolean(roadshowCity) && !isExplicitBogo;
-
     const db = getDb();
 
+    // 2. Check if the roadshow city is EXPIRED (date has passed or manually marked expired)
+    const isCityExpired =
+      Boolean(roadshowCity) &&
+      (
+        args.is_expired === true ||
+        args.expired === true ||
+        args.past === true ||
+        args.sudah_lewat === true ||
+        (db.settings.expiredRoadshowCities || []).some(
+          (c: string) => c.toLowerCase().trim() === roadshowCity!.name.toLowerCase().trim()
+        ) ||
+        isCityRoadshowExpired(roadshowCity!.dateStr)
+      );
+
+    // A city is a roadshow booking ONLY if it's in CITIES_DATA AND not explicitly a BOGO reminder AND NOT EXPIRED
+    const isRoadshowBooking = Boolean(roadshowCity) && !isExplicitBogo && !isCityExpired;
+
     // =========================================================================
-    // SCENARIO 1: NON-ROADSHOW CITY (BANDUNG, MEDAN, BALI, DLL) ATAU REMINDER BOGO
+    // SCENARIO 1: NON-ROADSHOW CITY (BANDUNG, MEDAN, BALI, DLL) ATAU KOTA ROADSHOW TERLEWAT (SEMARANG EXPIRED) / REMINDER BOGO
     // =========================================================================
     if (!isRoadshowBooking) {
+      const targetCityName = roadshowCity ? roadshowCity.name : String(cityLocation);
+
       // Check if phone already registered in bogoReminders
       const existingReminder = db.bogoReminders.find(r =>
         r.phone.replace(/[^0-9]/g, '').endsWith(cleanPhone.slice(-9))
@@ -162,7 +178,7 @@ export async function POST(req: NextRequest) {
           name: String(name),
           phone: String(phone),
           email: String(email),
-          city: String(cityLocation),
+          city: targetCityName,
           registeredAt: new Date().toISOString(),
           reminderStatus: 'pending',
           whatsappSentAt: new Date().toISOString(),
@@ -171,6 +187,27 @@ export async function POST(req: NextRequest) {
         saveDb(db);
       }
 
+      // KASUS 1A: KOTA ROADSHOW YANG TANGGALNYA SUDAH TERLEWAT (EXPIRED, MISAL SEMARANG SETELAH 22 OKT)
+      if (isCityExpired && roadshowCity) {
+        return NextResponse.json(
+          {
+            status: 'success',
+            success: true,
+            action: 'bogo_reminder_registered',
+            category: 'roadshow_expired_redirect_bogo',
+            isRoadshowExpired: true,
+            name,
+            city: roadshowCity.name,
+            roadshowDate: roadshowCity.dateStr,
+            phone,
+            replyMessage: `🎬 *ROADSHOW ${roadshowCity.name.toUpperCase()} SUDAH SELESAI — NOMOR KAMU DIALIHKAN KE PENGINGAT BUY 1 GET 1!* 🎬\n\nHalo *${name}*,\nSesi roadshow dan penukaran voucher fisik di booth mall ${roadshowCity.name} (${roadshowCity.dateStr}) kemarin sudah selesai ya lur. Karena tanggalnya sudah terlewat, penukaran kode booking ke voucher fisik di booth mall sudah tidak bisa lagi.\n\n🍿 *TAPI JANGAN KHAWATIR! SAMPEAN TETAP BISA NONTON PROMO SPESIAL:*\n• Tanggal Tayang Serentak: *19 NOVEMBER 2026*\n• Lokasi: Seluruh bioskop di Kota ${roadshowCity.name} (XXI, CGV, Cinépolis, dll).\n• Status: *Nomor kamu (${phone}) sudah RESMI TERDAFTAR dalam Pengingat Prioritas Promo BUY 1 GET 1 (BOGO)* untuk penayangan perdana 19-20 November! 🎟️\n\n📌 Begitu penjualan tiket promo presale dibuka di aplikasi bioskop resmi (M-TIX / CGV / TIX ID), sistem WhatsApp kami akan langsung mengirimkan notifikasi pengingat prioritas ke nomor kamu! Sampai jumpa di bioskop lur! ✨`,
+            instructions_for_ai: `Sampaikan ucapan terima kasih kepada ${name}. Jelaskan dengan ramah dan empati bahwa sesi roadshow dan penukaran voucher fisik di booth mall Kota ${roadshowCity.name} (${roadshowCity.dateStr}) SUDAH SELESAI / TERLEWAT. Oleh karena itu, penukaran voucher fisik di booth mall sudah tidak tersedia lagi.\n\nPERINGATAN KERAS UNTUK AI (JANGAN SALAH):\n1. JANGAN PERNAH memberikan link voucher atau kode booking penukaran tiket di mall!\n2. JANGAN sebutkan ada booth penukaran di mall lagi, karena acaranya sudah lewat!\n3. Tegaskan bahwa nomornya (${phone}) sudah RESMI DIAMANKAN untuk Pengingat Prioritas Promo BUY 1 GET 1 (BOGO) bioskop mulai penayangan serentak 19 NOVEMBER 2026.\n4. Tiket promo bisa dibeli lewat aplikasi bioskop resmi (M-TIX / CGV / TIX ID) saat penjualan tiket dibuka, dan sistem kami akan mengirimkan pengingat WhatsApp prioritas.`,
+          },
+          { status: 200, headers: corsHeaders }
+        );
+      }
+
+      // KASUS 1B: KOTA DI LUAR 17 ROADSHOW (BANDUNG, MEDAN, JAKARTA, DLL)
       return NextResponse.json(
         {
           status: 'success',
@@ -188,7 +225,7 @@ export async function POST(req: NextRequest) {
     }
 
     // =========================================================================
-    // SCENARIO 2: 17 KOTA ROADSHOW (SEMARANG, JOGJA, SOLO, KUDUS, SURABAYA, DLL)
+    // SCENARIO 2: 17 KOTA ROADSHOW AKTIF (SEMARANG, JOGJA, SOLO, KUDUS, SURABAYA, DLL)
     // =========================================================================
     const matchedCity = roadshowCity!;
     const validityText = db.settings.voucherValidDatesText || '19 - 20 November 2026 (Penayangan Perdana)';
