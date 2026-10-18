@@ -10,6 +10,15 @@ export async function GET() {
   const validityText = db.settings.voucherValidDatesText || '19 - 20 November 2026';
   const manualExpired = db.settings.expiredRoadshowCities || [];
 
+  const ticketLinks = {
+    default: db.settings.bogoDefaultTicketLink || 'https://m.21cineplex.com/id/movies/16PTKH',
+    xxi: db.settings.bogoCinemaLinks?.xxi || 'https://m.21cineplex.com/id/movies/16PTKH',
+    tixid: db.settings.bogoCinemaLinks?.tixid || 'https://rb.gy/l28pzj',
+    cgv: db.settings.bogoCinemaLinks?.cgv || 'https://www.cgv.id',
+    cinepolis: db.settings.bogoCinemaLinks?.cinepolis || 'https://cinepolis.co.id',
+    website: 'https://piyetokihfilm.com',
+  };
+
   return NextResponse.json({
     success: true,
     status: 'active',
@@ -26,6 +35,7 @@ export async function GET() {
       dataPengetahuanFAQ: PIYE_TO_KIH_AI_PERSONA.dataPengetahuanFAQ,
       sampleDialogs: PIYE_TO_KIH_AI_PERSONA.sampleDialogs,
     },
+    ticketLinks,
     toolSchema: WAHNOTIF_TOOL_SCHEMA,
     integration: {
       webhookUrl: 'https://piyetokihfilm.com/api/webhook/wahnotif',

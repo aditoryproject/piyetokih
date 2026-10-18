@@ -27,11 +27,11 @@ export async function GET(req: NextRequest) {
   const toolDefinition = {
     status: 'active',
     success: true,
-    message: 'Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant.',
+    message: 'Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant (Humor, Friendly, Fast-Track Ticket Links).',
     name: 'generate_voucher_presale',
     tool_name: 'generate_voucher_presale',
-    title: 'Registrasi Tiket & Pengingat Promo Piye Toh Kih',
-    description: 'Mendaftarkan penonton ke sistem database resmi: (1) Untuk kota roadshow yang tanggalnya sudah terlewat (misal Semarang setelah 22 Oktober 2026), sistem otomatis menolak voucher mall dan mengalihkan penonton ke Pengingat Prioritas Promo Buy 1 Get 1 (BOGO) Bioskop 19 November. (2) Untuk kota non-roadshow (Bandung, Medan, dll), sistem mendaftarkan ke Pengingat Prioritas Promo Buy 1 Get 1 Bioskop 19 November (tanpa kode booth). (3) Untuk 17 kota roadshow aktif yang tanggalnya belum lewat, sistem menerbitkan Kode Booking penukaran voucher fisik di booth mall.',
+    title: 'Registrasi Tiket, Promo BOGO & Link Tiket Langsung Piye Toh Kih',
+    description: 'Mendaftarkan penonton ke sistem database resmi dan memberikan link langsung pembelian tiket bioskop: (1) Untuk kota roadshow yang tanggalnya sudah terlewat (misal Semarang setelah 22 Oktober 2026), sistem otomatis menolak voucher mall, memberikan link beli tiket bioskop langsung, dan mengalihkan penonton ke Pengingat Prioritas Promo Buy 1 Get 1 (BOGO) Bioskop 19 November. (2) Untuk kota non-roadshow (Bandung, Medan, dll), sistem memberikan link langsung tiket dan mendaftarkan ke Pengingat Promo Buy 1 Get 1. (3) Untuk 17 kota roadshow aktif yang tanggalnya belum lewat, sistem menerbitkan Kode Booking penukaran voucher fisik di booth mall.',
     url: `${effectiveOrigin}/api/webhook/wahnotif`,
     webhook_url: `${effectiveOrigin}/api/webhook/wahnotif`,
     method: 'POST',
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     tools: [
       {
         name: 'generate_voucher_presale',
-        description: 'Mendaftarkan calon penonton untuk Pengingat Promo Buy 1 Get 1 (Expired/Non-Roadshow) atau Voucher Fisik Roadshow (17 Kota Aktif).',
+        description: 'Mendaftarkan calon penonton untuk Pengingat Promo Buy 1 Get 1 (Expired/Non-Roadshow) atau Voucher Fisik Roadshow (17 Kota Aktif) serta mengirim link tiket langsung.',
         url: `${effectiveOrigin}/api/webhook/wahnotif`,
         method: 'POST',
         parameters: {
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     const args = body.arguments || body.parameters || body;
 
     // Extract lead attributes
-    const name = args.name || args.customer_name || args.sender_name || body.push_name || 'Penonton Piye Toh Kih';
+    const name = args.name || args.customer_name || args.sender_name || body.push_name || 'Bolo Piye Toh Kih';
     const phone = args.phone || args.number || body.number || body.sender || body.from || '';
     const email = args.email || (phone ? `${String(phone).replace(/[^0-9]/g, '')}@whatsapp.user` : 'user@whatsapp.user');
     const cityLocation = args.city || args.kota || args.cityLocation || 'Nasional';
@@ -143,6 +143,18 @@ export async function POST(req: NextRequest) {
       args.intent === 'reminder';
 
     const db = getDb();
+
+    // Direct Ticket Links from db.settings
+    const xxiLink = db.settings.bogoCinemaLinks?.xxi || 'https://m.21cineplex.com/id/movies/16PTKH';
+    const tixidLink = db.settings.bogoCinemaLinks?.tixid || 'https://rb.gy/l28pzj';
+    const cgvLink = db.settings.bogoCinemaLinks?.cgv || 'https://www.cgv.id';
+    const cinepolisLink = db.settings.bogoCinemaLinks?.cinepolis || 'https://cinepolis.co.id';
+    const defaultTicketLink = db.settings.bogoDefaultTicketLink || xxiLink;
+
+    const rawOrigin = req.nextUrl?.origin || 'https://piyetokihfilm.com';
+    const siteOrigin = (rawOrigin.includes('localhost') || rawOrigin.includes('127.0.0.1') || rawOrigin.includes('0.0.0.0'))
+      ? 'https://piyetokihfilm.com'
+      : rawOrigin;
 
     // 2. Check if the roadshow city is EXPIRED (date has passed or manually marked expired)
     const isCityExpired =
@@ -200,8 +212,16 @@ export async function POST(req: NextRequest) {
             city: roadshowCity.name,
             roadshowDate: roadshowCity.dateStr,
             phone,
-            replyMessage: `🎬 *ROADSHOW ${roadshowCity.name.toUpperCase()} SUDAH SELESAI — NOMOR KAMU DIALIHKAN KE PENGINGAT BUY 1 GET 1!* 🎬\n\nHalo *${name}*,\nSesi roadshow dan penukaran voucher fisik di booth mall ${roadshowCity.name} (${roadshowCity.dateStr}) kemarin sudah selesai ya lur. Karena tanggalnya sudah terlewat, penukaran kode booking ke voucher fisik di booth mall sudah tidak bisa lagi.\n\n🍿 *TAPI JANGAN KHAWATIR! SAMPEAN TETAP BISA NONTON PROMO SPESIAL:*\n• Tanggal Tayang Serentak: *19 NOVEMBER 2026*\n• Lokasi: Seluruh bioskop di Kota ${roadshowCity.name} (XXI, CGV, Cinépolis, dll).\n• Status: *Nomor kamu (${phone}) sudah RESMI TERDAFTAR dalam Pengingat Prioritas Promo BUY 1 GET 1 (BOGO)* untuk penayangan perdana 19-20 November! 🎟️\n\n📌 Begitu penjualan tiket promo presale dibuka di aplikasi bioskop resmi (M-TIX / CGV / TIX ID), sistem WhatsApp kami akan langsung mengirimkan notifikasi pengingat prioritas ke nomor kamu! Sampai jumpa di bioskop lur! ✨`,
-            instructions_for_ai: `Sampaikan ucapan terima kasih kepada ${name}. Jelaskan dengan ramah dan empati bahwa sesi roadshow dan penukaran voucher fisik di booth mall Kota ${roadshowCity.name} (${roadshowCity.dateStr}) SUDAH SELESAI / TERLEWAT. Oleh karena itu, penukaran voucher fisik di booth mall sudah tidak tersedia lagi.\n\nPERINGATAN KERAS UNTUK AI (JANGAN SALAH):\n1. JANGAN PERNAH memberikan link voucher atau kode booking penukaran tiket di mall!\n2. JANGAN sebutkan ada booth penukaran di mall lagi, karena acaranya sudah lewat!\n3. Tegaskan bahwa nomornya (${phone}) sudah RESMI DIAMANKAN untuk Pengingat Prioritas Promo BUY 1 GET 1 (BOGO) bioskop mulai penayangan serentak 19 NOVEMBER 2026.\n4. Tiket promo bisa dibeli lewat aplikasi bioskop resmi (M-TIX / CGV / TIX ID) saat penjualan tiket dibuka, dan sistem kami akan mengirimkan pengingat WhatsApp prioritas.`,
+            ticketLinks: {
+              xxi: xxiLink,
+              tixid: tixidLink,
+              cgv: cgvLink,
+              cinepolis: cinepolisLink,
+              default: defaultTicketLink,
+              website: siteOrigin,
+            },
+            replyMessage: `🎬 *ROADSHOW ${roadshowCity.name.toUpperCase()} SUDAH SELESAI — NOMOR KAMU DIALIHKAN KE PENGINGAT BUY 1 GET 1!* 🎬\n\nHalo *${name}*, bolo asikku! Piye kabare? 😄\nMangan getuk nang Pasar Johar, roadshow Semarang kemarin wes rampung lur! Hehehe...\nKarena tanggalnya kemarin sudah lewat, penukaran kode booking ke voucher fisik di booth mall sudah tidak bisa lagi ya.\n\n🍿 *TAPI OJO CILIK ATI LUR! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di seluruh bioskop ${roadshowCity.name} (XXI, Cinépolis, dll) dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK, GAK REPOT NYARI LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• Cinépolis: ${cinepolisLink}\n• Jadwal & Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI DIAMANKAN di Pengingat Prioritas BOGO*. Nanti begitu kuota presale dibuka, kami langsung japri via WA! Ajak ayang atau kawan tongkrongan ya lur! ✨`,
+            instructions_for_ai: `Jawab dengan gaya super ramah, akrab, humoris khas kawan tongkrongan ('nggak kaku teing'). Jelaskan dengan santai bahwa sesi roadshow dan booth voucher fisik di Kota ${roadshowCity.name} (${roadshowCity.dateStr}) SUDAH SELESAI. JANGAN memberikan kode booking atau booth penukaran di mall lagi! Tegaskan nomornya (${phone}) sudah RESMI DIAMANKAN untuk Pengingat Prioritas Promo BUY 1 GET 1 bioskop serentak 19 NOVEMBER 2026. LANGSUNG BERIKAN LINK PEMBELIAN TIKET INI: Cinema XXI: ${xxiLink} | TIX ID: ${tixidLink} agar penonton tinggal klik dan gak usah repot nyari manual di aplikasi!`,
           },
           { status: 200, headers: corsHeaders }
         );
@@ -217,8 +237,16 @@ export async function POST(req: NextRequest) {
           name,
           city: cityLocation,
           phone,
-          replyMessage: `🎬 *PENDAFTARAN PENGINGAT BUY 1 GET 1 BERHASIL!* 🎬\n\nNama: *${name}*\nKota Bioskop: *${cityLocation}*\nNo. WhatsApp: *${phone}*\n\nStatus: *Terdaftar di Notifikasi Prioritas Promo Presale Buy 1 Get 1 (BOGO)* 🍿\n\n📌 *INFORMASI PENAYANGAN RESMI:*\n• Tanggal Tayang Serentak: *19 NOVEMBER 2026*\n• Lokasi: Seluruh bioskop XXI, CGV, Cinépolis, dan mitra bioskop resmi di Kota ${cityLocation}.\n\n⚠️ *PENTING DIBACA:*\n1. Di Kota *${cityLocation}* *TIDAK ADA event roadshow* dan *TIDAK ADA voucher fisik* yang harus ditukar di mall.\n2. Tiket promo Buy 1 Get 1 bisa dibeli langsung melalui aplikasi resmi bioskop (M-TIX / CGV / TIX ID) saat penjualan tiket dibuka.\n3. Sistem WhatsApp kami akan otomatis mengirimkan pesan pengingat ke nomor kamu begitu penjualan presale promo dibuka di kotamu! 🎟️`,
-          instructions_for_ai: `Sampaikan ucapan terima kasih kepada ${name}. Konfirmasikan bahwa nomornya (${phone}) sudah RESMI TERDAFTAR dalam sistem Pengingat Prioritas Promo BUY 1 GET 1 untuk penayangan bioskop di Kota ${cityLocation} mulai 19 NOVEMBER 2026.\n\nPERINGATAN KERAS UNTUK AI (JANGAN SALAH):\n1. JANGAN memberikan link voucher atau kode booking penukaran tiket!\n2. JANGAN sebutkan ada booth penukaran voucher fisik di mall!\n3. JANGAN sebutkan ada acara roadshow atau meet & greet di Kota ${cityLocation}, karena di Kota ${cityLocation} TIDAK ADA acara roadshow.\n4. Jelaskan bahwa film tayang serentak mulai 19 NOVEMBER 2026 di bioskop kotanya (XXI/CGV/Cinépolis), dan sistem kami akan mengirimkan pesan pengingat via WhatsApp ke nomor ini saat tiket promo presale dibuka di aplikasi bioskop.`,
+          ticketLinks: {
+            xxi: xxiLink,
+            tixid: tixidLink,
+            cgv: cgvLink,
+            cinepolis: cinepolisLink,
+            default: defaultTicketLink,
+            website: siteOrigin,
+          },
+          replyMessage: `🎬 *PENDAFTARAN PENGINGAT BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${cityLocation}! Piye kabare lur? 😄\nTuku klopo menyang Pasar Minggu, nonton Mukidi ben atine gak gampang ngelu! ✨\n\nUntuk roadshow temu cast saat ini memang lagi keliling 17 kota Jateng-Jatim lur. TAPI TENANG! Tanggal *19 NOVEMBER 2026* film PIYE TO KIH? *TAYANG SERENTAK* di bioskop kesayangan kotamu (XXI, CGV, Cinépolis)!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\nBiar gak usah repot nyari-nyari di aplikasi bioskop, ini Kang Kih kasih link langsungnya:\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas Promo BUY 1 GET 1 (BOGO)*. Nanti pas presale dibuka, kami langsung kirimkan notifikasi WA lur! Sampai ketemu di bioskop! 🍿🎉`,
+          instructions_for_ai: `Jawab dengan gaya akrab, humoris, guyub, dan friendly. Sampaikan bahwa nomor ${phone} milik ${name} sudah TERDAFTAR RESMI di Pengingat Prioritas Promo BUY 1 GET 1 untuk penayangan bioskop di Kota ${cityLocation} mulai 19 NOVEMBER 2026. JANGAN sebutkan ada booth voucher mall karena di ${cityLocation} tidak ada roadshow. LANGSUNG BERIKAN LINK PEMBELIAN TIKET RESMI: Cinema XXI: ${xxiLink} | TIX ID: ${tixidLink} | CGV: ${cgvLink} | Cinépolis: ${cinepolisLink} agar penonton bisa langsung klik!`,
         },
         { status: 200, headers: corsHeaders }
       );
@@ -237,17 +265,13 @@ export async function POST(req: NextRequest) {
 
     let serialNumber = '';
     let voucherUrl = '';
-    const rawOrigin = req.nextUrl.origin || 'https://piyetokihfilm.com';
-    const origin = (rawOrigin.includes('localhost') || rawOrigin.includes('127.0.0.1') || rawOrigin.includes('0.0.0.0'))
-      ? 'https://piyetokihfilm.com'
-      : rawOrigin;
 
     if (existingLead) {
       serialNumber = existingLead.serialNumber;
-      voucherUrl = `${origin}/voucher/${serialNumber}`;
+      voucherUrl = `${siteOrigin}/voucher/${serialNumber}`;
     } else {
       serialNumber = generateVoucherSerial();
-      voucherUrl = `${origin}/voucher/${serialNumber}`;
+      voucherUrl = `${siteOrigin}/voucher/${serialNumber}`;
 
       const newLead: LeadRecord = {
         id: `lead-wa-${Date.now()}`,
@@ -302,8 +326,16 @@ export async function POST(req: NextRequest) {
         boothFloor,
         boothTime,
         dateStr: matchedCity.dateStr,
-        replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nNama: *${name}*\nKota Roadshow: *${matchedCity.name}*\nTanggal Roadshow: *${matchedCity.dateStr}*\nKode Booking: *${serialNumber}*\n\nBuka & simpan link tiket kamu di sini:\n${voucherUrl}\n\n📍 *LOKASI PENUKARAN VOUCHER FISIK RP10.000:*\n• Tempat: *${boothVenue}*\n• Lokasi: *${boothFloor}*\n• Waktu: *${boothTime}*\n\n⚠️ *KETENTUAN:* Kode ini adalah tanda bukti untuk mengambil voucher fisik resmi di booth roadshow mall. Sampai jumpa lur! 🍿`,
-        instructions_for_ai: `Sampaikan ucapan selamat kepada ${name}. Infokan bahwa Kode Booking resmi untuk Roadshow Kota ${matchedCity.name} sudah aktif dengan Kode ${serialNumber}. Berikan link tiket ${voucherUrl}. Sampaikan dengan ramah bahwa penukaran voucher fisik resmi Rp10.000 dilakukan di booth resmi ${boothVenue} (${boothFloor}) pada tanggal ${matchedCity.dateStr} jam ${boothTime}.`,
+        ticketLinks: {
+          xxi: xxiLink,
+          tixid: tixidLink,
+          cgv: cgvLink,
+          cinepolis: cinepolisLink,
+          default: defaultTicketLink,
+          website: siteOrigin,
+        },
+        replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nHalo *${name}*, bolo nonton Kota ${matchedCity.name}! Mantap tenan lur! 😄\nMangan getuk nang kutha Salatiga, nonton bareng Mukidi atine lego! 🍿✨\n\n🎟️ *KODE BOOKING KAMU:* ${serialNumber}\n📥 *Buka & Download PDF Tiket:* ${voucherUrl}\n\n📍 *LOKASI PENUKARAN VOUCHER FISIK RP10.000:*\n• Tempat: *${boothVenue}*\n• Lokasi: *${boothFloor}*\n• Waktu: *${boothTime}* (${matchedCity.dateStr})\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP REGULER / NONTON DULUAN:*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• Info Lengkap: ${siteOrigin}\n\n⚠️ Tunjukkan kode booking ini ke petugas booth resmi pas hari H roadshow ya lur. Sampai jumpa bareng Mukidi & Sukma! 🍿`,
+        instructions_for_ai: `Sampaikan ucapan selamat dengan gaya akrab, santai, dan ceria. Infokan Kode Booking resmi Kota ${matchedCity.name} adalah ${serialNumber} dan link tiket ${voucherUrl}. Infokan penukaran voucher fisik resmi Rp10.000 di booth ${boothVenue} (${boothFloor}) pada ${matchedCity.dateStr} jam ${boothTime}. Jika penonton menanyakan link tiket bioskop reguler/nonton duluan, BERIKAN LANGSUNG: Cinema XXI: ${xxiLink} | TIX ID: ${tixidLink}!`,
       },
       {
         status: 200,
