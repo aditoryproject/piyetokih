@@ -78,6 +78,23 @@ export async function POST(req: NextRequest) {
       }, { status: 200, headers: corsHeaders });
     }
 
+    // Check human handover
+    if (
+      query.includes('admin') ||
+      query.includes('manusia') ||
+      query.includes('orang') ||
+      query.includes('operator') ||
+      query.includes('cs manusia') ||
+      query.includes('bicara sama cs') ||
+      query.includes('ngomong sama admin')
+    ) {
+      return NextResponse.json({
+        success: true,
+        isHumanHandover: true,
+        replyMessage: `Siap bolo asik! Mas Kidi sambungkan langsung ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean di sini! 🍿✨`
+      }, { status: 200, headers: corsHeaders });
+    }
+
     // Default friendly assistant response
     return NextResponse.json({
       success: true,

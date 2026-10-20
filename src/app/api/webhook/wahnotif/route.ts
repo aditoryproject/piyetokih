@@ -171,6 +171,31 @@ export async function POST(req: NextRequest) {
     const cityParam = String(args.city || args.kota || '').toLowerCase().trim();
 
     // =========================================================================
+    // SUB-ROUTER 0: HUMAN HANDOVER / ESKALASI KE ADMIN MANUSIA
+    // =========================================================================
+    const isHumanHandoff =
+      action.includes('human') ||
+      action.includes('admin') ||
+      action.includes('handoff') ||
+      action.includes('handover') ||
+      action.includes('eskalasi') ||
+      queryText.includes('admin') ||
+      queryText.includes('manusia') ||
+      queryText.includes('orang') ||
+      queryText.includes('operator') ||
+      queryText.includes('cs manusia') ||
+      queryText.includes('bicara sama cs');
+
+    if (isHumanHandoff) {
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        action: 'human_handover',
+        replyMessage: `Siap bolo asik! Mas Kidi sambungkan langsung ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean di sini! 🍿✨`
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // =========================================================================
     // SUB-ROUTER 1: ROADSHOW & JADWAL PER KOTA
     // =========================================================================
     const isRoadshowAction =

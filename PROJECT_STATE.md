@@ -146,3 +146,9 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
     * **Madiun**: Suncity Madiun XXI berubah menjadi **19.00 WIB** (sebelumnya 18.45).
     * Ter-update pada [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts), [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts), dan [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts).
 
+12. **Standarisasi Sapaan & Eskalasi Human Handover Wahnotif (Anti Ayah/Bunda)**:
+    * **Penyebab Sapaan Ayah/Bunda**: Sebutan tersebut merupakan default template bawaan sistem chatbot Wahnotif saat memicu pesan fallback/eskalasi CS manusia.
+    * **Aturan Mutlak Persona & Webhook**:
+      - Menambahkan larangan mutlak sebutan Ayah/Bunda pada [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts) dan mewajibkan panggilan khas Piye To Kih: *Lur / Bolo Asik / Dulur*.
+      - Menambahkan router eskalasi manusia otomatis di [`/api/webhook/wahnotif`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts) dan [`/api/webhook/ai-brain`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts) dengan teks khas Mas Kidi: *"Siap bolo asik! Mas Kidi sambungkan langsung ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean di sini! 🍿✨"*.
+
