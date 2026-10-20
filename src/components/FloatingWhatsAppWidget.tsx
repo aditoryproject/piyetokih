@@ -243,7 +243,7 @@ export default function FloatingWhatsAppWidget({
               </div>
               <div className="bg-white/[0.05] border border-white/[0.08] rounded-2xl rounded-tl-sm p-3 text-xs leading-relaxed text-slate-200 shadow-inner">
                 <p className="font-semibold text-amber-300 mb-1">
-                  Halo bolo asik! Piye kabare? 😄
+                  Halo, Dulur! Piye kabare?☺️
                 </p>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
                   Mau cari tiket presale nonton duluan, cek jadwal kota, atau promo Buy 1 Get 1? 
