@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import AdminLoginForm from '@/components/AdminLoginForm';
-import { CITIES_DATA } from '@/lib/cities';
+import { CITIES_DATA, cleanVenueToMallName } from '@/lib/cities';
 import { DEFAULT_MOVIE_SETTINGS, MovieSettings, MovieCastMember } from '@/lib/movie-types';
 import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
 import {
@@ -857,7 +857,7 @@ export default function AdminDashboardClient() {
       `"${l.phone}"`,
       `"${l.email}"`,
       `"${l.cityLocation || 'Nasional'}"`,
-      `"${(l as any).venueLocation || '-'}"`,
+      `"${cleanVenueToMallName((l as any).venueLocation) || '-'}"`,
       `"${l.source}"`,
       `"${l.whatsappStatus}"`,
       `"${l.claimedAt}"`,
@@ -1340,8 +1340,8 @@ export default function AdminDashboardClient() {
                               {l.cityLocation || 'Nasional'}
                             </span>
                             {(l as any).venueLocation && (
-                              <div className="text-[10px] text-slate-500 font-semibold mt-1 truncate max-w-[140px]" title={(l as any).venueLocation}>
-                                📍 {(l as any).venueLocation}
+                              <div className="text-[10px] text-slate-500 font-semibold mt-1 truncate max-w-[140px]" title={cleanVenueToMallName((l as any).venueLocation)}>
+                                📍 {cleanVenueToMallName((l as any).venueLocation)}
                               </div>
                             )}
                           </td>

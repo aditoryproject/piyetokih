@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { MovieCastMember, MovieSettings, DEFAULT_MOVIE_SETTINGS } from './movie-types';
+import { cleanVenueToMallName } from './cities';
 export type { MovieCastMember, MovieSettings };
 export { DEFAULT_MOVIE_SETTINGS };
 
@@ -210,7 +211,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   isWarOpen: true,
   countdownTarget: '2026-10-22T13:00:00+07:00', // Hari H Roadshow
   warHeadline: 'WAR VOUCHER NONTON FILM PIYE TO KIH',
-  warSubtitle: 'Klaim e-voucher resmi! Voucher dapat ditukarkan di bioskop kesayangan Anda saat periode penayangan film.',
+  warSubtitle: 'Klaim e-voucher resmi! Ambil Voucher Fisik di booth roadshow offline untuk penayangan perdana film.',
   metaPixelId: '',
   tiktokPixelId: '',
   googleAnalyticsId: '',
@@ -233,7 +234,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   voucherValidDatesText: '19 - 20 November 2026 (Penayangan Perdana)',
   voucherValidStart: '2026-11-19',
   voucherValidEnd: '2026-11-20',
-  voucherTermsText: 'Voucher digital ini bukan bukti pembayaran. Untuk penukaran voucher fisik resmi, silakan kunjungi booth di samping acara Roadshow & Meet and Greet di kotamu.',
+  voucherTermsText: 'Tukarkan Kode Booking ini di konter booth resmi saat acara Roadshow & Meet and Greet offline untuk mengambil voucher fisik penayangan film. DILARANG menukar di kasir bioskop.',
 
   // BOGO Promo Defaults
   isBogoActive: true,
@@ -444,11 +445,30 @@ function ensureDb(): DatabaseSchema {
     settings.voucherTermsText = settings.voucherTermsText.replace(/22 November/g, '20 November');
   }
 
+  // Auto-cleanse settings that mention exchanging vouchers at cinema counters
+  if (settings.warSubtitle && (settings.warSubtitle.includes('ditukarkan di bioskop') || settings.warSubtitle.includes('bioskop kesayangan'))) {
+    settings.warSubtitle = 'Klaim e-voucher resmi! Ambil Voucher Fisik di booth roadshow offline untuk penayangan perdana film.';
+  }
+  if (settings.voucherTermsText && (settings.voucherTermsText.includes('ditukarkan di bioskop') || settings.voucherTermsText.includes('bioskop kesayangan'))) {
+    settings.voucherTermsText = 'Tukarkan Kode Booking ini di konter booth resmi saat acara Roadshow & Meet and Greet offline untuk mengambil voucher fisik penayangan film. DILARANG menukar di kasir bioskop.';
+  }
+
   // Merge leads (never lose collected attendee data!)
   let leads = Array.isArray(parsed.leads) ? parsed.leads : [];
   if (Array.isArray(backup?.leads) && backup.leads.length > leads.length) {
     leads = backup.leads;
   }
+
+  // Auto-sanitize all existing leads' venueLocation to mall names only (clean cinema brands)
+  leads = leads.map(l => {
+    if (l.venueLocation) {
+      const cleaned = cleanVenueToMallName(l.venueLocation);
+      if (cleaned !== l.venueLocation) {
+        return { ...l, venueLocation: cleaned };
+      }
+    }
+    return l;
+  });
 
   // Merge bogo reminders:
   let bogoReminders = Array.isArray(parsed.bogoReminders) ? parsed.bogoReminders : [];

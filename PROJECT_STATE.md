@@ -129,7 +129,8 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      - Memberikan peringatan keras bahwa kasir bioskop tidak melayani penukaran e-voucher kode booking. Lembaran voucher fisik resmi yang sudah diambil di booth baru digunakan saat nonton di bioskop tanggal 19–20 November 2026.
    * **Update Halaman & Komponen Pendukung**:
      - [`/voucher/[id]`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/voucher/[id]/page.tsx), [`src/components/WarVoucherForm.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/WarVoucherForm.tsx), [`src/components/CityVoucherPickupSection.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/CityVoucherPickupSection.tsx), [`src/app/city/[slug]/page.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/city/[slug]/page.tsx), dan template email [`src/lib/email.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/email.ts) diselaraskan secara konsisten.
-
-
-
+   * **Auto-Migrasi & Sanitasi Data Leads Lama (Tanpa Perlu Daftar Ulang)**:
+     - Di [`src/lib/db.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/db.ts) ditambahkan auto-sanitasi pada `ensureDb()`: seluruh leads lama yang tersimpan di `db.json` / `db.persist.json` yang masih memuat nama brand bioskop otomatis dibersihkan menjadi nama mall/tempat acara roadshow secara permanen.
+     - Di [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx), tampilan tabel leads dan export CSV otomatis menampilkan nama mall bersih.
+     - User/penonton lama yang membuka link e-voucher kode bookingnya ([`/voucher/[id]`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/voucher/[id]/page.tsx)) otomatis melihat tampilan booth roadshow dan nama mall yang baru tanpa perlu mengisi formulir pendaftaran baru.
 
