@@ -5,6 +5,7 @@ import { getDb } from '@/lib/db';
 import AdminMaintenanceBanner from '@/components/AdminMaintenanceBanner';
 import PublicHeader from '@/components/PublicHeader';
 import ComingSoonView from '@/components/ComingSoonView';
+import FloatingWhatsAppWidget from '@/components/FloatingWhatsAppWidget';
 import { cookies, headers } from 'next/headers';
 import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
 
@@ -162,6 +163,15 @@ export default async function RootLayout({
             children
           )}
         </main>
+
+        {/* Floating WhatsApp AI CS Widget (Mas Kidi - Universal Fast Track) */}
+        <FloatingWhatsAppWidget
+          whatsappNumber={
+            db.settings.wahnotifSenderNumber ||
+            db.settings.kabarGaleriSettings?.mediaKitContactWa ||
+            '6285691921764'
+          }
+        />
       </body>
     </html>
   );

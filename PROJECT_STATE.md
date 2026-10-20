@@ -96,3 +96,17 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      - `src/lib/wahnotif.ts`, `/api/wahnotif/persona`, dan `/api/webhook/ai-brain` kini menginterpolasi link tiket dari database secara dinamis.
      - Panel Admin (`/admin` tab Wahnotif) kini merefleksikan link presale terbaru yang diisi admin secara real-time pada 4 kolom isian dan Master Prompt.
 
+7. **Floating WhatsApp Widget (Mas Kidi AI CS Fast-Track) Mobile-Responsive**:
+   * **Komponen Baru**: [`src/components/FloatingWhatsAppWidget.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/FloatingWhatsAppWidget.tsx) dimuat global di [`src/app/layout.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/layout.tsx).
+   * **Desain & Responsivitas Mobile Anti-Terhalang**:
+     - Posisi adaptif safe-area insets (`env(safe-area-inset-bottom)`, `env(safe-area-inset-right)`) mencegah tabrakan dengan home bar iOS / toolbar browser mobile.
+     - Di mobile (< 640px), modal popover menggunakan `inset-x-3` (terpusat presisi tanpa terpotong sisi kiri/kanan), `max-h-[calc(100dvh-2.5rem)]` adaptif terhadap keyboard & address bar, serta scroll locking body.
+     - Pilihan cepat menggunakan anchor link native (`<a>`) untuk menghindari blokir popup pada iOS Safari dan Chrome Android.
+   * **4 Pilihan Cepat Khas Mas Kidi**:
+     1. Tiket Presale & Nonton Duluan (konversi tinggi sebelum 19 Nov).
+     2. Jadwal Roadshow & Temu Pemain (auto-detect kota jika sedang membuka `/city/[slug]`).
+     3. Info Promo Buy 1 Get 1 (amankan slot reminder kuota 1.000 TIX ID & 500 M-TIX).
+     4. Tanya Bebas / Ngobrol Mas Kidi (jokes santai, pemain, sinopsis).
+   * **Tracking Analytics**: Dilengkapi pelacakan Meta Pixel event `Contact` untuk setiap klik opsi atau pengiriman pertanyaan custom.
+
+
