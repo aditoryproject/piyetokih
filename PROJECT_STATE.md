@@ -96,8 +96,9 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      - `src/lib/wahnotif.ts`, `/api/wahnotif/persona`, dan `/api/webhook/ai-brain` kini menginterpolasi link tiket dari database secara dinamis.
      - Panel Admin (`/admin` tab Wahnotif) kini merefleksikan link presale terbaru yang diisi admin secara real-time pada 4 kolom isian dan Master Prompt.
 
-7. **Floating WhatsApp Widget (Mas Kidi AI CS Fast-Track) Mobile-Responsive**:
+7. **Floating WhatsApp Widget (Mas Kidi - Official WA Piye To Kih) Mobile-Responsive**:
    * **Komponen Baru**: [`src/components/FloatingWhatsAppWidget.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/FloatingWhatsAppWidget.tsx) dimuat global di [`src/app/layout.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/layout.tsx).
+   * **Branding Natural & Human (Non-AI)**: Seluruh label "Official AI" dan "AI CS" diganti menjadi **"Official WA Piye To Kih"** dan **"Official WA"** agar terasa natural, resmi, dan ramah seperti CS WhatsApp resmi film.
    * **Desain & Responsivitas Mobile Anti-Terhalang**:
      - Posisi adaptif safe-area insets (`env(safe-area-inset-bottom)`, `env(safe-area-inset-right)`) mencegah tabrakan dengan home bar iOS / toolbar browser mobile.
      - Di mobile (< 640px), modal popover menggunakan `inset-x-3` (terpusat presisi tanpa terpotong sisi kiri/kanan), `max-h-[calc(100dvh-2.5rem)]` adaptif terhadap keyboard & address bar, serta scroll locking body.
@@ -108,5 +109,6 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      3. Info Promo Buy 1 Get 1 (amankan slot reminder kuota 1.000 TIX ID & 500 M-TIX).
      4. Tanya Bebas / Ngobrol Mas Kidi (jokes santai, pemain, sinopsis).
    * **Tracking Analytics**: Dilengkapi pelacakan Meta Pixel event `Contact` untuk setiap klik opsi atau pengiriman pertanyaan custom.
+
 
 

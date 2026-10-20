@@ -164,7 +164,7 @@ export default async function RootLayout({
           )}
         </main>
 
-        {/* Floating WhatsApp AI CS Widget (Mas Kidi - Universal Fast Track) */}
+        {/* Floating WhatsApp Official Widget (Mas Kidi - Universal Fast Track) */}
         <FloatingWhatsAppWidget
           whatsappNumber={
             db.settings.wahnotifSenderNumber ||

@@ -104,7 +104,7 @@ export default function FloatingWhatsAppWidget({
   const handleOptionClick = (actionTitle: string) => {
     try {
       trackMetaEvent('Contact', {
-        channel: 'whatsapp_ai_mas_kidi',
+        channel: 'whatsapp_official_piyetokih',
         topic: actionTitle,
         city: currentCityName || 'Nasional',
         path: pathname,
@@ -119,7 +119,7 @@ export default function FloatingWhatsAppWidget({
 
     try {
       trackMetaEvent('Contact', {
-        channel: 'whatsapp_ai_mas_kidi',
+        channel: 'whatsapp_official_piyetokih',
         topic: 'Custom Question',
         city: currentCityName || 'Nasional',
         path: pathname,
@@ -197,7 +197,7 @@ export default function FloatingWhatsAppWidget({
           ref={widgetRef}
           role="dialog"
           aria-modal="true"
-          aria-label="Chat WhatsApp Mas Kidi Official AI"
+          aria-label="Chat WhatsApp Resmi Piye To Kih"
           className="fixed z-50 bottom-[max(0.75rem,env(safe-area-inset-bottom,12px))] inset-x-3 sm:inset-x-auto sm:right-6 sm:bottom-24 w-auto sm:w-[380px] max-w-[420px] mx-auto sm:mx-0 flex flex-col bg-[#0E131F]/98 border border-amber-500/40 rounded-2xl sm:rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(245,158,11,0.2)] backdrop-blur-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[calc(100dvh-2.5rem)] sm:max-h-[min(580px,85vh)]"
           style={{ isolation: 'isolate' }}
         >
@@ -215,8 +215,8 @@ export default function FloatingWhatsAppWidget({
                   <h3 className="text-sm font-black text-white tracking-wide">
                     Mas Kidi
                   </h3>
-                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[9px] font-black uppercase tracking-wider">
-                    Official AI
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[9px] font-black uppercase tracking-wider">
+                    Official WA Piye To Kih
                   </span>
                 </div>
                 <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
@@ -329,7 +329,7 @@ export default function FloatingWhatsAppWidget({
           onClick={handleOpenWidget}
           className="group relative flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-black text-xs sm:text-sm tracking-wide shadow-[0_8px_30px_rgb(245,158,11,0.4)] hover:shadow-[0_12px_35px_rgb(245,158,11,0.6)] hover:scale-105 active:scale-95 transition-all duration-200 border border-amber-300/60 touch-manipulation"
           aria-expanded={isOpen}
-          aria-label="Buka Chat WhatsApp Mas Kidi AI CS"
+          aria-label="Buka Chat WhatsApp Resmi Piye To Kih"
         >
           {/* Avatar Icon Mas Kidi */}
           <div className="relative flex items-center justify-center">
@@ -347,7 +347,7 @@ export default function FloatingWhatsAppWidget({
           <span className="flex items-center gap-1.5 font-black">
             <span className="text-xs sm:text-sm">Tanya Mas Kidi</span>
             <span className="px-1.5 py-0.5 rounded-full bg-slate-950/20 text-[10px] font-black uppercase tracking-wider hidden sm:inline-block">
-              AI CS
+              Official WA
             </span>
           </span>
 
