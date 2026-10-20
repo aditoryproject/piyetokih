@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Clock, MapPin, CheckCircle2, AlertTriangle, Info, Store } from 'lucide-react';
-import { BoothInfo } from '@/lib/cities';
+import { BoothInfo, cleanVenueToMallName } from '@/lib/cities';
 
 interface CityVoucherPickupSectionProps {
   cityName: string;
@@ -19,8 +19,8 @@ export default function CityVoucherPickupSection({
   schoolVenue,
   campusVenue,
 }: CityVoucherPickupSectionProps) {
-  const mallTitle = boothInfo?.venue || `BOOTH ROADSHOW PIYE TO KIH? ${cityName.toUpperCase()}`;
-  const mallFloor = boothInfo?.floor || 'Area Panggung Meet & Greet / Bioskop Mitra';
+  const mallTitle = cleanVenueToMallName(boothInfo?.venue) || `BOOTH ROADSHOW PIYE TO KIH? ${cityName.toUpperCase()}`;
+  const mallFloor = cleanVenueToMallName(boothInfo?.floor) || 'Area Panggung Meet & Greet Offline';
   const mallTime = boothInfo?.timeStr || '16.00 – 17.00 WIB';
 
   return (

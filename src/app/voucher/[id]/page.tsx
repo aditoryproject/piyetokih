@@ -96,10 +96,13 @@ export default function VoucherDetailPage() {
         <div>
           <div className="text-center mb-6">
             <h1 className="text-2xl font-black text-white">
-              CODE VERIFIKASI RESMI
+              KODE BOOKING RESMI ROADSHOW
             </h1>
             <p className="text-xs text-amber-300 font-bold mt-1">
-              Tukarkan Code Verifikasi ini di booth resmi samping panggung Meet &amp; Greet Kota {lead.cityLocation || 'terkait'} untuk mendapatkan voucher fisik resmi.
+              Tukarkan Kode Booking ini di konter booth resmi saat acara Roadshow &amp; Meet and Greet offline Kota {lead.cityLocation || 'terkait'}.
+            </p>
+            <p className="text-[11px] text-red-400 font-extrabold mt-1.5 bg-red-950/40 border border-red-500/30 rounded-lg py-1 px-2.5 max-w-md mx-auto">
+              ⛔ DILARANG MENUKAR DI AREA BIOSKOP: Kasir bioskop TIDAK MELAYANI penukaran kode booking. Penukaran HANYA di booth roadshow offline.
             </p>
           </div>
 

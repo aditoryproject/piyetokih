@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
-import { CITIES_DATA, isCityRoadshowExpired } from '@/lib/cities';
+import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName } from '@/lib/cities';
 import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
 import { WAHNOTIF_TOOL_VOUCHER_SCHEMA } from '@/lib/wahnotif';
 
@@ -203,8 +203,10 @@ export async function POST(req: NextRequest) {
 
     // Stop details
     const stopDetails = MASTER_ROADSHOW_STOPS[matchedCity.slug] || {};
-    const boothVenue = stopDetails.boothMall?.venue || matchedCity.boothInfo?.venue || `Mall Roadshow Resmi ${matchedCity.name}`;
-    const boothFloor = stopDetails.boothMall?.floor || matchedCity.boothInfo?.floor || 'Ground Floor';
+    const rawVenue = stopDetails.boothMall?.venue || matchedCity.boothInfo?.venue || `Mall Acara Roadshow ${matchedCity.name}`;
+    const rawFloor = stopDetails.boothMall?.floor || matchedCity.boothInfo?.floor || 'Area Panggung Meet and Greet';
+    const boothVenue = cleanVenueToMallName(rawVenue);
+    const boothFloor = cleanVenueToMallName(rawFloor);
     const boothTime = stopDetails.boothMall?.time || matchedCity.boothInfo?.timeStr || '16.00 – 17.00 WIB';
 
     return NextResponse.json({
@@ -220,7 +222,7 @@ export async function POST(req: NextRequest) {
       boothTime,
       dateStr: matchedCity.dateStr,
       ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-      replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nHalo *${name}*, bolo nonton Kota ${matchedCity.name}! Mantap tenan lur! 😄\n${randomPantun}\n\n🎟️ *KODE BOOKING KAMU:* ${serialNumber}\n📥 *Buka & Download PDF Tiket:* ${voucherUrl}\n\n📍 *LOKASI PENUKARAN VOUCHER FISIK RP10.000:*\n• Tempat: *${boothVenue}*\n• Lokasi: *${boothFloor}*\n• Waktu: *${boothTime}* (${matchedCity.dateStr})\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP REGULER / NONTON DULUAN:*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• Info Lengkap: ${siteOrigin}\n\n⚠️ Tunjukkan kode booking ini ke petugas booth resmi pas hari H roadshow ya lur. Sampai jumpa bareng Mukidi & Sukma! 🍿`
+      replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nHalo *${name}*, bolo nonton Kota ${matchedCity.name}! Mantap tenan lur! 😄\n${randomPantun}\n\n🎟️ *KODE BOOKING KAMU:* ${serialNumber}\n📥 *Buka & Download PDF Tiket:* ${voucherUrl}\n\n📍 *LOKASI PENUKARAN RESMI (BUKAN BIOSKOP):*\nPenukaran *BUKAN di area bioskop*, melainkan di booth resmi saat acara *Roadshow & Meet and Greet Offline*:\n• Acara: *Roadshow & Meet and Greet Kota ${matchedCity.name}*\n• Tempat: *${boothVenue}*\n• Area: *${boothFloor}*\n• Waktu: *${boothTime}* (${matchedCity.dateStr})\n• Cek Jadwal Lengkap di Web: ${siteOrigin}/city/${matchedCity.slug}\n\n🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline.\n\n⚠️ Tunjukkan kode booking ini ke petugas booth roadshow offline untuk bayar Rp10.000 & ambil voucher fisik resminya. Sampai jumpa bareng Mukidi & kawan-kawan! 🍿`
     }, { status: 200, headers: corsHeaders });
 
   } catch (err: any) {

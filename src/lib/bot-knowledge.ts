@@ -74,7 +74,7 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
     },
     boothMall: {
       venue: 'The Park Mall Semarang',
-      floor: 'Lantai 2 (Area Depan Cinema XXI)',
+      floor: 'Lantai 2 (Area Atrium Depan Eskalator The Park Mall)',
       time: '16.00 – 17.00 WIB'
     },
     scheduleItems: [
@@ -218,8 +218,8 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
       penyok: 'Cek jadwal dan info Nonton Duluan lewat link di bio!'
     },
     boothMall: {
-      venue: 'Plaza Atrium Sragen (Depan Bioskop Platinum)',
-      floor: 'Area Bioskop',
+      venue: 'Plaza Atrium Sragen',
+      floor: 'Area Atrium Utama Plaza Atrium Sragen (Samping Panggung)',
       time: '15.00 – 17.00 WIB'
     },
     scheduleItems: [
@@ -249,8 +249,8 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
       bunga: 'Cek jadwal lengkap dan Nonton Duluan lewat link di bio!'
     },
     boothMall: {
-      venue: 'NSC Ngawi',
-      floor: 'Lobby Bioskop NSC',
+      venue: 'Area Roadshow Ngawi',
+      floor: 'Area Halaman Depan Panggung Acara Ngawi',
       time: '15.00 – 17.00 WIB'
     },
     scheduleItems: [
@@ -611,8 +611,8 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
       penyok: 'Cek info Nonton Duluan lewat link di bio!'
     },
     boothMall: {
-      venue: 'Golden Theatre Tulungagung',
-      floor: 'Lobby Bioskop',
+      venue: 'Area Roadshow Tulungagung',
+      floor: 'Area Booth Panggung Acara Roadshow Tulungagung',
       time: '18.00 – 20.00 WIB'
     },
     scheduleItems: [

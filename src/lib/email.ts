@@ -158,10 +158,14 @@ export async function sendVoucherEmail({
 
         <!-- MASA BERLAKU & PETUNJUK PENUKARAN DI BOOTH (MERAH GELAP) -->
         <div class="validity-tag">
-          <div style="font-size: 9px; font-weight: 900; color: #F87171; letter-spacing: 1px; text-transform: uppercase;">LOKASI PENUKARAN VOUCHER FISIK</div>
-          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">📍 Booth Resmi Samping Panggung Meet and Greet Kota ${city}</div>
+          <div style="font-size: 9px; font-weight: 900; color: #F87171; letter-spacing: 1px; text-transform: uppercase;">LOKASI PENUKARAN VOUCHER FISIK (BUKAN BIOSKOP)</div>
+          <div style="font-size: 13px; font-weight: 900; color: #FDE047; margin: 3px 0;">📍 Booth Resmi Acara Roadshow &amp; Meet and Greet Kota ${city}</div>
           <div style="font-size: 9.5px; color: #CBD5E1; line-height: 1.4; margin-top: 4px;">
-            ⚠️ <b>Code ini bukan bukti pembayaran tiket.</b> Untuk penukaran voucher fisik resmi penayangan bioskop (${validity}), silakan kunjungi booth resmi penukaran di samping panggung / venue Meet &amp; Greet Kota ${city} dengan menunjukkan Code Verifikasi di atas.
+            ⚠️ <b>Code booking ini bukan tiket dan bukan bukti pembayaran.</b><br>
+            <span style="color: #FCA5A5; font-weight: 800;">⛔ DILARANG MENUKAR DI AREA BIOSKOP:</span> Kasir bioskop TIDAK MELAYANI penukaran kode booking. Penukaran WAJIB dilakukan di konter booth resmi saat acara Roadshow &amp; Meet and Greet offline di Kota ${city} untuk bayar Rp10.000 dan mengambil lembaran Voucher Fisik resmi. Lembaran voucher fisik tersebut baru dibawa ke bioskop saat penayangan perdana film (${validity}).
+          </div>
+          <div style="margin-top: 8px;">
+            <a href="https://piyetokihfilm.com/roadshow" style="color: #FACC15; font-weight: 800; font-size: 10px; text-decoration: underline;" target="_blank">Lihat Jadwal Lengkap Acara Roadshow &amp; Titik Booth di Website &rarr;</a>
           </div>
         </div>
 

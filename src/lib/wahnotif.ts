@@ -196,9 +196,14 @@ Misi setiap respon adalah membuat penonton tersenyum akrab, mendapatkan informas
    - TEGASKAN 19 NOVEMBER 2026 film TAYANG SERENTAK di bioskop kotanya (XXI, CGV, Cinépolis).
    - Kirim link tiket langsung & daftarkan ke Pengingat Promo Buy 1 Get 1 (BOGO).
 
-5. ATURAN 17 KOTA ROADSHOW AKTIF & BELUM LEWAT (UPCOMING):
+5. ATURAN 17 KOTA ROADSHOW AKTIF & PENUKARAN VOUCHER (BUKAN DI BIOSKOP):
    - Jelaskan ada 2 opsi: Nonton Duluan (Special Screening) bareng cast sebelum 19 Nov (link presale: ${links.xxi} / ${links.tixid}), dan Voucher Fisik Booth Mall Rp10.000 untuk penayangan 19-20 Nov.
-   - Closing: Amankan Kode Booking penukaran voucher fisik di booth mall sekarang dengan memanggil tool "claim_war_voucher".`,
+   - PERINGATAN MUTLAK PENUKARAN VOUCHER (KARENA DI WA TIDAK ADA DROPDOWN LOKASI SEPERTI DI WEB):
+     • Tegaskan dengan jelas: Penukaran e-voucher/kode booking BUKAN di kasir bioskop dan DILARANG di area bioskop! Kasir bioskop tidak melayani penukaran e-voucher.
+     • Penukaran HANYA dilayani di konter booth resmi saat acara Roadshow & Meet and Greet offline di kotamu.
+     • Karena di WhatsApp tidak ada dropdown titik penukaran seperti di website, arahkan penonton untuk mengecek jadwal rundown dan titik acara meet and greet lengkap di website: https://piyetokihfilm.com/roadshow atau https://piyetokihfilm.com/city/{slug}.
+     • Alur penukaran: bawa kode booking ke booth roadshow meet & greet -> bayar Rp10.000 -> ambil lembaran Voucher Fisik -> voucher fisik tersebut baru dibawa ke kasir bioskop saat penayangan 19-20 November 2026.
+   - Closing: Amankan Kode Booking penukaran voucher fisik di booth roadshow sekarang dengan memanggil tool "claim_war_voucher".`,
 
     // KOTAK 3 WAHNOTIF: PERSONA / KARAKTER CS
     karakterPersona: `PERSONA & GAYA BICARA MAS KIDI (ASISTEN RESMI):
@@ -428,15 +433,23 @@ Klaim Kode Booking kamu berhasil diterbitkan resmi oleh MIRACLE Pictures:
 🎟️ *KODE BOOKING:* ${serialNumber}
 ✨ *Status:* Terverifikasi & Berstempel Resmi Miracle Pictures
 
-📥 *Lihat & Download PDF Tiket Kamu di sini:*
+📥 *Lihat & Download PDF Tiket Kamu:*
 ${voucherUrl}
 
-📌 *KETENTUAN & CARA PENUKARAN VOUCHER FISIK:*
-⚠️ *PENTING:* Kode ini *BUKAN BUKTI PEMBAYARAN TIKET*.
-Untuk penukaran voucher fisik resmi penayangan bioskop dilakukan pada saat *Roadshow & Meet and Greet* di kotamu.
-📍 *Lokasi Penukaran:* Silakan kunjungi *booth resmi di samping venue/panggung Meet and Greet* di kotamu dengan menunjukkan Kode Booking ini ke petugas kami.
+📌 *PETUNJUK PENUKARAN VOUCHER FISIK (BUKAN DI BIOSKOP):*
+⚠️ *PENTING:* Kode booking ini *BUKAN BUKTI PEMBAYARAN TIKET*.
 
-Ajak teman, sahabat, dan keluarga semua ya lur! Sampai jumpa di Meet and Greet & Bioskop! 🍿✨
+🚫 *PERINGATAN KERAS — BUKAN DI BIOSKOP:*
+Penukaran *BUKAN di kasir bioskop maupun area bioskop* (karena dilarang penukaran di area bioskop). Kasir bioskop *TIDAK MELAYANI* penukaran kode booking!
+
+📍 *LOKASI PENUKARAN RESMI:*
+Penukaran *HANYA DILAYANI di konter booth resmi saat acara Roadshow & Meet and Greet offline* di kotamu. Tunjukkan Kode Booking ini ke petugas booth kami untuk membayar Rp10.000 dan mengambil lembaran Voucher Fisik resmi.
+
+📋 *Jadwal Lengkap & Titik Acara Meet and Greet:*
+Karena di WA tidak ada pilihan dropdown seperti di website, silakan cek jadwal jam & titik panggung Meet and Greet di kotamu lewat website:
+👉 https://piyetokihfilm.com/roadshow
+
+Voucher fisik resmi yang sudah diambil di booth roadshow baru dibawa ke kasir bioskop saat penayangan serentak 19–20 November 2026. Sampai jumpa di acara roadshow offline ya lur! 🍿✨
 _Miracle Pictures - Piye Toh Kih Film Official_`;
 
   if (!apiKey || apiKey.trim() === '') {

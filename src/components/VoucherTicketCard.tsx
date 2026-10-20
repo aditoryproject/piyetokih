@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { Download, Share2, CheckCircle2, Film, MapPin, Building2 } from 'lucide-react';
-import { getCityByNameOrSlug } from '@/lib/cities';
+import { getCityByNameOrSlug, cleanVenueToMallName } from '@/lib/cities';
 
 interface VoucherTicketCardProps {
   serialNumber: string;
@@ -74,8 +74,37 @@ export default function VoucherTicketCard({
   }, []);
 
   const cityData = getCityByNameOrSlug(cityLocation);
-  const cityVenues = cityData?.cinemas?.map(c => c.name) || [];
-  const displayVenue = venueLocation || (cityVenues.length === 1 ? cityVenues[0] : null);
+
+  // Ambil data booth resmi acara roadshow offline (Meet & Greet), BUKAN bioskop!
+  let roadshowVenue = '';
+  let roadshowFloor = '';
+  let roadshowTime = '';
+  let roadshowDirections = '';
+  const roadshowDate = cityData?.dateStr || '';
+
+  if (cityData?.boothInfo) {
+    roadshowVenue = cleanVenueToMallName(cityData.boothInfo.venue);
+    roadshowFloor = cleanVenueToMallName(cityData.boothInfo.floor);
+    roadshowTime = cityData.boothInfo.timeStr;
+    roadshowDirections = cleanVenueToMallName(cityData.boothInfo.directions);
+  } else if (cityData?.rundown) {
+    const mallItem = cityData.rundown.items.find(it => it.category === 'Mall & Meet' || it.isVoucherExchange);
+    if (mallItem) {
+      roadshowVenue = cleanVenueToMallName(mallItem.venue);
+      roadshowFloor = cleanVenueToMallName(mallItem.note || 'Area Panggung Meet & Greet');
+      roadshowTime = mallItem.time;
+    }
+  }
+
+  // Jika ada venueLocation yang dipilih user, bersihkan kata-kata bioskop
+  const chosenVenue = venueLocation ? cleanVenueToMallName(venueLocation) : null;
+  const boothDetailVenue = chosenVenue || roadshowVenue || (cityLocation ? `Mall Acara Roadshow Kota ${cityLocation}` : 'Konter Booth Acara Roadshow');
+  const boothDetailFloor = roadshowFloor || 'Area Panggung Meet & Greet';
+  const boothDetailTime = roadshowTime || '16.00 – 17.00 WIB';
+
+  // Daftar Mall Acara di Kota Ini (Nama Tempat Bersih Murni, Tanpa Kata Bioskop/XXI/Cinépolis)
+  const rawVenues = cityData?.cinemas?.map(c => cleanVenueToMallName(c.name)) || [];
+  const cleanMallVenues = Array.from(new Set(rawVenues.filter(Boolean)));
 
   const handleShare = () => {
     const shareUrl = (typeof window !== 'undefined' && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1'))
@@ -132,33 +161,59 @@ export default function VoucherTicketCard({
             ⚠️ Kode booking ini BUKAN tiket dan BUKAN bukti pembayaran
           </div>
           <div className="text-[8.5px] sm:text-[9.5px] text-gray-300 mt-0.5 leading-tight">
-            Tunjukkan kode booking ini di booth resmi roadshow untuk melakukan pembayaran dan mengambil Voucher Fisik resmi.
+            Tunjukkan kode booking ini di konter booth resmi saat acara roadshow meet &amp; greet offline untuk bayar Rp10.000 dan mengambil Voucher Fisik resmi.
           </div>
 
-          {/* LOKASI MALL & BIOSKOP PENUKARAN */}
-          {(displayVenue || cityVenues.length > 0) && (
-            <div className="mt-2 pt-2 border-t border-amber-500/30 text-left bg-black/40 rounded-xl p-2 sm:p-2.5">
-              <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] font-black uppercase text-amber-400 tracking-wider mb-1">
-                <Building2 className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                <span>LOKASI PENUKARAN (MALL &amp; BIOSKOP):</span>
+          {/* LOKASI DETAIL BOOTH ROADSHOW OFFLINE (BUKAN BIOSKOP) */}
+          <div className="mt-2.5 pt-2 border-t border-amber-500/30 text-left bg-black/65 rounded-xl p-2.5 sm:p-3 space-y-2">
+            <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9.5px] font-black uppercase text-amber-400 tracking-wider">
+              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>LOKASI PENUKARAN: BOOTH ACARA ROADSHOW (BUKAN BIOSKOP)</span>
+            </div>
+
+            {/* Kotak Detail Lokasi Resmi */}
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 space-y-1 text-white text-[10px] sm:text-[10.5px]">
+              <div className="font-black text-amber-300 flex items-start gap-1.5">
+                <span className="text-amber-400">•</span>
+                <span><b>Titik Booth:</b> {boothDetailVenue}</span>
               </div>
-              {displayVenue ? (
-                <div className="text-white font-extrabold text-[10.5px] sm:text-[11px] leading-tight flex items-start gap-1.5">
-                  <span className="text-amber-400 font-bold">•</span>
-                  <span>{displayVenue}</span>
+              {boothDetailFloor && (
+                <div className="text-gray-200 font-bold text-[9.5px] sm:text-[10px] pl-3.5">
+                  <b>Area / Lantai:</b> {boothDetailFloor}
                 </div>
-              ) : (
-                <div className="space-y-1">
-                  {cityVenues.map((v, i) => (
-                    <div key={i} className="text-white font-extrabold text-[10px] sm:text-[10.5px] leading-tight flex items-start gap-1.5">
-                      <span className="text-amber-400 font-bold">•</span>
-                      <span>{v}</span>
-                    </div>
-                  ))}
+              )}
+              {boothDetailTime && (
+                <div className="text-amber-200 font-semibold text-[9px] sm:text-[9.5px] pl-3.5">
+                  <b>Waktu Meet &amp; Greet:</b> {boothDetailTime} {roadshowDate ? `(${roadshowDate})` : ''}
+                </div>
+              )}
+              {roadshowDirections && (
+                <div className="text-slate-300 text-[8.5px] sm:text-[9px] pl-3.5 italic">
+                  <b>Petunjuk:</b> {roadshowDirections}
                 </div>
               )}
             </div>
-          )}
+
+            {/* Lokasi Mall Tempat Acara di Kota Ini (Nama Tempat Bersih Murni Tanpa Nama Bioskop) */}
+            {cleanMallVenues.length > 0 && (
+              <div className="text-[9px] sm:text-[9.5px] text-slate-300 pt-0.5">
+                <span className="text-gray-400 font-bold block mb-0.5">Lokasi Mall Acara Kota Ini:</span>
+                <div className="space-y-0.5 pl-1">
+                  {cleanMallVenues.map((m, idx) => (
+                    <div key={idx} className="flex items-center gap-1 text-white font-bold">
+                      <span className="text-amber-400">•</span>
+                      <span>{m}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Peringatan Keras Bukan di Bioskop */}
+            <div className="mt-1 pt-1.5 border-t border-red-500/40 text-[8px] sm:text-[9px] text-red-200 font-extrabold leading-tight bg-red-950/50 p-1.5 rounded-lg">
+              ⛔ DILARANG MENUKAR DI AREA BIOSKOP: Penukaran HANYA dilayani di konter booth roadshow Meet &amp; Greet offline. Kasir bioskop DILARANG &amp; TIDAK MELAYANI penukaran kode booking.
+            </div>
+          </div>
         </div>
 
         {/* Attendee Info */}
@@ -241,21 +296,41 @@ export default function VoucherTicketCard({
         </div>
 
         {/* Notice & Premiere Validity */}
-        <div className="mt-2.5 bg-red-950/40 border border-red-500/40 rounded-xl p-2 sm:p-2.5 text-center text-[9px] sm:text-[9.5px]">
+        <div className="mt-2.5 bg-red-950/60 border border-red-500/60 rounded-xl p-2.5 sm:p-3 text-center text-[9px] sm:text-[9.5px]">
           <span className="block font-black text-red-400 uppercase tracking-wider text-[8px] sm:text-[8.5px]">
-            LOKASI PENUKARAN VOUCHER FISIK
+            LOKASI PENUKARAN VOUCHER FISIK (BUKAN BIOSKOP)
           </span>
           <span className="font-black text-amber-300 text-[11px] sm:text-xs block mt-0.5 tracking-tight">
-            📍 Booth Khusus Voucher Fisik {cityLocation ? `Kota ${cityLocation}` : ''}
+            📍 Konter Booth Resmi Roadshow &amp; Meet and Greet {cityLocation ? `Kota ${cityLocation}` : ''}
           </span>
-          {(displayVenue || cityVenues.length > 0) && (
-            <div className="my-1 py-0.5 px-2 bg-black/70 rounded-lg border border-red-500/30 text-[9px] sm:text-[9.5px] text-amber-200 font-bold text-center">
-              {displayVenue ? `Lokasi: ${displayVenue}` : `Lokasi Mall: ${cityVenues.join(' • ')}`}
-            </div>
-          )}
-          <span className="text-gray-300 text-[8.5px] sm:text-[9px] block mt-1 leading-snug">
-            Tunjukkan Kode Booking ini di booth resmi roadshow untuk menyelesaikan pembayaran dan mengambil Voucher Fisik penayangan ({validityText}).
+
+          <div className="my-1.5 py-1.5 px-2.5 bg-black/80 rounded-lg border border-red-500/40 text-[9.5px] sm:text-[10px] text-amber-200 font-bold text-left space-y-0.5">
+            <div>• <b>Tempat Booth:</b> {boothDetailVenue}</div>
+            {boothDetailFloor && <div>• <b>Area / Lantai:</b> {boothDetailFloor}</div>}
+            {boothDetailTime && <div>• <b>Waktu Meet &amp; Greet:</b> {boothDetailTime} {roadshowDate ? `(${roadshowDate})` : ''}</div>}
+            {cleanMallVenues.length > 0 && (
+              <div className="text-slate-300 text-[9px] pt-0.5">
+                • <b>Lokasi Mall Acara Kota Ini:</b> {cleanMallVenues.join(' • ')}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-red-900/50 rounded-lg p-2 border border-red-500/40 text-[8.5px] sm:text-[9.5px] text-red-200 font-black leading-tight text-left">
+            ⛔ PERINGATAN KERAS: DILARANG &amp; TIDAK MELAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA bisa dilakukan di konter booth saat acara Roadshow Meet &amp; Greet offline berlangsung.
+          </div>
+
+          <span className="text-gray-300 text-[8.5px] sm:text-[9px] block mt-1.5 leading-snug text-left">
+            Tunjukkan Kode Booking ini di konter booth saat acara roadshow meet &amp; greet offline untuk bayar Rp10.000 dan mengambil lembaran Voucher Fisik resmi. Lembaran voucher fisik tersebut baru dibawa ke bioskop saat penayangan film ({validityText}).
           </span>
+
+          <a
+            href={cityData ? `/city/${cityData.slug}` : '/#roadshow'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2 text-[9px] sm:text-[10px] text-amber-400 underline font-black hover:text-amber-300"
+          >
+            Lihat Jadwal Roadshow &amp; Titik Booth di Website ({cityLocation || 'Semua Kota'}) →
+          </a>
         </div>
 
         <div className="mt-2 text-center text-[9px] sm:text-[9.5px] text-gray-400 font-medium">

@@ -400,8 +400,9 @@ export default function WarVoucherForm({
               <ArrowRight className="w-4 h-4" />
             </button>
             <div className="text-[11px] text-slate-400 text-center mt-3 space-y-1">
-              <p>Tunjukkan kode ini ke booth PIYE TO KIH? di kotamu untuk bayar &amp; ambil voucher fisik.</p>
-              <p className="text-amber-300/90 font-medium">Voucher berlaku untuk nonton serentak 19-20 November 2026 di seluruh bioskop.</p>
+              <p>Tunjukkan kode booking ini ke booth resmi saat acara roadshow meet &amp; greet offline di kotamu untuk bayar Rp10.000 &amp; ambil voucher fisik.</p>
+              <p className="text-red-300 font-bold">⛔ Penukaran BUKAN di bioskop (kasir bioskop dilarang melayani penukaran e-voucher).</p>
+              <p className="text-amber-300/90 font-medium">Lembaran voucher fisik yang sudah diambil berlaku untuk nonton serentak 19-20 November 2026 di seluruh bioskop.</p>
             </div>
           </div>
         </form>
@@ -434,7 +435,10 @@ export default function WarVoucherForm({
               </span>
               <h3 className="text-base sm:text-lg font-black text-white">🎟️ SIAP! VOUCHER BERHASIL DIBOOKING</h3>
               <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5 max-w-xs sm:max-w-sm mx-auto">
-                Tunjukkan kode ini di booth {claimedLead.venueLocation || cityLocation} untuk pembayaran &amp; ambil voucher fisik.
+                Tunjukkan kode ini di konter booth resmi saat acara roadshow meet &amp; greet offline untuk bayar Rp10.000 &amp; ambil voucher fisik resmi.
+              </p>
+              <p className="text-[10px] text-red-300 font-extrabold mt-0.5">
+                ⛔ BUKAN DI BIOSKOP: Kasir bioskop tidak melayani penukaran kode booking.
               </p>
             </div>
 

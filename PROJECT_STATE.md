@@ -113,5 +113,23 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
 8. **Update Greeting Sticky Floating WhatsApp Widget**:
    * Teks sapaan pembuka pada popup chat [`src/components/FloatingWhatsAppWidget.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/FloatingWhatsAppWidget.tsx) diperbarui dari `Halo bolo asik! Piye kabare? 😄` menjadi `Halo, Dulur! Piye kabare?☺️` sesuai permintaan.
 
+9. **Revisi Alur Penukaran E-Voucher: Isolasi ke Booth Roadshow Meet & Greet Offline (Steril dari Nama Bioskop)**:
+   * **Latar Belakang & Masalah**: Pihak bioskop (XXI, Cinepolis, CGV, dll.) melarang keras transaksi/penukaran e-voucher di area dan kasir bioskop. Sebelumnya, kartu voucher menampilkan nama bioskop (misal: `The Park XXI Semarang - Cinepolis Java Mall Semarang` atau `Solo Paragon XXI • Platinum Cineplex Pakuwon Mall Solo Baru`) yang memicu salah paham penonton datang ke kasir bioskop.
+   * **Implementasi Fungsi Pembersih Nama Tempat (`cleanVenueToMallName`)**:
+     - Ditambahkan helper `cleanVenueToMallName` di [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts) yang otomatis membersihkan seluruh kata brand bioskop (`XXI`, `Cinema XXI`, `Cinépolis`, `Cinepolis`, `CGV`, `Platinum Cineplex`, `Platinum`, `NSC`, `New Star Cineplex`, `Cinema`, `Bioskop`) menjadi nama mall/tempat saja (contoh: `The Park Mall Semarang - Java Mall Semarang`, `Solo Paragon Mall • Pakuwon Mall Solo Baru`).
+   * **Update Kartu E-Voucher & PDF ([`src/components/VoucherTicketCard.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/VoucherTicketCard.tsx))**:
+     - Menghapus label `(MALL & BIOSKOP)`.
+     - Mengubah header menjadi `LOKASI PENUKARAN: BOOTH ACARA ROADSHOW (BUKAN BIOSKOP)`.
+     - Menyajikan detail lengkap: Titik Booth, Area/Lantai Booth, Jam Acara Meet & Greet, Petunjuk Arah, dan Daftar Mall Acara di kota tersebut (steril dari kata bioskop).
+     - Menambahkan banner peringatan tegas: `⛔ DILARANG MENUKAR DI AREA BIOSKOP: Penukaran HANYA dilayani di konter booth roadshow Meet & Greet offline. Kasir bioskop DILARANG & TIDAK MELAYANI penukaran kode booking.`
+     - Menambahkan tautan langsung melihat jadwal roadshow lengkap di website.
+   * **Update Saluran WhatsApp & Webhook**:
+     - [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts), `/api/webhook/voucher`, `/api/webhook/wahnotif`, dan `/api/webhook/roadshow`:
+     - Menegaskan bahwa di WA tidak terdapat dropdown pilihan titik seperti di website, sehingga bot Mas Kidi dan pesan balasan langsung mengarahkan ke konter booth resmi acara Roadshow Meet & Greet offline di kotanya serta memberikan link jadwal lengkap website (`piyetokihfilm.com/roadshow` atau `/city/{slug}`).
+     - Memberikan peringatan keras bahwa kasir bioskop tidak melayani penukaran e-voucher kode booking. Lembaran voucher fisik resmi yang sudah diambil di booth baru digunakan saat nonton di bioskop tanggal 19–20 November 2026.
+   * **Update Halaman & Komponen Pendukung**:
+     - [`/voucher/[id]`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/voucher/[id]/page.tsx), [`src/components/WarVoucherForm.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/WarVoucherForm.tsx), [`src/components/CityVoucherPickupSection.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/CityVoucherPickupSection.tsx), [`src/app/city/[slug]/page.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/city/[slug]/page.tsx), dan template email [`src/lib/email.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/email.ts) diselaraskan secara konsisten.
+
+
 
 

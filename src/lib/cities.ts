@@ -52,10 +52,10 @@ export const CITIES_DATA: CityData[] = [
     "dateStr": "22 Oktober 2026",
     "boothInfo": {
       "venue": "THE PARK MALL SEMARANG",
-      "floor": "Lantai 2 (Area Atrium Depan Cinema XXI)",
+      "floor": "Lantai 2 (Area Atrium Depan Eskalator The Park Mall)",
       "timeStr": "16.00 – 17.00 WIB",
-      "directions": "Dekat eskalator tengah, cari booth oranye dengan spanduk PIYE TO KIH?",
-      "exclusiveNotice": "Penukaran voucher fisik hanya berada di The Park Mall Lantai 2 pada jam 16.00–17.00 WIB. Bioskop Cinépolis Java Mall bukan tempat pengambilan voucher, melainkan khusus pemegang tiket Special Screening sesi malam."
+      "directions": "Dekat eskalator tengah lantai 2, cari booth oranye dengan spanduk PIYE TO KIH?",
+      "exclusiveNotice": "Penukaran voucher fisik resmi hanya berada di The Park Mall Lantai 2 pada jam 16.00–17.00 WIB. DILARANG menukar di kasir bioskop manapun."
     },
     "rundown": {
       "date": "Kamis, 22 Oktober 2026",
@@ -388,10 +388,10 @@ export const CITIES_DATA: CityData[] = [
     "dateStr": "26 Oktober 2026",
     "boothInfo": {
       "venue": "PLAZA ATRIUM SRAGEN",
-      "floor": "Area Depan Bioskop Platinum Cineplex Sragen",
+      "floor": "Area Atrium Utama Plaza Atrium Sragen (Samping Panggung)",
       "timeStr": "15.00 – 17.00 WIB",
-      "directions": "Cari booth resmi oranye PIYE TO KIH? di Plaza Atrium Sragen dekat bioskop Platinum.",
-      "exclusiveNotice": "Penukaran voucher fisik resmi berada di Plaza Atrium Sragen pada jam 15.00–17.00 WIB."
+      "directions": "Cari booth resmi oranye PIYE TO KIH? di Atrium Utama Plaza Atrium Sragen.",
+      "exclusiveNotice": "Penukaran voucher fisik resmi berada di booth Plaza Atrium Sragen pada jam 15.00–17.00 WIB. DILARANG menukar di kasir bioskop."
     },
     "rundown": {
       "date": "Senin, 26 Oktober 2026",
@@ -451,11 +451,11 @@ export const CITIES_DATA: CityData[] = [
     "province": "Jawa Timur",
     "dateStr": "27 Oktober 2026",
     "boothInfo": {
-      "venue": "NEW STAR CINEPLEX (NSC) NGAWI",
-      "floor": "Area Lobi Bioskop NSC Ngawi",
+      "venue": "AREA ROADSHOW NGAWI",
+      "floor": "Area Halaman Panggung Acara Roadshow Ngawi",
       "timeStr": "16.00 – 17.00 WIB",
-      "directions": "Cari booth resmi PIYE TO KIH? di area lobi utama bioskop NSC Ngawi.",
-      "exclusiveNotice": "Penukaran voucher fisik resmi berada di lobi bioskop NSC Ngawi pada jam 16.00–17.00 WIB."
+      "directions": "Cari booth resmi oranye PIYE TO KIH? di area panggung acara roadshow Ngawi.",
+      "exclusiveNotice": "Penukaran voucher fisik resmi berada di booth acara roadshow Ngawi pada jam 16.00–17.00 WIB. DILARANG menukar di kasir bioskop."
     },
     "rundown": {
       "date": "Selasa, 27 Oktober 2026",
@@ -1267,11 +1267,11 @@ export const CITIES_DATA: CityData[] = [
     "province": "Jawa Timur",
     "dateStr": "8 November 2026",
     "boothInfo": {
-      "venue": "GOLDEN THEATRE TULUNGAGUNG",
-      "floor": "Area Lobi Bioskop Golden Theatre",
+      "venue": "AREA ROADSHOW TULUNGAGUNG",
+      "floor": "Area Panggung / Booth Acara Roadshow Tulungagung",
       "timeStr": "17.00 – 19.00 WIB",
-      "directions": "Cari booth resmi PIYE TO KIH? di lobi bioskop Golden Theatre Tulungagung.",
-      "exclusiveNotice": "Penukaran voucher fisik resmi berada di Golden Theatre Tulungagung jam 17.00–19.00 WIB."
+      "directions": "Cari booth resmi oranye PIYE TO KIH? di area panggung acara roadshow Tulungagung.",
+      "exclusiveNotice": "Penukaran voucher fisik resmi berada di booth acara roadshow Tulungagung jam 17.00–19.00 WIB. DILARANG menukar di kasir bioskop."
     },
     "rundown": {
       "date": "Minggu, 8 November 2026",
@@ -1311,6 +1311,61 @@ export const CITIES_DATA: CityData[] = [
     ]
   }
 ];
+
+/**
+ * Membersihkan nama tempat/mall agar TIDAK menyebut nama bioskop (XXI, Cinepolis, CGV, Platinum Cineplex, NSC, dll.)
+ * melainkan nama mall / tempat acaranya saja, sesuai aturan ketat agar penonton tidak salah datang ke kasir bioskop.
+ */
+export function cleanVenueToMallName(venueName?: string): string {
+  if (!venueName) return '';
+  let cleaned = venueName
+    // Hapus kata bioskop & jaringan bioskop
+    .replace(/Cinema\s*XXI/gi, 'Mall')
+    .replace(/\bXXI\b/gi, 'Mall')
+    .replace(/Cinépolis|Cinepolis/gi, '')
+    .replace(/\bCGV\b/gi, '')
+    .replace(/Platinum\s*Cineplex/gi, '')
+    .replace(/\bPlatinum\b/gi, '')
+    .replace(/New\s*Star\s*Cineplex|NSC/gi, '')
+    .replace(/\bCinema\b/gi, '')
+    .replace(/\bBioskop\b/gi, '')
+    .replace(/\bCineplex\b/gi, '')
+    .replace(/\bMall\s+Mall\b/gi, 'Mall')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Standarisasi nama tempat / mall resmi
+  cleaned = cleaned
+    .replace(/^The Park Mall\b/i, 'The Park Mall')
+    .replace(/^The Park Semarang/i, 'The Park Mall Semarang')
+    .replace(/Java Supermall/i, 'Java Mall Semarang')
+    .replace(/^Java Mall/i, 'Java Mall Semarang')
+    .replace(/^Solo Paragon/i, 'Solo Paragon Mall')
+    .replace(/^Pakuwon Solo Baru/i, 'Pakuwon Mall Solo Baru')
+    .replace(/^Plaza Ambarrukmo/i, 'Plaza Ambarrukmo')
+    .replace(/^Jogja City Mall/i, 'Jogja City Mall')
+    .replace(/^Artos/i, 'Artos Mall Magelang')
+    .replace(/^The Aloon\s*-\s*Aloon/i, 'Aloon - Aloon Magelang')
+    .replace(/^Plaza Atrium Sragen/i, 'Plaza Atrium Sragen')
+    .replace(/^Lawu Plaza/i, 'Lawu Plaza Madiun')
+    .replace(/^Suncity Madiun/i, 'Suncity Mall Madiun')
+    .replace(/^Ponorogo City Center/i, 'Ponorogo City Center Mall')
+    .replace(/^Sunrise Mall/i, 'Sunrise Mall Mojokerto')
+    .replace(/^Gressmall/i, 'Gressmall Gresik')
+    .replace(/^Pakuwon Mall/i, 'Pakuwon Mall Surabaya')
+    .replace(/^Royal Plaza/i, 'Royal Plaza Surabaya')
+    .replace(/^Suncity Mall/i, 'Suncity Mall Sidoarjo')
+    .replace(/^Ciplaz Sidoarjo/i, 'Ciplaz Sidoarjo')
+    .replace(/^Dieng Mall|Dieng Malang/i, 'Cyber Mall Malang')
+    .replace(/^Ciplaz Kediri/i, 'Ciplaz Kediri')
+    .replace(/^Kediri Mall/i, 'Kediri Mall')
+    .replace(/^Blitar Square/i, 'Blitar Square Mall')
+    .replace(/\bMall\s+Mall\b/gi, 'Mall')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned;
+}
 
 export function getCityBySlug(slug: string): CityData | undefined {
   const normalized = slug.toLowerCase().replace(/[^a-z0-9]/g, "");

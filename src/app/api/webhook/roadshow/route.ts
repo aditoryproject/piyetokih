@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
-import { isCityRoadshowExpired } from '@/lib/cities';
+import { isCityRoadshowExpired, cleanVenueToMallName } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA } from '@/lib/wahnotif';
 
@@ -132,15 +132,17 @@ Rombongan film PIYE TO KIH? bakal hadir seru-seruan di kotamu pada:
 📋 *RUNDOWN JADWAL KEGIATAN:*
 ${scheduleFormatted}
 
-📍 *LOKASI BOOTH PENUKARAN VOUCHER FISIK RP10.000:*
-${cityData.boothMall ? `• Tempat: *${cityData.boothMall.venue}*\n• Lokasi: *${cityData.boothMall.floor}*\n• Jam: *${cityData.boothMall.time}*` : '• Informasi booth penukaran mengikuti pengumuman resmi.'}
+📍 *LOKASI PENUKARAN VOUCHER (BOOTH ROADSHOW OFFLINE):*
+${cityData.boothMall ? `• Acara: *Konter Booth Resmi Roadshow & Meet and Greet*\n• Tempat: *${cleanVenueToMallName(cityData.boothMall.venue)}*\n• Lokasi: *${cleanVenueToMallName(cityData.boothMall.floor)}*\n• Jam: *${cityData.boothMall.time}*` : '• Informasi booth penukaran mengikuti pengumuman resmi di website.'}
 
-🎟️ *LINK LANGSUNG TIKET BIOSKOP / NONTON DULUAN:*
+🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline ya lur.
+
+🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*
+• Cek Rundown Lengkap: ${ticketLinks.website}/city/${cityData.slug}
 • Cinema XXI (M-TIX): ${ticketLinks.xxi}
 • TIX ID: ${ticketLinks.tixid}
-• Info Lengkap: ${ticketLinks.website}
 
-Mau sekalian Mas Kidi amankan Kode Booking voucher fisik Rp10.000 buat diambil di booth mall lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`;
+Mau sekalian Mas Kidi amankan Kode Booking voucher fisik Rp10.000 buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`;
 
     return NextResponse.json({
       success: true,

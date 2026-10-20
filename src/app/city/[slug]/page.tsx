@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getCityBySlug } from '@/lib/cities';
+import { getCityBySlug, cleanVenueToMallName } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import CityChoiceSection from '@/components/CityChoiceSection';
 import CityCinemaList from '@/components/CityCinemaList';
@@ -95,18 +95,20 @@ export default async function CityRoadshowPage({ params }: Props) {
 
   const venueOptions: string[] = [];
   if (schoolItem) {
-    venueOptions.push(`Kunjungan Sekolah: ${schoolItem.venue} (${schoolItem.time})`);
+    venueOptions.push(`Kunjungan Sekolah: ${cleanVenueToMallName(schoolItem.venue)} (${schoolItem.time})`);
   }
   if (campusItem) {
-    venueOptions.push(`Kunjungan Kampus: ${campusItem.venue} (${campusItem.time})`);
+    venueOptions.push(`Kunjungan Kampus: ${cleanVenueToMallName(campusItem.venue)} (${campusItem.time})`);
   }
   if (city.boothInfo) {
-    venueOptions.push(`Mall Roadshow: ${city.boothInfo.venue} — ${city.boothInfo.floor} (${city.boothInfo.timeStr})`);
+    const cleanMall = cleanVenueToMallName(city.boothInfo.venue);
+    const cleanFloor = cleanVenueToMallName(city.boothInfo.floor);
+    venueOptions.push(`Mall Roadshow: ${cleanMall} — ${cleanFloor} (${city.boothInfo.timeStr})`);
   } else if (mallItem) {
-    venueOptions.push(`Mall Roadshow: ${mallItem.venue} (${mallItem.time})`);
+    venueOptions.push(`Mall Roadshow: ${cleanVenueToMallName(mallItem.venue)} (${mallItem.time})`);
   }
   const defaultVenueStr = venueOptions[0] || (city.boothInfo
-    ? `${city.boothInfo.venue} — ${city.boothInfo.floor} (${city.boothInfo.timeStr})`
+    ? `${cleanVenueToMallName(city.boothInfo.venue)} — ${cleanVenueToMallName(city.boothInfo.floor)} (${city.boothInfo.timeStr})`
     : undefined);
 
   return (
