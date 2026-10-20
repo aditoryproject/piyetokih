@@ -44,6 +44,14 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
 * **Penyimpanan Database Persisten**: [`data/db.json`](file:///Users/maulanaadipriatna/Documents/Miracleweb/data/db.json) & [`data/db.persist.json`](file:///Users/maulanaadipriatna/Documents/Miracleweb/data/db.persist.json)
 * **Sistem Proteksi Database**: [`src/lib/db.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/db.ts) (Multi-layer fallback & external persist file).
 * **Integrasi WhatsApp & AI Bot**: [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts) (Persona resmi: **Mas Kidi**).
+* **Otak Pengetahuan & Fakta Bot**: [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts) (Knowledge Base lengkap dari 2 dokumen docx).
+* **Koleksi Endpoint Webhook Wahnotif**:
+  - Master Webhook All-In-One: `/api/webhook/wahnotif`
+  - Webhook Jadwal & Roster Roadshow: `/api/webhook/roadshow`
+  - Webhook Link Tiket, Presale & BOGO: `/api/webhook/tickets`
+  - Webhook Info Film, Cast & Soundtrack: `/api/webhook/movie-info`
+  - Webhook Klaim Voucher & Leads: `/api/webhook/voucher`
+  - Webhook Otak AI & Knowledge Base: `/api/webhook/ai-brain`
 * **Data Kota & Bioskop Roadshow (17 Kota)**: [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts)
 
 ---
@@ -66,3 +74,17 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
    * Menghapus duplikasi port 3000 dari backend socialedge sehingga AdSight (`adsight.id`) pulih normal.
    * Menghidupkan daemon PM2 untuk `taskmanager` (port 3100) dan `playlistweb` (port 3001).
    * Menetapkan konfigurasi PM2 persisten (`pm2 save`).
+5. **Upgrade Total Webhook CS AI Wahnotif (Multi-Webhook Endpoints & Embedding 2 Dokumen Docx)**:
+   * **Embedding 2 Dokumen Resmi**:
+     - `PIYE_TO_KIH_Wahnotif_AI_Bot_Training_Knowledge_Base_v1_0.docx`: Master facts, sinopsis resmi, arti judul "Piye To Kih?", pantun jenaka, jokes tongkrongan khas WOKO, spoiler guardrails, complaint & media escalation, serta FAQ Answer Bank lengkap.
+     - `PIYE_TO_KIH_Roadshow_Flyer_Template_Scripts_v1_1_Mukidi_Dara.docx`: Rundown jadwal 18 stops / 17 kota lengkap dengan jam, sekolah, kampus, radio, meet & greet mall, bioskop greeting / nonton duluan, lead speaker (Mukidi + Dara Sarasvati / Trio WOKO), serta roster aktual pemain yang hadir di tiap kota.
+   * **Pemisahan Jadi Multi-Webhook Endpoints (Tidak Lagi Hanya 1 Webhook)**:
+     - 📍 `/api/webhook/roadshow`: Khusus jadwal per kota, jam acara, status aktif/expired, dan roster pemain.
+     - 🎟️ `/api/webhook/tickets`: Khusus link cepat pembelian tiket resmi bioskop (Cinema XXI/M-TIX, TIX ID, CGV, Cinepolis) serta kuota promo Buy 1 Get 1 (1.000 TIX ID, 500 M-TIX).
+     - 🎬 `/api/webhook/movie-info`: Khusus sinopsis, profil 13 cast pemain, 4 OST Lek Dahlan (+ tautan klip YouTube), dan 25 bioskop mitra (menegaskan Movieplex UNCONFIRMED).
+     - 🎁 `/api/webhook/voucher`: Khusus penerbitan Kode Booking voucher fisik Rp10.000 booth mall atau pengalihan otomatis ke Pengingat BOGO untuk kota expired.
+     - 🧠 `/api/webhook/ai-brain`: Khusus Knowledge Base lengkap dalam format JSON yang dapat ditarik langsung oleh bot.
+     - ⚡ `/api/webhook/wahnotif`: Master Multi-Tools Dispatcher yang otomatis mengenali intent pesan user.
+   * **Update Panel Admin (`/admin`)**:
+     - Tab "Wahnotif & Webhook" kini menyediakan daftar 5 Webhook Khusus + 1 Master Webhook lengkap dengan tombol 1-klik untuk Salin URL Webhook dan Salin Skema Tool JSON.
+
