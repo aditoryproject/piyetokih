@@ -134,3 +134,7 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      - Di [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx), tampilan tabel leads dan export CSV otomatis menampilkan nama mall bersih.
      - User/penonton lama yang membuka link e-voucher kode bookingnya ([`/voucher/[id]`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/voucher/[id]/page.tsx)) otomatis melihat tampilan booth roadshow dan nama mall yang baru tanpa perlu mengisi formulir pendaftaran baru.
 
+10. **Update Jadwal Tayang Cinépolis Java Mall Semarang (18.00 -> 19.00 WIB)**:
+    * **Jadwal Screening & Tiket**: Mengubah jam tayang Special Screening Nonton Duluan di Cinépolis Java Mall Semarang dari 18.00 WIB menjadi **19.00 WIB** (pintu dibuka 15 menit sebelumnya pada 18.45 WIB) di [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts).
+    * **Rundown Acara & Bot AI / WhatsApp**: Memperbarui informasi jadwal roadshow Semarang di [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts) dan [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts) menjadi `19.00 - 20.40 WIB: Nonton Duluan di Java Mall Cinepolis`.
+

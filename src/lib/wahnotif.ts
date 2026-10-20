@@ -379,7 +379,7 @@ Ini jadwal kegiatannya:
 • 14.00 - 15.00: Live talkshow di Jateng Radio FM
 • 15.30: Nonton Duluan di The Park XXI Semarang
 • 16.00 - 17.00: Meet & Greet Mall & Booth Penukaran Voucher Fisik di The Park Mall Lt 2 (Depan XXI)
-• 18.00 - 19.40: Nonton Duluan di Java Mall Cinepolis
+• 19.00 - 20.40: Nonton Duluan di Java Mall Cinepolis
 
 Mau sekalian Mas Kidi amankan Kode Booking voucher potongan Rp10.000 buat diambil di booth mall lur? Boleh sebutkan Nama & Nomor WA sampean ya!`
       },

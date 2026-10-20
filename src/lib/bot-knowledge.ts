@@ -83,7 +83,7 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
       { time: '14.00 - 15.00 WIB', activity: 'Live Interview On-Air', venue: 'Jateng Radio', status: 'LOCK', type: 'Radio' },
       { time: '15.30 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'The Park XXI Semarang', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
       { time: '16.00 - 17.00 WIB', activity: 'Meet & Greet Mall & Penukaran Voucher Fisik', venue: 'The Park Mall Semarang (2nd Floor)', status: 'LOCK', type: 'Mall', isVoucherExchange: true },
-      { time: '18.00 - 19.40 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'Java Mall Cinepolis', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true }
+      { time: '19.00 - 20.40 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'Java Mall Cinepolis', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true }
     ],
     cinemas: ['The Park XXI', 'Cinepolis Java Mall']
   },

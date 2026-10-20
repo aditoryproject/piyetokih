@@ -100,7 +100,7 @@ export const CITIES_DATA: CityData[] = [
           "isVoucherExchange": true
         },
         {
-          "time": "18.00 WIB",
+          "time": "19.00 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 2)",
           "venue": "Cinépolis Java Mall Semarang",
@@ -131,7 +131,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "Java Supermall Lt. 3, Jl. Letjen MT Haryono No. 992-994",
         "showTimes": [
-          "18.00 WIB"
+          "19.00 WIB"
         ],
         "ticketUrl": "https://cinepolis.co.id"
       }
