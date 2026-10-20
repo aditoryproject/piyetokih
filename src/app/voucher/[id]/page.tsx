@@ -23,37 +23,19 @@ export default function VoucherDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch settings for validity text
-    fetch('/api/admin/settings')
-      .then(r => r.json())
-      .then(d => {
-        if (d.settings?.voucherValidDatesText) {
-          setValidityText(d.settings.voucherValidDatesText);
-        }
-      })
-      .catch(() => {});
-
     if (!serial) return;
 
-    fetch(`/api/admin/leads?search=${serial}`)
+    fetch(`/api/vouchers/${serial}`)
       .then(r => r.json())
       .then(data => {
-        if (data.leads && data.leads.length > 0) {
-          const found = data.leads.find((l: any) => l.serialNumber === serial);
-          if (found) {
-            setLead(found);
-          } else {
-            setLead({
-              serialNumber: String(serial),
-              name: 'Penonton Setia Piye Toh Kih',
-              phone: 'Terverifikasi',
-              cityLocation: 'Nasional',
-              claimedAt: new Date().toLocaleDateString('id-ID'),
-            });
+        if (data.success && data.lead) {
+          setLead(data.lead);
+          if (data.validityText) {
+            setValidityText(data.validityText);
           }
         } else {
           setLead({
-            serialNumber: String(serial),
+            serialNumber: String(serial).toUpperCase(),
             name: 'Penonton Setia Piye Toh Kih',
             phone: 'Terverifikasi',
             cityLocation: 'Nasional',
@@ -63,7 +45,7 @@ export default function VoucherDetailPage() {
       })
       .catch(() => {
         setLead({
-          serialNumber: String(serial),
+          serialNumber: String(serial).toUpperCase(),
           name: 'Penonton Setia Piye Toh Kih',
           phone: 'Terverifikasi',
           cityLocation: 'Nasional',
