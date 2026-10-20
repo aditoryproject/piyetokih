@@ -99,6 +99,13 @@ Terima kasih! Nomor WhatsApp Anda sudah resmi terdaftar dalam antrean pengingat 
 
 Kami akan otomatis mengirimkan pesan pengingat beserta link pembelian langsung ke WhatsApp ini pada *15 November 2026* saat presale dibuka agar Anda tidak kehabisan kuota! 🍿✨
 
+🔥 *EITS! MAU NONTON DULUAN SEKARANG BARENG PEMAIN TANPA PERLU NUNGGU?*
+Anda tidak perlu menunggu sampai 19 November! Tiket Presale sesi *SPECIAL SCREENING (NONTON DULUAN)* bareng langsung rombongan pemain (Mukidi, Sukma, Gendut, Penyok) di bioskop roadshow SUDAH BISA DIBELI SEKARANG!
+🎟️ *Beli Tiket Presale Nonton Duluan Sekarang:*
+• Cinema XXI (M-TIX): ${db.settings.bogoCinemaLinks?.xxi || 'https://m.21cineplex.com/id/movies/16PTKH'}
+• TIX ID: ${db.settings.bogoCinemaLinks?.tixid || 'https://rb.gy/l28pzj'}
+⚠️ *PERINGATAN:* Kuota kursi studio sangat terbatas! Amankan kursi bioskop favorit Anda sekarang sebelum ludes! 🍿✨
+
 _Miracle Pictures - Official Film "PIYE TO KIH?"_`;
 
     if (db.settings.wahnotifApiKey) {

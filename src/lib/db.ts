@@ -18,6 +18,8 @@ export interface LeadRecord {
   emailStatus: 'sent' | 'pending' | 'failed';
   cityLocation?: string;
   venueLocation?: string;
+  presaleFollowupStatus?: 'pending' | 'sent' | 'failed';
+  presaleFollowupSentAt?: string;
 }
 
 export interface AppSettings {
@@ -180,6 +182,8 @@ export interface BogoReminderRecord {
   reminderStatus: 'pending' | 'sent' | 'failed';
   whatsappSentAt?: string;
   emailSentAt?: string;
+  presaleFollowupStatus?: 'pending' | 'sent' | 'failed';
+  presaleFollowupSentAt?: string;
 }
 
 export interface DatabaseSchema {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS, MAS_KIDI_PANTUN, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
+import { getCityCinemaTicketLinks } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_TICKETS_SCHEMA } from '@/lib/wahnotif';
 
@@ -105,7 +106,11 @@ export async function POST(req: NextRequest) {
         s.cityName.toLowerCase().includes(slug) || slug.includes(s.slug)
       );
       if (matchedStop) {
-        if (matchedStop.cinemas?.length > 0) {
+        const cityCinemas = getCityCinemaTicketLinks(matchedStop.slug);
+        if (cityCinemas.length > 0) {
+          cinemaCityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` +
+            cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n');
+        } else if (matchedStop.cinemas?.length > 0) {
           cinemaCityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStop.cityName}:* ${matchedStop.cinemas.join(', ')}`;
         }
         const cityOverride = db.settings.cityLinkOverrides?.[matchedStop.slug];
@@ -134,7 +139,8 @@ Ada sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop rangkaian roadshow bar
 • *Cinépolis:* ${ticketLinks.cinepolis}
 • *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}
 
-⚠️ *PENTING LUR:* Kuota kursi Nonton Duluan & Presale ini sangat terbatas per studio! Saran Mas Kidi, langsung klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya lur ben gak gigit jari! 🍿✨`;
+⚠️ *PENTING LUR:* Kuota kursi Nonton Duluan & Presale ini sangat terbatas per studio! Baris tengah cepat penuh lur. Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae ragu-ragu? 😂
+Langsung klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
 
     } else if (isBogoInquiry && isBogoLive) {
       // 2. Promo Buy 1 Get 1 on or after 15 Nov 2026 (Live War)
@@ -154,30 +160,32 @@ Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayanga
 ⚠️ Kuota promo sangat terbatas (1.000 di TIX ID & 500 di M-TIX), langsung klik link di atas sekarang juga ya lur ben gak kehabisan kuota! 🍿✨`;
 
     } else if (isBogoInquiry && !isBogoLive) {
-      // 3. Promo Buy 1 Get 1 before 15 Nov 2026 (Urge Registration + Offer Presale)
+      // 3. Promo Buy 1 Get 1 before 15 Nov 2026: UPSELL PRESALE ROADSHOW DULU!
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 ${randomPantun}
 
-🎁 *INFO PROMO BUY 1 GET 1 (BOGO) PENAYANGAN PERDANA 19 NOVEMBER:*
-Promo Buy 1 Get 1 film *"PIYE TO KIH?"* menyediakan kuota: *1.000 tiket di TIX ID* dan *500 tiket di Cinema XXI (M-TIX)*!
-
-🗓️ *Jadwal War Tiket Promo:* Loket resmi baru dibuka pada *15 - 18 November 2026*.
-Biar gak kehabisan kuota saat loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 SEKARANG LUR! Mas Kidi bakal kirim link langsung ke WA sampean pas loket dibuka.
-
-📲 *Format Daftar:* Cukup balas dengan sebutkan *Nama Lengkap & Kota* sampean ya lur!
-
-🎟️ *TAPI KALAU PENGEN NONTON DULUAN SEBELUM 19 NOVEMBER:*
-Sampean gak perlu nunggu tgl 19, tiket Presale Nonton Duluan (Special Screening) bareng cast di kota roadshow SUDAH BISA DIBELI SEKARANG lur lewat link ini:
+🎟️ *MAU NONTON DULUAN SEKARANG BARENG PEMAIN TANPA PERLU NUNGGU?* 🎟️
+Kenapa harus nunggu sampai 19 November kalau sekarang sampean bisa *NONTON DULUAN* bareng rombongan Mukidi, Sukma, Gendut, dan Penyok di sesi *SPECIAL SCREENING ROADSHOW*!
+Tiket Presale Nonton Duluan sudah resmi dibuka dan bisa dibeli sekarang lewat link ini:
 • *Cinema XXI (M-TIX):* ${ticketLinks.xxi}
 • *TIX ID:* ${ticketLinks.tixid}
-• *Website Resmi:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
+• *Website Resmi & Jadwal Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}
+⚠️ *Kursi studio terbatas banget lur, amankan nomor kursi terbaik sampean sekarang sebelum ludes!*
+
+🎁 *INFO PROMO BUY 1 GET 1 (BOGO) PENAYANGAN PERDANA 19 NOVEMBER:*
+Kalau sampean tetep mau war promo Buy 1 Get 1 (kuota 1.000 tiket TIX ID & 500 tiket M-TIX), loket baru dibuka pada *15 - 18 November 2026*.
+Biar gak kehabisan kuota pas loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 SEKARANG LUR! Mas Kidi bakal kirim link langsung via WA pas dibuka!
+📲 Cukup balas dengan sebutkan *Nama Lengkap & Kota* sampean ya lur! Mau Mas Kidi daftarkan sekarang? 🍿✨`;
 
     } else {
-      // 4. General Ticket Request: High-Converting Pitch
+      // 4. General Ticket Request: UPSELL PRESALE FIRST + HARDSALE CLOSING
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 ${randomPantun}
 
 ${randomJoke}
+
+🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER BARENG PEMAIN?*
+Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* di bioskop kota roadshow bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok)! Tiket presale sudah bisa langsung dibeli sekarang!
 
 🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*
 Biar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:
@@ -187,8 +195,7 @@ Biar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih
 • *Cinépolis:* ${ticketLinks.cinepolis}
 • *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}
 
-🎬 *MAU NONTON DULUAN SEBELUM 19 NOV?*
-Ada sesi Special Screening Nonton Duluan bareng rombongan cast! Tiket presale sudah bisa langsung dibeli lewat link di atas (kuota kursi terbatas).
+⚠️ *PENTING LUR:* Kuota kursi studio cepat habis lur! Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas sekarang dan amankan kursimu lur!
 
 🎁 *INFO PROMO BUY 1 GET 1 (BOGO):*
 Kuota promo: *1.000 tiket di TIX ID* dan *500 tiket di M-TIX (XXI)* dibuka 15-18 November. Mau Mas Kidi amankan slot Notifikasi Pengingat Prioritas H-1 via WA? Cukup sebutkan Nama Lengkap & Kota sampean ya lur! 🍿✨`;

@@ -126,6 +126,8 @@ export default function AdminDashboardClient() {
   const [loadingReminders, setLoadingReminders] = useState(false);
   const [blastingReminder, setBlastingReminder] = useState(false);
   const [blastResult, setBlastResult] = useState<{ total: number; sentWhatsapp: number; sentEmail: number } | null>(null);
+  const [followingUpPresale, setFollowingUpPresale] = useState(false);
+  const [followupResult, setFollowupResult] = useState<{ total: number; sent: number; failed: number } | null>(null);
 
   // Settings state
   const [settings, setSettings] = useState<any>({
@@ -435,6 +437,39 @@ export default function AdminDashboardClient() {
       alert('Terjadi kesalahan koneksi saat mengirim blast');
     } finally {
       setBlastingReminder(false);
+    }
+  };
+
+  const handleTriggerPresaleFollowup = async (target: 'all' | 'leads' | 'reminders' = 'all') => {
+    const targetLabel = target === 'all' ? 'SEMUA KONTAK (Leads + Reminder)' : target.toUpperCase();
+    if (!confirm(`Kirim WhatsApp Follow-Up Hardsale Presale Roadshow (gaya Mas Kidi hardsell) sekarang ke ${targetLabel}?`)) {
+      return;
+    }
+    setFollowingUpPresale(true);
+    setFollowupResult(null);
+    try {
+      const res = await fetch('/api/cron/presale-followup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target, limit: 100 }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setFollowupResult({
+          total: data.totalProcessed,
+          sent: data.sentCount,
+          failed: data.failCount,
+        });
+        alert(`Follow-up WA Hardsale Presale Selesai!\nTotal diproses: ${data.totalProcessed}\nBerhasil: ${data.sentCount}\nGagal: ${data.failCount}`);
+        fetchReminders();
+        fetchLeads();
+      } else {
+        alert(data.error || 'Gagal mengirim follow-up WA');
+      }
+    } catch {
+      alert('Terjadi kesalahan koneksi saat mengirim follow-up WA');
+    } finally {
+      setFollowingUpPresale(false);
     }
   };
 
@@ -1272,6 +1307,16 @@ export default function AdminDashboardClient() {
                     <span>Download CSV / Excel</span>
                   </button>
 
+                  <button
+                    onClick={() => handleTriggerPresaleFollowup('leads')}
+                    disabled={followingUpPresale}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold text-xs shadow-sm transition disabled:opacity-50"
+                    title="Kirim follow-up WhatsApp hardselling presale roadshow ke semua pemegang kode booking voucher"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${followingUpPresale ? 'animate-pulse' : ''}`} />
+                    <span>{followingUpPresale ? 'Mengirim...' : '🔥 Follow-Up Presale (WA)'}</span>
+                  </button>
+
                   {leads.length > 0 && (
                     <button
                       onClick={handleClearAllLeads}
@@ -1426,6 +1471,16 @@ export default function AdminDashboardClient() {
                   </button>
 
                   <button
+                    onClick={() => handleTriggerPresaleFollowup('reminders')}
+                    disabled={followingUpPresale}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-black shadow-md shadow-rose-500/20 transition active:scale-95 disabled:opacity-50"
+                    title="Kirim follow-up WhatsApp hardselling presale roadshow gaya Mas Kidi"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${followingUpPresale ? 'animate-pulse' : ''}`} />
+                    <span>{followingUpPresale ? 'Mengirim Follow-Up...' : '🔥 Follow-Up Presale (WA)'}</span>
+                  </button>
+
+                  <button
                     onClick={handleTriggerBlast}
                     disabled={blastingReminder}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black shadow-md shadow-amber-500/20 transition active:scale-95 disabled:opacity-50"
@@ -1435,6 +1490,15 @@ export default function AdminDashboardClient() {
                   </button>
                 </div>
               </div>
+
+              {followupResult && (
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between">
+                  <div>
+                    <span className="font-bold">Laporan Follow-Up Presale Terakhir:</span> {followupResult.total} diproses • {followupResult.sent} Berhasil Terkirim • {followupResult.failed} Gagal.
+                  </div>
+                  <button onClick={() => setFollowupResult(null)} className="text-rose-600 hover:text-rose-900 font-bold ml-4">Tutup</button>
+                </div>
+              )}
 
               {/* Status Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

@@ -1426,3 +1426,25 @@ export function isCityRoadshowExpired(
   return now > date.getTime();
 }
 
+/**
+ * Get specific ticket URLs for a city from CITIES_DATA
+ */
+export function getCityCinemaTicketLinks(query?: string): Array<{
+  cinemaName: string;
+  chain: string;
+  showTimes: string[];
+  ticketUrl: string;
+}> {
+  if (!query) return [];
+  const city = findCityByQuery(query);
+  if (!city || !city.cinemas) return [];
+  return city.cinemas
+    .filter(c => Boolean(c.ticketUrl && c.ticketUrl.trim().length > 0))
+    .map(c => ({
+      cinemaName: c.name,
+      chain: c.chain,
+      showTimes: c.showTimes || [],
+      ticketUrl: c.ticketUrl,
+    }));
+}
+

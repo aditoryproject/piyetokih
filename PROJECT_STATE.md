@@ -152,3 +152,18 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
       - Menambahkan larangan mutlak sebutan Ayah/Bunda pada [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts) dan mewajibkan panggilan khas Piye To Kih: *Lur / Bolo Asik / Dulur*.
       - Menambahkan router eskalasi manusia otomatis di [`/api/webhook/wahnotif`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts) dan [`/api/webhook/ai-brain`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts) dengan teks khas Mas Kidi: *"Siap bolo asik! Mas Kidi sambungkan langsung ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean di sini! 🍿✨"*.
 
+13. **Sinkronisasi Link Tiket Dinamis, Upsell Presale Roadshow #1 & Mesin Follow-Up WA Hardsell**:
+    * **Sinkronisasi Otomatis Link Tiket Terkini**:
+      - Ditambahkan helper [`getCityCinemaTicketLinks`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts) yang mengaitkan link bioskop kota ke seluruh endpoint webhook CS Wahnotif (`/api/webhook/tickets`, `/api/webhook/wahnotif`, `/api/webhook/roadshow`).
+      - Setiap kali link diperbarui (baik via Admin Dashboard pada `bogoCinemaLinks` / `cityLinkOverrides`, maupun via kode `cities.ts`), CS AI WhatsApp secara otomatis dan langsung memberikan link tiket yang paling baru secara real-time tanpa perlu konfigurasi ulang.
+    * **Upsell Presale Roadshow (Nonton Duluan) Sebagai Prioritas #1**:
+      - Setiap penonton yang menanyakan tiket, promo BOGO 19 Nov, jadwal, harga, atau voucher booth offline: bot Mas Kidi dan webhook wajib meng-upsell sesi **Presale Nonton Duluan (Special Screening) Roadshow** terlebih dahulu sebelum penayangan reguler.
+      - Menekankan benefit nonton bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok) di dalam studio bioskop sebelum penayangan reguler, disertai urgensi kelangkaan kuota kursi.
+      - Diselipkan langsung pada pesan konfirmasi WhatsApp saat penonton mendaftar booking voucher roadshow maupun antrean reminder promo BOGO.
+    * **Persona Mas Kidi Hardselling & FOMO Urgency**:
+      - Dilengkapi gaya penutup mendesak (FOMO): *"Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? Klik saiki lur!"*, dorongan kursi tengah cepat ludes, dan pertanyaan penutup yang menuntut aksi (closing question).
+    * **Mesin Follow-Up WhatsApp Presale Roadshow (Drip / Cron)**:
+      - Dibuat endpoint baru [`/api/cron/presale-followup`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/cron/presale-followup/route.ts) yang dapat dipanggil via Cron Job berkala atau di-trigger langsung dari panel Admin Dashboard.
+      - Mengirimkan pesan WhatsApp follow-up personal khas Mas Kidi yang mengingatkan pendaftar voucher/BOGO untuk segera checkout tiket Presale Nonton Duluan sebelum kuota studio habis.
+      - Tombol trigger `🔥 Follow-Up Presale (WA)` dan banner laporan status pengiriman ditambahkan pada tab Leads & tab Reminders di [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx).
+

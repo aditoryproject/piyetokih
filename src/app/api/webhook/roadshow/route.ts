@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
-import { isCityRoadshowExpired, cleanVenueToMallName } from '@/lib/cities';
+import { isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA } from '@/lib/wahnotif';
 
@@ -119,6 +119,12 @@ export async function POST(req: NextRequest) {
 
     const rosterFormatted = cityData.rosterActual.join(', ');
 
+    const cityCinemas = getCityCinemaTicketLinks(cityData.slug);
+    const cityCinemasText = cityCinemas.length > 0
+      ? `\n🎬 *TIKET PRESALE SPECIAL SCREENING BIOSKOP ${cityData.cityName.toUpperCase()}:*\n` +
+        cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n')
+      : '';
+
     const replyMessage = `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬
 
 Halo warga ${cityData.cityName} bolo asikku! Piye kabare? 😄
@@ -136,11 +142,14 @@ ${scheduleFormatted}
 ${cityData.boothMall ? `• Acara: *Konter Booth Resmi Roadshow & Meet and Greet*\n• Tempat: *${cleanVenueToMallName(cityData.boothMall.venue)}*\n• Lokasi: *${cleanVenueToMallName(cityData.boothMall.floor)}*\n• Jam: *${cityData.boothMall.time}*` : '• Informasi booth penukaran mengikuti pengumuman resmi di website.'}
 
 🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline ya lur.
-
-🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*
-• Cek Rundown Lengkap: ${ticketLinks.website}/city/${cityData.slug}
+${cityCinemasText}
+🎟️ *LINK TIKET PRESALE & JADWAL KOTA (TINGGAL KLIK):*
+• Cek Rundown & Panggung: ${ticketLinks.website}/city/${cityData.slug}
 • Cinema XXI (M-TIX): ${ticketLinks.xxi}
 • TIX ID: ${ticketLinks.tixid}
+
+🔥 *MAU NONTON DULUAN DI DALAM STUDIO BARENG PEMAIN?*
+Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas lur! Baris tengah cepat ludes. Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas dan amankan tiketmu sekarang lur!
 
 Mau sekalian Mas Kidi amankan Kode Booking voucher fisik Rp10.000 buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`;
 

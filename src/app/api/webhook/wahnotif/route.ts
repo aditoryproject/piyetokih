@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
-import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName } from '@/lib/cities';
+import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks } from '@/lib/cities';
 import {
   MASTER_ROADSHOW_STOPS,
   MASTER_MOVIE_FACTS,
@@ -307,7 +307,11 @@ export async function POST(req: NextRequest) {
           s.cityName.toLowerCase().includes(cityParam) || cityParam.includes(s.slug)
         );
         if (matchedStop) {
-          if (matchedStop.cinemas?.length > 0) {
+          const cityCinemas = getCityCinemaTicketLinks(matchedStop.slug);
+          if (cityCinemas.length > 0) {
+            cityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` +
+              cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n');
+          } else if (matchedStop.cinemas?.length > 0) {
             cityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStop.cityName}:* ${matchedStop.cinemas.join(', ')}`;
           }
           const cityOverride = db.settings.cityLinkOverrides?.[matchedStop.slug];
@@ -336,7 +340,8 @@ Ada sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop rangkaian roadshow bar
 • *Cinépolis:* ${cinepolisLink}
 • *Website Resmi & Info Kota:* ${siteOrigin}${cityOverrideNote}${cityNote}
 
-⚠️ *PENTING LUR:* Kuota kursi Nonton Duluan & Presale ini sangat terbatas per studio! Saran Mas Kidi, langsung klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya lur ben gak gigit jari! 🍿✨`;
+⚠️ *PENTING LUR:* Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas! Baris tengah cepat ludes lur. Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? 😂
+Langsung klik link di atas dan amankan tiket sampean sekarang ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
 
       } else if (isBogoInquiry && isBogoLive) {
         // Promo BOGO on or after 15 Nov 2026
@@ -353,33 +358,35 @@ Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayanga
 • *Cinépolis:* ${cinepolisLink}
 • *Website Resmi:* ${siteOrigin}${cityOverrideNote}${cityNote}
 
-⚠️ Kuota promo sangat terbatas (1.000 di TIX ID & 500 di M-TIX), langsung klik link di atas sekarang juga ya lur ben gak kehabisan kuota! 🍿✨`;
+⚠️ Kuota promo sangat terbatas (1.000 di TIX ID & 500 di M-TIX), langsung klik link di atas sekarang juga ya lur ben gak kehabisan kuota! Jangan sampai nyesel kehabisan lur! 🍿✨`;
 
       } else if (isBogoInquiry && !isBogoLive) {
-        // Promo BOGO before 15 Nov 2026: urge leads registration + offer presale nonton duluan
+        // Promo BOGO before 15 Nov 2026: UPSELL PRESALE ROADSHOW FIRST, then offer BOGO Reminder!
         ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 ${randomPantun}
 
-🎁 *INFO PROMO BUY 1 GET 1 (BOGO) PENAYANGAN PERDANA 19 NOVEMBER:*
-Promo Buy 1 Get 1 film *"PIYE TO KIH?"* menyediakan kuota: *1.000 tiket di TIX ID* dan *500 tiket di Cinema XXI (M-TIX)*!
-
-🗓️ *Jadwal War Tiket Promo:* Loket resmi baru dibuka pada *15 - 18 November 2026*.
-Biar gak kehabisan kuota saat loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 SEKARANG LUR! Mas Kidi bakal kirim link langsung ke WA sampean pas loket dibuka.
-
-📲 *Format Daftar:* Cukup balas dengan sebutkan *Nama Lengkap & Kota* sampean ya lur!
-
-🎟️ *TAPI KALAU PENGEN NONTON DULUAN SEBELUM 19 NOVEMBER:*
-Sampean gak perlu nunggu tgl 19, tiket Presale Nonton Duluan (Special Screening) bareng cast di kota roadshow SUDAH BISA DIBELI SEKARANG lur lewat link ini:
+🎟️ *MAU NONTON DULUAN SEKARANG BARENG PEMAIN TANPA PERLU NUNGGU?* 🎟️
+Kenapa harus nunggu sampai 19 November kalau sekarang sampean bisa *NONTON DULUAN* bareng rombongan Mukidi, Sukma, Gendut, dan Penyok di sesi *SPECIAL SCREENING ROADSHOW*!
+Tiket Presale Nonton Duluan sudah resmi dibuka dan bisa dibeli sekarang lewat link ini:
 • *Cinema XXI (M-TIX):* ${xxiLink}
 • *TIX ID:* ${tixidLink}
-• *Website Resmi:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
+• *Website Resmi & Jadwal Kota:* ${siteOrigin}${cityOverrideNote}${cityNote}
+⚠️ *Kursi studio terbatas banget lur, amankan posisi favorit sampean sekarang sebelum ludes!*
+
+🎁 *INFO PROMO BUY 1 GET 1 (BOGO) PENAYANGAN PERDANA 19 NOVEMBER:*
+Kalau sampean tetep mau war promo Buy 1 Get 1 (kuota 1.000 tiket TIX ID & 500 tiket M-TIX), loket baru dibuka pada *15 - 18 November 2026*.
+Biar gak kehabisan kuota pas loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 SEKARANG LUR! Mas Kidi bakal kirim link langsung via WA pas dibuka!
+📲 Cukup balas dengan sebutkan *Nama Lengkap & Kota* sampean ya lur! Mau Mas Kidi daftarkan sekarang? 🍿✨`;
 
       } else {
-        // General Ticket Inquiry
+        // General Ticket Inquiry: UPSELL PRESALE FIRST + HARDSALE CLOSING
         ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 ${randomPantun}
 
 ${randomJoke}
+
+🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER BARENG PEMAIN?*
+Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* di bioskop kota roadshow bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok)! Tiket presale sudah bisa langsung dibeli sekarang!
 
 🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*
 Biar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:
@@ -389,11 +396,10 @@ Biar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih
 • *Cinépolis:* ${cinepolisLink}
 • *Website & Info Lengkap:* ${siteOrigin}${cityOverrideNote}${cityNote}
 
-🎬 *MAU NONTON DULUAN SEBELUM 19 NOV?*
-Ada sesi Special Screening Nonton Duluan bareng rombongan cast! Tiket presale sudah bisa langsung dibeli lewat link di atas (kuota kursi terbatas).
+⚠️ *PENTING LUR:* Kuota kursi studio cepat habis lur! Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas sekarang dan amankan kursimu lur!
 
 🎁 *INFO PROMO BUY 1 GET 1 (BOGO):*
-Kuota promo: 1.000 tiket di TIX ID dan 500 tiket di M-TIX (XXI) dibuka 15-18 November. Mau Mas Kidi amankan slot Notifikasi Pengingat Prioritas H-1 via WA? Cukup infokan Nama Lengkap & Kota sampean ya lur! 🍿✨`;
+Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 November. Mau Mas Kidi amankan nomor sampean di Pengingat Prioritas H-1 via WA? Cukup infokan Nama Lengkap & Kota sampean ya lur! 🍿✨`;
       }
 
       return NextResponse.json({
@@ -630,7 +636,7 @@ Kuota promo: 1.000 tiket di TIX ID dan 500 tiket di M-TIX (XXI) dibuka 15-18 Nov
       boothTime,
       dateStr: matchedCity.dateStr,
       ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-      replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nHalo *${name}*, bolo nonton Kota ${matchedCity.name}! Mantap tenan lur! 😄\n${randomPantun}\n\n🎟️ *KODE BOOKING KAMU:* ${serialNumber}\n📥 *Buka & Download PDF Tiket:* ${voucherUrl}\n\n📍 *LOKASI PENUKARAN RESMI (BUKAN BIOSKOP):*\nPenukaran *BUKAN di area bioskop*, melainkan di booth resmi saat acara *Roadshow & Meet and Greet Offline*:\n• Acara: *Roadshow & Meet and Greet Kota ${matchedCity.name}*\n• Tempat: *${boothVenue}*\n• Area: *${boothFloor}*\n• Waktu: *${boothTime}* (${matchedCity.dateStr})\n• Cek Jadwal Lengkap di Web: ${siteOrigin}/city/${matchedCity.slug}\n\n🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline.\n\n⚠️ Tunjukkan kode booking ini ke petugas booth roadshow offline untuk bayar Rp10.000 & ambil voucher fisik resminya. Sampai jumpa bareng Mukidi & kawan-kawan! 🍿`
+      replyMessage: `🎬 *KODE BOOKING ROADSHOW RESMI AKTIF!* 🎬\n\nHalo *${name}*, bolo nonton Kota ${matchedCity.name}! Mantap tenan lur! 😄\n${randomPantun}\n\n🎟️ *KODE BOOKING KAMU:* ${serialNumber}\n📥 *Buka & Download PDF Tiket:* ${voucherUrl}\n\n📍 *LOKASI PENUKARAN RESMI (BUKAN BIOSKOP):*\nPenukaran *BUKAN di area bioskop*, melainkan di booth resmi saat acara *Roadshow & Meet and Greet Offline*:\n• Acara: *Roadshow & Meet and Greet Kota ${matchedCity.name}*\n• Tempat: *${boothVenue}*\n• Area: *${boothFloor}*\n• Waktu: *${boothTime}* (${matchedCity.dateStr})\n• Cek Jadwal Lengkap di Web: ${siteOrigin}/city/${matchedCity.slug}\n\n🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline.\n\n⚠️ Tunjukkan kode booking ini ke petugas booth roadshow offline untuk bayar Rp10.000 & ambil voucher fisik resminya.\n\n🔥 *EITS LUR! MAU NONTON DULUAN SEKARANG DI DALAM STUDIO BARENG PEMAIN?*\nSampean GAK PERLU nunggu sampai 19 November lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* bareng langsung rombongan Mukidi, Sukma, Gendut, dan Penyok di bioskop roadshow! Tiket presale sudah bisa dibeli sekarang lewat link ini:\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n⚠️ *Kuota kursi per studio sangat terbatas lur!* Langsung amankan tiket sampean sekarang sebelum ludes ya! 🍿✨`
     }, { status: 200, headers: corsHeaders });
 
   } catch (err: any) {
