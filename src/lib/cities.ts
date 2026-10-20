@@ -85,7 +85,7 @@ export const CITIES_DATA: CityData[] = [
           "note": "Live talkshow on-air seputar kisah film & lagu soundtrack"
         },
         {
-          "time": "15.30 WIB",
+          "time": "14.30 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 1)",
           "venue": "The Park XXI Semarang",
@@ -118,7 +118,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "The Park Mall Semarang Lt. 3, Jl. Madukoro Raya No. 1",
         "showTimes": [
-          "15.30 WIB"
+          "14.30 WIB"
         ],
         "ticketUrl": "https://tinyurl.com/mrx93shj"
       },
@@ -169,7 +169,7 @@ export const CITIES_DATA: CityData[] = [
           "isVoucherExchange": true
         },
         {
-          "time": "15.45 – 16.35 WIB",
+          "time": "14.30 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 1)",
           "venue": "Plaza Ambarrukmo XXI Jogja",
@@ -184,7 +184,7 @@ export const CITIES_DATA: CityData[] = [
           "isVoucherExchange": true
         },
         {
-          "time": "18.30 – 19.00 WIB",
+          "time": "16.30 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 2)",
           "venue": "Jogja City Mall XXI",
@@ -202,7 +202,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "Plaza Ambarrukmo Lt. 3, Jl. Laksda Adisucipto No. 80",
         "showTimes": [
-          "15.45 WIB"
+          "14.30 WIB"
         ],
         "ticketUrl": "https://m.21cineplex.com"
       },
@@ -215,7 +215,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "Jogja City Mall Lt. 2, Jl. Magelang Km. 6 No. 18",
         "showTimes": [
-          "18.30 WIB"
+          "16.30 WIB"
         ],
         "ticketUrl": "https://m.21cineplex.com"
       }
@@ -260,7 +260,7 @@ export const CITIES_DATA: CityData[] = [
           "isVoucherExchange": true
         },
         {
-          "time": "18.00 – 18.30 WIB",
+          "time": "16.45 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 2)",
           "venue": "The Aloon - Aloon XXI Magelang",
@@ -291,7 +291,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "Jl. Alun-Alun Utara No. 1, Magelang",
         "showTimes": [
-          "18.00 WIB"
+          "16.45 WIB"
         ],
         "ticketUrl": "https://m.21cineplex.com"
       }
@@ -329,7 +329,7 @@ export const CITIES_DATA: CityData[] = [
           "note": "Live talkshow seru bareng cast film"
         },
         {
-          "time": "13.15 – 14.45 WIB",
+          "time": "12.15 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 1)",
           "venue": "Solo Paragon XXI",
@@ -362,7 +362,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "Solo Paragon Mall Lt. 1, Jl. Yosodipuro No. 133",
         "showTimes": [
-          "13.15 WIB"
+          "12.15 WIB"
         ],
         "ticketUrl": "https://m.21cineplex.com"
       },
@@ -571,7 +571,7 @@ export const CITIES_DATA: CityData[] = [
           "isVoucherExchange": true
         },
         {
-          "time": "18.45 – 20.15 WIB",
+          "time": "19.00 WIB",
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 2)",
           "venue": "Suncity Madiun XXI",
@@ -616,7 +616,7 @@ export const CITIES_DATA: CityData[] = [
         "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
         "address": "Suncity Mall Lt. 2, Jl. S. Parman No. 8",
         "showTimes": [
-          "18.45 WIB"
+          "19.00 WIB"
         ],
         "ticketUrl": "https://m.21cineplex.com"
       }

@@ -81,7 +81,7 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
       { time: '08.00 - 09.00 WIB', activity: 'Mampir ke Sekolah', venue: 'SMA Negeri 15 Semarang', status: 'LOCK', type: 'Sekolah' },
       { time: '10.00 - 12.00 WIB', activity: 'Ngobrol Bareng Kampus', venue: 'UNNES / Auditorium Prof. Wuryanto', status: 'LOCK', type: 'Kampus' },
       { time: '14.00 - 15.00 WIB', activity: 'Live Interview On-Air', venue: 'Jateng Radio', status: 'LOCK', type: 'Radio' },
-      { time: '15.30 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'The Park XXI Semarang', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
+      { time: '14.30 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'The Park XXI Semarang', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
       { time: '16.00 - 17.00 WIB', activity: 'Meet & Greet Mall & Penukaran Voucher Fisik', venue: 'The Park Mall Semarang (2nd Floor)', status: 'LOCK', type: 'Mall', isVoucherExchange: true },
       { time: '19.00 - 20.40 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'Java Mall Cinepolis', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true }
     ],
@@ -119,9 +119,9 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
     scheduleItems: [
       { time: '10.00 - 11.00 WIB', activity: 'Live Talkshow Radio', venue: 'RRI Pro 2 Yogyakarta', status: 'LOCK', type: 'Radio' },
       { time: '13.00 - 15.00 WIB', activity: 'Campus Roadshow & Sharing', venue: 'AMIKOM Yogyakarta', status: 'LOCK', type: 'Kampus' },
-      { time: '15.45 - 16.35 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'Ambarrukmo XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
+      { time: '14.30 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'Ambarrukmo XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
       { time: '17.00 - 18.00 WIB', activity: 'Meet & Greet Mall & Penukaran Voucher Fisik', venue: 'Plaza Ambarrukmo (Ground Floor)', status: 'LOCK', type: 'Mall', isVoucherExchange: true },
-      { time: '18.30 - 19.00 WIB', activity: 'Greeting Ending Penonton', venue: 'Jogja City XXI', status: 'LOCK', type: 'Bioskop', isNontonDuluan: true }
+      { time: '16.30 WIB', activity: 'Greeting Ending Penonton', venue: 'Jogja City XXI', status: 'LOCK', type: 'Bioskop', isNontonDuluan: true }
     ],
     cinemas: ['Ambarrukmo XXI', 'Jogja City XXI', 'CGV Pakuwon Mall Jogja']
   },
@@ -156,7 +156,7 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
     scheduleItems: [
       { time: '13.00 - 15.00 WIB', activity: 'Special Screening Nonton Duluan Bareng Cast', venue: 'Platinum Cineplex Artos Mall', status: 'LOCK', type: 'Bioskop', isNontonDuluan: true },
       { time: '16.00 - 17.00 WIB', activity: 'Meet & Greet & Booth Penukaran Voucher', venue: 'Atrium Armada Town Square / Artos Mall', status: 'working', type: 'Mall', isVoucherExchange: true },
-      { time: '18.00 - 18.30 WIB', activity: 'Greeting Ending Cast', venue: 'The Aloon-Aloon XXI Magelang', status: 'LOCK', type: 'Bioskop' }
+      { time: '16.45 WIB', activity: 'Greeting Ending Cast', venue: 'The Aloon-Aloon XXI Magelang', status: 'LOCK', type: 'Bioskop' }
     ],
     cinemas: ['Platinum Cineplex Artos Mall', 'The Aloon-Aloon XXI']
   },
@@ -193,7 +193,7 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
     scheduleItems: [
       { time: '06.00 - 09.00 WIB', activity: 'Seru-seruan Bareng Warga di CFD', venue: 'Car Free Day Jl. Slamet Riyadi', status: 'working', type: 'Special Event' },
       { time: '11.00 - 12.00 WIB', activity: 'Interview Radio', venue: 'RRI Solo', status: 'working', type: 'Radio' },
-      { time: '13.15 - 14.45 WIB', activity: 'Greeting Ending & Nonton Duluan', venue: 'Solo Paragon XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
+      { time: '12.15 WIB', activity: 'Greeting Ending & Nonton Duluan', venue: 'Solo Paragon XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
       { time: '16.00 - 17.00 WIB', activity: 'Meet & Greet Mall & Penukaran Voucher Fisik', venue: 'Stage Food Factory Solo Paragon Mall', status: 'LOCK', type: 'Mall', isVoucherExchange: true },
       { time: '19.00 - 20.40 WIB', activity: 'Special Screening & Nonton Duluan Sesi Malam', venue: 'Platinum Cineplex Pakuwon Mall Solo Baru', status: 'LOCK', type: 'Bioskop', isNontonDuluan: true }
     ],
@@ -290,7 +290,7 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
       { time: '11.30 - 12.30 WIB', activity: 'Live Radio Talkshow', venue: 'RRI Madiun', status: 'working', type: 'Radio' },
       { time: '14.40 - 15.00 WIB', activity: 'Greeting Ending Penonton', venue: 'CGV Lawu Plaza Madiun', status: 'Konfirmasi', type: 'Bioskop' },
       { time: '16.00 - 17.00 WIB', activity: 'Meet & Greet Mall & Penukaran Voucher', venue: 'Atrium Lawu Plaza Madiun', status: 'LOCK', type: 'Mall', isVoucherExchange: true },
-      { time: '18.45 - 20.15 WIB', activity: 'Nonton Duluan Sesi Malam', venue: 'Suncity Madiun XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
+      { time: '19.00 - 20.30 WIB', activity: 'Nonton Duluan Sesi Malam', venue: 'Suncity Madiun XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
       { time: '20.15 - 21.15 WIB', activity: 'Temu Warga Madiun', venue: 'Suncity Mall Madiun', status: 'Soft Lock', type: 'Mall' }
     ],
     cinemas: ['CGV Lawu Plaza', 'Suncity Madiun XXI', 'Plaza Madiun XXI']

@@ -138,3 +138,11 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
     * **Jadwal Screening & Tiket**: Mengubah jam tayang Special Screening Nonton Duluan di Cinépolis Java Mall Semarang dari 18.00 WIB menjadi **19.00 WIB** (pintu dibuka 15 menit sebelumnya pada 18.45 WIB) di [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts).
     * **Rundown Acara & Bot AI / WhatsApp**: Memperbarui informasi jadwal roadshow Semarang di [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts) dan [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts) menjadi `19.00 - 20.40 WIB: Nonton Duluan di Java Mall Cinepolis`.
 
+11. **Update Jadwal Special Screening XXI 5 Kota Sesuai Rilis Resmi**:
+    * **Semarang**: The Park XXI berubah menjadi **14.30 WIB** (sebelumnya 15.30).
+    * **Yogyakarta**: Plaza Ambarrukmo XXI berubah menjadi **14.30 WIB** (sebelumnya 15.45) dan Jogja City XXI berubah menjadi **16.30 WIB** (sebelumnya 18.30).
+    * **Magelang**: The Aloon-Aloon XXI berubah menjadi **16.45 WIB** (sebelumnya 18.00).
+    * **Solo**: Solo Paragon XXI berubah menjadi **12.15 WIB** (sebelumnya 13.15).
+    * **Madiun**: Suncity Madiun XXI berubah menjadi **19.00 WIB** (sebelumnya 18.45).
+    * Ter-update pada [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts), [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts), dan [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts).
+

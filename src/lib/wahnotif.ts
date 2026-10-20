@@ -377,7 +377,7 @@ Ini jadwal kegiatannya:
 • 08.00 - 09.00: Sapa pagi di SMA Negeri 15 Semarang
 • 10.00 - 12.00: Sharing session di UNNES (Auditorium Prof. Wuryanto)
 • 14.00 - 15.00: Live talkshow di Jateng Radio FM
-• 15.30: Nonton Duluan di The Park XXI Semarang
+• 14.30: Nonton Duluan di The Park XXI Semarang
 • 16.00 - 17.00: Meet & Greet Mall & Booth Penukaran Voucher Fisik di The Park Mall Lt 2 (Depan XXI)
 • 19.00 - 20.40: Nonton Duluan di Java Mall Cinepolis
 
