@@ -110,5 +110,8 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      4. Tanya Bebas / Ngobrol Mas Kidi (jokes santai, pemain, sinopsis).
    * **Tracking Analytics**: Dilengkapi pelacakan Meta Pixel event `Contact` untuk setiap klik opsi atau pengiriman pertanyaan custom.
 
+8. **Update Greeting Sticky Floating WhatsApp Widget**:
+   * Teks sapaan pembuka pada popup chat [`src/components/FloatingWhatsAppWidget.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/FloatingWhatsAppWidget.tsx) diperbarui dari `Halo bolo asik! Piye kabare? 😄` menjadi `Halo, Dulur! Piye kabare?☺️` sesuai permintaan.
+
 
 
