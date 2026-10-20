@@ -1436,7 +1436,7 @@ export function getCityCinemaTicketLinks(query?: string): Array<{
   ticketUrl: string;
 }> {
   if (!query) return [];
-  const city = findCityByQuery(query);
+  const city = getCityByNameOrSlug(query);
   if (!city || !city.cinemas) return [];
   return city.cinemas
     .filter(c => Boolean(c.ticketUrl && c.ticketUrl.trim().length > 0))
