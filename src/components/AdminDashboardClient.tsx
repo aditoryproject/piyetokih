@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import AdminLoginForm from '@/components/AdminLoginForm';
 import { CITIES_DATA } from '@/lib/cities';
@@ -13,6 +13,7 @@ import {
   WAHNOTIF_TOOL_TICKETS_SCHEMA,
   WAHNOTIF_TOOL_MOVIE_SCHEMA,
   WAHNOTIF_TOOL_VOUCHER_SCHEMA,
+  getWahnotifPersona,
   PIYE_TO_KIH_AI_PERSONA
 } from '@/lib/wahnotif';
 import {
@@ -190,8 +191,17 @@ export default function AdminDashboardClient() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
-  // Media Upload states
   const [uploadingPoster, setUploadingPoster] = useState(false);
+
+  const activePersona = useMemo(() => {
+    return getWahnotifPersona({
+      xxi: settings.bogoCinemaLinks?.xxi,
+      tixid: settings.bogoCinemaLinks?.tixid,
+      cgv: settings.bogoCinemaLinks?.cgv,
+      cinepolis: settings.bogoCinemaLinks?.cinepolis,
+      website: siteOrigin || 'https://piyetokihfilm.com',
+    });
+  }, [settings.bogoCinemaLinks, siteOrigin]);
   const [uploadingBackdrop, setUploadingBackdrop] = useState(false);
   const [uploadingHeroCover, setUploadingHeroCover] = useState(false);
   const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);
@@ -4883,14 +4893,14 @@ export default function AdminDashboardClient() {
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">1. Nama Bot / Asisten</span>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.botName, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.botName, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
                           <span>Salin</span>
                         </button>
                       </div>
-                      <p className="text-xs font-black text-slate-900 mt-2">{PIYE_TO_KIH_AI_PERSONA.botName}</p>
+                      <p className="text-xs font-black text-slate-900 mt-2">{activePersona.botName}</p>
                     </div>
                     <p className="text-[10px] text-slate-400">Tempel di field: <b>Bot Name / Nama Asisten</b></p>
                   </div>
@@ -4901,14 +4911,14 @@ export default function AdminDashboardClient() {
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">2. Peran / Role Identity</span>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.role, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.role, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
                           <span>Salin</span>
                         </button>
                       </div>
-                      <p className="text-xs font-semibold text-slate-800 mt-2 leading-snug">{PIYE_TO_KIH_AI_PERSONA.role}</p>
+                      <p className="text-xs font-semibold text-slate-800 mt-2 leading-snug">{activePersona.role}</p>
                     </div>
                     <p className="text-[10px] text-slate-400">Tempel di field: <b>Role / Peran Utama</b></p>
                   </div>
@@ -4919,14 +4929,14 @@ export default function AdminDashboardClient() {
                       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">3. Tone of Voice</span>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.tone, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.tone, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
                           <span>Salin</span>
                         </button>
                       </div>
-                      <p className="text-xs text-slate-700 mt-2 leading-snug">{PIYE_TO_KIH_AI_PERSONA.tone}</p>
+                      <p className="text-xs text-slate-700 mt-2 leading-snug">{activePersona.tone}</p>
                     </div>
                     <p className="text-[10px] text-slate-400">Tempel di field: <b>Tone of Voice / Karakter Bicara</b></p>
                   </div>
@@ -4943,12 +4953,12 @@ export default function AdminDashboardClient() {
                         </h3>
                       </div>
                       <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">
-                        ✓ Filter Jadwal 17 Kota, Deteksi Tanggal Roadshow Expired vs Tayang Serentak 19 Nov, Tiket Bioskop &amp; Voucher Booth
+                        ✓ Filter Jadwal 17 Kota, Nonton Duluan Presale, BOGO 15 Nov, Tiket Bioskop &amp; Voucher Booth
                       </p>
                     </div>
 
                     <button
-                      onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.systemPrompt, 'prompt')}
+                      onClick={() => copyToClipboard(activePersona.systemPrompt, 'prompt')}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition shadow-sm"
                     >
                       <Copy className="w-4 h-4" />
@@ -4958,7 +4968,7 @@ export default function AdminDashboardClient() {
 
                   <textarea
                     readOnly
-                    value={PIYE_TO_KIH_AI_PERSONA.systemPrompt}
+                    value={activePersona.systemPrompt}
                     rows={12}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-slate-700 text-xs font-mono outline-none leading-relaxed"
                   />
@@ -4987,7 +4997,7 @@ export default function AdminDashboardClient() {
                           <h4 className="text-xs font-bold text-slate-900">Konteks Bisnis / Profil Toko</h4>
                         </div>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.konteksBisnis, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.konteksBisnis, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
@@ -4996,7 +5006,7 @@ export default function AdminDashboardClient() {
                       </div>
                       <textarea
                         readOnly
-                        value={PIYE_TO_KIH_AI_PERSONA.konteksBisnis}
+                        value={activePersona.konteksBisnis}
                         rows={5}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 outline-none"
                       />
@@ -5010,7 +5020,7 @@ export default function AdminDashboardClient() {
                           <h4 className="text-xs font-bold text-slate-900">Teknik Closing &amp; Filter Tanggal</h4>
                         </div>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.teknikClosing, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.teknikClosing, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
@@ -5019,7 +5029,7 @@ export default function AdminDashboardClient() {
                       </div>
                       <textarea
                         readOnly
-                        value={PIYE_TO_KIH_AI_PERSONA.teknikClosing}
+                        value={activePersona.teknikClosing}
                         rows={5}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 outline-none"
                       />
@@ -5033,7 +5043,7 @@ export default function AdminDashboardClient() {
                           <h4 className="text-xs font-bold text-slate-900">Persona &amp; Karakter CS (Mas Kidi)</h4>
                         </div>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.karakterPersona, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.karakterPersona, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
@@ -5042,7 +5052,7 @@ export default function AdminDashboardClient() {
                       </div>
                       <textarea
                         readOnly
-                        value={PIYE_TO_KIH_AI_PERSONA.karakterPersona}
+                        value={activePersona.karakterPersona}
                         rows={5}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 outline-none"
                       />
@@ -5056,7 +5066,7 @@ export default function AdminDashboardClient() {
                           <h4 className="text-xs font-bold text-slate-900">Data Pengetahuan &amp; FAQ Lengkap</h4>
                         </div>
                         <button
-                          onClick={() => copyToClipboard(PIYE_TO_KIH_AI_PERSONA.dataPengetahuanFAQ, 'prompt')}
+                          onClick={() => copyToClipboard(activePersona.dataPengetahuanFAQ, 'prompt')}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-[11px] transition"
                         >
                           <Copy className="w-3 h-3" />
@@ -5065,7 +5075,7 @@ export default function AdminDashboardClient() {
                       </div>
                       <textarea
                         readOnly
-                        value={PIYE_TO_KIH_AI_PERSONA.dataPengetahuanFAQ}
+                        value={activePersona.dataPengetahuanFAQ}
                         rows={5}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-[11px] font-mono text-slate-700 outline-none"
                       />

@@ -87,4 +87,12 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
      - ⚡ `/api/webhook/wahnotif`: Master Multi-Tools Dispatcher yang otomatis mengenali intent pesan user.
    * **Update Panel Admin (`/admin`)**:
      - Tab "Wahnotif & Webhook" kini menyediakan daftar 5 Webhook Khusus + 1 Master Webhook lengkap dengan tombol 1-klik untuk Salin URL Webhook dan Salin Skema Tool JSON.
+6. **Implementasi Konversi Presale & Nonton Duluan (Special Screening) + Sinkronisasi Dinamis Wahnotif**:
+   * **Intent Presale & Nonton Duluan**: `/api/webhook/tickets` dan `/api/webhook/wahnotif` otomatis mengenali kata kunci *nonton duluan*, *presale*, *spesial screening*, *screening*, *nonton awal*. Respon bot langsung memicu konversi tinggi: mengajak nonton lebih awal bareng pemain sebelum penayangan nasional 19 Nov, menegaskan kuota kursi terbatas per studio, dan menyodorkan link presale resmi (XXI M-TIX, TIX ID, CGV, Cinepolis).
+   * **Timeline Promo Buy 1 Get 1 (BOGO)**:
+     - **Sebelum 15 November 2026**: Mengarahkan calon penonton mengamankan slot Pengingat Prioritas H-1 via WA (Nama Lengkap & Kota) agar kuota 1.000 tiket TIX ID dan 500 tiket M-TIX tidak terlewat, sembari menawarkan opsi presale nonton duluan jika ingin nonton lebih awal.
+     - **Mulai 15 November 2026 ke atas**: Langsung mengirimkan link aktif loket promo BOGO TIX ID & M-TIX XXI untuk war tiket langsung.
+   * **Generator Persona Dinamis (`getWahnotifPersona`)**:
+     - `src/lib/wahnotif.ts`, `/api/wahnotif/persona`, dan `/api/webhook/ai-brain` kini menginterpolasi link tiket dari database secara dinamis.
+     - Panel Admin (`/admin` tab Wahnotif) kini merefleksikan link presale terbaru yang diisi admin secara real-time pada 4 kolom isian dan Master Prompt.
 

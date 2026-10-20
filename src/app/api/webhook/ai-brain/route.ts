@@ -6,7 +6,7 @@ import {
   MAS_KIDI_PANTUN,
   MAS_KIDI_JOKES
 } from '@/lib/bot-knowledge';
-import { PIYE_TO_KIH_AI_PERSONA, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
+import { getWahnotifPersona, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
 import { getDb } from '@/lib/db';
 
 const corsHeaders = {
@@ -34,20 +34,22 @@ export async function GET(req: NextRequest) {
     website: FAST_TRACK_TICKET_LINKS.website,
   };
 
+  const persona = getWahnotifPersona(ticketLinks);
+
   return NextResponse.json({
     status: 'active',
     success: true,
     webhook_name: 'Webhook Otak AI CS Assistant & Master Knowledge Base',
     endpoint: `${effectiveOrigin}/api/webhook/ai-brain`,
-    persona_name: PIYE_TO_KIH_AI_PERSONA.botName,
-    role: PIYE_TO_KIH_AI_PERSONA.role,
-    tone: PIYE_TO_KIH_AI_PERSONA.tone,
-    systemPrompt: PIYE_TO_KIH_AI_PERSONA.systemPrompt,
+    persona_name: persona.botName,
+    role: persona.role,
+    tone: persona.tone,
+    systemPrompt: persona.systemPrompt,
     wahnotif_setup_boxes: {
-      box1_konteksBisnis: PIYE_TO_KIH_AI_PERSONA.konteksBisnis,
-      box2_teknikClosing: PIYE_TO_KIH_AI_PERSONA.teknikClosing,
-      box3_karakterPersona: PIYE_TO_KIH_AI_PERSONA.karakterPersona,
-      box4_dataPengetahuanFAQ: PIYE_TO_KIH_AI_PERSONA.dataPengetahuanFAQ,
+      box1_konteksBisnis: persona.konteksBisnis,
+      box2_teknikClosing: persona.teknikClosing,
+      box3_karakterPersona: persona.karakterPersona,
+      box4_dataPengetahuanFAQ: persona.dataPengetahuanFAQ,
     },
     tools_schemas: WAHNOTIF_ALL_TOOLS,
     master_facts: MASTER_MOVIE_FACTS,
@@ -55,7 +57,7 @@ export async function GET(req: NextRequest) {
     ticket_links: ticketLinks,
     pantun_bank: MAS_KIDI_PANTUN,
     jokes_bank: MAS_KIDI_JOKES,
-    sample_dialogs: PIYE_TO_KIH_AI_PERSONA.sampleDialogs
+    sample_dialogs: persona.sampleDialogs
   }, { status: 200, headers: corsHeaders });
 }
 

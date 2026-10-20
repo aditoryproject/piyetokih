@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PIYE_TO_KIH_AI_PERSONA, WAHNOTIF_TOOL_SCHEMA, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
+import { getWahnotifPersona, WAHNOTIF_TOOL_SCHEMA, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
 import { CITIES_DATA, isCityRoadshowExpired } from '@/lib/cities';
 import { MASTER_ROADSHOW_STOPS, MASTER_MOVIE_FACTS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
 import { getDb } from '@/lib/db';
@@ -20,22 +20,13 @@ export async function GET() {
     website: FAST_TRACK_TICKET_LINKS.website,
   };
 
+  const dynamicPersona = getWahnotifPersona(ticketLinks);
+
   return NextResponse.json({
     success: true,
     status: 'active',
     lastUpdated: new Date().toISOString(),
-    persona: {
-      botName: PIYE_TO_KIH_AI_PERSONA.botName,
-      role: PIYE_TO_KIH_AI_PERSONA.role,
-      tone: PIYE_TO_KIH_AI_PERSONA.tone,
-      systemPrompt: PIYE_TO_KIH_AI_PERSONA.systemPrompt,
-      // 4 Isian Kolom Wahnotif
-      konteksBisnis: PIYE_TO_KIH_AI_PERSONA.konteksBisnis,
-      teknikClosing: PIYE_TO_KIH_AI_PERSONA.teknikClosing,
-      karakterPersona: PIYE_TO_KIH_AI_PERSONA.karakterPersona,
-      dataPengetahuanFAQ: PIYE_TO_KIH_AI_PERSONA.dataPengetahuanFAQ,
-      sampleDialogs: PIYE_TO_KIH_AI_PERSONA.sampleDialogs,
-    },
+    persona: dynamicPersona,
     ticketLinks,
     toolSchema: WAHNOTIF_TOOL_SCHEMA,
     allTools: WAHNOTIF_ALL_TOOLS,
