@@ -164,6 +164,32 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
       - Dilengkapi gaya penutup mendesak (FOMO): *"Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? Klik saiki lur!"*, dorongan kursi tengah cepat ludes, dan pertanyaan penutup yang menuntut aksi (closing question).
     * **Mesin Follow-Up WhatsApp Presale Roadshow (Drip / Cron)**:
       - Dibuat endpoint baru [`/api/cron/presale-followup`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/cron/presale-followup/route.ts) yang dapat dipanggil via Cron Job berkala atau di-trigger langsung dari panel Admin Dashboard.
-      - Mengirimkan pesan WhatsApp follow-up personal khas Mas Kidi yang mengingatkan pendaftar voucher/BOGO untuk segera checkout tiket Presale Nonton Duluan sebelum kuota studio habis.
-      - Tombol trigger `🔥 Follow-Up Presale (WA)` dan banner laporan status pengiriman ditambahkan pada tab Leads & tab Reminders di [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx).
+14. **Pusat Kendali Pengaturan Jadwal Roadshow & Bioskop 17 Kota di Panel Admin**:
+    * **Latar Belakang & Kebutuhan**:
+      - Jadwal roadshow (jam tayang, bioskop, sisa kursi, alamat, link tiket, booth mall, rundown) sering mengalami penyesuaian dari pihak bioskop/mall di lapangan.
+      - Sebelumnya hanya link tiket bioskop yang dapat diubah di panel admin; sekarang telah ditingkatkan menjadi **Pusat Kendali Lengkap** di mana admin dapat mengedit seluruh detail jadwal 17 kota kapan saja secara real-time.
+    * **Fitur Utama di Admin Dashboard (`/admin/dashboard` - Tab "Jadwal Roadshow 17 Kota")**:
+      - **City Selector (17 Kota)**: Tombol pemilih kota responsif dengan filter pencarian instan, indikator kustomisasi, dan status jadwal.
+      - **Tanggal Pelaksanaan (`dateStr`)**: Dapat diedit langsung per kota (misal: "22 Oktober 2026").
+      - **Manajemen Bioskop & Special Screening (Sesuai Kartu Nonton Duluan)**:
+        - Edit Nama Bioskop (misal: *THE PARK XXI SEMARANG*).
+        - Pilih Jaringan Bioskop / Chain (*XXI, Cinépolis, CGV, Platinum, NSC, Indie*).
+        - Edit Studio / Audi (misal: *Studio 1 Premiere Sound*).
+        - Edit Jam Tayang / Showtimes (misal: *14.30 WIB* atau multiple time dipisah koma).
+        - Edit Catatan Pintu Teater (misal: *Pintu teater dibuka 15 mnt sebelumnya*).
+        - Edit Teks Sisa Kursi / Urgensi (misal: *±42 kursi tersisa*, *Hampir Habis*).
+        - Edit Alamat Lengkap / Mall (misal: *The Park Mall Semarang Lt. 3, Jl. Madukoro Raya No. 1*).
+        - Edit Link Tiket Langsung (dengan tombol *Test Link Tiket*).
+        - Tombol `+ Tambah Bioskop di Kota Ini` dan `Hapus Bioskop`.
+      - **Interactive Live Preview**:
+        - Menampilkan kartu gelap preview identik 100% dengan tampilan di halaman publik `/city/[slug]` (sesuai screenshot user), lengkap dengan badge, studio, tanggal, jam tayang, alamat, dan tombol CTA amber.
+      - **Pengaturan Titik Booth Mall & Penukaran Voucher Fisik**:
+        - Nama Mall, Lantai & Area, Jam Standby, Petunjuk Arah, dan Catatan Khusus.
+      - **Pengaturan Rundown Agenda Harian Roadshow**:
+        - Tambah/hapus agenda (Jam, Kategori Sekolah/Kampus/Radio/Mall/Screening, Judul, dan Lokasi).
+      - **Tombol Reset Default**:
+        - Memungkinkan admin mengembalikan jadwal kota tertentu ke pengaturan awal jika diperlukan.
+    * **Integrasi Menyeluruh & Reaktivitas Otomatis**:
+      - Tersimpan permanen di database (`db.settings.roadshowOverrides[slug]`).
+      - Halaman publik kota ([`/city/[slug]`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/city/[slug]/page.tsx)), halaman beranda ([`/`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/page.tsx)), dan semua webhook WhatsApp Wahnotif (`/api/webhook/tickets`, `/api/webhook/roadshow`, `/api/webhook/wahnotif`, `/api/wahnotif/persona`) langsung membaca data kustom tersebut secara real-time.
 
