@@ -85,9 +85,9 @@ export default async function CityRoadshowPage({ params }: Props) {
     );
   }
 
-  const db = getDb();
   const movieSettings = db.settings.movieSettings;
   const customLinks = db.settings.cityLinkOverrides || {};
+
   const currentClaimed = db.leads.length;
   const remainingStock = Math.max(0, db.settings.totalQuota - currentClaimed);
   const shortDate = `${city.dateStr.split(' ')[0]} ${city.dateStr.split(' ')[1]?.slice(0, 3) || ''}`;
