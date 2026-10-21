@@ -1526,12 +1526,14 @@ export function getCityBySlug(slug: string): CityData | undefined {
 export function getCityByNameOrSlug(query?: string): CityData | undefined {
   if (!query) return undefined;
   const rawLower = query.toLowerCase().trim();
+  if (['all', 'list', 'semua', 'daftar', 'semuanya', 'kota', 'roadshow', 'jadwal'].includes(rawLower)) return undefined;
   const q = rawLower.replace(/[^a-z0-9]/g, "");
+  if (!q || q.length < 3) return undefined;
 
   // 1. Direct Alias Check
   for (const [alias, targetSlug] of Object.entries(CITY_ALIASES)) {
     const aliasNorm = alias.replace(/[^a-z0-9]/g, "");
-    if (q === aliasNorm || rawLower.includes(alias) || (aliasNorm.length >= 4 && q.includes(aliasNorm))) {
+    if (q === aliasNorm || (aliasNorm.length >= 4 && (rawLower.includes(alias) || q.includes(aliasNorm)))) {
       const found = CITIES_DATA.find(c => c.slug === targetSlug);
       if (found) return found;
     }
@@ -1541,16 +1543,23 @@ export function getCityByNameOrSlug(query?: string): CityData | undefined {
   const directMatch = CITIES_DATA.find(c => {
     const slugNorm = c.slug.toLowerCase().replace(/[^a-z0-9]/g, "");
     const nameNorm = c.name.toLowerCase().replace(/[^a-z0-9]/g, "");
-    return slugNorm === q || nameNorm === q || q.includes(slugNorm) || slugNorm.includes(q) || q.includes(nameNorm) || nameNorm.includes(q);
+    return (
+      slugNorm === q ||
+      nameNorm === q ||
+      (q.length >= 4 && (slugNorm.includes(q) || nameNorm.includes(q))) ||
+      (slugNorm.length >= 4 && q.includes(slugNorm)) ||
+      (nameNorm.length >= 4 && q.includes(nameNorm))
+    );
   });
   if (directMatch) return directMatch;
 
-  // 3. Search inside each city's cinemas name and address
+  // 3. Search inside each city's cinemas name and address (requires at least 5 letters and exact word boundary)
+  if (rawLower.length < 5) return undefined;
   return CITIES_DATA.find(c => {
     return c.cinemas?.some(cin => {
       const cinName = cin.name.toLowerCase();
       const cinAddr = (cin.address || '').toLowerCase();
-      return cinName.includes(rawLower) || rawLower.includes(cinName) || (rawLower.length >= 4 && cinAddr.includes(rawLower));
+      return cinName.includes(rawLower) || (cinAddr.length >= 5 && cinAddr.includes(rawLower));
     });
   });
 }

@@ -48,34 +48,6 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const manualExpired = db.settings.expiredRoadshowCities || [];
 
-    // Find matching city from MASTER_ROADSHOW_STOPS & CITY_ALIASES
-    const effectiveCity = getCityByNameOrSlug(normalizedCity);
-    let matchedSlug = effectiveCity?.slug === 'jogja' ? 'yogyakarta' : effectiveCity?.slug;
-
-    if (!matchedSlug) {
-      matchedSlug = Object.keys(MASTER_ROADSHOW_STOPS).find(slug => {
-        const data = MASTER_ROADSHOW_STOPS[slug];
-        const name = data.cityName.toLowerCase();
-        return (
-          normalizedCity === slug ||
-          normalizedCity === name ||
-          normalizedCity.includes(slug) ||
-          normalizedCity.includes(name) ||
-          slug.includes(normalizedCity) ||
-          name.includes(normalizedCity)
-        );
-      });
-    }
-
-    // Special match checks (e.g. jogja/amplaz -> yogyakarta, solo/paragon -> solo)
-    if (!matchedSlug) {
-      if (normalizedCity.includes('jogja') || normalizedCity.includes('amplaz') || normalizedCity.includes('ambarrukmo')) matchedSlug = 'yogyakarta';
-      else if (normalizedCity.includes('solo') || normalizedCity.includes('paragon')) matchedSlug = 'solo';
-      else if (normalizedCity.includes('batu') || normalizedCity.includes('matos')) matchedSlug = 'malang';
-      else if (normalizedCity.includes('smg') || normalizedCity.includes('java mall')) matchedSlug = 'semarang';
-      else if (normalizedCity.includes('artos')) matchedSlug = 'magelang';
-    }
-
     const ticketLinks = {
       xxi: db.settings.bogoCinemaLinks?.xxi || FAST_TRACK_TICKET_LINKS.xxi,
       tixid: db.settings.bogoCinemaLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid,
@@ -84,30 +56,32 @@ export async function POST(req: NextRequest) {
       website: FAST_TRACK_TICKET_LINKS.website,
     };
 
-    // If matchedSlug is not found: check if this is a general city inquiry or a specific non-roadshow city
-    if (!matchedSlug) {
-      const isGeneralCityQuery =
-        !normalizedCity ||
-        normalizedCity === 'all' ||
-        normalizedCity === 'list' ||
-        normalizedCity === 'semua' ||
-        normalizedCity.includes('mana') ||
-        normalizedCity.includes('mna') ||
-        normalizedCity.includes('kota') ||
-        normalizedCity.includes('temu') ||
-        normalizedCity.includes('cast') ||
-        normalizedCity.includes('jadwal') ||
-        normalizedCity.includes('daftar') ||
-        normalizedCity.includes('rundown');
+    // Check first if user is asking for general roadshow list, all cities, or temu cast in general
+    const isGeneralCityQuery =
+      !normalizedCity ||
+      normalizedCity === 'all' ||
+      normalizedCity === 'list' ||
+      normalizedCity === 'semua' ||
+      normalizedCity.includes('mana') ||
+      normalizedCity.includes('mna') ||
+      normalizedCity.includes('kota') ||
+      normalizedCity.includes('temu') ||
+      normalizedCity.includes('cast') ||
+      normalizedCity.includes('jadwal') ||
+      normalizedCity.includes('daftar') ||
+      normalizedCity.includes('rundown');
 
-      if (isGeneralCityQuery) {
-        const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
-        const formattedCitiesList = CITIES_DATA.map((c, idx) => {
-          const note = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
-          return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${note}`;
-        }).join('\n');
+    // SCENARIO 0: GENERAL ROADSHOW 17 CITIES INQUIRY
+    // (Only trigger general list if a specific city name like 'semarang' or 'solo' is NOT mentioned alongside)
+    const effectiveCity = getCityByNameOrSlug(normalizedCity);
+    if (!effectiveCity && isGeneralCityQuery) {
+      const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
+      const formattedCitiesList = CITIES_DATA.map((c, idx) => {
+        const note = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
+        return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${note}`;
+      }).join('\n');
 
-        const replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+      const replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 ${randomPantun}
 
 🎬 *DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST PIYE TO KIH? THE MOVIE:*
@@ -123,18 +97,43 @@ Di 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)
 
 Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutkan nama kotamu ya! 🍿✨`;
 
-        return NextResponse.json({
-          success: true,
-          isRoadshowCity: true,
-          isGeneralList: true,
-          totalCities: CITIES_DATA.length,
-          cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, dateStr: c.dateStr })),
-          ticketLinks,
-          replyMessage
-        }, { status: 200, headers: corsHeaders });
-      }
+      return NextResponse.json({
+        success: true,
+        isRoadshowCity: true,
+        isGeneralList: true,
+        totalCities: CITIES_DATA.length,
+        cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, dateStr: c.dateStr })),
+        ticketLinks,
+        replyMessage
+      }, { status: 200, headers: corsHeaders });
+    }
 
-      // If city is a specific non-roadshow city (e.g. Bandung, Jakarta, Medan, Bali, etc)
+    // SCENARIO 1: FIND MATCHING SPECIFIC CITY
+    let matchedSlug = effectiveCity?.slug === 'jogja' ? 'yogyakarta' : effectiveCity?.slug;
+
+    if (!matchedSlug) {
+      matchedSlug = Object.keys(MASTER_ROADSHOW_STOPS).find(slug => {
+        const data = MASTER_ROADSHOW_STOPS[slug];
+        const name = data.cityName.toLowerCase();
+        return (
+          normalizedCity === slug ||
+          normalizedCity === name ||
+          (normalizedCity.length >= 4 && (normalizedCity.includes(slug) || normalizedCity.includes(name)))
+        );
+      });
+    }
+
+    // Special match checks (e.g. jogja/amplaz -> yogyakarta, solo/paragon -> solo)
+    if (!matchedSlug) {
+      if (normalizedCity.includes('jogja') || normalizedCity.includes('amplaz') || normalizedCity.includes('ambarrukmo')) matchedSlug = 'yogyakarta';
+      else if (normalizedCity.includes('solo') || normalizedCity.includes('paragon')) matchedSlug = 'solo';
+      else if (normalizedCity.includes('batu') || normalizedCity.includes('matos')) matchedSlug = 'malang';
+      else if (normalizedCity.includes('smg') || normalizedCity.includes('java mall')) matchedSlug = 'semarang';
+      else if (normalizedCity.includes('artos')) matchedSlug = 'magelang';
+    }
+
+    // If city is a specific non-roadshow city (e.g. Bandung, Jakarta, Medan, Bali, etc)
+    if (!matchedSlug) {
       const cityNameDisplay = rawCity ? String(rawCity).toUpperCase() : 'KOTA KAMU';
       return NextResponse.json({
         success: true,
