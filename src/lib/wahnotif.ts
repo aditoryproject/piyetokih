@@ -96,6 +96,29 @@ export const WAHNOTIF_TOOL_VOUCHER_SCHEMA = {
   }
 };
 
+// TOOL 5: PARTNERSHIP, NOBAR, SPONSOR & HUMAN HANDOVER
+export const WAHNOTIF_TOOL_PARTNERSHIP_SCHEMA = {
+  name: "contact_partnership_and_team",
+  description: "Menghubungkan calon penonton, komunitas, instansi, atau brand yang ingin berkomunikasi langsung dengan tim partnership & admin Miracle Pictures untuk kolaborasi, nobar (nonton bareng), sponsorship, media partner, meet and greet khusus, atau berbicara dengan admin manusia.",
+  parameters: {
+    type: "object",
+    properties: {
+      topic: {
+        type: "string",
+        description: "Topik pembicaraan: 'partnership', 'kolaborasi', 'nobar', 'sponsor', 'media', atau 'admin_human'"
+      },
+      name: {
+        type: "string",
+        description: "Nama penanya atau perwakilan instansi (opsional)"
+      },
+      message: {
+        type: "string",
+        description: "Pesan atau maksud kolaborasi (opsional)"
+      }
+    }
+  }
+};
+
 // COMPATIBILITY: Default single tool schema
 export const WAHNOTIF_TOOL_SCHEMA = WAHNOTIF_TOOL_VOUCHER_SCHEMA;
 
@@ -104,7 +127,8 @@ export const WAHNOTIF_ALL_TOOLS = [
   WAHNOTIF_TOOL_ROADSHOW_SCHEMA,
   WAHNOTIF_TOOL_TICKETS_SCHEMA,
   WAHNOTIF_TOOL_MOVIE_SCHEMA,
-  WAHNOTIF_TOOL_VOUCHER_SCHEMA
+  WAHNOTIF_TOOL_VOUCHER_SCHEMA,
+  WAHNOTIF_TOOL_PARTNERSHIP_SCHEMA
 ];
 
 export interface WahnotifPersonaLinks {
@@ -237,13 +261,14 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
   - Tolak dengan candaan santai: "Waduh kalau itu masuk wilayah spoiler rahasia lur 😄 Biar kejutan dan lucunya nampol, temukan jawabannya langsung di bioskop 19 November nanti ya!"
   - Jangan meminta data finansial (OTP, PIN, CVV, kartu ATM).
 
-• PANTANGAN MUTLAK PANGGILAN (DILARANG KERAS MENGGUNAKAN SEBUTAN AYAH / BUNDA):
-  - DILARANG KERAS memanggil penonton dengan sebutan "Ayah", "Bunda", "Kakak", atau "Bapak/Ibu formal".
-  - WAJIB gunakan panggilan khas guyub Piye To Kih: "Lur", "Bolo Asik", "Dulur", atau "Bolo-bolo".
+• PANTANGAN MUTLAK PANGGILAN & LARANGAN TEMPLATE BAWAAN (ANTI AYAH / BUNDA & KAK ADMIN):
+  - DILARANG KERAS memanggil lawan bicara dengan sebutan "Ayah", "Bunda", "Kakak", atau "Bapak/Ibu formal".
+  - DILARANG KERAS menggunakan kalimat template bawaan bot e-commerce: "Baik Ayah/Bunda, percakapan ini sudah langsung saya teruskan ke nomor WhatsApp Tim CS/Admin kami (Kak Admin)..."
+  - WAJIB 100% gunakan panggilan khas guyub Piye To Kih: "Lur", "Bolo Asik", "Dulur", atau "Bolo-bolo".
 
-• ATURAN ESKALASI KE ADMIN HUMAN (HANDOVER TO HUMAN):
-  - Jika penonton ingin bicara dengan admin/manusia, atau jika ada pertanyaan di luar topik film/voucher yang tidak bisa dijawab:
-  - Jawab dengan ramah ala Mas Kidi: "Siap bolo asik! Mas Kidi sambungkan langsung ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean di sini! 🍿✨"`,
+• ATURAN ESKALASI TIM PARTNERSHIP & ADMIN HUMAN (HANDOVER):
+  - Jika penonton atau mitra ingin bicara dengan tim partnership, kolaborasi event/acara, nobar (nonton bareng), sponsorship, media partner, meet and greet, atau admin manusia:
+  - WAJIB gunakan gaya Mas Kidi: "Siap bolo asik! Mas Kidi sambungkan langsung obrolan ini ke Tim Partnership & Admin Miracle Pictures ya lur. Tunggu sebentar nggih, tim kami bakal segera balas chat sampean langsung di sini! 🍿✨"`,
 
     // KOTAK 4 WAHNOTIF: DATA PENGETAHUAN & FAQ
     dataPengetahuanFAQ: `DATA PENGETAHUAN LENGKAP & JADWAL ROADSHOW 17 KOTA:
@@ -413,6 +438,10 @@ Bakal ada promo Buy 1 Get 1 juga lho. Mau Mas Kidi daftarkan nomor sampean di Pe
       {
         user: "Endingnya Mukidi sama Sukma gimana mas?",
         ai: "Waduh, kalau ending itu masuk wilayah spoiler kelas berat lur 😄 Biar sensasi emosi, baper, dan lucunya tetap nampol, temukan jawabannya langsung di bioskop 19 November nanti ya lur! Gas nonton bareng kawan tongkrongan! 🍿✨"
+      },
+      {
+        user: "Boleh juga kak, aku ingin berkomunikasi langsung dengan pihak tim partnership untuk bisa kolaborasi jika ada event nobar dan meet and greet. Terima kasih sebelumnya 🙏",
+        ai: "Siap bolo asik! Mas Kidi sambungkan langsung obrolan ini ke Tim Partnership & Admin Miracle Pictures ya lur. Tunggu sebentar nggih, tim kami bakal segera balas chat sampean langsung di sini! 🍿✨"
       },
       {
         user: "Bisa bicara sama admin manusia?",

@@ -190,6 +190,28 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
       - **Tombol Reset Default**:
         - Memungkinkan admin mengembalikan jadwal kota tertentu ke pengaturan awal jika diperlukan.
     * **Integrasi Menyeluruh & Reaktivitas Otomatis**:
-      - Tersimpan permanen di database (`db.settings.roadshowOverrides[slug]`).
-      - Halaman publik kota ([`/city/[slug]`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/city/[slug]/page.tsx)), halaman beranda ([`/`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/page.tsx)), dan semua webhook WhatsApp Wahnotif (`/api/webhook/tickets`, `/api/webhook/roadshow`, `/api/webhook/wahnotif`, `/api/wahnotif/persona`) langsung membaca data kustom tersebut secara real-time.
+15. **Perbaikan Tautan Tiket Bioskop Spesifik Per Kota & Eliminasi Total Balasan Ayah/Bunda**:
+    * **Masalah 1: Balasan "Ayah/Bunda" & "Kak Admin"**:
+      - **Akar Masalah**: Kalimat *"Baik Ayah/Bunda, percakapan ini sudah langsung saya teruskan ke nomor WhatsApp Tim CS/Admin kami (Kak Admin)..."* berasal dari template default sistem Wahnotif saat memicu fitur *Live Agent Handover / Ambil Alih AI*. Ini terpicu karena pesan mitra/penonton (misal meminta kontak tim partnership/kolaborasi/nobar) tidak tertangkap oleh router tool webhook, sehingga Wahnotif memicu handover default-nya.
+      - **Solusi Komprehensif**:
+        1. Di [`src/app/api/webhook/wahnotif/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts) dan [`src/app/api/webhook/ai-brain/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts), ditambahkan interceptor lengkap untuk kata kunci `partnership`, `partner`, `kolaborasi`, `kerjasama`, `nobar`, `sponsor`, `media partner`, `berkomunikasi langsung`, `hubungi tim`, dll. Respon langsung dibalas dengan gaya Mas Kidi: *"Siap bolo asik! Mas Kidi sambungkan langsung obrolan ini ke Tim Partnership & Promosi Miracle Pictures ya lur. Tunggu sebentar nggih, tim kami bakal segera balas chat sampean langsung di sini! 🍿✨"* tanpa membiarkan Wahnotif memicu fallback default-nya.
+        2. Dibuat Tool 5 baru di skema Wahnotif (`contact_partnership_and_team`) pada [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts) dan didaftarkan pada `/api/webhook/wahnotif`.
+        3. Ditambahkan panduan visual jelas di Admin Dashboard ([`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx)) pada tab Wahnotif untuk menginstruksikan pengguna mengganti atau mematikan teks template default di dashboard Wahnotif (menu *AI CS Assistant > Pengaturan Handover / Eskalasi CS*).
+    * **Masalah 2: Tautan Tiket Tidak Sesuai Yang Dicantumkan Per Kota di Panel Admin**:
+      - **Akar Masalah**: Di [`src/app/api/webhook/wahnotif/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts) pada action `get_roadshow_schedule`, daftar link tiket pada balasan chat sebelumnya masih tertulis hardcoded ke link global XXI & TIX ID (`• Cinema XXI: ${xxiLink}\n• TIX ID: ${tixidLink}`). Akibatnya, saat penonton menanyakan jadwal Solo atau kota lain, bot mengirim link generic `m.21cineplex.com` dan `tix.id` alih-alih link bioskop spesifik yang sudah diinput admin di panel admin (`cityLinkOverrides` seperti `solo_0`, `solo_1`, dll).
+      - **Solusi**:
+        1. Fungsi [`getCityCinemaTicketLinks`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts) diperbarui agar menerima parameter `cityLinkOverrides?: Record<string, string>` dan otomatis menyelesaikan override per bioskop (`${citySlug}_${idx}`) maupun direct city override (`${citySlug}`).
+        2. Di seluruh webhook ([`/api/webhook/wahnotif`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts), [`/api/webhook/roadshow`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/roadshow/route.ts), [`/api/webhook/tickets`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/tickets/route.ts), dan cron follow-up), pemanggilan `getCityCinemaTicketLinks` kini menyertakan `db.settings.cityLinkOverrides`.
+        3. Format balasan chat kini mencantumkan setiap venue bioskop beserta jam tayang dan URL langsung pemesanannya:
+           ```
+           🎟️ LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):
+           • SOLO PARAGON XXI (12.15 WIB):
+             👉 https://m.21cineplex.com/id/movies/16PTKH
+           • PLATINUM CINEPLEX PAKUWON MALL SOLO BARU (19.00 WIB):
+             👉 https://www.platinumcineplex.co.id/now-showing-booking/482/1/
+           • Cek Rundown Lengkap: https://piyetokihfilm.com/city/solo
+           • TIX ID: https://rb.gy/l28pzj
+           ```
+           Sehingga penonton langsung mendapatkan tautan presale bioskop kota yang bersangkutan tanpa salah link!
+
 

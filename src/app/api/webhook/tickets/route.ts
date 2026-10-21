@@ -100,16 +100,29 @@ export async function POST(req: NextRequest) {
 
     let cinemaCityNote = '';
     let cityLinkNote = '';
+    let cityCinemasList = '';
+    let matchedCityName = '';
+    let matchedCitySlug = '';
+
     if (requestedCity) {
       const slug = requestedCity.toLowerCase().trim();
       const matchedStop = Object.values(MASTER_ROADSHOW_STOPS).find(s =>
         s.cityName.toLowerCase().includes(slug) || slug.includes(s.slug)
       );
       if (matchedStop) {
-        const cityCinemas = getCityCinemaTicketLinks(matchedStop.slug, db.settings.roadshowOverrides);
+        matchedCityName = matchedStop.cityName;
+        matchedCitySlug = matchedStop.slug;
+        const cityCinemas = getCityCinemaTicketLinks(
+          matchedStop.slug,
+          db.settings.roadshowOverrides,
+          db.settings.cityLinkOverrides
+        );
         if (cityCinemas.length > 0) {
-          cinemaCityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` +
-            cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n');
+          cityCinemasList = cityCinemas.map(c => {
+            const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
+            return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
+          }).join('\n');
+          cinemaCityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` + cityCinemasList;
         } else if (matchedStop.cinemas?.length > 0) {
           cinemaCityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStop.cityName}:* ${matchedStop.cinemas.join(', ')}`;
         }
@@ -124,6 +137,10 @@ export async function POST(req: NextRequest) {
 
     if (isSpecialScreeningOrPresale) {
       // 1. High-Conversion Pitch for Nonton Duluan / Presale Special Screening
+      const ticketBlock = cityCinemasList
+        ? `🎟️ *LINK TIKET PRESALE SPECIAL SCREENING ${matchedCityName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${ticketLinks.website}${matchedCitySlug ? `/city/${matchedCitySlug}` : ''}\n• *TIX ID:* ${ticketLinks.tixid}`
+        : `🎟️ *LINK LANGSUNG BELI TIKET PRESALE / NONTON DULUAN (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
+
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 ${randomPantun}
 
@@ -132,12 +149,7 @@ Kabar gembira! Sampean GAK PERLU nunggu sampai penayangan reguler 19 November bu
 
 Ada sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop rangkaian roadshow bareng langsung rombongan pemain (Mukidi, Sukma, Gendut, Penyok)!
 
-🎟️ *LINK LANGSUNG BELI TIKET PRESALE / NONTON DULUAN (TINGGAL KLIK):*
-• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}
-• *TIX ID:* ${ticketLinks.tixid}
-• *CGV Cinemas:* ${ticketLinks.cgv}
-• *Cinépolis:* ${ticketLinks.cinepolis}
-• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}
+${ticketBlock}
 
 ⚠️ *PENTING LUR:* Kuota kursi Nonton Duluan & Presale ini sangat terbatas per studio! Baris tengah cepat penuh lur. Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae ragu-ragu? 😂
 Langsung klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;

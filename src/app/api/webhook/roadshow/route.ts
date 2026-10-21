@@ -119,11 +119,24 @@ export async function POST(req: NextRequest) {
 
     const rosterFormatted = cityData.rosterActual.join(', ');
 
-    const cityCinemas = getCityCinemaTicketLinks(cityData.slug, db.settings.roadshowOverrides);
-    const cityCinemasText = cityCinemas.length > 0
-      ? `\n🎬 *TIKET PRESALE SPECIAL SCREENING BIOSKOP ${cityData.cityName.toUpperCase()}:*\n` +
-        cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n')
-      : '';
+    const cityCinemas = getCityCinemaTicketLinks(
+      cityData.slug,
+      db.settings.roadshowOverrides,
+      db.settings.cityLinkOverrides
+    );
+
+    let cinemasTicketSection = '';
+    if (cityCinemas.length > 0) {
+      cinemasTicketSection = `🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n` +
+        cityCinemas.map(c => {
+          const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
+          return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
+        }).join('\n') +
+        `\n• Cek Rundown Lengkap: ${ticketLinks.website}/city/${cityData.slug}\n• TIX ID: ${ticketLinks.tixid}`;
+    } else {
+      const directCityLink = db.settings.cityLinkOverrides?.[cityData.slug] || ticketLinks.xxi;
+      cinemasTicketSection = `🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n• Cinema XXI (M-TIX): ${directCityLink}\n• Cek Rundown Lengkap: ${ticketLinks.website}/city/${cityData.slug}\n• TIX ID: ${ticketLinks.tixid}`;
+    }
 
     const replyMessage = `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬
 
@@ -142,11 +155,8 @@ ${scheduleFormatted}
 ${cityData.boothMall ? `• Acara: *Konter Booth Resmi Roadshow & Meet and Greet*\n• Tempat: *${cleanVenueToMallName(cityData.boothMall.venue)}*\n• Lokasi: *${cleanVenueToMallName(cityData.boothMall.floor)}*\n• Jam: *${cityData.boothMall.time}*` : '• Informasi booth penukaran mengikuti pengumuman resmi di website.'}
 
 🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline ya lur.
-${cityCinemasText}
-🎟️ *LINK TIKET PRESALE & JADWAL KOTA (TINGGAL KLIK):*
-• Cek Rundown & Panggung: ${ticketLinks.website}/city/${cityData.slug}
-• Cinema XXI (M-TIX): ${ticketLinks.xxi}
-• TIX ID: ${ticketLinks.tixid}
+
+${cinemasTicketSection}
 
 🔥 *MAU NONTON DULUAN DI DALAM STUDIO BARENG PEMAIN?*
 Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas lur! Baris tengah cepat ludes. Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas dan amankan tiketmu sekarang lur!

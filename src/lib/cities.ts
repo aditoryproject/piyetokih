@@ -1469,12 +1469,10 @@ export function getEffectiveCity(
   return applyRoadshowOverride(baseCity, overrides?.[baseCity.slug]);
 }
 
-/**
- * Get specific ticket URLs for a city from CITIES_DATA or overrides
- */
 export function getCityCinemaTicketLinks(
   query?: string,
-  overrides?: Record<string, Partial<CityData>>
+  overrides?: Record<string, Partial<CityData>>,
+  cityLinkOverrides?: Record<string, string>
 ): Array<{
   cinemaName: string;
   chain: string;
@@ -1484,14 +1482,25 @@ export function getCityCinemaTicketLinks(
   if (!query) return [];
   const city = getEffectiveCity(query, overrides);
   if (!city || !city.cinemas) return [];
+
+  const customLinks = cityLinkOverrides || {};
+  const citySlug = city.slug;
+  const legacyDirectCityLink = customLinks[citySlug] || (citySlug === 'yogyakarta' ? customLinks['jogja'] : undefined);
+
   return city.cinemas
-    .filter(c => Boolean(c.ticketUrl && c.ticketUrl.trim().length > 0))
-    .map(c => ({
-      cinemaName: c.name,
-      chain: c.chain,
-      showTimes: c.showTimes || [],
-      ticketUrl: c.ticketUrl,
-    }));
+    .map((c, idx) => {
+      const overrideKey = `${citySlug}_${idx}`;
+      const altKey = citySlug === 'yogyakarta' ? `jogja_${idx}` : undefined;
+      const targetUrl = customLinks[overrideKey] || (altKey && customLinks[altKey]) || c.ticketUrl || legacyDirectCityLink || '';
+
+      return {
+        cinemaName: c.name,
+        chain: c.chain,
+        showTimes: c.showTimes || [],
+        ticketUrl: targetUrl,
+      };
+    })
+    .filter(c => Boolean(c.ticketUrl && c.ticketUrl.trim().length > 0));
 }
 
 

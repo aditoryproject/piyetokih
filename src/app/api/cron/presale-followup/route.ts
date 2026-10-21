@@ -125,14 +125,18 @@ export async function POST(req: NextRequest) {
 
       // Check city cinemas or override
       const citySlug = c.city.toLowerCase().trim();
-      const cityCinemas = getCityCinemaTicketLinks(citySlug, db.settings.roadshowOverrides);
+      const cityCinemas = getCityCinemaTicketLinks(
+        citySlug,
+        db.settings.roadshowOverrides,
+        db.settings.cityLinkOverrides
+      );
       const cityOverride = db.settings.cityLinkOverrides?.[citySlug];
 
       let cinemaLinksText = `• *Cinema XXI (M-TIX):* ${defaultXxi}\n• *TIX ID:* ${defaultTixid}`;
-      if (cityOverride) {
+      if (cityCinemas.length > 0) {
+        cinemaLinksText = cityCinemas.map(cin => `• *${cin.cinemaName}* (${cin.showTimes.join(', ')}):\n  👉 ${cin.ticketUrl}`).join('\n') + `\n• *TIX ID:* ${defaultTixid}`;
+      } else if (cityOverride) {
         cinemaLinksText = `• *Link Khusus Tiket ${c.city}:* ${cityOverride}\n` + cinemaLinksText;
-      } else if (cityCinemas.length > 0) {
-        cinemaLinksText = `• *Tiket Bioskop ${c.city}:* ${cityCinemas[0].cinemaName} (${cityCinemas[0].showTimes.join(', ')}): ${cityCinemas[0].ticketUrl}\n` + cinemaLinksText;
       }
 
       const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];

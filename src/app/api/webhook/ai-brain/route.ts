@@ -78,20 +78,41 @@ export async function POST(req: NextRequest) {
       }, { status: 200, headers: corsHeaders });
     }
 
-    // Check human handover
-    if (
+    // Check human / partnership handover
+    const isPartnershipQuery =
+      query.includes('partnership') ||
+      query.includes('partner') ||
+      query.includes('kolaborasi') ||
+      query.includes('kerjasama') ||
+      query.includes('kerja sama') ||
+      query.includes('nobar') ||
+      query.includes('nonton bareng') ||
+      query.includes('sponsor') ||
+      query.includes('media partner');
+
+    const isHumanHandover =
+      isPartnershipQuery ||
       query.includes('admin') ||
       query.includes('manusia') ||
       query.includes('orang') ||
       query.includes('operator') ||
       query.includes('cs manusia') ||
       query.includes('bicara sama cs') ||
-      query.includes('ngomong sama admin')
-    ) {
+      query.includes('ngomong sama admin') ||
+      query.includes('berkomunikasi langsung') ||
+      query.includes('bicara langsung') ||
+      query.includes('hubungi tim') ||
+      query.includes('pihak tim');
+
+    if (isHumanHandover) {
+      const replyMsg = isPartnershipQuery
+        ? `Siap bolo asik! Mas Kidi sambungkan langsung obrolan ini ke Tim Partnership & Promosi Miracle Pictures ya lur. Tunggu sebentar nggih, tim kami bakal segera balas chat sampean langsung di sini! 🍿✨`
+        : `Siap bolo asik! Mas Kidi sambungkan langsung obrolan ini ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean langsung di sini! 🍿✨`;
+
       return NextResponse.json({
         success: true,
         isHumanHandover: true,
-        replyMessage: `Siap bolo asik! Mas Kidi sambungkan langsung ke Tim Admin Miracle Pictures ya lur. Tunggu sebentar nggih, admin kami bakal segera balas chat sampean di sini! 🍿✨`
+        replyMessage: replyMsg
       }, { status: 200, headers: corsHeaders });
     }
 

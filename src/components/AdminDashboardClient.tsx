@@ -20,6 +20,7 @@ import {
   WAHNOTIF_TOOL_TICKETS_SCHEMA,
   WAHNOTIF_TOOL_MOVIE_SCHEMA,
   WAHNOTIF_TOOL_VOUCHER_SCHEMA,
+  WAHNOTIF_TOOL_PARTNERSHIP_SCHEMA,
   getWahnotifPersona,
   PIYE_TO_KIH_AI_PERSONA
 } from '@/lib/wahnotif';
@@ -5682,6 +5683,36 @@ export default function AdminDashboardClient() {
 
               {/* Script Asisten Chat & Custom AI Tool */}
               <div className="space-y-6">
+                {/* 🚨 ALERT PENTING: PANDUAN ANTI AYAH/BUNDA & LIVE AGENT HANDOVER */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-950 text-xs shadow-sm space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-xl leading-none">🚨</span>
+                    <div>
+                      <h4 className="font-black text-sm text-rose-950 uppercase tracking-wide">
+                        PANDUAN HAPUS BALASAN &quot;AYAH/BUNDA&quot; &amp; &quot;KAK ADMIN&quot; DARI WAHNOTIF
+                      </h4>
+                      <p className="text-[12px] text-rose-900 mt-1 leading-relaxed">
+                        Jika bot pernah membalas: <i>&quot;Baik Ayah/Bunda, percakapan ini sudah langsung saya teruskan ke nomor WhatsApp Tim CS/Admin kami (Kak Admin)...&quot;</i>, itu adalah <b>template bawaan bawaan Wahnotif</b> saat terjadi pengalihan ke live human CS (Ambil Alih / Eskalasi).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-white/90 rounded-xl border border-rose-200 text-[11px] text-slate-800 space-y-2">
+                    <p className="font-bold text-rose-950">Cara Mengubah / Menghapusnya di Dashboard Wahnotif Anda:</p>
+                    <ol className="list-decimal pl-4 space-y-1.5 text-slate-700">
+                      <li>Buka dashboard Wahnotif Anda di <b>wahnotif.com</b>.</li>
+                      <li>Masuk ke menu <b>AI CS Assistant &gt; Pengaturan Handover / Eskalasi CS (Ambil Alih AI)</b>.</li>
+                      <li>
+                        Cari input field <b>&quot;Pesan Pengalihan ke Admin / Template Eskalasi&quot;</b>. Ubah teks default tersebut menjadi gaya Mas Kidi:
+                        <span className="block font-mono bg-slate-100 p-2 rounded mt-1 border text-rose-900 text-[11px]">
+                          Siap bolo asik! Mas Kidi sambungkan langsung obrolan ini ke Tim Partnership &amp; Admin Miracle Pictures ya lur. Tunggu sebentar nggih, tim kami bakal segera balas chat sampean langsung di sini! 🍿✨
+                        </span>
+                      </li>
+                      <li>Klik <b>Simpan</b> di Wahnotif. Webhook kami juga sudah otomatis menangani kata kunci kemitraan/nobar/admin agar langsung dibalas Mas Kidi!</li>
+                    </ol>
+                  </div>
+                </div>
+
                 {/* Banner Panduan 4 Isian Wahnotif */}
                 <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
                   <div>
@@ -6097,6 +6128,52 @@ export default function AdminDashboardClient() {
                           className="w-full py-1 text-center bg-white hover:bg-emerald-100 border border-emerald-200 text-emerald-900 font-bold text-[10px] rounded transition"
                         >
                           Salin Skema Tool JSON (claim_war_voucher)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* TOOL 5: PARTNERSHIP, NOBAR & HUMAN HANDOVER */}
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-violet-600 text-white font-bold text-[10px] flex items-center justify-center">
+                            5
+                          </span>
+                          <span className="font-extrabold text-xs text-slate-900">
+                            Tool Kemitraan &amp; Eskalasi CS (contact_partnership_and_team)
+                          </span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-100 text-violet-800">
+                          Partnership &amp; Handover
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-600">
+                        Menangani obrolan yang menanyakan kerjasama, sponsorship, nobar (nonton bareng), media partner, atau ingin berbicara langsung dengan tim/admin manusia (100% bebas dari sebutan Ayah/Bunda!).
+                      </p>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={`${siteOrigin || 'https://piyetokihfilm.com'}/api/webhook/wahnotif`}
+                            className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-[11px] text-slate-700 select-all"
+                          />
+                          <button
+                            onClick={() => copyToClipboard(`${siteOrigin || 'https://piyetokihfilm.com'}/api/webhook/wahnotif`, 'webhook')}
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold transition"
+                            title="Salin URL"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(JSON.stringify(WAHNOTIF_TOOL_PARTNERSHIP_SCHEMA, null, 2));
+                            alert('Skema JSON Tool Kemitraan & Handover berhasil disalin!');
+                          }}
+                          className="w-full py-1 text-center bg-white hover:bg-violet-100 border border-violet-200 text-violet-900 font-bold text-[10px] rounded transition"
+                        >
+                          Salin Skema Tool JSON (contact_partnership_and_team)
                         </button>
                       </div>
                     </div>
