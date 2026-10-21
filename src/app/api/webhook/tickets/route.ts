@@ -92,6 +92,17 @@ export async function POST(req: NextRequest) {
       queryText.includes('promo') ||
       args.type === 'bogo';
 
+    const isPriceInquiry =
+      queryText.includes('harga') ||
+      queryText.includes('harganya') ||
+      queryText.includes('htm') ||
+      queryText.includes('biaya') ||
+      queryText.includes('tarif') ||
+      queryText.includes('berapaan') ||
+      queryText.includes('berapa tiket') ||
+      queryText.includes('berapa harga') ||
+      (queryText.includes('berapa') && (queryText.includes('tiket') || queryText.includes('nonton') || queryText.includes('bayar')));
+
     const now = new Date();
     const isBogoLive = now >= new Date(2026, 10, 15); // Dibuka 15 Nov 2026
 
@@ -128,7 +139,30 @@ export async function POST(req: NextRequest) {
 
     let replyMessage = '';
 
-    if (isSpecialScreeningOrPresale) {
+    if (isPriceInquiry) {
+      // 0. Ticket Price (HTM) Inquiry: Estimated Rp 30.000 - Rp 50.000 + Landing Page Links
+      const priceTicketBlock = cityCinemasList
+        ? `🎟️ *LINK CEK HARGA PASTI & BELI TIKET BIOSKOP ${matchedCityName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${ticketLinks.website}${matchedCitySlug ? `/city/${matchedCitySlug}` : ''}\n• *TIX ID:* ${ticketLinks.tixid}`
+        : `🎟️ *LINK LANGSUNG CEK HARGA & BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
+
+      replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+${randomPantun}
+
+🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
+Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran **Rp 30.000 sampai Rp 50.000** per tiket lur!
+*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, menyesuaikan kota/lokasi dan hari tayang weekday atau weekend).*
+
+Buat cek harga tiket pasti di bioskop kotamu sekaligus langsung amankan kursi incaran sampean biar gak kehabisan, ini Mas Kidi kasih tautan resmi bioskopnya lur (tinggal klik sesuai yang ada di website):
+${priceTicketBlock}
+
+🔥 *TIPS HEMAT DARI MAS KIDI:*
+• *Mau Nonton Duluan bareng cast sebelum 19 Nov?* Sesi Special Screening di bioskop kota roadshow sudah bisa dibeli tiket presale-nya sekarang lewat link di atas lur!
+• *Promo Buy 1 Get 1 (19 Nov):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID & M-TIX XXI! Mau Mas Kidi amankan slot Pengingat Prioritas H-1 via WA? Cukup infokan Nama & Kota sampean ya lur!
+
+Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂
+Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`;
+
+    } else if (isSpecialScreeningOrPresale) {
       // 1. High-Conversion Pitch for Nonton Duluan / Presale Special Screening
       const ticketBlock = cityCinemasList
         ? `🎟️ *LINK TIKET PRESALE SPECIAL SCREENING ${matchedCityName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${ticketLinks.website}${matchedCitySlug ? `/city/${matchedCitySlug}` : ''}\n• *TIX ID:* ${ticketLinks.tixid}`
@@ -209,6 +243,8 @@ Kuota promo: *1.000 tiket di TIX ID* dan *500 tiket di M-TIX (XXI)* dibuka 15-18
       ticketLinks,
       requestedCity: requestedCity || 'Nasional',
       requestedChain,
+      action: isPriceInquiry ? 'ticket_price_info' : 'get_ticket_links',
+      estimatedPriceRange: isPriceInquiry ? 'Rp 30.000 – Rp 50.000' : undefined,
       promoBogoAllocation: '1.000 Tiket di TIX ID & 500 Tiket di M-TIX',
       nationalReleaseDate: '19 November 2026',
       replyMessage

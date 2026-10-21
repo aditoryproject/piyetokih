@@ -5783,6 +5783,31 @@ export default function AdminDashboardClient() {
                   </div>
                 </div>
 
+                {/* 🎟️ ALERT KHUSUS: PANDUAN MENJAWAB HARGA TIKET (30-50 RIBU) & HAPUS KATA "KATALOG / ADMIN TOKO" */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 text-xs shadow-sm space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-xl leading-none">🎟️</span>
+                    <div>
+                      <h4 className="font-black text-sm text-emerald-950 uppercase tracking-wide">
+                        PANDUAN HARGA TIKET (RENTANG RP 30.000 – RP 50.000) &amp; ELIMINASI KATA &quot;KATALOG / TOKO KAMI&quot;
+                      </h4>
+                      <p className="text-[12px] text-emerald-900 mt-1 leading-relaxed">
+                        Jika penonton bertanya seputar harga tiket di WhatsApp (misal: <i>&quot;berapa harganya tiket nya bosku&quot;</i>), AI <b>DILARANG KERAS</b> membalas dengan istilah e-commerce (seperti <i>&quot;cek di katalog/website toko kami atau admin toko&quot;</i>).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-white/95 rounded-xl border border-emerald-200 text-[11px] text-slate-800 space-y-2">
+                    <p className="font-bold text-emerald-950">Standar Jawaban Resmi Mas Kidi Saat Tanya Harga Tiket (HTM):</p>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-700">
+                      <li><b>Rentang Perkiraan Harga:</b> Berikan perkiraan <b>Rp 30.000 s/d Rp 50.000</b> per tiket (tergantung bioskop XXI/CGV/Cinepolis/Platinum/NSC, kota, dan hari biasa/weekend).</li>
+                      <li><b>Tautan Bioskop Langsung:</b> Arahkan langsung ke tautan resmi bioskop yang ada di landing page (Cinema XXI/M-TIX, TIX ID, CGV, Cinépolis, atau link kota yang bersangkutan) untuk cek harga pasti dan pilih kursi.</li>
+                      <li><b>Info Promo:</b> Sisipkan info Nonton Duluan (Special Screening) sebelum 19 Nov, promo Buy 1 Get 1 (19 Nov), dan voucher booth mall Rp 10.000.</li>
+                      <li><b>Action Admin:</b> Salin ulang <b>4 Isian Wahnotif</b> atau <b>Master System Prompt</b> di bawah ini dan simpan di dashboard Wahnotif Anda agar prompt terbaru langsung aktif!</li>
+                    </ul>
+                  </div>
+                </div>
+
                 {/* Banner Panduan 4 Isian Wahnotif */}
                 <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
                   <div>

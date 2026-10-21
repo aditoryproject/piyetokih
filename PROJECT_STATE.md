@@ -232,4 +232,24 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
     * **Panel Admin Modal Interaktif**:
       - UI Modal interaktif di Admin Dashboard (`/admin`) dengan live preview teks pesan, filter target audiens (Leads / Reminders / All), pemilih kota, stage nurturing, opsi jeda aman, dan counter nomor eligible secara real-time.
 
+17. **Penanganan Pertanyaan Harga Tiket (Rentang Perkiraan Rp 30.000 – Rp 50.000) & Eliminasi Total Istilah 'Katalog / Toko Kami' di CS AI Wahnotif**:
+    * **Latar Belakang & Masalah**:
+      - Calon penonton di WhatsApp bertanya: *"Tp saya msh penasaran berapa harganya tiket nya bosku"*.
+      - Karena webhook dan prompt sebelumnya belum memiliki penanganan khusus untuk kata kunci harga/HTM, bot Wahnotif memicu fallback bawaan e-commerce: *"Bisa banget Kak! Untuk proses pembayaran dan pemesanan, Kakak bisa langsung cek di katalog/website toko kami atau admin toko akan segera bantu kirimkan detail transaksinya ya. 🙏😊"*.
+      - Ini merusak persona karena film bioskop disangka toko online ("katalog toko", "admin toko", sapaan "Kakak").
+    * **Standar Respon Resmi Mas Kidi**:
+      1. **Rentang Perkiraan Harga (HTM)**: Menjelaskan bahwa harga tiket nonton film *PIYE TO KIH?* berkisar antara **Rp 30.000 sampai Rp 50.000** per tiket (menyesuaikan jaringan bioskop XXI/CGV/Cinépolis/Platinum/NSC, wilayah kota, serta hari biasa weekday vs akhir pekan weekend).
+      2. **Pengalihan Langsung ke Link Website Bioskop Sesuai Landing Page**: Langsung menyodorkan tautan resmi bioskop (Cinema XXI/M-TIX, TIX ID, CGV Cinemas, Cinépolis, atau link bioskop spesifik kotanya) agar penonton dapat mengecek harga pasti di kotanya dan langsung mengamankan nomor kursi terbaik sebelum habis.
+      3. **Tips Hemat Promo**: Menginfokan sesi Nonton Duluan (Special Screening) sebelum 19 Nov, promo Buy 1 Get 1 (19 Nov), dan voucher potongan Rp 10.000 di booth roadshow mall.
+      4. **Hardsale Closing Khas Mas Kidi**: Mendorong checkout segera (*"Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂"*).
+    * **Eliminasi Total Kata E-Commerce**:
+      - Dilarang keras menggunakan istilah: "katalog toko", "website toko", "admin toko", "proses pembayaran toko", "detail transaksi toko", serta sapaan "Kak/Kakak/Ayah/Bunda".
+    * **File Terkait yang Ter-update**:
+      - [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts): Ditambahkan `ticketPricing` pada `MASTER_MOVIE_FACTS`.
+      - [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts): Update deskripsi tool `get_ticket_links`, `konteksBisnis`, aturan 7 `teknikClosing`, `karakterPersona`, FAQ #6, `systemPrompt`, dan `sampleDialogs`.
+      - [`src/app/api/webhook/wahnotif/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts) & [`src/app/api/webhook/tickets/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/tickets/route.ts): Interceptor `isPriceInquiry` (`harga`, `harganya`, `htm`, `biaya`, `tarif`, `berapaan`, `berapa tiket`, dll.) otomatis membalas dengan rentang harga Rp 30.000 - Rp 50.000 dan link bioskop landing page.
+      - [`src/app/api/webhook/ai-brain/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts): Sinkronisasi jawaban harga tiket dan link bioskop.
+      - [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx): Ditambahkan alert panduan harga tiket (30-50 ribu) dan panduan anti-toko di Tab Wahnotif.
+
+
 

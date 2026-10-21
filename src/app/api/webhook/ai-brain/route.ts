@@ -116,6 +116,46 @@ export async function POST(req: NextRequest) {
       }, { status: 200, headers: corsHeaders });
     }
 
+    // Check ticket price inquiry
+    const isPriceQuery =
+      query.includes('harga') ||
+      query.includes('harganya') ||
+      query.includes('htm') ||
+      query.includes('biaya') ||
+      query.includes('tarif') ||
+      query.includes('berapaan') ||
+      query.includes('berapa tiket') ||
+      query.includes('berapa harga') ||
+      (query.includes('berapa') && (query.includes('tiket') || query.includes('nonton') || query.includes('bayar')));
+
+    if (isPriceQuery) {
+      return NextResponse.json({
+        success: true,
+        action: 'ticket_price_info',
+        estimatedPriceRange: 'Rp 30.000 – Rp 50.000',
+        replyMessage: `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+${randomPantun}
+
+🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
+Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran *Rp 30.000 sampai Rp 50.000* per tiket lur!
+*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, sesuai kota dan hari tayang weekday atau weekend).*
+
+Buat cek harga pasti di bioskop kotamu sekaligus langsung amankan kursi incaran sampean biar gak kehabisan, ini Mas Kidi kasih link langsung websitenya lur (tinggal klik sesuai yang ada di website):
+🎟️ Cinema XXI (M-TIX): ${FAST_TRACK_TICKET_LINKS.xxi}
+🎟️ TIX ID: ${FAST_TRACK_TICKET_LINKS.tixid}
+🎟️ CGV Cinemas: ${FAST_TRACK_TICKET_LINKS.cgv}
+🎟️ Cinépolis: ${FAST_TRACK_TICKET_LINKS.cinepolis}
+🎟️ Website Resmi: ${FAST_TRACK_TICKET_LINKS.website}
+
+🔥 *TIPS HEMAT DARI MAS KIDI:*
+• Mau Nonton Duluan bareng cast sebelum 19 Nov? Tiket sesi Special Screening sudah bisa dibeli lewat link di atas lur!
+• Buat penayangan serentak 19 November, bakal ada promo Buy 1 Get 1 di TIX ID & M-TIX juga lho!
+
+Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂
+Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`
+      }, { status: 200, headers: corsHeaders });
+    }
+
     // Default friendly assistant response
     return NextResponse.json({
       success: true,

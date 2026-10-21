@@ -98,8 +98,8 @@ export async function GET(req: NextRequest) {
     success: true,
     message: 'Master Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant (Multi-Tools: Jadwal Roadshow, Link Tiket Presale/BOGO, Info Film/Cast/OST, Klaim Voucher).',
     name: 'piye_to_kih_master_assistant',
-    title: 'Master AI Webhook Piye Toh Kih (Jadwal, Cast, Tiket, Voucher & Persona)',
-    description: 'Master webhook terintegrasi yang menyediakan data lengkap jadwal roadshow 17 kota, roster cast pemain, link langsung beli tiket bioskop (XXI, TIX ID, CGV, Cinepolis), promo Buy 1 Get 1, fakta resmi film, serta penerbitan voucher fisik & pengingat prioritas.',
+    title: 'Master AI Webhook Piye Toh Kih (Jadwal, Cast, Harga Tiket, Voucher & Persona)',
+    description: 'Master webhook terintegrasi yang menyediakan data lengkap jadwal roadshow 17 kota, roster cast pemain, rentang perkiraan harga tiket (HTM Rp 30.000 - Rp 50.000), link langsung beli tiket bioskop (XXI, TIX ID, CGV, Cinepolis), promo Buy 1 Get 1, fakta resmi film, serta penerbitan voucher fisik & pengingat prioritas.',
     url: `${effectiveOrigin}/api/webhook/wahnotif`,
     webhook_url: `${effectiveOrigin}/api/webhook/wahnotif`,
     method: 'POST',
@@ -113,6 +113,10 @@ export async function GET(req: NextRequest) {
         action: {
           type: 'string',
           description: "Aksi atau tool yang dipanggil: 'get_roadshow_schedule', 'get_ticket_links', 'get_movie_info', atau 'claim_war_voucher'",
+        },
+        query: {
+          type: 'string',
+          description: 'Pertanyaan atau pesan dari calon penonton (contoh: berapa harga tiketnya, jadwal nonton duluan, dll.)',
         },
         city: {
           type: 'string',
@@ -151,7 +155,7 @@ export async function GET(req: NextRequest) {
       },
       {
         name: 'get_ticket_links',
-        description: 'Mengambil link langsung pembelian tiket resmi bioskop (Cinema XXI/M-TIX, TIX ID, CGV, Cinepolis) serta status presale dan promo Buy 1 Get 1 (BOGO) agar calon penonton tidak perlu mencari manual di aplikasi.',
+        description: WAHNOTIF_TOOL_TICKETS_SCHEMA.description,
         url: `${effectiveOrigin}/api/webhook/tickets`,
         method: 'POST',
         parameters: WAHNOTIF_TOOL_TICKETS_SCHEMA.parameters
@@ -573,9 +577,24 @@ Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kid
       queryText.includes('promo buy 1 get 1') ||
       args.type === 'bogo';
 
+    const isPriceInquiry =
+      action.includes('price') ||
+      action.includes('harga') ||
+      action.includes('htm') ||
+      queryText.includes('harga') ||
+      queryText.includes('harganya') ||
+      queryText.includes('htm') ||
+      queryText.includes('biaya') ||
+      queryText.includes('tarif') ||
+      queryText.includes('berapaan') ||
+      queryText.includes('berapa tiket') ||
+      queryText.includes('berapa harga') ||
+      (queryText.includes('berapa') && (queryText.includes('tiket') || queryText.includes('nonton') || queryText.includes('bayar')));
+
     const isTicketAction =
       isSpecialScreeningOrPresale ||
       isBogoInquiry ||
+      isPriceInquiry ||
       action.includes('ticket') ||
       action.includes('tiket') ||
       action.includes('promo') ||
@@ -630,7 +649,30 @@ Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kid
 
       let ticketReply = '';
 
-      if (isSpecialScreeningOrPresale) {
+      if (isPriceInquiry) {
+        // Price / HTM Inquiry: Estimated 30-50k + Direct Links from Landing Page
+        const priceTicketBlock = cityCinemasList
+          ? `🎟️ *LINK CEK HARGA PASTI & BELI TIKET BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${siteOrigin}${matchedStopSlug ? `/city/${matchedStopSlug}` : ''}\n• *TIX ID:* ${tixidLink}`
+          : `🎟️ *LINK LANGSUNG CEK HARGA & BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website Resmi & Jadwal Kota:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
+
+        ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+${randomPantun}
+
+🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
+Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran **Rp 30.000 sampai Rp 50.000** per tiket lur!
+*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, menyesuaikan kota/lokasi dan hari tayang weekday atau weekend).*
+
+Buat cek harga tiket pasti di bioskop kotamu sekaligus langsung amankan kursi incaran sampean biar gak kehabisan, ini Mas Kidi kasih tautan resmi bioskopnya lur (tinggal klik sesuai yang ada di website):
+${priceTicketBlock}
+
+🔥 *TIPS HEMAT DARI MAS KIDI:*
+• *Mau Nonton Duluan bareng cast sebelum 19 Nov?* Sesi Special Screening di bioskop kota roadshow sudah bisa dibeli tiket presale-nya sekarang lewat link di atas lur!
+• *Promo Buy 1 Get 1 (19 Nov):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID & M-TIX XXI! Mau Mas Kidi amankan slot Pengingat Prioritas H-1 via WA? Cukup infokan Nama & Kota sampean ya lur!
+
+Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂
+Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`;
+
+      } else if (isSpecialScreeningOrPresale) {
         // High-Conversion Pitch Nonton Duluan / Special Screening Presale
         const ticketSection = cityCinemasList
           ? `🎟️ *LINK TIKET PRESALE SPECIAL SCREENING ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${siteOrigin}${matchedStopSlug ? `/city/${matchedStopSlug}` : ''}\n• *TIX ID:* ${tixidLink}`
@@ -711,7 +753,8 @@ Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 Novem
       return NextResponse.json({
         status: 'success',
         success: true,
-        action: 'get_ticket_links',
+        action: isPriceInquiry ? 'ticket_price_info' : 'get_ticket_links',
+        estimatedPriceRange: isPriceInquiry ? 'Rp 30.000 – Rp 50.000' : undefined,
         ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
         replyMessage: ticketReply
       }, { status: 200, headers: corsHeaders });

@@ -634,6 +634,10 @@ export const MASTER_MOVIE_FACTS = {
   releaseScope: 'Penayangan Serentak di Seluruh Bioskop Indonesia',
   runtime: '±110 menit',
   ageRating: '13+ (LSF Indonesia, Ramah Remaja & Keluarga)',
+  ticketPricing: {
+    estimatedRange: 'Rp 30.000 – Rp 50.000 per tiket',
+    note: 'Harga tiket (HTM) bioskop berkisar antara Rp 30.000 s/d Rp 50.000 tergantung jaringan bioskop (Cinema XXI, CGV, Cinépolis, Platinum, NSC), lokasi kota, dan hari tayang (weekday vs weekend/libur). Harga pasti dan denah kursi langsung dilihat melalui tautan resmi bioskop di landing page.',
+  },
   genre: 'Drama dengan elemen supranatural dan sentuhan komedi',
   exhibitorGenre: 'Drama, Komedi',
   notHorrorExplanation: 'Bukan film horor jumpscare atau teror! Ada elemen supranatural berupa arwah Sukma, tetapi fokus utamanya adalah drama cinta, persahabatan, kekeluargaan, dan transformasi diri Mukidi yang dikemas hangat dengan komedi khas.',
