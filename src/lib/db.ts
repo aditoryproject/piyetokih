@@ -238,7 +238,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   tiktokPixelId: '',
   googleAnalyticsId: '',
   wahnotifApiKey: '',
-  wahnotifSenderNumber: '',
+  wahnotifSenderNumber: '6285220954750',
   cityLinkOverrides: {},
   roadshowOverrides: {},
 

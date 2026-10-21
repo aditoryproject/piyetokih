@@ -174,7 +174,7 @@ export default async function RootLayout({
 
         {/* Floating WhatsApp Official Widget (Mas Kidi - Universal Fast Track) */}
         <FloatingWhatsAppWidget
-          whatsappNumber={db.settings.wahnotifSenderNumber || ''}
+          whatsappNumber={db.settings.wahnotifSenderNumber || '6285220954750'}
         />
       </body>
     </html>

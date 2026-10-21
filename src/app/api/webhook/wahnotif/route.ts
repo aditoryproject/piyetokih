@@ -482,15 +482,91 @@ Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kid
     }
 
     // =========================================================================
-    // SUB-ROUTER 1: ROADSHOW & JADWAL PER KOTA
+    // SUB-ROUTER 1: ROADSHOW & JADWAL 17 KOTA (GENERAL LIST & PER KOTA)
     // =========================================================================
     const detectedCityRes = getCityByNameOrSlug(cityParam || queryText);
+    const hasSpecificCity = Boolean(detectedCityRes && !['all', 'list', 'semua'].includes(detectedCityRes.slug));
+
+    const isGeneralCityListQuery =
+      queryText.includes('dikota mna') ||
+      queryText.includes('dikota mana') ||
+      queryText.includes('di kota mana') ||
+      queryText.includes('di kota mna') ||
+      queryText.includes('kota mana') ||
+      queryText.includes('kota mna') ||
+      queryText.includes('mana saja') ||
+      queryText.includes('mna saaja') ||
+      queryText.includes('mana aja') ||
+      queryText.includes('mna aja') ||
+      queryText.includes('daftar kota') ||
+      queryText.includes('semua kota') ||
+      queryText.includes('17 kota') ||
+      queryText.includes('temu cast') ||
+      queryText.includes('meet and greet') ||
+      cityParam === 'all' ||
+      cityParam === 'list' ||
+      cityParam === 'semua';
 
     const isRoadshowAction =
       action.includes('roadshow') ||
       action.includes('jadwal') ||
       action.includes('schedule') ||
       Boolean(detectedCityRes && (queryText.includes('jadwal') || queryText.includes('kapan') || queryText.includes('pemain') || queryText.includes('cast') || queryText.includes('roadshow') || queryText.includes('jam')));
+
+    // CASE 1A: GENERAL CITY LIST INQUIRY (17 KOTA RESMI SESUAI WEBSITE)
+    if (!hasSpecificCity && (isGeneralCityListQuery || isRoadshowAction || action === 'get_roadshow_schedule')) {
+      const citiesFormatted = CITIES_DATA.map((c, idx) => {
+        const extraNote = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
+        return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${extraNote}`;
+      }).join('\n');
+
+      const reply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+${randomPantun}
+
+🎬 *DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST PIYE TO KIH? THE MOVIE:*
+${citiesFormatted}
+
+🍿 *INFO PENTING BUAT BOLO ASIK:*
+Di 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)** di dalam studio bioskop bareng langsung rombongan cast sebelum tayang serentak 19 November lho!
+
+🎟️ *LINK LANGSUNG BELI TIKET PRESALE RESMI (TINGGAL KLIK):*
+• Cinema XXI (M-TIX): ${xxiLink}
+• TIX ID: ${tixidLink}
+• CGV: ${cgvLink}
+• Cinépolis: ${cinepolisLink}
+• Cek Rundown Lengkap di Web: ${siteOrigin}/#roadshow
+
+Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutkan nama kotamu ya! 🍿✨`;
+
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        action: 'get_roadshow_schedule',
+        city: 'all',
+        totalCities: CITIES_DATA.length,
+        cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, dateStr: c.dateStr })),
+        replyMessage: reply
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // CASE 1B: NON-ROADSHOW CITIES CHECK (Bandung, Jakarta, Kudus, Salatiga, Klaten, dll)
+    const knownNonRoadshowCities = [
+      'jakarta', 'bandung', 'medan', 'bali', 'denpasar', 'makassar', 'palembang', 'batam',
+      'bekasi', 'bogor', 'depok', 'tangerang', 'kudus', 'salatiga', 'klaten', 'purwokerto',
+      'tegal', 'jember', 'lampung'
+    ];
+    const nonRoadshowMatch = !hasSpecificCity ? knownNonRoadshowCities.find(c => queryText.includes(c) || (cityParam && cityParam.includes(c))) : null;
+
+    if (nonRoadshowMatch) {
+      const cityNameDisplay = nonRoadshowMatch.toUpperCase();
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        action: 'roadshow_non_active_city',
+        cityName: cityNameDisplay,
+        replyMessage: `Halo bolo asik di ${cityNameDisplay}! Piye kabare? 😄\n${randomPantun}\n\nUntuk rangkaian roadshow temu cast saat ini memang lagi keliling 17 kota Jateng & Jatim lur (Semarang, Jogja, Magelang, Solo, Sragen, Ngawi, Madiun, Ponorogo, Nganjuk, Mojokerto, Gresik, Surabaya, Sidoarjo, Malang, Kediri, Blitar, Tulungagung).\n\n🍿 *TAPI TENANG! TANGGAL 19 NOVEMBER 2026 PIYE TO KIH? TAYANG SERENTAK DI BIOSKOP KOTAMU!*\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n\nBakal ada Promo Buy 1 Get 1 (BOGO) juga lho! Mau Mas Kidi daftarkan nomor sampean buat Pengingat Prioritas H-1 via WA? Cukup infokan Nama Lengkap sampean ya lur! ✨`
+      }, { status: 200, headers: corsHeaders });
+    }
 
     if (isRoadshowAction && (cityParam || detectedCityRes)) {
       const targetSlug = detectedCityRes?.slug === 'jogja' ? 'yogyakarta' : (detectedCityRes?.slug || cityParam);

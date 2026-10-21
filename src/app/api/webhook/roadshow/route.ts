@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
-import { isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
+import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA } from '@/lib/wahnotif';
 
@@ -84,8 +84,57 @@ export async function POST(req: NextRequest) {
       website: FAST_TRACK_TICKET_LINKS.website,
     };
 
-    // If city is NOT in the 17 Roadshow cities (e.g. Bandung, Jakarta, Medan, Bali, etc)
+    // If matchedSlug is not found: check if this is a general city inquiry or a specific non-roadshow city
     if (!matchedSlug) {
+      const isGeneralCityQuery =
+        !normalizedCity ||
+        normalizedCity === 'all' ||
+        normalizedCity === 'list' ||
+        normalizedCity === 'semua' ||
+        normalizedCity.includes('mana') ||
+        normalizedCity.includes('mna') ||
+        normalizedCity.includes('kota') ||
+        normalizedCity.includes('temu') ||
+        normalizedCity.includes('cast') ||
+        normalizedCity.includes('jadwal') ||
+        normalizedCity.includes('daftar') ||
+        normalizedCity.includes('rundown');
+
+      if (isGeneralCityQuery) {
+        const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
+        const formattedCitiesList = CITIES_DATA.map((c, idx) => {
+          const note = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
+          return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${note}`;
+        }).join('\n');
+
+        const replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+${randomPantun}
+
+🎬 *DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST PIYE TO KIH? THE MOVIE:*
+${formattedCitiesList}
+
+🍿 *INFO PENTING LUR:*
+Di 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop bareng langsung pemain sebelum tayang serentak 19 November! Tiket presale sudah bisa langsung dibeli sekarang:
+🎟️ Cinema XXI (M-TIX): ${ticketLinks.xxi}
+🎟️ TIX ID: ${ticketLinks.tixid}
+🎟️ CGV: ${ticketLinks.cgv}
+🎟️ Cinépolis: ${ticketLinks.cinepolis}
+🎟️ Cek Rundown Lengkap di Web: ${ticketLinks.website}/#roadshow
+
+Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutkan nama kotamu ya! 🍿✨`;
+
+        return NextResponse.json({
+          success: true,
+          isRoadshowCity: true,
+          isGeneralList: true,
+          totalCities: CITIES_DATA.length,
+          cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, dateStr: c.dateStr })),
+          ticketLinks,
+          replyMessage
+        }, { status: 200, headers: corsHeaders });
+      }
+
+      // If city is a specific non-roadshow city (e.g. Bandung, Jakarta, Medan, Bali, etc)
       const cityNameDisplay = rawCity ? String(rawCity).toUpperCase() : 'KOTA KAMU';
       return NextResponse.json({
         success: true,

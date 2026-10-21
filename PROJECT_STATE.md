@@ -263,3 +263,44 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
        - `src/app/layout.tsx` kini murni hanya mengoper `db.settings.wahnotifSenderNumber || ''`.
        - `src/components/FloatingWhatsAppWidget.tsx` kini secara protektif menyembunyikan diri (`return null`) jika nomor bot resmi (`wahnotifSenderNumber`) belum disetting atau kosong, sehingga dipastikan tidak akan ada nomor pribadi tim mana pun yang bocor atau menerima chat nyasar.
 
+19. **Pemasangan Nomor Official Bot Mas Kidi (6285220954750) Pada Floating Widget & Pemisahan Total Dari Nomor Media (+62 852-2095-2407)**:
+     * **Nomor Official Bot Mas Kidi**: **`6285220954750`** (`+62 852-2095-4750`).
+     * **Nomor Media Relations**: **`+62 852-2095-2407`** (`6285220952407`).
+     * **Konfigurasi Widget Melayang**:
+       - Mengembalikan tombol floating/sticky "Tanya Mas Kidi" ke seluruh halaman publik dengan nomor resmi **`6285220954750`**.
+       - Menjadikan `6285220954750` sebagai default fallback langsung di `src/app/layout.tsx`, `src/components/FloatingWhatsAppWidget.tsx`, dan `src/lib/db.ts`.
+       - Database `wahnotifSenderNumber` disinkronkan ke `6285220954750`.
+       - Menjamin 100% obrolan Mas Kidi hanya mengarah ke nomor official bot (`6285220954750`) dan tidak pernah bocor ke nomor media relations.
+
+20. **Sinkronisasi Total 17 Kota Roadshow Website vs Webhook / Wahnotif AI & Eliminasi Halusinasi Kota**:
+     * **Latar Belakang & Investigasi Masalah**:
+       - Calon penonton bertanya di WhatsApp: *"temu cast nya ada dikota mna saaja?"*.
+       - Bot AI Wahnotif menjawab dengan daftar kota halusinasi fiktif yang salah total (mencantumkan Kudus 25 Okt, Salatiga 26 Okt, Klaten 27 Okt, Purwokerto 29 Okt, Tegal 30 Okt, Jember 6 Nov, Jakarta 12 Nov) dengan sapaan terlarang *"Kak!"*.
+       - **Penyebab Utama**:
+         1. Pada skema tool `get_roadshow_schedule` (`src/lib/wahnotif.ts`), properti `city` memiliki syarat `required: ["city"]`. Ketika user bertanya pertanyaan umum tanpa nama kota, AI Wahnotif tidak memanggil tool dan memilih berhalusinasi sendiri dari bobot modelnya.
+         2. Pada webhook `src/app/api/webhook/wahnotif/route.ts`, router Sub-Router 1 mensyaratkan `if (isRoadshowAction && (cityParam || detectedCityRes))`. Karena `cityParam` dan `detectedCityRes` kosong, query daftar kota dilewati begitu saja.
+         3. Pada webhook `src/app/api/webhook/roadshow/route.ts`, jika nama kota tidak cocok (`!matchedSlug`), string pertanyaan umum user justru diubah menjadi nama kota display (`"Halo bolo asik di TEMU CAST NYA ADA DIKOTA MNA SAAJA!..."`).
+     * **Solusi & Sinkronisasi Sesuai Website (`src/lib/cities.ts`)**:
+       - Mengimpor `CITIES_DATA` langsung ke webhook `/api/webhook/roadshow` dan `/api/webhook/wahnotif`.
+       - Menangani query umum daftar kota / temu cast (`isGeneralCityQuery`) dengan langsung mengembalikan **17 Kota Resmi** lengkap beserta tanggal asli sesuai website:
+         1. Semarang (22 Oktober 2026)
+         2. Yogyakarta (23 Oktober 2026)
+         3. Magelang (24 Oktober 2026)
+         4. Surakarta (Solo) (25 Oktober 2026)
+         5. Sragen (26 Oktober 2026)
+         6. Ngawi (27 Oktober 2026)
+         7. Madiun (28 Oktober 2026)
+         8. Ponorogo (29 Oktober 2026)
+         9. Nganjuk (30 Oktober 2026)
+         10. Mojokerto (31 Oktober 2026)
+         11. Gresik (1 November 2026)
+         12. Surabaya (2 November 2026)
+         13. Sidoarjo (3 November 2026)
+         14. Malang (4 November 2026)
+         15. Kediri (6 November 2026) — Puncak Home Premiere
+         16. Blitar (8 November 2026)
+         17. Tulungagung (8 November 2026)
+       - Pada `src/lib/wahnotif.ts`, menghapus syarat `required: ["city"]`, menambahkan aturan anti-halusinasi eksplisit yang melarang penyebutan kota fiktif (Kudus, Salatiga, Klaten, Purwokerto, Tegal, Jember, Jakarta), menyinkronkan FAQ #2 menjadi tepat 17 kota, dan menambahkan sample dialog untuk pertanyaan temu cast.
+       - Menambahkan proteksi non-roadshow jika audiens menyebut kota lain (Jakarta, Bandung, Medan, Kudus, dll) agar langsung diarahkan ke penayangan serentak 19 November di bioskop kotanya.
+
+

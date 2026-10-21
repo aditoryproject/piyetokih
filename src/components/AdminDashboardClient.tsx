@@ -160,7 +160,7 @@ export default function AdminDashboardClient() {
     countdownTarget: '2026-10-22T13:00:00+07:00',
     metaPixelId: '',
     wahnotifApiKey: '',
-    wahnotifSenderNumber: '',
+    wahnotifSenderNumber: '6285220954750',
     cityLinkOverrides: {},
     // Email defaults
     smtpHost: '',
@@ -5681,7 +5681,7 @@ export default function AdminDashboardClient() {
                       type="text"
                       value={settings.wahnotifSenderNumber || ''}
                       onChange={e => setSettings({ ...settings, wahnotifSenderNumber: e.target.value })}
-                      placeholder="6281234567890"
+                      placeholder="6285220954750"
                       className="w-full bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-xs outline-none font-mono"
                     />
                   </div>

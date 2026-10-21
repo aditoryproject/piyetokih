@@ -13,20 +13,20 @@ import {
   MAS_KIDI_PANTUN,
   MAS_KIDI_JOKES
 } from './bot-knowledge';
+import { CITIES_DATA } from './cities';
 
 // TOOL 1: ROADSHOW & JADWAL PER KOTA
 export const WAHNOTIF_TOOL_ROADSHOW_SCHEMA = {
   name: "get_roadshow_schedule",
-  description: "Mengambil jadwal detail rundown roadshow per kota, jam acara (sekolah, kampus, radio, meet & greet mall, bioskop greeting / nonton duluan), lokasi booth penukaran voucher fisik Rp10.000, serta roster cast pemain yang hadir.",
+  description: "Mengambil jadwal detail rundown roadshow per kota, jam acara (sekolah, kampus, radio, meet & greet mall, bioskop greeting / nonton duluan), lokasi booth penukaran voucher fisik Rp10.000, serta roster cast pemain yang hadir. JIKA AUDIENS BERTANYA 'TEMU CAST DI KOTA MANA SAJA', 'DI KOTA MANA AJA', 'KOTA MANA SAJA', 'DAFTAR KOTA', ATAU JADWAL UMUM, GUNAKAN TOOL INI dengan city='all' untuk mengambil daftar resmi 17 kota.",
   parameters: {
     type: "object",
     properties: {
       city: {
         type: "string",
-        description: "Nama kota yang ingin dicek jadwalnya (contoh: Semarang, Yogyakarta, Magelang, Solo, Sragen, Ngawi, Madiun, Ponorogo, Nganjuk, Mojokerto, Gresik, Surabaya, Sidoarjo, Malang, Kediri, Blitar, Tulungagung, atau kota lainnya)"
+        description: "Nama kota yang ingin dicek jadwalnya (contoh: Semarang, Yogyakarta, Magelang, Solo, Sragen, Ngawi, Madiun, Ponorogo, Nganjuk, Mojokerto, Gresik, Surabaya, Sidoarjo, Malang, Kediri, Blitar, Tulungagung) ATAU 'all' untuk melihat daftar resmi 17 kota roadshow."
       }
-    },
-    required: ["city"]
+    }
   }
 };
 
@@ -308,25 +308,29 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
    • Nonton Duluan (Special Screening): Sudah bisa dibeli tiket presale-nya sekarang di link XXI & TIX ID di atas.
    • Promo Buy 1 Get 1 (BOGO): Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI). Dibuka 15-18 Nov 2026.
 
-2. RANGKAIAN ROADSHOW 17 KOTA & ROSTER CAST (DARI FLYER SCRIPTS):
-   1) SEMARANG (22 Okt 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Gendut, Penyok, Pak No, Mintul, Dara Sarasvati, Gabriella Desta (Bunga), Ibu Gundul. Lokasi: SMA 15 Semarang, UNNES, Jateng Radio, The Park XXI, The Park Mall Lt 2 (Booth 16-17), Java Mall Cinepolis.
-   2) YOGYAKARTA (23 Okt 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Pak No, Dara, Gabriella Desta, Marwoto, Ibu Gundul. Lokasi: RRI Pro 2, AMIKOM, Ambarrukmo XXI, Plaza Ambarrukmo GF (Booth 17-18), Jogja City XXI.
-   3) MAGELANG (24 Okt 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Pak No, Dara, Gabriella Desta, Ibu Gundul. Lokasi: Platinum Artos Mall (Nonton Duluan 13-15), Atrium Artos (Booth 16-17), The Aloon-Aloon XXI.
-   4) SOLO (25 Okt 2026): Lead Mukidi, Gendut, Penyok. Cast: Mukidi, Gendut, Penyok, Mintul, Gabriella Desta, Ibu Gundul. Lokasi: CFD Slamet Riyadi, RRI Solo, Solo Paragon XXI, Stage Food Factory Paragon Mall (Booth 16-17), Platinum Pakuwon Solo Baru.
-   5) SRAGEN (26 Okt 2026): Cast Mukidi, Penyok, Gendut, Gabriella Desta. Lokasi: SMK Citra Medika, Radio Buana Asri, Platinum Plaza Atrium Sragen (Nonton Duluan 13-15 & Booth 15-17).
-   6) NGAWI (27 Okt 2026): Cast Mukidi, Gendut, Pak No, Mintul, Gabriella Desta. Lokasi: SMAN 1 Ngawi, Radio Bahana, NSC Ngawi (Nonton Duluan 14-15.40 & Booth 16-17).
-   7) MADIUN (28 Okt 2026): Cast Mukidi, Penyok, Gendut, Mintul, Pak No, Gabriella Desta. Lokasi: MAN 1 Madiun, Univ PGRI Madiun, RRI, CGV Lawu Plaza, Atrium Lawu Plaza (Booth 16-17), Suncity Madiun XXI (Nonton Duluan 18.45-20.15).
-   8) PONOROGO (29 Okt 2026): Cast Mukidi, Gendut, Pak No, Gabriella Desta. Lokasi: Univ Muhammadiyah Ponorogo, Gema Surya FM, Cinepolis Ponorogo City Center (Nonton Duluan 15-17 & Booth 17-18).
-   9) NGANJUK (30 Okt 2026): Cast Mukidi, Gendut, Penyok, Pak No, Mintul, Gabriella Desta. Lokasi: SMAN 2 Nganjuk, Univ PGRI Mpu Sindok, Radio Cakra Krisna, Sam's Studio (Nonton Duluan 15-17), Luwes Nganjuk (Booth 17-18).
-   10) MOJOKERTO (31 Okt 2026): Cast Mukidi, Gendut, Pak No, Gabriella Desta. Lokasi: SMKN 2 Mojokerto, UNIM, Radio R FM, CGV Sunrise Mall (Nonton Duluan 15-17), Sunrise Mall (Booth 17-18).
-   11) GRESIK (1 Nov 2026): Cast Mukidi, Gendut, Penyok, Pak No, Gabriella Desta. Lokasi: Suara Giri FM, Gressmall XXI (Nonton Duluan 13-14), Gressmall (Booth 17-18).
-   12) SURABAYA (2 Nov 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Gendut, Penyok, Dara Sarasvati, Gabriella Desta. Lokasi: RRI Pro 2, Pakuwon Mall XXI / Royal XXI, Royal Plaza / Pakuwon Mall (Booth 16-17), Podcast TV Jatim.
-   13) SIDOARJO (3 Nov 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Gendut, Penyok, Dara Sarasvati, Gabriella Desta, Lorenzo Gibbs. Lokasi: CFD Alun-alun, Platinum Suncity Mall (Nonton Duluan 13-14.40), Suncity Mall (Booth 15-16), Ciplaz Sidoarjo XXI (16.10-17.50).
-   14) MALANG & BATU (4 Nov 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Gendut, Penyok, Dara Sarasvati, Gabriella Desta, Lorenzo Gibbs. Lokasi: SMKN 12 Malang, Univ Brawijaya / UMM, RRI Pro 2 / Elfara FM, Dieng XXI (Nonton Duluan 15.50-16.30), Cyber Mall (Booth 17-18).
-   15) KEDIRI (5 Nov 2026): Lead Mukidi + Dara Sarasvati. Cast: Mukidi, Gendut, Penyok, Pak No, Mintul, Dara, Gabriella Desta, Lorenzo Gibbs. Lokasi: Udinus Kediri, Warung Brader.
-   16) KEDIRI HOME PREMIERE (6 Nov 2026): Homecoming Spesial! Cast lengkap: Mukidi, Gendut, Penyok, Pak No, Mintul, Dara Sarasvati, Gabriella Desta, Lorenzo Gibbs, Devina Aureel, TJ Ruth, Marwoto, Ibnu Gundul. Lokasi: Pamitan Orang Tua, Sarasehan Walikota, Taman Brantas (Booth 15-17), Ciplaz Kediri (Home Premiere All Studio Show 4 jam 19.00-21.00).
-   17) KEDIRI NONTON DULUAN (7 Nov 2026): Nonton Duluan di Kediri XXI (13-14), Golden Theater (16.30-17.30), Kediri Mall CGV (18.40-19.40).
-   18) BLITAR & TULUNGAGUNG (8 Nov 2026): Cast Mukidi, Gendut, Penyok, Pak No, Mintul. Lokasi: SMKN 1 Blitar, UNISBA, Radio Mahardhika FM, CGV Blitar Square (Nonton Duluan 13-15 & Booth 15-16), Golden Theatre Tulungagung (Nonton Duluan 18-20).
+2. DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST SESUAI WEBSITE:
+   1) SEMARANG (22 Oktober 2026) — The Park Mall & The Park XXI / Java Mall Cinépolis
+   2) YOGYAKARTA (23 Oktober 2026) — Plaza Ambarrukmo GF & Ambarrukmo XXI / Jogja City XXI
+   3) MAGELANG (24 Oktober 2026) — Armada Town Square (Artos) & Platinum Cineplex / The Aloon-Aloon XXI
+   4) SURAKARTA / SOLO (25 Oktober 2026) — Solo Paragon Mall & Solo Paragon XXI / Platinum Pakuwon Solo Baru
+   5) SRAGEN (26 Oktober 2026) — Plaza Atrium Sragen & Platinum Cineplex
+   6) NGAWI (27 Oktober 2026) — Area Bioskop NSC Ngawi
+   7) MADIUN (28 Oktober 2026) — Lawu Plaza Madiun & Suncity Madiun XXI / CGV Lawu Plaza
+   8) PONOROGO (29 Oktober 2026) — Ponorogo City Center (PCC) & Cinépolis PCC
+   9) NGANJUK (30 Oktober 2026) — Luwes Nganjuk & Sam's Studio
+   10) MOJOKERTO (31 Oktober 2026) — Sunrise Mall & CGV Sunrise Mall
+   11) GRESIK (1 November 2026) — Gressmall & Gressmall XXI
+   12) SURABAYA (2 November 2026) — Royal Plaza / Pakuwon Mall & Pakuwon XXI / Royal XXI
+   13) SIDOARJO (3 November 2026) — Suncity Mall & Platinum Cineplex / Ciplaz Sidoarjo XXI
+   14) MALANG & BATU (4 November 2026) — Cyber Mall & Dieng XXI
+   15) KEDIRI (6 November 2026) — Puncak Perayaan HOME PREMIERE di Ciplaz Kediri XXI / Kediri Mall CGV / Golden Theater (Rangkaian 5–7 Nov)
+   16) BLITAR (8 November 2026) — Blitar Square & CGV Blitar Square
+   17) TULUNGAGUNG (8 November 2026) — Golden Theatre Tulungagung
+
+   ⚠️ PERINGATAN MUTLAK ANTI-HALUSINASI KOTA ROADSHOW:
+   DILARANG KERAS MENYEBUT ATAU MENAMBAHKAN KOTA-KOTA LAIN!
+   KOTA SEPERTI KUDUS, SALATIGA, KLATEN, PURWOKERTO, TEGAL, JEMBER, DAN JAKARTA BUKAN MERUPAKAN KOTA ROADSHOW TEMU CAST!
+   HANYA ADA TEPAT 17 KOTA RESMI DI ATAS! Jika audiens bertanya kota mana saja, WAJIB sebutkan 17 kota di atas beserta tanggalnya yang benar!
 
 3. CAST & KARAKTER LENGKAP:
    • Mukidi (Heri Chandra), Sukma (Dara Sarasvati), Gendut (Sutrisno Agung), Penyok (Eko Dunung), Pak Nggalino / Pak No (Wiyono), Mintul (Rizka Oktavia), Bunga (Gabriella Desta), Bu Yeyen (TJ Ruth), Pak RT (Ibnu Gundul), Jotay (Lorenzo Gibz), Bu Tinah (Ivonne Dahler), Pak Gino (Marwoto), Bang Sadikin (Yono Bakrie).
@@ -402,6 +406,11 @@ KONDISI C: KOTA ROADSHOW AKTIF & BELUM LEWAT (UPCOMING):
 • Berikan jadwal rundown lengkap (sekolah, kampus, radio, mall, bioskop) dan roster cast yang hadir.
 • Tawarkan Tiket Nonton Duluan (Special Screening) lewat link presale dan Kode Booking Voucher Fisik Rp10.000 di booth mall.
 
+KONDISI D: AUDIENS MENANYAKAN 'TEMU CAST DI KOTA MANA SAJA' / 'DI KOTA MANA AJA' / 'DAFTAR KOTA':
+• Panggil tool get_roadshow_schedule dengan parameter { city: "all" }, ATAU sebutkan daftar resmi 17 kota ini:
+  1) Semarang (22 Okt), 2) Yogyakarta (23 Okt), 3) Magelang (24 Okt), 4) Surakarta / Solo (25 Okt), 5) Sragen (26 Okt), 6) Ngawi (27 Okt), 7) Madiun (28 Okt), 8) Ponorogo (29 Okt), 9) Nganjuk (30 Okt), 10) Mojokerto (31 Okt), 11) Gresik (1 Nov), 12) Surabaya (2 Nov), 13) Sidoarjo (3 Nov), 14) Malang & Batu (4 Nov), 15) Kediri (6 Nov), 16) Blitar (8 Nov), 17) Tulungagung (8 Nov).
+• DILARANG KERAS MENYEBUT KOTA LAIN SEPERTI KUDUS, SALATIGA, KLATEN, PURWOKERTO, TEGAL, JEMBER, ATAU JAKARTA! HANYA ADA TEPAT 17 KOTA RESMI DI ATAS!
+
 ══════════════════════════════════════════════════════════
 ⚡ TOOLS YANG DAPAT DIPANGGIL:
 ══════════════════════════════════════════════════════════
@@ -411,6 +420,40 @@ KONDISI C: KOTA ROADSHOW AKTIF & BELUM LEWAT (UPCOMING):
 4. claim_war_voucher: { name: "[Nama]", phone: "[Nomor WA]", city: "[Kota]", type: "bogo" | "roadshow" }`,
 
     sampleDialogs: [
+      {
+        user: "temu cast nya ada dikota mna saaja?",
+        ai: `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+Mangan getuk nang kutha Magelang, temu cast rame-rame atine padhang! 🍿
+
+🎬 *DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST PIYE TO KIH? THE MOVIE:*
+1. 📍 Semarang (22 Oktober 2026)
+2. 📍 Yogyakarta (23 Oktober 2026)
+3. 📍 Magelang (24 Oktober 2026)
+4. 📍 Surakarta / Solo (25 Oktober 2026)
+5. 📍 Sragen (26 Oktober 2026)
+6. 📍 Ngawi (27 Oktober 2026)
+7. 📍 Madiun (28 Oktober 2026)
+8. 📍 Ponorogo (29 Oktober 2026)
+9. 📍 Nganjuk (30 Oktober 2026)
+10. 📍 Mojokerto (31 Oktober 2026)
+11. 📍 Gresik (1 November 2026)
+12. 📍 Surabaya (2 November 2026)
+13. 📍 Sidoarjo (3 November 2026)
+14. 📍 Malang & Batu (4 November 2026)
+15. 📍 Kediri (6 November 2026) — Puncak Home Premiere
+16. 📍 Blitar (8 November 2026)
+17. 📍 Tulungagung (8 November 2026)
+
+🍿 *INFO PENTING LUR:*
+Di 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop bareng cast sebelum 19 Nov lho! Tiket presale sudah bisa langsung dibeli sekarang:
+🎟️ Cinema XXI (M-TIX): ${links.xxi}
+🎟️ TIX ID: ${links.tixid}
+🎟️ CGV: ${links.cgv}
+🎟️ Cinépolis: ${links.cinepolis}
+🎟️ Cek Rundown Lengkap di Web: ${links.website}
+
+Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutkan nama kotamu ya! 🍿✨`
+      },
       {
         user: "Tp saya msh penasaran berapa harganya tiket nya bosku",
         ai: `Halo bolo asik! Piye kabare? Pas banget lur! 😄
