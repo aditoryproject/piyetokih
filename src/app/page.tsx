@@ -16,13 +16,17 @@ import { Film, Ticket } from 'lucide-react';
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-  const session = await verifySessionToken(token);
-  const isAdmin = session.valid;
+  let isAdmin = false;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+    const session = await verifySessionToken(token);
+    isAdmin = Boolean(session?.valid);
+  } catch {}
 
   const db = getDb();
   const isMaintenanceMode = Boolean(db.settings.isMaintenanceMode);
+
 
   // Jika Mode Coming Soon aktif dan bukan admin, tampilkan Coming Soon
   if (isMaintenanceMode && !isAdmin) {

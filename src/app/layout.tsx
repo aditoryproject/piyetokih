@@ -82,18 +82,26 @@ export default async function RootLayout({
   const isMaintenanceMode = Boolean(db.settings.isMaintenanceMode);
 
   // Authenticate session securely (Strict Admin Verification)
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-  const session = await verifySessionToken(token);
-  const isAdmin = Boolean(session?.valid);
+  let isAdmin = false;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+    const session = await verifySessionToken(token);
+    isAdmin = Boolean(session?.valid);
+  } catch {}
 
   // Read current request path from middleware
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') || '';
+  let pathname = '';
+  try {
+    const headersList = await headers();
+    pathname = headersList.get('x-pathname') || '';
+  } catch {}
+
   const isPublicRoute = !pathname.startsWith('/admin') && !pathname.startsWith('/api');
 
   // Condition to show Coming Soon: maintenance mode is active, user is NOT admin, and route is public
   const showComingSoon = isMaintenanceMode && !isAdmin && isPublicRoute;
+
 
   return (
     <html lang="id">
