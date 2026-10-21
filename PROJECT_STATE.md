@@ -251,5 +251,15 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
       - [`src/app/api/webhook/ai-brain/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts): Sinkronisasi jawaban harga tiket dan link bioskop.
       - [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx): Ditambahkan alert panduan harga tiket (30-50 ribu) dan panduan anti-toko di Tab Wahnotif.
 
-
+18. **Pembaruan Kontak Media Relations (+62 852-2095-2407) & Isolasi Total Floating Widget Mas Kidi**:
+     * **Investigasi Akar Masalah Chat Mas Kidi Masuk ke WA Tim Media Relations**:
+       - Tim media relation menerima ratusan chat WA dengan format template Mas Kidi (*"Halo Mas Kidi! Piye kabare? Mau tanya-tanya seputar film komedi PIYE TO KIH? THE MOVIE dong lur! ✨"*).
+       - Ditemukan akar penyebab pada `src/app/layout.tsx` dan `src/components/FloatingWhatsAppWidget.tsx`: komponen floating widget sebelumnya memiliki kode fallback otomatis `whatsappNumber = db.settings.wahnotifSenderNumber || db.settings.kabarGaleriSettings?.mediaKitContactWa || '6285691921764'`.
+       - Karena `wahnotifSenderNumber` di database kosong, widget otomatis meminjam nomor WhatsApp Media Relations (`mediaKitContactWa` / `085691921764`). Akibatnya, setiap pengunjung website yang mengklik tombol floating "Tanya Mas Kidi" dan memilih opsi chat langsung diarahkan ke nomor pribadi tim media relation.
+     * **Pembaruan Nomor Kontak Resmi Media Relations**:
+       - Mengubah kontak Media Relations resmi menjadi **`+62 852-2095-2407`** (format angka: `6285220952407`) di seluruh database (`data/db.json`, `data/db.persist.json`), skema default `src/lib/db.ts`, halaman media `src/app/media/page.tsx`, dan Admin Dashboard `src/components/AdminDashboardClient.tsx`.
+     * **Isolasi Total Widget Mas Kidi Dari Kontak Personal / Media**:
+       - Menghapus total seluruh fallback ke nomor media relation (`mediaKitContactWa`) maupun nomor hardcoded `6285691921764`.
+       - `src/app/layout.tsx` kini murni hanya mengoper `db.settings.wahnotifSenderNumber || ''`.
+       - `src/components/FloatingWhatsAppWidget.tsx` kini secara protektif menyembunyikan diri (`return null`) jika nomor bot resmi (`wahnotifSenderNumber`) belum disetting atau kosong, sehingga dipastikan tidak akan ada nomor pribadi tim mana pun yang bocor atau menerima chat nyasar.
 

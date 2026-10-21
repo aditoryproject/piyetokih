@@ -19,7 +19,7 @@ interface FloatingWhatsAppWidgetProps {
 }
 
 export default function FloatingWhatsAppWidget({
-  whatsappNumber = '6285691921764',
+  whatsappNumber = '',
 }: FloatingWhatsAppWidgetProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -28,17 +28,18 @@ export default function FloatingWhatsAppWidget({
   const widgetRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Jangan tampilkan di halaman Admin atau API
-  const isHiddenRoute = pathname?.startsWith('/admin') || pathname?.startsWith('/api');
-
   // Format nomor WhatsApp (hanya angka, pastikan diawali 62)
-  let cleanPhone = (whatsappNumber || '6285691921764').replace(/[^0-9]/g, '');
+  let cleanPhone = (whatsappNumber || '').replace(/[^0-9]/g, '');
   if (cleanPhone.startsWith('0')) {
     cleanPhone = '62' + cleanPhone.slice(1);
   }
-  if (!cleanPhone || cleanPhone.length < 9) {
-    cleanPhone = '6285691921764';
-  }
+
+  // Jangan tampilkan di halaman Admin, API, atau jika nomor bot resmi belum disetting di admin
+  const isHiddenRoute =
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/api') ||
+    !cleanPhone ||
+    cleanPhone.length < 9;
 
   // Deteksi jika user sedang berada di halaman kota spesifik
   let currentCityName = '';

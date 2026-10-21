@@ -317,7 +317,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     mediaKitSoundtrackYoutubeUrl: '',
     mediaKitTrailerYoutubeUrl: 'https://www.youtube.com/@piyetokihfilm',
     mediaKitContactEmail: 'pr@miraclepictures.id',
-    mediaKitContactWa: '+6281234567890',
+    mediaKitContactWa: '+62 852-2095-2407',
     mediaCenter: {
       posterDownloadUrl: '/kabar-galeri-hero.jpg',
       pressReleasePdfUrl: '#',

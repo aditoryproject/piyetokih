@@ -208,7 +208,7 @@ export default function AdminDashboardClient() {
       mediaKitSoundtrackYoutubeUrl: '',
       mediaKitTrailerYoutubeUrl: '',
       mediaKitContactEmail: 'pr@miraclepictures.id',
-      mediaKitContactWa: '6281234567890',
+      mediaKitContactWa: '6285220952407',
     },
   });
   const [savingSettings, setSavingSettings] = useState(false);
@@ -2555,7 +2555,7 @@ export default function AdminDashboardClient() {
                               mediaKitContactWa: e.target.value
                             }
                           })}
-                          placeholder="+62 856-9192-1764"
+                          placeholder="+62 852-2095-2407"
                           className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-amber-500 outline-none"
                         />
                       </div>

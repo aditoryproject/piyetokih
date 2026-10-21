@@ -54,7 +54,7 @@ export default function MediaCenterPage() {
   const brandAssetsHubUrl = logoPackUrl.startsWith('http') ? logoPackUrl : (trailerUrl || 'https://www.youtube.com/@piyetokihfilm');
 
   const contactEmail = settings.mediaKitContactEmail || 'pr@miraclepictures.id';
-  const contactWa = settings.mediaKitContactWa || '6281234567890';
+  const contactWa = settings.mediaKitContactWa || '6285220952407';
 
   return (
     <div className="min-h-screen bg-[#0B0F17] text-slate-100 py-12 px-4 sm:px-6 antialiased">
