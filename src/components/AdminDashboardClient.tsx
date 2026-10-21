@@ -5686,6 +5686,23 @@ export default function AdminDashboardClient() {
                     />
                   </div>
 
+                  <div>
+                    <label className="block font-bold uppercase text-slate-700 mb-1 flex items-center justify-between">
+                      <span>Google Gemini API Key (Vision AI Baca Foto / Gambar)</span>
+                      <span className="text-[10px] text-amber-600 font-semibold lowercase">Opsional / Disarankan</span>
+                    </label>
+                    <input
+                      type="password"
+                      value={settings.geminiApiKey || ''}
+                      onChange={e => setSettings({ ...settings, geminiApiKey: e.target.value })}
+                      placeholder="AIzaSy... (Opsional, untuk membaca screenshot bukti transfer/e-ticket/denah kursi)"
+                      className="w-full bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-slate-900 text-xs outline-none font-mono"
+                    />
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Memungkinkan Mas Kidi menganalisis isi gambar/screenshot foto barcode e-ticket, denah kursi bioskop, atau bukti bayar yang dikirim penonton di WhatsApp secara cerdas.
+                    </p>
+                  </div>
+
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                     <span className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
                       URL Webhook Inbound:

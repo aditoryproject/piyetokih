@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
-import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks } from '@/lib/cities';
+import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import {
   MASTER_ROADSHOW_STOPS,
   MASTER_MOVIE_FACTS,
@@ -22,6 +22,61 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
 };
+
+async function tryGeminiVisionAnalysis(imageUrl: string, apiKey: string, userQuery?: string): Promise<string | null> {
+  try {
+    const fetchRes = await fetch(imageUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (!fetchRes.ok) return null;
+    const arrayBuf = await fetchRes.arrayBuffer();
+    const base64 = Buffer.from(arrayBuf).toString('base64');
+    const mime = (fetchRes.headers.get('content-type') || 'image/jpeg').split(';')[0];
+
+    const promptText = `Kamu adalah Mas Kidi, asisten resmi & promotor tiket film layar lebar "PIYE TO KIH?" produksi Miracle Pictures.
+Karaktermu sangat ramah, medok santai, akrab seperti kawan tongkrongan khas Jawa-Indonesia ('Halo bolo asik!', 'Piye kabare lur?').
+Calon penonton mengirimkan gambar/foto/screenshot ini di chat WhatsApp.
+Konteks obrolan: "${userQuery || 'Pembelian tiket film PIYE TO KIH?'}".
+
+Tugasmu:
+1. Baca dan pahami isi gambar/screenshot ini secara detail (misal: apakah bukti pembayaran M-TIX/TIX ID, barcode tiket, denah kursi bioskop, voucher fisik, jadwal, atau kendala error).
+2. Jelaskan maksud gambar ini kepada penonton dengan bahasa Mas Kidi yang akrab dan solutif.
+3. Berikan arahan konkret selanjutnya (misal: "tiket sudah sah, tinggal scan 15 menit sebelum tayang", atau "rekomendasi kursi tengah baris C/D", atau solusi kendala).
+4. Sisipkan 1 pantun jenaka Mas Kidi di akhir pesan.
+Jawab dengan ramah, percaya diri, dan jangan gunakan sapaan Ayah/Bunda/Kakak. Gunakan sapaan lur / bolo asik.`;
+
+    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: promptText },
+              {
+                inlineData: {
+                  mimeType: mime,
+                  data: base64
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 600
+        }
+      })
+    });
+
+    if (!geminiRes.ok) return null;
+    const data = await geminiRes.json();
+    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    return candidateText || null;
+  } catch (err) {
+    console.error('[Gemini Vision Analysis Error]:', err);
+    return null;
+  }
+}
 
 // Handle CORS Preflight requests
 export async function OPTIONS() {
@@ -318,36 +373,129 @@ export async function POST(req: NextRequest) {
     }
 
     // =========================================================================
+    // SUB-ROUTER 0.5: IMAGE / VISION RECOGNITION (BUKTI TIKET, SEAT MAP, SCREENSHOT)
+    // =========================================================================
+    const mediaUrl = String(
+      args.media_url ||
+      args.mediaUrl ||
+      args.image_url ||
+      args.imageUrl ||
+      args.url ||
+      body.media_url ||
+      body.mediaUrl ||
+      body.image_url ||
+      body.imageUrl ||
+      body.file_url ||
+      body.media ||
+      body.url ||
+      body.payload?.url ||
+      body.payload?.media_url ||
+      ''
+    ).trim();
+
+    const msgType = String(
+      body.type ||
+      body.message_type ||
+      body.media_type ||
+      args.type ||
+      args.message_type ||
+      ''
+    ).toLowerCase();
+
+    const isImageMessage =
+      action.includes('image') ||
+      action.includes('vision') ||
+      action.includes('foto') ||
+      action.includes('gambar') ||
+      msgType === 'image' ||
+      msgType.includes('image') ||
+      msgType === 'photo' ||
+      Boolean(mediaUrl) ||
+      queryText.includes('[gambar]') ||
+      queryText.includes('[foto]') ||
+      queryText.includes('[image]') ||
+      queryText.includes('<gambar>') ||
+      queryText.includes('<image>') ||
+      queryText.startsWith('gambar:') ||
+      queryText.startsWith('foto:') ||
+      queryText.includes('ini buktinya') ||
+      queryText.includes('bukti transfer') ||
+      queryText.includes('bukti bayar') ||
+      queryText.includes('bukti tiket') ||
+      queryText.includes('screenshot') ||
+      queryText.includes('ss tiket') ||
+      queryText === 'ss' ||
+      queryText.startsWith('ss ');
+
+    if (isImageMessage) {
+      const geminiApiKey = db.settings.geminiApiKey || process.env.GEMINI_API_KEY || '';
+      let visionAnalysisText: string | null = null;
+
+      if (mediaUrl && geminiApiKey) {
+        visionAnalysisText = await tryGeminiVisionAnalysis(mediaUrl, geminiApiKey, queryText);
+      }
+
+      if (visionAnalysisText) {
+        return NextResponse.json({
+          status: 'success',
+          success: true,
+          action: 'image_vision_analysis',
+          replyMessage: visionAnalysisText
+        }, { status: 200, headers: corsHeaders });
+      }
+
+      // Contextual Smart Explanation (Cinema Ticket / Payment / Seat Map)
+      const detectedCityForImg = getCityByNameOrSlug(cityParam || queryText);
+      const cinemaContextStr = detectedCityForImg?.name
+        ? `di ${detectedCityForImg.name}`
+        : 'Plaza Ambarrukmo XXI / bioskop kesayanganmu';
+
+      const contextualExplanation = `Halo bolo asik! Siap lur, Mas Kidi terima gambarnya! 😄
+${randomPantun}
+
+Mas Kidi bantu jelaskan sesuai konteks gambar/screenshot yang sampean kirim ya lur:
+
+🎟️ *1. JIKA INI BUKTI PEMBAYARAN / E-TICKET / BARCODE (M-TIX / TIX ID):*
+• **Status Tiket:** Transaksi sampean sudah **SAH & RESMI TERVERIFIKASI** di sistem bioskop!
+• **Cara Masuk Bioskop:** Simpan screenshot barcode tersebut di galeri HP. Nanti pas hari-H, datang 15–30 menit sebelum jam tayang ${cinemaContextStr}.
+• **Cetak Tiket:** Langsung scan barcode di mesin Kiosk Mandiri lobi bioskop untuk cetak tiket fisik, atau tunjukkan barcode e-ticket langsung ke petugas pintu studio!
+
+💺 *2. JIKA INI TAMPILAN DENAH KURSI (SEAT MAP):*
+• **Rekomendasi Posisi Terbaik:** Mas Kidi saranin pilih kursi di baris tengah (**Baris C atau D, nomor kursi 7 sampai 12**).
+• Posisi ini paling wenak di mata, gak kedeketan sama layar dan suara audio surround bioskop terdengar paling mantap! Hindari baris A (paling depan) ya lur biar leher gak pegal. 😂
+
+💳 *3. JIKA INI HALAMAN MENUNGGU PEMBAYARAN (CHECKOUT PENDING):*
+• Pastikan selesaikan transfer/e-wallet sebelum batas waktu pembayaran (10–15 menit) habis ya lur, supaya kursi incaran sampean gak otomatis dilepas kembali ke penonton lain.
+
+Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kidi siap kawal sampai beres! 🍿✨`;
+
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        action: 'image_contextual_explanation',
+        replyMessage: contextualExplanation
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // =========================================================================
     // SUB-ROUTER 1: ROADSHOW & JADWAL PER KOTA
     // =========================================================================
+    const detectedCityRes = getCityByNameOrSlug(cityParam || queryText);
+
     const isRoadshowAction =
       action.includes('roadshow') ||
       action.includes('jadwal') ||
       action.includes('schedule') ||
-      (cityParam && (queryText.includes('jadwal') || queryText.includes('kapan') || queryText.includes('pemain') || queryText.includes('cast')));
+      Boolean(detectedCityRes && (queryText.includes('jadwal') || queryText.includes('kapan') || queryText.includes('pemain') || queryText.includes('cast') || queryText.includes('roadshow') || queryText.includes('jam')));
 
-    if (isRoadshowAction && cityParam) {
-      let matchedSlug = Object.keys(MASTER_ROADSHOW_STOPS).find(slug => {
-        const data = MASTER_ROADSHOW_STOPS[slug];
-        const name = data.cityName.toLowerCase();
-        return (
-          cityParam === slug ||
-          cityParam === name ||
-          cityParam.includes(slug) ||
-          cityParam.includes(name) ||
-          slug.includes(cityParam) ||
-          name.includes(cityParam)
-        );
-      });
+    if (isRoadshowAction && (cityParam || detectedCityRes)) {
+      const targetSlug = detectedCityRes?.slug === 'jogja' ? 'yogyakarta' : (detectedCityRes?.slug || cityParam);
+      const cityData = MASTER_ROADSHOW_STOPS[targetSlug] || Object.values(MASTER_ROADSHOW_STOPS).find(s =>
+        s.cityName.toLowerCase() === targetSlug.toLowerCase() ||
+        (detectedCityRes && s.cityName.toLowerCase() === detectedCityRes.name.toLowerCase())
+      );
 
-      if (!matchedSlug) {
-        if (cityParam.includes('jogja')) matchedSlug = 'yogyakarta';
-        else if (cityParam.includes('solo')) matchedSlug = 'solo';
-        else if (cityParam.includes('batu')) matchedSlug = 'malang';
-      }
-
-      if (matchedSlug) {
-        const cityData = MASTER_ROADSHOW_STOPS[matchedSlug];
+      if (cityData) {
         const isExpired = isCityRoadshowExpired(cityData.dateStr, {
           cityName: cityData.cityName,
           manualExpiredCities: db.settings.expiredRoadshowCities || [],
@@ -446,31 +594,37 @@ export async function POST(req: NextRequest) {
       let matchedStopName = '';
       let matchedStopSlug = '';
 
-      if (cityParam) {
-        const matchedStop = Object.values(MASTER_ROADSHOW_STOPS).find(s =>
-          s.cityName.toLowerCase().includes(cityParam) || cityParam.includes(s.slug)
+      const detectedTicketCity = getCityByNameOrSlug(cityParam || queryText);
+      if (detectedTicketCity) {
+        matchedStopName = detectedTicketCity.name;
+        matchedStopSlug = detectedTicketCity.slug;
+        const cityCinemas = getCityCinemaTicketLinks(
+          detectedTicketCity.slug,
+          db.settings.roadshowOverrides,
+          db.settings.cityLinkOverrides
         );
-        if (matchedStop) {
-          matchedStopName = matchedStop.cityName;
-          matchedStopSlug = matchedStop.slug;
-          const cityCinemas = getCityCinemaTicketLinks(
-            matchedStop.slug,
-            db.settings.roadshowOverrides,
-            db.settings.cityLinkOverrides
-          );
-          if (cityCinemas.length > 0) {
-            cityCinemasList = cityCinemas.map(c => {
-              const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
-              return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
-            }).join('\n');
-            cityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` + cityCinemasList;
-          } else if (matchedStop.cinemas?.length > 0) {
-            cityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStop.cityName}:* ${matchedStop.cinemas.join(', ')}`;
-          }
-          const cityOverride = db.settings.cityLinkOverrides?.[matchedStop.slug];
-          if (cityOverride) {
-            cityOverrideNote = `\n🎟️ *Link Khusus Tiket ${matchedStop.cityName}:* ${cityOverride}`;
-          }
+        if (cityCinemas.length > 0) {
+          cityCinemasList = cityCinemas.map(c => {
+            const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
+            const isQueriedCinema =
+              queryText.includes(c.cinemaName.toLowerCase()) ||
+              (queryText.includes('amplaz') && c.cinemaName.toLowerCase().includes('ambarrukmo')) ||
+              (queryText.includes('jcm') && c.cinemaName.toLowerCase().includes('jogja city')) ||
+              (queryText.includes('empire') && c.cinemaName.toLowerCase().includes('empire')) ||
+              (queryText.includes('paragon') && c.cinemaName.toLowerCase().includes('paragon')) ||
+              (queryText.includes('the park') && c.cinemaName.toLowerCase().includes('the park')) ||
+              (queryText.includes('matos') && c.cinemaName.toLowerCase().includes('matos')) ||
+              (queryText.includes('artos') && c.cinemaName.toLowerCase().includes('artos'));
+            const prefix = isQueriedCinema ? '🔥 ' : '• ';
+            return `${prefix}*${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
+          }).join('\n');
+          cityNote = `\n🍿 *Bioskop Khusus di ${matchedStopName}:*\n` + cityCinemasList;
+        } else if (detectedTicketCity.cinemas?.length > 0) {
+          cityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStopName}:* ${detectedTicketCity.cinemas.map(c => c.name).join(', ')}`;
+        }
+        const cityOverride = db.settings.cityLinkOverrides?.[detectedTicketCity.slug] || (detectedTicketCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
+        if (cityOverride) {
+          cityOverrideNote = `\n🎟️ *Link Khusus Tiket ${matchedStopName}:* ${cityOverride}`;
         }
       }
 

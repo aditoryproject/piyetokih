@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
-import { isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks } from '@/lib/cities';
+import { isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA } from '@/lib/wahnotif';
 
@@ -48,25 +48,32 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const manualExpired = db.settings.expiredRoadshowCities || [];
 
-    // Find matching city from MASTER_ROADSHOW_STOPS
-    let matchedSlug = Object.keys(MASTER_ROADSHOW_STOPS).find(slug => {
-      const data = MASTER_ROADSHOW_STOPS[slug];
-      const name = data.cityName.toLowerCase();
-      return (
-        normalizedCity === slug ||
-        normalizedCity === name ||
-        normalizedCity.includes(slug) ||
-        normalizedCity.includes(name) ||
-        slug.includes(normalizedCity) ||
-        name.includes(normalizedCity)
-      );
-    });
+    // Find matching city from MASTER_ROADSHOW_STOPS & CITY_ALIASES
+    const effectiveCity = getCityByNameOrSlug(normalizedCity);
+    let matchedSlug = effectiveCity?.slug === 'jogja' ? 'yogyakarta' : effectiveCity?.slug;
 
-    // Special match checks (e.g. jogja -> yogyakarta, solo -> surakarta)
     if (!matchedSlug) {
-      if (normalizedCity.includes('jogja')) matchedSlug = 'yogyakarta';
-      else if (normalizedCity.includes('solo')) matchedSlug = 'solo';
-      else if (normalizedCity.includes('batu')) matchedSlug = 'malang';
+      matchedSlug = Object.keys(MASTER_ROADSHOW_STOPS).find(slug => {
+        const data = MASTER_ROADSHOW_STOPS[slug];
+        const name = data.cityName.toLowerCase();
+        return (
+          normalizedCity === slug ||
+          normalizedCity === name ||
+          normalizedCity.includes(slug) ||
+          normalizedCity.includes(name) ||
+          slug.includes(normalizedCity) ||
+          name.includes(normalizedCity)
+        );
+      });
+    }
+
+    // Special match checks (e.g. jogja/amplaz -> yogyakarta, solo/paragon -> solo)
+    if (!matchedSlug) {
+      if (normalizedCity.includes('jogja') || normalizedCity.includes('amplaz') || normalizedCity.includes('ambarrukmo')) matchedSlug = 'yogyakarta';
+      else if (normalizedCity.includes('solo') || normalizedCity.includes('paragon')) matchedSlug = 'solo';
+      else if (normalizedCity.includes('batu') || normalizedCity.includes('matos')) matchedSlug = 'malang';
+      else if (normalizedCity.includes('smg') || normalizedCity.includes('java mall')) matchedSlug = 'semarang';
+      else if (normalizedCity.includes('artos')) matchedSlug = 'magelang';
     }
 
     const ticketLinks = {

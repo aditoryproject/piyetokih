@@ -45,6 +45,7 @@ export interface AppSettings {
   googleAnalyticsId?: string;
   wahnotifApiKey: string;
   wahnotifSenderNumber: string;
+  geminiApiKey?: string;
   cityLinkOverrides: Record<string, string>; // city slug -> ticket url
 
   // Roadshow Cities & Cinema Overrides (Full schedule config per city)

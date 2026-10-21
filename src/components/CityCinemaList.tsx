@@ -42,8 +42,10 @@ export default function CityCinemaList({
       {/* Grid of Cinema Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mb-8">
         {cinemas.map((cinema, idx) => {
+          const altSlug = slug === 'jogja' ? 'yogyakarta' : slug === 'yogyakarta' ? 'jogja' : undefined;
           const overrideKey = `${slug}_${idx}`;
-          const targetUrl = customLinks[overrideKey] || cinema.ticketUrl;
+          const altKey = altSlug ? `${altSlug}_${idx}` : undefined;
+          const targetUrl = customLinks[overrideKey] || (altKey && customLinks[altKey]) || customLinks[slug] || (altSlug && customLinks[altSlug]) || cinema.ticketUrl;
 
           return (
             <div

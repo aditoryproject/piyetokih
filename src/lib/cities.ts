@@ -204,7 +204,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "14.30 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       },
       {
         "name": "JOGJA CITY MALL XXI",
@@ -217,7 +217,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "16.30 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -293,7 +293,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "16.45 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -364,7 +364,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "12.15 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       },
       {
         "name": "PLATINUM CINEPLEX PAKUWON MALL SOLO BARU",
@@ -618,7 +618,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "19.00 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -882,7 +882,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "13.00 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -952,7 +952,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "14.30 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -1029,7 +1029,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "16.10 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -1101,7 +1101,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "15.50 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       },
       {
         "name": "CINÉPOLIS MALANG TOWN SQUARE",
@@ -1185,7 +1185,7 @@ export const CITIES_DATA: CityData[] = [
         "showTimes": [
           "19.00 WIB"
         ],
-        "ticketUrl": "https://m.21cineplex.com"
+        "ticketUrl": "https://m.21cineplex.com/id/movies/16PTKH"
       }
     ]
   },
@@ -1367,6 +1367,157 @@ export function cleanVenueToMallName(venueName?: string): string {
   return cleaned;
 }
 
+export const CITY_ALIASES: Record<string, string> = {
+  // Yogyakarta / Jogja & Venues
+  'jogja': 'jogja',
+  'yogyakarta': 'jogja',
+  'yogya': 'jogja',
+  'yk': 'jogja',
+  'amplaz': 'jogja',
+  'ambarrukmo': 'jogja',
+  'plaza ambarrukmo': 'jogja',
+  'jcm': 'jogja',
+  'jogja city mall': 'jogja',
+  'pakuwon jogja': 'jogja',
+  'hartono': 'jogja',
+
+  // Solo / Surakarta & Venues
+  'solo': 'solo',
+  'surakarta': 'solo',
+  'paragon solo': 'solo',
+  'solo paragon': 'solo',
+  'the park solo': 'solo',
+  'the park solo baru': 'solo',
+  'pakuwon solo': 'solo',
+  'pakuwon mall solo': 'solo',
+  'platinum solo': 'solo',
+
+  // Semarang & Venues
+  'semarang': 'semarang',
+  'smg': 'semarang',
+  'the park semarang': 'semarang',
+  'the park smg': 'semarang',
+  'java mall': 'semarang',
+  'cinepolis java mall': 'semarang',
+  'paragon semarang': 'semarang',
+  'pollux paragon': 'semarang',
+  'citraland semarang': 'semarang',
+
+  // Magelang & Venues
+  'magelang': 'magelang',
+  'mgl': 'magelang',
+  'artos': 'magelang',
+  'artos mall': 'magelang',
+  'armada town square': 'magelang',
+  'the aloon aloon': 'magelang',
+
+  // Purwokerto & Venues
+  'purwokerto': 'purwokerto',
+  'pwt': 'purwokerto',
+  'rita supermall': 'purwokerto',
+  'rajawali': 'purwokerto',
+  'rajawali cinema': 'purwokerto',
+
+  // Tegal & Venues
+  'tegal': 'tegal',
+  'pacific mall': 'tegal',
+  'transmart tegal': 'tegal',
+
+  // Pekalongan & Venues
+  'pekalongan': 'pekalongan',
+  'pekalongan square': 'pekalongan',
+  'transmart pekalongan': 'pekalongan',
+
+  // Salatiga & Venues
+  'salatiga': 'salatiga',
+  'mall salatiga': 'salatiga',
+
+  // Kudus & Venues
+  'kudus': 'kudus',
+  'kudus extension': 'kudus',
+  'kudus extension mall': 'kudus',
+
+  // Cilacap & Venues
+  'cilacap': 'cilacap',
+  'sami jaya': 'cilacap',
+  'dakota cilacap': 'cilacap',
+
+  // Cirebon & Venues
+  'cirebon': 'cirebon',
+  'csb': 'cirebon',
+  'csb mall': 'cirebon',
+  'grage mall': 'cirebon',
+
+  // Tasikmalaya & Venues
+  'tasik': 'tasikmalaya',
+  'tasikmalaya': 'tasikmalaya',
+  'asia plaza': 'tasikmalaya',
+  'transmart tasik': 'tasikmalaya',
+
+  // Surabaya & Venues
+  'surabaya': 'surabaya',
+  'sby': 'surabaya',
+  'tunjungan': 'surabaya',
+  'tunjungan plaza': 'surabaya',
+  'royal plaza': 'surabaya',
+  'pakuwon surabaya': 'surabaya',
+  'ciputra world': 'surabaya',
+
+  // Malang & Batu & Venues
+  'malang': 'malang',
+  'mlg': 'malang',
+  'batu': 'malang',
+  'kotabatu': 'malang',
+  'matos': 'malang',
+  'malang town square': 'malang',
+  'dieng': 'malang',
+  'dieng xxi': 'malang',
+  'cyber mall': 'malang',
+  'araya': 'malang',
+
+  // Sidoarjo & Venues
+  'sidoarjo': 'sidoarjo',
+  'sda': 'sidoarjo',
+  'suncity': 'sidoarjo',
+  'suncity mall': 'sidoarjo',
+  'ciplaz sidoarjo': 'sidoarjo',
+
+  // Jember & Venues
+  'jember': 'jember',
+  'jbr': 'jember',
+  'lippo jember': 'jember',
+  'lippo plaza jember': 'jember',
+  'roxo': 'jember',
+
+  // Kediri & Venues
+  'kediri': 'kediri',
+  'kdr': 'kediri',
+  'ciplaz kediri': 'kediri',
+  'golden theater': 'kediri',
+  'kediri mall': 'kediri',
+
+  // Blitar & Tulungagung
+  'blitar': 'blitar',
+  'blitar square': 'blitar',
+  'tulungagung': 'tulungagung',
+  'golden tulungagung': 'tulungagung',
+
+  // Madiun, Gresik, Sragen, Ponorogo, Ngawi, Nganjuk, Mojokerto
+  'madiun': 'madiun',
+  'plaza madiun': 'madiun',
+  'lawu plaza': 'madiun',
+  'gresik': 'gresik',
+  'icon mall': 'gresik',
+  'gresik mall': 'gresik',
+  'sragen': 'sragen',
+  'ponorogo': 'ponorogo',
+  'pcc': 'ponorogo',
+  'ponorogo city center': 'ponorogo',
+  'ngawi': 'ngawi',
+  'nganjuk': 'nganjuk',
+  'mojokerto': 'mojokerto',
+};
+
 export function getCityBySlug(slug: string): CityData | undefined {
   const normalized = slug.toLowerCase().replace(/[^a-z0-9]/g, "");
   return CITIES_DATA.find(c => c.slug.toLowerCase().replace(/[^a-z0-9]/g, "") === normalized);
@@ -1374,11 +1525,33 @@ export function getCityBySlug(slug: string): CityData | undefined {
 
 export function getCityByNameOrSlug(query?: string): CityData | undefined {
   if (!query) return undefined;
-  const q = query.toLowerCase().replace(/[^a-z0-9]/g, "");
-  return CITIES_DATA.find(c => {
+  const rawLower = query.toLowerCase().trim();
+  const q = rawLower.replace(/[^a-z0-9]/g, "");
+
+  // 1. Direct Alias Check
+  for (const [alias, targetSlug] of Object.entries(CITY_ALIASES)) {
+    const aliasNorm = alias.replace(/[^a-z0-9]/g, "");
+    if (q === aliasNorm || rawLower.includes(alias) || (aliasNorm.length >= 4 && q.includes(aliasNorm))) {
+      const found = CITIES_DATA.find(c => c.slug === targetSlug);
+      if (found) return found;
+    }
+  }
+
+  // 2. Exact or substring match in CITIES_DATA
+  const directMatch = CITIES_DATA.find(c => {
     const slugNorm = c.slug.toLowerCase().replace(/[^a-z0-9]/g, "");
     const nameNorm = c.name.toLowerCase().replace(/[^a-z0-9]/g, "");
-    return slugNorm === q || nameNorm === q || q.includes(slugNorm) || slugNorm.includes(q);
+    return slugNorm === q || nameNorm === q || q.includes(slugNorm) || slugNorm.includes(q) || q.includes(nameNorm) || nameNorm.includes(q);
+  });
+  if (directMatch) return directMatch;
+
+  // 3. Search inside each city's cinemas name and address
+  return CITIES_DATA.find(c => {
+    return c.cinemas?.some(cin => {
+      const cinName = cin.name.toLowerCase();
+      const cinAddr = (cin.address || '').toLowerCase();
+      return cinName.includes(rawLower) || rawLower.includes(cinName) || (rawLower.length >= 4 && cinAddr.includes(rawLower));
+    });
   });
 }
 
@@ -1484,14 +1657,41 @@ export function getCityCinemaTicketLinks(
   if (!city || !city.cinemas) return [];
 
   const customLinks = cityLinkOverrides || {};
-  const citySlug = city.slug;
-  const legacyDirectCityLink = customLinks[citySlug] || (citySlug === 'yogyakarta' ? customLinks['jogja'] : undefined);
+  const citySlug = city.slug; // e.g. "jogja"
+  const altSlug = citySlug === 'jogja' ? 'yogyakarta' : citySlug === 'yogyakarta' ? 'jogja' : undefined;
+
+  const legacyDirectCityLink =
+    customLinks[citySlug] ||
+    (altSlug && customLinks[altSlug]) ||
+    '';
 
   return city.cinemas
     .map((c, idx) => {
-      const overrideKey = `${citySlug}_${idx}`;
-      const altKey = citySlug === 'yogyakarta' ? `jogja_${idx}` : undefined;
-      const targetUrl = customLinks[overrideKey] || (altKey && customLinks[altKey]) || c.ticketUrl || legacyDirectCityLink || '';
+      const primaryKey = `${citySlug}_${idx}`;
+      const altKey = altSlug ? `${altSlug}_${idx}` : undefined;
+
+      // Determine default ticket URL by chain if c.ticketUrl is empty or generic homepage
+      let defaultChainUrl = c.ticketUrl;
+      const lowerUrl = (c.ticketUrl || '').toLowerCase();
+      const isGeneric = !lowerUrl || lowerUrl === 'https://m.21cineplex.com' || lowerUrl === 'https://m.21cineplex.com/' || lowerUrl.endsWith('.co.id') || lowerUrl.endsWith('.id');
+
+      if (isGeneric) {
+        if (c.chain === 'XXI') {
+          defaultChainUrl = 'https://m.21cineplex.com/id/movies/16PTKH';
+        } else if (c.chain === 'Cinepolis') {
+          defaultChainUrl = 'https://www.cinepolis.co.id/movies/piye-to-kih/b372aa5c-12a5-4440-85bf-e8a91fe1c57e/#';
+        } else if (c.chain === 'Platinum') {
+          defaultChainUrl = 'https://www.platinumcineplex.co.id/now-showing-booking/482/1/';
+        } else {
+          defaultChainUrl = 'https://m.21cineplex.com/id/movies/16PTKH';
+        }
+      }
+
+      const targetUrl =
+        customLinks[primaryKey] ||
+        (altKey && customLinks[altKey]) ||
+        legacyDirectCityLink ||
+        defaultChainUrl;
 
       return {
         cinemaName: c.name,

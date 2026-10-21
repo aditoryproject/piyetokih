@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS, MAS_KIDI_PANTUN, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
-import { getCityCinemaTicketLinks } from '@/lib/cities';
+import { getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_TICKETS_SCHEMA } from '@/lib/wahnotif';
 
@@ -104,32 +104,25 @@ export async function POST(req: NextRequest) {
     let matchedCityName = '';
     let matchedCitySlug = '';
 
-    if (requestedCity) {
-      const slug = requestedCity.toLowerCase().trim();
-      const matchedStop = Object.values(MASTER_ROADSHOW_STOPS).find(s =>
-        s.cityName.toLowerCase().includes(slug) || slug.includes(s.slug)
+    const effectiveCity = getCityByNameOrSlug(requestedCity || queryText);
+    if (effectiveCity) {
+      matchedCityName = effectiveCity.name;
+      matchedCitySlug = effectiveCity.slug;
+      const cityCinemas = getCityCinemaTicketLinks(
+        effectiveCity.slug,
+        db.settings.roadshowOverrides,
+        db.settings.cityLinkOverrides
       );
-      if (matchedStop) {
-        matchedCityName = matchedStop.cityName;
-        matchedCitySlug = matchedStop.slug;
-        const cityCinemas = getCityCinemaTicketLinks(
-          matchedStop.slug,
-          db.settings.roadshowOverrides,
-          db.settings.cityLinkOverrides
-        );
-        if (cityCinemas.length > 0) {
-          cityCinemasList = cityCinemas.map(c => {
-            const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
-            return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
-          }).join('\n');
-          cinemaCityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` + cityCinemasList;
-        } else if (matchedStop.cinemas?.length > 0) {
-          cinemaCityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStop.cityName}:* ${matchedStop.cinemas.join(', ')}`;
-        }
-        const cityOverride = db.settings.cityLinkOverrides?.[matchedStop.slug];
-        if (cityOverride) {
-          cityLinkNote = `\n🎟️ *Link Khusus Tiket ${matchedStop.cityName}:* ${cityOverride}`;
-        }
+      if (cityCinemas.length > 0) {
+        cityCinemasList = cityCinemas.map(c => {
+          const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
+          return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
+        }).join('\n');
+        cinemaCityNote = `\n🍿 *Bioskop Khusus di ${effectiveCity.name}:*\n` + cityCinemasList;
+      }
+      const cityOverride = db.settings.cityLinkOverrides?.[effectiveCity.slug] || (effectiveCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
+      if (cityOverride) {
+        cityLinkNote = `\n🎟️ *Link Khusus Tiket ${effectiveCity.name}:* ${cityOverride}`;
       }
     }
 
@@ -199,13 +192,19 @@ ${randomJoke}
 🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER BARENG PEMAIN?*
 Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* di bioskop kota roadshow bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok)! Tiket presale sudah bisa langsung dibeli sekarang!
 
-🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*
-Biar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:
-• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}
-• *TIX ID:* ${ticketLinks.tixid}
-• *CGV Cinemas:* ${ticketLinks.cgv}
-• *Cinépolis:* ${ticketLinks.cinepolis}
-• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}
+      const generalTicketBlock = cityCinemasList
+        ? `🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP ${matchedCityName.toUpperCase()} (TINGGAL KLIK LUR):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${ticketLinks.website}${matchedCitySlug ? `/city/${matchedCitySlug}` : ''}\n• *TIX ID:* ${ticketLinks.tixid}`
+        : `🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*\nBiar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
+
+      replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
+${randomPantun}
+
+${randomJoke}
+
+🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER BARENG PEMAIN?*
+Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* di bioskop kota roadshow bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok)! Tiket presale sudah bisa langsung dibeli sekarang!
+
+${generalTicketBlock}
 
 ⚠️ *PENTING LUR:* Kuota kursi studio cepat habis lur! Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas sekarang dan amankan kursimu lur!
 
