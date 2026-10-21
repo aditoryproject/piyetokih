@@ -139,6 +139,17 @@ export default function AdminDashboardClient() {
   const [followingUpPresale, setFollowingUpPresale] = useState(false);
   const [followupResult, setFollowupResult] = useState<{ total: number; sent: number; failed: number } | null>(null);
 
+  // Advanced Presale Follow-Up Modal State
+  const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
+  const [followupTarget, setFollowupTarget] = useState<'all' | 'leads' | 'reminders'>('all');
+  const [followupCity, setFollowupCity] = useState<string>('all');
+  const [followupStage, setFollowupStage] = useState<number>(1);
+  const [followupDelay, setFollowupDelay] = useState<number>(8); // Safe anti-spam delay in seconds
+  const [followupForceResend, setFollowupForceResend] = useState<boolean>(false);
+  const [followupPreviewText, setFollowupPreviewText] = useState<string>('');
+  const [followupEligibleCount, setFollowupEligibleCount] = useState<number>(0);
+  const [loadingFollowupPreview, setLoadingFollowupPreview] = useState<boolean>(false);
+
   // Settings state
   const [settings, setSettings] = useState<any>({
     totalQuota: 500,
@@ -456,9 +467,31 @@ export default function AdminDashboardClient() {
     }
   };
 
-  const handleTriggerPresaleFollowup = async (target: 'all' | 'leads' | 'reminders' = 'all') => {
-    const targetLabel = target === 'all' ? 'SEMUA KONTAK (Leads + Reminder)' : target.toUpperCase();
-    if (!confirm(`Kirim WhatsApp Follow-Up Hardsale Presale Roadshow (gaya Mas Kidi hardsell) sekarang ke ${targetLabel}?`)) {
+  const fetchFollowupPreview = async (city: string, target: string, stage: number) => {
+    setLoadingFollowupPreview(true);
+    try {
+      const res = await fetch(`/api/cron/presale-followup?city=${encodeURIComponent(city)}&target=${encodeURIComponent(target)}&stage=${stage}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setFollowupPreviewText(data.sampleMessagePreview || '');
+        setFollowupEligibleCount(data.totalPendingFollowup || 0);
+      }
+    } catch (e) {
+      console.error('Error fetching followup preview:', e);
+    } finally {
+      setLoadingFollowupPreview(false);
+    }
+  };
+
+  const openFollowupModal = (target: 'all' | 'leads' | 'reminders' = 'all') => {
+    setFollowupTarget(target);
+    setIsFollowupModalOpen(true);
+    fetchFollowupPreview(followupCity, target, followupStage);
+  };
+
+  const handleExecutePresaleFollowup = async () => {
+    const targetLabel = followupCity === 'all' ? 'SEMUA KOTA' : `KOTA ${followupCity.toUpperCase()}`;
+    if (!confirm(`Mulai kirim Follow-Up Presale (Stage ${followupStage}) ke ${targetLabel} dengan jeda aman ${followupDelay} detik per nomor?\n\nTarget: ${followupTarget.toUpperCase()}\nJumlah kontak siap kirim: ${followupEligibleCount} nomor`)) {
       return;
     }
     setFollowingUpPresale(true);
@@ -467,7 +500,14 @@ export default function AdminDashboardClient() {
       const res = await fetch('/api/cron/presale-followup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target, limit: 100 }),
+        body: JSON.stringify({
+          target: followupTarget,
+          city: followupCity,
+          stage: followupStage,
+          delaySeconds: followupDelay,
+          forceResend: followupForceResend,
+          limit: 250,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -476,7 +516,8 @@ export default function AdminDashboardClient() {
           sent: data.sentCount,
           failed: data.failCount,
         });
-        alert(`Follow-up WA Hardsale Presale Selesai!\nTotal diproses: ${data.totalProcessed}\nBerhasil: ${data.sentCount}\nGagal: ${data.failCount}`);
+        alert(`Follow-up WA Selesai!\nTotal diproses: ${data.totalProcessed}\nBerhasil terkirim: ${data.sentCount}\nGagal: ${data.failCount}`);
+        setIsFollowupModalOpen(false);
         fetchReminders();
         fetchLeads();
       } else {
@@ -488,6 +529,8 @@ export default function AdminDashboardClient() {
       setFollowingUpPresale(false);
     }
   };
+
+  const handleTriggerPresaleFollowup = openFollowupModal;
 
   const handleExportRemindersCsv = () => {
     if (!bogoReminders.length) {
@@ -5671,13 +5714,23 @@ export default function AdminDashboardClient() {
                     )}
                   </div>
 
-                  <button
-                    onClick={handleSaveSettings}
-                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-6 rounded-xl transition shadow-sm"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Simpan Pengaturan Wahnotif</span>
-                  </button>
+                  <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={handleSaveSettings}
+                      className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-4 rounded-xl transition shadow-sm"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Simpan Pengaturan Wahnotif</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openFollowupModal('all')}
+                      className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-extrabold text-xs py-3 px-4 rounded-xl transition shadow-sm"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>🔥 Broadcast & Follow-Up Presale</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -7210,6 +7263,287 @@ export default function AdminDashboardClient() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Presale Follow-Up Modal */}
+      {isFollowupModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-3xl my-8 bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-6 sm:p-8 text-slate-100">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-5 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+                  <Send className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white flex items-center gap-2">
+                    Follow-Up Presale Roadshow
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      Anti-Spam Safe
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Broadcast nurturing ramah ke kontak terdaftar dengan filter kota, jeda aman, dan auto-stop saat audiens merespons.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsFollowupModalOpen(false)}
+                className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content Form */}
+            <div className="mt-6 space-y-6">
+              {/* Target & City Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Target Audience */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-amber-400" />
+                    Target Audiens
+                  </label>
+                  <select
+                    value={followupTarget}
+                    onChange={(e) => {
+                      const newTarget = e.target.value as 'all' | 'leads' | 'reminders';
+                      setFollowupTarget(newTarget);
+                      fetchFollowupPreview(followupCity, newTarget, followupStage);
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="all">Semua Kontak (Leads Booking + Reminder BOGO)</option>
+                    <option value="leads">Hanya Pemegang Voucher / Leads (Booking Code)</option>
+                    <option value="reminders">Hanya Pendaftar Pengingat Tiket (BOGO Reminder)</option>
+                  </select>
+                </div>
+
+                {/* City Filter */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-rose-400" />
+                    Filter Kota Roadshow
+                  </label>
+                  <select
+                    value={followupCity}
+                    onChange={(e) => {
+                      const newCity = e.target.value;
+                      setFollowupCity(newCity);
+                      fetchFollowupPreview(newCity, followupTarget, followupStage);
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  >
+                    <option value="all">Semua Kota (17 Kota Roadshow)</option>
+                    {CITIES_DATA.map((c) => (
+                      <option key={c.city} value={c.city}>
+                        {c.city} ({c.date} - {c.status === 'done' ? 'Selesai' : c.status === 'today' ? 'Hari Ini' : 'Mendatang'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Stage Nurturing Selector */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
+                  <Activity className="w-4 h-4 text-cyan-400" />
+                  Pilih Stage Nurturing Follow-Up
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFollowupStage(1);
+                      fetchFollowupPreview(followupCity, followupTarget, 1);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left transition ${
+                      followupStage === 1
+                        ? 'bg-amber-500/10 border-amber-500/50 text-white shadow-lg shadow-amber-500/10'
+                        : 'bg-slate-800/50 border-slate-700/60 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-black text-amber-400">STAGE 1</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Soft Nudge</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-200">Cek Tiket & Sapa Santai</div>
+                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                      Menyapa bolo asik, infokan presale special screening bareng cast sudah dibuka di kotanya.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFollowupStage(2);
+                      fetchFollowupPreview(followupCity, followupTarget, 2);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left transition ${
+                      followupStage === 2
+                        ? 'bg-rose-500/10 border-rose-500/50 text-white shadow-lg shadow-rose-500/10'
+                        : 'bg-slate-800/50 border-slate-700/60 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-black text-rose-400">STAGE 2</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">Urgensi Kuota</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-200">Kursi Studio Menipis</div>
+                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                      Eskalasi urgensi: kursi nonton bareng makin tipis, amankan kursi tengah sebelum ludes.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFollowupStage(3);
+                      fetchFollowupPreview(followupCity, followupTarget, 3);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left transition ${
+                      followupStage === 3
+                        ? 'bg-emerald-500/10 border-emerald-500/50 text-white shadow-lg shadow-emerald-500/10'
+                        : 'bg-slate-800/50 border-slate-700/60 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-black text-emerald-400">STAGE 3</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Closing Final</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-200">Konfirmasi (SUDAH/MAU/SKIP)</div>
+                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                      Minta kepastian singkat: balas SUDAH (sudah beli), MAU (butuh link), atau SKIP (batal/lewatkan).
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Safe Delay & Anti-Spam Safeguards */}
+              <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/70 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                      Pengaturan Anti-Spam & Jeda Waktu (Delay)
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> Auto-Jitter 0-2 dtk aktif
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {[
+                    { label: '8 Detik', value: 8, tag: 'Standar Cepat' },
+                    { label: '20 Detik', value: 20, tag: 'Sangat Aman' },
+                    { label: '45 Detik', value: 45, tag: 'Human Pace' },
+                    { label: '360 Detik (6 Menit)', value: 360, tag: 'Ultra Safe Meta' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setFollowupDelay(opt.value)}
+                      className={`p-2.5 rounded-xl border text-center transition ${
+                        followupDelay === opt.value
+                          ? 'bg-emerald-500/20 border-emerald-500 text-white font-bold'
+                          : 'bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-600'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{opt.label}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{opt.tag}</div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 pt-1 text-xs text-slate-400">
+                  <input
+                    type="checkbox"
+                    id="forceResendCheck"
+                    checked={followupForceResend}
+                    onChange={(e) => setFollowupForceResend(e.target.checked)}
+                    className="w-4 h-4 rounded text-amber-500 bg-slate-900 border-slate-700 focus:ring-amber-500 focus:ring-offset-slate-900"
+                  />
+                  <label htmlFor="forceResendCheck" className="cursor-pointer">
+                    Paksa kirim ulang (abaikan jika nomor sudah pernah dikirimi stage ini)
+                  </label>
+                </div>
+
+                <div className="bg-emerald-950/40 border border-emerald-500/20 rounded-xl p-3 text-[11px] text-emerald-300/90 leading-relaxed flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Sistem Anti-Spam & Auto-Stop Pintar:</strong> Setiap pesan menggunakan pantun unik dan sapaan personal. Jika audiens membalas (misal: <em>&quot;sudah beli&quot;, &quot;oke&quot;, &quot;skip&quot;, &quot;tidak jadi&quot;</em>), AI CS otomatis menandai kontak dan <strong>langsung menghentikan follow-up selanjutnya</strong> agar tidak mengganggu penonton.
+                  </div>
+                </div>
+              </div>
+
+              {/* Message Live Preview */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <MessageSquare className="w-4 h-4 text-emerald-400" />
+                    Preview Pesan WhatsApp (Contoh Personal di {followupCity === 'all' ? 'Semua Kota' : followupCity})
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => fetchFollowupPreview(followupCity, followupTarget, followupStage)}
+                    className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${loadingFollowupPreview ? 'animate-spin' : ''}`} />
+                    Refresh Preview
+                  </button>
+                </div>
+                <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono text-slate-200 whitespace-pre-wrap max-h-56 overflow-y-auto leading-relaxed shadow-inner">
+                  {loadingFollowupPreview ? (
+                    <div className="py-6 text-center text-slate-400 flex items-center justify-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin text-amber-400" /> Memuat preview pesan & link tiket...
+                    </div>
+                  ) : (
+                    followupPreviewText || 'Pilih target dan kota untuk melihat preview pesan.'
+                  )}
+                </div>
+              </div>
+
+              {/* Status Bar: Target Count */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400">Nomor Siap Dikirimi Follow-Up:</div>
+                    <div className="text-lg font-black text-amber-400">
+                      {followupEligibleCount} Nomor
+                      <span className="text-xs font-normal text-slate-400 ml-2">
+                        ({followupCity === 'all' ? 'Semua Kota' : `Kota ${followupCity}`} • Target: {followupTarget.toUpperCase()})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setIsFollowupModalOpen(false)}
+                    className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 font-bold text-xs transition"
+                  >
+                    Tutup
+                  </button>
+                  <button
+                    type="button"
+                    disabled={followingUpPresale || followupEligibleCount === 0}
+                    onClick={handleExecutePresaleFollowup}
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-black text-xs shadow-lg shadow-rose-600/20 transition disabled:opacity-50"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${followingUpPresale ? 'animate-spin' : ''}`} />
+                    <span>{followingUpPresale ? 'Sedang Memproses...' : '🚀 Mulai Kirim Follow-Up'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

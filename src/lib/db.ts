@@ -27,8 +27,10 @@ export interface LeadRecord {
   emailStatus: 'sent' | 'pending' | 'failed';
   cityLocation?: string;
   venueLocation?: string;
-  presaleFollowupStatus?: 'pending' | 'sent' | 'failed';
+  presaleFollowupStatus?: 'pending' | 'sent' | 'failed' | 'responded';
   presaleFollowupSentAt?: string;
+  presaleFollowupStage?: number;
+  presaleFollowupResponse?: 'pending' | 'responded' | 'bought' | 'declined' | 'oke';
 }
 
 export interface AppSettings {
@@ -195,8 +197,10 @@ export interface BogoReminderRecord {
   reminderStatus: 'pending' | 'sent' | 'failed';
   whatsappSentAt?: string;
   emailSentAt?: string;
-  presaleFollowupStatus?: 'pending' | 'sent' | 'failed';
+  presaleFollowupStatus?: 'pending' | 'sent' | 'failed' | 'responded';
   presaleFollowupSentAt?: string;
+  presaleFollowupStage?: number;
+  presaleFollowupResponse?: 'pending' | 'responded' | 'bought' | 'declined' | 'oke';
 }
 
 export interface DatabaseSchema {

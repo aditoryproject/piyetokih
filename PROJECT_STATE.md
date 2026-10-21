@@ -214,4 +214,22 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
            ```
            Sehingga penonton langsung mendapatkan tautan presale bioskop kota yang bersangkutan tanpa salah link!
 
+10. **Sistem Follow-Up & Broadcast Presale Roadshow (Anti-Spam Meta, Multi-Stage Nurturing, Filter Kota, & Auto-Stop Cerdas)**:
+    * **Keamanan Anti-Spam Meta / WhatsApp**:
+      - Menyediakan opsi jeda waktu (delay) fleksibel dari 8 detik (standar aman), 20 detik, 45 detik, hingga 6-8 menit (360-480 detik ultra-safe) untuk pencegahan banned/spam oleh Meta.
+      - Random human jitter otomatis (0 - 2000 ms) di setiap jeda pengiriman.
+      - Dynamic spintax pantun Mas Kidi dan sapaan personal penerima sehingga hash pesan WhatsApp selalu variatif dan unik.
+    * **Filter Per Kota Roadshow**:
+      - Pengiriman follow-up dapat difilter per kota tertentu (misal: Solo saja, Semarang saja, Jogja saja) atau semua kota, sehingga broadcast presale roadshow tepat sasaran sesuai jadwal kota terdekat.
+    * **3 Stage Nurturing Nonton Duluan / Special Screening**:
+      - **Stage 1 (Soft Nudge & Cek Tiket)**: Sapa santai, mengabarkan presale special screening bareng cast sudah dibuka di kotanya.
+      - **Stage 2 (Urgensi Kursi Menipis)**: Eskalasi urgensi bahwa kursi studio nonton duluan makin menipis, mengajak segera checkout kursi terbaik.
+      - **Stage 3 (Closing Final SUDAH/MAU/SKIP)**: Meminta kepastian singkat: balas SUDAH (sudah beli), MAU (butuh link), atau SKIP (batal/lewatkan).
+    * **Auto-Stop Cerdas Saat Audiens Merespons**:
+      - Webhook inbound Wahnotif (`/api/webhook/wahnotif`) mendeteksi jawaban konfirmasi positif (`sudah`, `udah beli`, `oke`, `siap`, `dapat tiket`) maupun negatif (`skip`, `gak jadi`, `tidak jadi`, `batal`).
+      - Nomor kontak otomatis ditandai `presaleFollowupStatus: 'responded'` dan `presaleFollowupResponse: 'bought' | 'declined'`.
+      - Sistem secara otomatis **menghentikan follow-up berikutnya** ke nomor tersebut agar tidak mengganggu penonton.
+    * **Panel Admin Modal Interaktif**:
+      - UI Modal interaktif di Admin Dashboard (`/admin`) dengan live preview teks pesan, filter target audiens (Leads / Reminders / All), pemilih kota, stage nurturing, opsi jeda aman, dan counter nomor eligible secara real-time.
+
 

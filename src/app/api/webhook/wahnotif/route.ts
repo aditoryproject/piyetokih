@@ -191,8 +191,75 @@ export async function POST(req: NextRequest) {
     const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
     const randomJoke = MAS_KIDI_JOKES[Math.floor(Math.random() * MAS_KIDI_JOKES.length)];
 
-    const queryText = String(args.query || args.message || args.text || '').toLowerCase();
+    const queryText = String(args.query || args.message || args.text || '').toLowerCase().trim();
     const cityParam = String(args.city || args.kota || '').toLowerCase().trim();
+
+    // =========================================================================
+    // SUB-ROUTER -1: DETEKSI JAWABAN AUDIENS DARI FOLLOW-UP (STOPPING FOLLOW-UP)
+    // =========================================================================
+    const rawSender = String(args.phone || args.number || body.number || body.sender || body.from || '').replace(/[^0-9]/g, '');
+    const cleanSender = rawSender.startsWith('0') ? '62' + rawSender.slice(1) : rawSender;
+
+    const isAffirmativeResponse =
+      queryText === 'sudah' ||
+      queryText.includes('sudah beli') ||
+      queryText.includes('udah beli') ||
+      queryText.includes('tiket aman') ||
+      queryText.includes('dapat tiket') ||
+      queryText.includes('sudah punya') ||
+      queryText.includes('udah punya') ||
+      queryText === 'oke' ||
+      queryText === 'siap' ||
+      queryText === 'beres' ||
+      queryText === 'mau';
+
+    const isNegativeResponse =
+      queryText === 'skip' ||
+      queryText.includes('gak jadi') ||
+      queryText.includes('nggak jadi') ||
+      queryText.includes('tidak jadi') ||
+      queryText.includes('belum bisa') ||
+      queryText.includes('batal') ||
+      queryText.includes('skip dulu');
+
+    if ((isAffirmativeResponse || isNegativeResponse) && cleanSender.length >= 8) {
+      const matchedLead = db.leads.find(l => {
+        const p = l.phone.replace(/[^0-9]/g, '');
+        return p.endsWith(cleanSender.slice(-8));
+      });
+      const matchedReminder = db.bogoReminders.find(r => {
+        const p = r.phone.replace(/[^0-9]/g, '');
+        return p.endsWith(cleanSender.slice(-8));
+      });
+
+      if (matchedLead) {
+        matchedLead.presaleFollowupStatus = 'responded';
+        matchedLead.presaleFollowupResponse = isAffirmativeResponse ? 'bought' : 'declined';
+      }
+      if (matchedReminder) {
+        matchedReminder.presaleFollowupStatus = 'responded';
+        matchedReminder.presaleFollowupResponse = isAffirmativeResponse ? 'bought' : 'declined';
+      }
+      if (matchedLead || matchedReminder) {
+        saveDb(db);
+      }
+
+      if (isAffirmativeResponse) {
+        return NextResponse.json({
+          status: 'success',
+          success: true,
+          action: 'followup_confirmed_positive',
+          replyMessage: `Mantap tenan bolo asikku! 😄🎉\n${randomPantun}\n\nTerima kasih banyak ya lur udah konfirmasi! Mas Kidi dan rombongan artis (Mukidi, Sukma, Gendut, Penyok) udah gak sabar pengen ketemu langsung bareng sampean di bioskop!\n\nJangan lupa datang lebih awal ya lur, biar dapet posisi kursi paling wenak. Sampai jumpa di bioskop! 🍿✨`
+        }, { status: 200, headers: corsHeaders });
+      } else {
+        return NextResponse.json({
+          status: 'success',
+          success: true,
+          action: 'followup_confirmed_negative',
+          replyMessage: `Siap bolo asik, gak popo lur santai wae! 😄\n${randomPantun}\n\nTerima kasih ya lur udah konfirmasi ke Mas Kidi. Nanti kalau ada waktu luang, sampean tetep bisa nonton pas penayangan serentak nasional mulai 19 NOVEMBER 2026 di bioskop kotamu ya!\n\nTetep semangat dan sehat selalu bolo kencengku! 🍿🙏`
+        }, { status: 200, headers: corsHeaders });
+      }
+    }
 
     // =========================================================================
     // SUB-ROUTER 0: HUMAN HANDOVER / PARTNERSHIP / KOLABORASI / NOBAR
