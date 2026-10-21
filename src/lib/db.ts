@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { MovieCastMember, MovieSettings, DEFAULT_MOVIE_SETTINGS } from './movie-types';
 import {
   cleanVenueToMallName,
   applyRoadshowOverride,
@@ -10,6 +11,7 @@ import {
 } from './cities';
 export type { MovieCastMember, MovieSettings, CityData, CinemaVenue };
 export { DEFAULT_MOVIE_SETTINGS };
+
 
 
 export interface LeadRecord {
