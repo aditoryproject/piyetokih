@@ -184,14 +184,6 @@ Biar gak kehabisan kuota pas loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 
 
     } else {
       // 4. General Ticket Request: UPSELL PRESALE FIRST + HARDSALE CLOSING
-      replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
-
-${randomJoke}
-
-🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER BARENG PEMAIN?*
-Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* di bioskop kota roadshow bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok)! Tiket presale sudah bisa langsung dibeli sekarang!
-
       const generalTicketBlock = cityCinemasList
         ? `🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP ${matchedCityName.toUpperCase()} (TINGGAL KLIK LUR):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${ticketLinks.website}${matchedCitySlug ? `/city/${matchedCitySlug}` : ''}\n• *TIX ID:* ${ticketLinks.tixid}`
         : `🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*\nBiar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
