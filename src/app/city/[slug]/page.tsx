@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getCityBySlug, cleanVenueToMallName } from '@/lib/cities';
-import { getDb } from '@/lib/db';
+import { cleanVenueToMallName } from '@/lib/cities';
+import { getDb, getEffectiveCity } from '@/lib/db';
 import CityChoiceSection from '@/components/CityChoiceSection';
 import CityCinemaList from '@/components/CityCinemaList';
 import WarVoucherForm from '@/components/WarVoucherForm';
@@ -24,7 +24,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const city = getCityBySlug(slug || '');
+  const db = getDb();
+  const city = getEffectiveCity(slug || '', db);
 
   if (!city) {
     return {
@@ -65,7 +66,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CityRoadshowPage({ params }: Props) {
   const { slug } = await params;
-  const city = getCityBySlug(slug || '');
+  const db = getDb();
+  const city = getEffectiveCity(slug || '', db);
 
   if (!city) {
     return (

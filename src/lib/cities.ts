@@ -1427,16 +1427,62 @@ export function isCityRoadshowExpired(
 }
 
 /**
- * Get specific ticket URLs for a city from CITIES_DATA
+ * Merge base city data with admin roadshow overrides
  */
-export function getCityCinemaTicketLinks(query?: string): Array<{
+export function applyRoadshowOverride(baseCity: CityData, override?: Partial<CityData>): CityData {
+  if (!override) return baseCity;
+  return {
+    ...baseCity,
+    ...override,
+    cinemas: Array.isArray(override.cinemas) ? override.cinemas : baseCity.cinemas,
+    boothInfo: override.boothInfo ? { ...baseCity.boothInfo, ...override.boothInfo } : baseCity.boothInfo,
+    rundown: override.rundown
+      ? {
+          ...baseCity.rundown,
+          ...override.rundown,
+          items: Array.isArray(override.rundown.items)
+            ? override.rundown.items
+            : (baseCity.rundown?.items || []),
+        }
+      : baseCity.rundown,
+  };
+}
+
+/**
+ * Get all cities with roadshow overrides applied
+ */
+export function getEffectiveCities(overrides?: Record<string, Partial<CityData>>): CityData[] {
+  if (!overrides || Object.keys(overrides).length === 0) return CITIES_DATA;
+  return CITIES_DATA.map(c => applyRoadshowOverride(c, overrides[c.slug]));
+}
+
+/**
+ * Get a single city with roadshow overrides applied
+ */
+export function getEffectiveCity(
+  query?: string,
+  overrides?: Record<string, Partial<CityData>>
+): CityData | undefined {
+  if (!query) return undefined;
+  const baseCity = getCityByNameOrSlug(query);
+  if (!baseCity) return undefined;
+  return applyRoadshowOverride(baseCity, overrides?.[baseCity.slug]);
+}
+
+/**
+ * Get specific ticket URLs for a city from CITIES_DATA or overrides
+ */
+export function getCityCinemaTicketLinks(
+  query?: string,
+  overrides?: Record<string, Partial<CityData>>
+): Array<{
   cinemaName: string;
   chain: string;
   showTimes: string[];
   ticketUrl: string;
 }> {
   if (!query) return [];
-  const city = getCityByNameOrSlug(query);
+  const city = getEffectiveCity(query, overrides);
   if (!city || !city.cinemas) return [];
   return city.cinemas
     .filter(c => Boolean(c.ticketUrl && c.ticketUrl.trim().length > 0))
@@ -1447,4 +1493,5 @@ export function getCityCinemaTicketLinks(query?: string): Array<{
       ticketUrl: c.ticketUrl,
     }));
 }
+
 

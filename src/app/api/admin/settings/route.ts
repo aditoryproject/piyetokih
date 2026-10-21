@@ -33,6 +33,8 @@ export async function POST(req: NextRequest) {
     if (body.wahnotifApiKey !== undefined) db.settings.wahnotifApiKey = String(body.wahnotifApiKey);
     if (body.wahnotifSenderNumber !== undefined) db.settings.wahnotifSenderNumber = String(body.wahnotifSenderNumber);
     if (body.cityLinkOverrides) db.settings.cityLinkOverrides = { ...db.settings.cityLinkOverrides, ...body.cityLinkOverrides };
+    if (body.roadshowOverrides !== undefined) db.settings.roadshowOverrides = body.roadshowOverrides;
+    if (body.expiredRoadshowCities !== undefined) db.settings.expiredRoadshowCities = body.expiredRoadshowCities;
 
     // Global Movie Content & Media Settings
     if (body.movieSettings) {

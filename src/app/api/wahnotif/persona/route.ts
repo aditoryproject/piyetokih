@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getWahnotifPersona, WAHNOTIF_TOOL_SCHEMA, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
-import { CITIES_DATA, isCityRoadshowExpired } from '@/lib/cities';
+import { isCityRoadshowExpired } from '@/lib/cities';
 import { MASTER_ROADSHOW_STOPS, MASTER_MOVIE_FACTS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
-import { getDb } from '@/lib/db';
+import { getDb, getEffectiveCities } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +10,7 @@ export async function GET() {
   const db = getDb();
   const validityText = db.settings.voucherValidDatesText || '19 - 20 November 2026';
   const manualExpired = db.settings.expiredRoadshowCities || [];
+  const effectiveCities = getEffectiveCities(db);
 
   const ticketLinks = {
     default: db.settings.bogoDefaultTicketLink || FAST_TRACK_TICKET_LINKS.xxi,
@@ -39,8 +40,8 @@ export async function GET() {
       voucherClaims: 'https://piyetokihfilm.com/api/webhook/voucher',
       aiBrain: 'https://piyetokihfilm.com/api/webhook/ai-brain',
     },
-    citiesCount: CITIES_DATA.length,
-    cities: CITIES_DATA.map(c => {
+    citiesCount: effectiveCities.length,
+    cities: effectiveCities.map(c => {
       const isExpired = isCityRoadshowExpired(c.dateStr, {
         cityName: c.name,
         manualExpiredCities: manualExpired,

@@ -1,9 +1,16 @@
 import fs from 'fs';
 import path from 'path';
-import { MovieCastMember, MovieSettings, DEFAULT_MOVIE_SETTINGS } from './movie-types';
-import { cleanVenueToMallName } from './cities';
-export type { MovieCastMember, MovieSettings };
+import {
+  cleanVenueToMallName,
+  applyRoadshowOverride,
+  getEffectiveCities as getEffectiveCitiesFromLib,
+  getEffectiveCity as getEffectiveCityFromLib,
+  CityData,
+  CinemaVenue,
+} from './cities';
+export type { MovieCastMember, MovieSettings, CityData, CinemaVenue };
 export { DEFAULT_MOVIE_SETTINGS };
+
 
 export interface LeadRecord {
   id: string;
@@ -36,7 +43,11 @@ export interface AppSettings {
   wahnotifSenderNumber: string;
   cityLinkOverrides: Record<string, string>; // city slug -> ticket url
 
+  // Roadshow Cities & Cinema Overrides (Full schedule config per city)
+  roadshowOverrides?: Record<string, Partial<CityData>>;
+
   // Movie Media & Content Configuration (Global Sync)
+
   movieSettings?: MovieSettings;
 
   // Email Dispatcher Configuration
@@ -222,8 +233,10 @@ const DEFAULT_SETTINGS: AppSettings = {
   wahnotifApiKey: '',
   wahnotifSenderNumber: '',
   cityLinkOverrides: {},
+  roadshowOverrides: {},
 
   // Global Movie Content Settings
+
   movieSettings: DEFAULT_MOVIE_SETTINGS,
 
   // Email Defaults
@@ -425,7 +438,12 @@ function ensureDb(): DatabaseSchema {
     ...DEFAULT_SETTINGS,
     ...(backupSettings || {}),
     ...currentSettings,
+    roadshowOverrides: {
+      ...(backupSettings?.roadshowOverrides || {}),
+      ...(currentSettings.roadshowOverrides || {}),
+    },
     movieSettings,
+
     kabarGaleriSettings: {
       ...(DEFAULT_SETTINGS.kabarGaleriSettings || {}),
       ...(backupSettings?.kabarGaleriSettings || {}),
@@ -551,3 +569,20 @@ export function generateVoucherSerial(): string {
   }
   return `PTK-WAR-${rand}`;
 }
+
+/**
+ * Get all 17 cities with database roadshow overrides applied
+ */
+export function getEffectiveCities(customDb?: DatabaseSchema): CityData[] {
+  const db = customDb || getDb();
+  return getEffectiveCitiesFromLib(db.settings.roadshowOverrides);
+}
+
+/**
+ * Get a single city with database roadshow overrides applied
+ */
+export function getEffectiveCity(query?: string, customDb?: DatabaseSchema): CityData | undefined {
+  const db = customDb || getDb();
+  return getEffectiveCityFromLib(query, db.settings.roadshowOverrides);
+}
+

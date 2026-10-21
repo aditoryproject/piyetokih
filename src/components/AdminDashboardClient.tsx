@@ -3,7 +3,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import AdminLoginForm from '@/components/AdminLoginForm';
-import { CITIES_DATA, cleanVenueToMallName } from '@/lib/cities';
+import {
+  CITIES_DATA,
+  cleanVenueToMallName,
+  CityData,
+  CinemaVenue,
+  CityRundownItem,
+  applyRoadshowOverride,
+} from '@/lib/cities';
 import { DEFAULT_MOVIE_SETTINGS, MovieSettings, MovieCastMember } from '@/lib/movie-types';
 import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
 import {
@@ -62,7 +69,9 @@ import {
   Power,
   AlertTriangle,
   Sparkles,
+  Clock,
 } from 'lucide-react';
+
 
 export default function AdminDashboardClient() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -304,6 +313,12 @@ export default function AdminDashboardClient() {
   // Copied states
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedWebhook, setCopiedWebhook] = useState(false);
+
+  // 17 Roadshow Cities schedule editor state
+  const [selectedCitySlug, setSelectedCitySlug] = useState<string>('semarang');
+  const [citySearchQuery, setCitySearchQuery] = useState<string>('');
+  const [expandedSection, setExpandedSection] = useState<'cinemas' | 'booth' | 'rundown'>('cinemas');
+
 
   // Security & Authentication state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -919,7 +934,139 @@ export default function AdminDashboardClient() {
     }
   };
 
+  // Helper to get city data merged with current settings.roadshowOverrides
+  const getCurrentCityData = (slug: string): CityData => {
+    const base = CITIES_DATA.find(c => c.slug === slug) || CITIES_DATA[0];
+    const override = settings.roadshowOverrides?.[slug];
+    return applyRoadshowOverride(base, override);
+  };
+
+  const activeCityData = useMemo<CityData>(() => {
+    return getCurrentCityData(selectedCitySlug);
+  }, [selectedCitySlug, settings.roadshowOverrides]);
+
+  const isCityOverridden = (slug: string) => {
+    const ov = settings.roadshowOverrides?.[slug];
+    return Boolean(ov && Object.keys(ov).length > 0);
+  };
+
+  const updateSelectedCityField = <K extends keyof CityData>(field: K, value: CityData[K]) => {
+    setSettings((prev: any) => ({
+      ...prev,
+      roadshowOverrides: {
+        ...(prev.roadshowOverrides || {}),
+        [selectedCitySlug]: {
+          ...(prev.roadshowOverrides?.[selectedCitySlug] || {}),
+          [field]: value,
+        },
+      },
+    }));
+  };
+
+  const updateCinemaInSelectedCity = (cIdx: number, updatedFields: Partial<CinemaVenue>) => {
+    const currentCinemas = [...(activeCityData.cinemas || [])];
+    if (currentCinemas[cIdx]) {
+      currentCinemas[cIdx] = { ...currentCinemas[cIdx], ...updatedFields };
+      updateSelectedCityField('cinemas', currentCinemas);
+      // Synchronize legacy cityLinkOverrides if ticketUrl changed
+      if (updatedFields.ticketUrl !== undefined) {
+        setSettings((prev: any) => ({
+          ...prev,
+          cityLinkOverrides: {
+            ...(prev.cityLinkOverrides || {}),
+            [`${selectedCitySlug}_${cIdx}`]: updatedFields.ticketUrl,
+          },
+        }));
+      }
+    }
+  };
+
+  const addCinemaToSelectedCity = () => {
+    const currentCinemas = [...(activeCityData.cinemas || [])];
+    const newCinema: CinemaVenue = {
+      name: `${activeCityData.name.toUpperCase()} XXI`,
+      chain: 'XXI',
+      studio: 'Studio 1 Premiere Sound',
+      seats: 150,
+      showTimes: ['14.30 WIB'],
+      ticketUrl: 'https://m.21cineplex.com',
+      address: `Mall Kota ${activeCityData.name}`,
+      remainingSeatsText: '±45 kursi tersisa',
+      doorNote: 'Pintu teater dibuka 15 mnt sebelumnya',
+      badgeText: 'SPECIAL SCREENING · GREETING CAST',
+    };
+    currentCinemas.push(newCinema);
+    updateSelectedCityField('cinemas', currentCinemas);
+  };
+
+  const removeCinemaFromSelectedCity = (cIdx: number) => {
+    if ((activeCityData.cinemas || []).length <= 1) {
+      alert('Setiap kota harus memiliki minimal 1 bioskop penayangan.');
+      return;
+    }
+    if (!confirm('Hapus bioskop ini dari jadwal roadshow kota?')) return;
+    const currentCinemas = (activeCityData.cinemas || []).filter((_, idx) => idx !== cIdx);
+    updateSelectedCityField('cinemas', currentCinemas);
+  };
+
+  const resetSelectedCityToDefault = () => {
+    if (!confirm(`Kembalikan seluruh jadwal & bioskop Kota ${activeCityData.name} ke pengaturan default awal?`)) return;
+    setSettings((prev: any) => {
+      const nextOverrides = { ...(prev.roadshowOverrides || {}) };
+      delete nextOverrides[selectedCitySlug];
+      return {
+        ...prev,
+        roadshowOverrides: nextOverrides,
+      };
+    });
+  };
+
+  const updateBoothInfoInSelectedCity = (updatedFields: Partial<NonNullable<CityData['boothInfo']>>) => {
+    const currentBooth = activeCityData.boothInfo || {
+      venue: '',
+      floor: '',
+      timeStr: '',
+      directions: '',
+      exclusiveNotice: '',
+    };
+    updateSelectedCityField('boothInfo', { ...currentBooth, ...updatedFields });
+  };
+
+  const updateRundownItem = (rIdx: number, updatedFields: Partial<CityRundownItem>) => {
+    const currentRundown = activeCityData.rundown
+      ? { ...activeCityData.rundown }
+      : { date: activeCityData.dateStr, voucherExchangeInfo: '', items: [] };
+    const items = [...(currentRundown.items || [])];
+    if (items[rIdx]) {
+      items[rIdx] = { ...items[rIdx], ...updatedFields };
+      updateSelectedCityField('rundown', { ...currentRundown, items });
+    }
+  };
+
+  const addRundownItem = () => {
+    const currentRundown = activeCityData.rundown
+      ? { ...activeCityData.rundown }
+      : { date: activeCityData.dateStr, voucherExchangeInfo: '', items: [] };
+    const items = [...(currentRundown.items || [])];
+    items.push({
+      time: '14.00 – 16.00 WIB',
+      category: 'Mall & Meet',
+      title: 'Meet & Greet dan Penukaran Voucher Fisik',
+      venue: activeCityData.boothInfo?.venue || `Mall Utama ${activeCityData.name}`,
+    });
+    updateSelectedCityField('rundown', { ...currentRundown, items });
+  };
+
+  const removeRundownItem = (rIdx: number) => {
+    const currentRundown = activeCityData.rundown
+      ? { ...activeCityData.rundown }
+      : { date: activeCityData.dateStr, voucherExchangeInfo: '', items: [] };
+    const items = (currentRundown.items || []).filter((_, idx) => idx !== rIdx);
+    updateSelectedCityField('rundown', { ...currentRundown, items });
+  };
+
   const remainingQuota = Math.max(0, (settings.totalQuota || 500) - leads.length);
+
 
   const menuItems = [
     { id: 'leads', label: 'Database Leads', icon: Users, badge: leads.length },
@@ -929,7 +1076,7 @@ export default function AdminDashboardClient() {
     { id: 'settings', label: 'Pengaturan Voucher & Tayang', icon: Settings },
     { id: 'bogo', label: 'Promo Buy 1 Get 1 (BOGO)', icon: Ticket, badge: 'Promo' },
     { id: 'email', label: 'Pengaturan Email Gateway', icon: Mail },
-    { id: 'cities', label: 'Link Tiket 17 Kota', icon: Calendar, badge: '17' },
+    { id: 'cities', label: 'Jadwal Roadshow 17 Kota', icon: Calendar, badge: '17 Kota' },
     { id: 'wahnotif', label: 'Wahnotif & Webhook', icon: MessageSquare },
     { id: 'analytics', label: 'Visitor Analytics', icon: Globe, badge: visitors.length },
   ];
@@ -4778,77 +4925,686 @@ export default function AdminDashboardClient() {
             </div>
           )}
 
-          {/* TAB 3: LINK TIKET 17 KOTA (CLEAN WHITE) */}
+          {/* TAB 3: PENGATURAN JADWAL ROADSHOW & BIOSKOP 17 KOTA */}
           {activeTab === 'cities' && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
-              <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-base font-black text-slate-900">
-                  Pengaturan Link Tombol Tiket 17 Kota
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Ubah URL tombol &quot;BELI TIKET BIOSKOP&quot; untuk bioskop di masing-masing kota roadshow.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {CITIES_DATA.map(city => (
-                  <div key={city.slug} className="bg-slate-50 border border-slate-200/80 rounded-xl p-4.5">
-                    <div className="flex items-center justify-between mb-3 border-b border-slate-200/60 pb-2">
-                      <span className="font-extrabold text-sm text-slate-900 uppercase">
-                        {city.name} ({city.dateStr})
-                      </span>
-                      <Link
-                        href={`/city/${city.slug}`}
-                        target="_blank"
-                        className="text-[11px] text-amber-600 hover:text-amber-700 font-bold flex items-center gap-1"
-                      >
-                        <span>Preview Kota</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
+            <div className="space-y-6">
+              {/* Header Box */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center shrink-0">
+                      <Calendar className="w-6 h-6 text-amber-600" />
                     </div>
-
-                    <div className="space-y-3">
-                      {city.cinemas.map((cinema, cIdx) => {
-                        const overrideKey = `${city.slug}_${cIdx}`;
-                        const currentVal = settings.cityLinkOverrides?.[overrideKey] ?? cinema.ticketUrl;
-
-                        return (
-                          <div key={cIdx} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-xs">
-                            <div className="text-slate-700 font-bold">
-                              {cinema.name} ({cinema.chain})
-                            </div>
-                            <div className="sm:col-span-2">
-                              <input
-                                type="text"
-                                value={currentVal}
-                                onChange={e => {
-                                  const updated = {
-                                    ...(settings.cityLinkOverrides || {}),
-                                    [overrideKey]: e.target.value,
-                                  };
-                                  setSettings({ ...settings, cityLinkOverrides: updated });
-                                }}
-                                placeholder="URL tiket bioskop..."
-                                className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none font-mono text-[11px]"
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-black text-slate-900">
+                          Pusat Kendali Jadwal Roadshow &amp; Bioskop (17 Kota)
+                        </h3>
+                        <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+                          17 Kota Roadshow
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+                        Kelola jam tayang Special Screening (nonton duluan), info studio, ketersediaan kursi, alamat, link tiket bioskop, titik booth mall, dan rundown harian untuk seluruh kota roadshow secara langsung (real-time).
+                      </p>
                     </div>
                   </div>
-                ))}
 
-                <button
-                  onClick={handleSaveSettings}
-                  className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-3 px-6 rounded-xl transition shadow-sm"
-                >
-                  <Save className="w-4 h-4 text-amber-400" />
-                  <span>Simpan Perubahan Link Tiket</span>
-                </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveSettings}
+                      disabled={savingSettings}
+                      className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs py-2.5 px-5 rounded-xl transition shadow-sm active:scale-95 disabled:opacity-50"
+                    >
+                      {savingSettings ? <RefreshCw className="w-4 h-4 animate-spin text-amber-400" /> : <Save className="w-4 h-4 text-amber-400" />}
+                      <span>{savingSettings ? 'Menyimpan...' : 'Simpan Semua'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Search & City Filter Bar */}
+                <div className="mt-5 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700">
+                      PILIH KOTA YANG INGIN DIEDIT:
+                    </span>
+                    <div className="relative w-full sm:w-64">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={citySearchQuery}
+                        onChange={e => setCitySearchQuery(e.target.value)}
+                        placeholder="Cari nama kota..."
+                        className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 outline-none focus:border-slate-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 17 Cities Quick Selector Pills */}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {CITIES_DATA.filter(c => {
+                      if (!citySearchQuery.trim()) return true;
+                      const q = citySearchQuery.toLowerCase();
+                      return c.name.toLowerCase().includes(q) || c.province.toLowerCase().includes(q);
+                    }).map(c => {
+                      const isSelected = c.slug === selectedCitySlug;
+                      const overridden = isCityOverridden(c.slug);
+                      const currentCity = getCurrentCityData(c.slug);
+
+                      return (
+                        <button
+                          key={c.slug}
+                          type="button"
+                          onClick={() => setSelectedCitySlug(c.slug)}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                            isSelected
+                              ? 'bg-slate-900 text-amber-400 shadow-md ring-2 ring-amber-400/40'
+                              : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200/60'
+                          }`}
+                        >
+                          <span>{c.name}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                            isSelected ? 'bg-white/10 text-slate-300' : 'bg-white text-slate-500'
+                          }`}>
+                            {currentCity.dateStr.split(' ')[0]} {currentCity.dateStr.split(' ')[1]?.slice(0, 3)}
+                          </span>
+                          {overridden && (
+                            <span className="w-2 h-2 rounded-full bg-amber-400" title="Ada jadwal kustom tersimpan" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* City Active Workspace */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-8 shadow-sm">
+                {/* Active City Title & Actions */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xl font-black text-slate-900 uppercase">
+                        KOTA {activeCityData.name} ({activeCityData.province})
+                      </h4>
+                      {isCityOverridden(activeCityData.slug) ? (
+                        <span className="bg-amber-500/10 border border-amber-500/30 text-amber-700 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">
+                          Jadwal Kustom Aktif
+                        </span>
+                      ) : (
+                        <span className="bg-slate-100 text-slate-500 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
+                          Default Awal
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Slug URL: <code className="text-amber-600 font-mono">/city/{activeCityData.slug}</code>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/city/${activeCityData.slug}`}
+                      target="_blank"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition"
+                    >
+                      <span>Lihat Halaman Publik</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={resetSelectedCityToDefault}
+                      title="Kembalikan ke jadwal default awal"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Reset Default</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 1. TANGGAL ROADSHOW KOTA */}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+                  <div className="flex items-center gap-2 text-slate-900 font-extrabold text-sm">
+                    <Calendar className="w-4 h-4 text-amber-600" />
+                    <span>Tanggal Pelaksanaan Roadshow Kota</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                        Tanggal Tampil (Bahasa Indonesia)
+                      </label>
+                      <input
+                        type="text"
+                        value={activeCityData.dateStr}
+                        onChange={e => updateSelectedCityField('dateStr', e.target.value)}
+                        placeholder="Contoh: 22 Oktober 2026"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-4 py-2.5 text-slate-900 font-bold text-xs outline-none"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Tanggal ini akan otomatis diperbarui di seluruh kartu bioskop, hero kota, dan balasan CS AI WhatsApp.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. DAFTAR BIOSKOP SPECIAL SCREENING (INTI REVISI USER) */}
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Film className="w-4 h-4 text-amber-600" />
+                        <h5 className="font-extrabold text-sm text-slate-900 uppercase">
+                          Bioskop &amp; Jam Tayang Special Screening (Nonton Duluan)
+                        </h5>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Kelola bioskop, jam tayang, catatan pintu, kuota kursi, dan link pembelian tiket resmi.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={addCinemaToSelectedCity}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-sm active:scale-95"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Tambah Bioskop di {activeCityData.name}</span>
+                    </button>
+                  </div>
+
+                  {/* List of Cinema Cards */}
+                  <div className="space-y-4">
+                    {(activeCityData.cinemas || []).map((cinema, cIdx) => (
+                      <div
+                        key={cIdx}
+                        className="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 relative"
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-black flex items-center justify-center">
+                              {cIdx + 1}
+                            </span>
+                            <span className="font-extrabold text-sm text-slate-900 uppercase">
+                              {cinema.name || `Bioskop #${cIdx + 1}`}
+                            </span>
+                            <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded">
+                              {cinema.chain}
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => removeCinemaFromSelectedCity(cIdx)}
+                            className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-bold px-2.5 py-1 rounded-lg hover:bg-red-50 transition"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Hapus</span>
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                          {/* Nama Bioskop */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Nama Bioskop
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.name}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { name: e.target.value })}
+                              placeholder="Contoh: THE PARK XXI SEMARANG"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-bold outline-none"
+                            />
+                          </div>
+
+                          {/* Chain */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Jaringan (Chain)
+                            </label>
+                            <select
+                              value={cinema.chain}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { chain: e.target.value as any })}
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-bold outline-none"
+                            >
+                              <option value="XXI">XXI (Cinema 21)</option>
+                              <option value="Cinepolis">Cinépolis</option>
+                              <option value="CGV">CGV Cinemas</option>
+                              <option value="Platinum">Platinum Cineplex</option>
+                              <option value="NSC">New Star Cineplex (NSC)</option>
+                              <option value="Indie">Bioskop Independen / Lainnya</option>
+                            </select>
+                          </div>
+
+                          {/* Nama Studio */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Nama Studio / Audi
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.studio}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { studio: e.target.value })}
+                              placeholder="Contoh: Studio 1 Premiere Sound / Audi 2 Super Screen"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none"
+                            />
+                          </div>
+
+                          {/* Jam Tayang */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Jam Tayang (Showtime)
+                            </label>
+                            <input
+                              type="text"
+                              value={Array.isArray(cinema.showTimes) ? cinema.showTimes.join(', ') : (cinema.showTimes || '')}
+                              onChange={e => {
+                                const val = e.target.value;
+                                const times = val.split(',').map(s => s.trim()).filter(Boolean);
+                                updateCinemaInSelectedCity(cIdx, { showTimes: times });
+                              }}
+                              placeholder="Contoh: 14.30 WIB atau 14.30 WIB, 19.00 WIB"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-mono font-bold outline-none"
+                            />
+                            <span className="text-[10px] text-slate-500 mt-0.5 block">
+                              Pisahkan koma jika ada lebih dari 1 jam tayang.
+                            </span>
+                          </div>
+
+                          {/* Catatan Pintu */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Catatan Pintu Teater
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.doorNote || ''}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { doorNote: e.target.value })}
+                              placeholder="Contoh: Pintu teater dibuka 15 mnt sebelumnya"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none"
+                            />
+                          </div>
+
+                          {/* Sisa Kursi Text Badge */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Teks Sisa Kursi (Badge)
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.remainingSeatsText || ''}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { remainingSeatsText: e.target.value })}
+                              placeholder="Contoh: ±42 kursi tersisa"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-mono outline-none"
+                            />
+                          </div>
+
+                          {/* Alamat Bioskop */}
+                          <div className="sm:col-span-2">
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Alamat Lengkap / Lokasi Mall
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.address || ''}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { address: e.target.value })}
+                              placeholder="Contoh: The Park Mall Semarang Lt. 3, Jl. Madukoro Raya No. 1"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none"
+                            />
+                          </div>
+
+                          {/* Badge Text Atas */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Badge Header Kartu
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.badgeText || 'SPECIAL SCREENING · GREETING CAST'}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { badgeText: e.target.value })}
+                              placeholder="Contoh: SPECIAL SCREENING · GREETING CAST"
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-mono outline-none text-[11px]"
+                            />
+                          </div>
+
+                          {/* Link Tiket URL */}
+                          <div className="sm:col-span-2 lg:col-span-3">
+                            <label className="block font-bold text-slate-700 uppercase mb-1 flex items-center justify-between">
+                              <span>Link Tiket (URL Pembelian Langsung ke Bioskop)</span>
+                              {cinema.ticketUrl && (
+                                <a
+                                  href={cinema.ticketUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[11px] text-amber-600 hover:text-amber-700 font-bold inline-flex items-center gap-1"
+                                >
+                                  <span>Test Link Tiket</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.ticketUrl || ''}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { ticketUrl: e.target.value })}
+                              placeholder="https://m.21cineplex.com/... atau https://tix.id/..."
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-mono text-[11px] outline-none"
+                            />
+                            <span className="text-[10px] text-slate-500 mt-0.5 block">
+                              URL ini menjadi target tombol &quot;NONTON DULUAN DI {cinema.name}&quot; dan dikirimkan oleh CS AI WhatsApp ke penonton.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. LIVE PREVIEW KARTU BIOSKOP (PERSIS SCREENSHOT USER) */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-500" />
+                      <h5 className="font-extrabold text-sm text-slate-900 uppercase">
+                        Live Preview: Tampilan Kartu di Halaman Publik
+                      </h5>
+                    </div>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      Real-time Preview (Persis seperti yang dilihat pengunjung)
+                    </span>
+                  </div>
+
+                  <div className="bg-[#0b0f17] border border-white/10 rounded-2xl p-6 sm:p-8">
+                    <div className="text-center mb-6">
+                      <span className="text-[11px] font-black uppercase tracking-[0.25em] text-amber-400">
+                        PILIHAN LOKASI NONTON DULUAN
+                      </span>
+                      <h4 className="text-2xl font-black text-white uppercase tracking-tight mt-1 mb-1">
+                        PILIH LOKASI NONTON DULUAN!
+                      </h4>
+                      <p className="text-xs text-slate-400 max-w-lg mx-auto">
+                        Beli tiket sekarang dan nonton duluan di tanggal {activeCityData.dateStr}. Jangan sampai kehabisan, persediaan tiket terbatas!
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                      {(activeCityData.cinemas || []).map((cinema, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-[#121620] border border-white/10 hover:border-amber-500/50 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden transition-all"
+                        >
+                          <div>
+                            {/* Badges */}
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                              <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400">
+                                {cinema.badgeText || 'SPECIAL SCREENING · GREETING CAST'}
+                              </span>
+                              {cinema.remainingSeatsText && (
+                                <span className="text-[11px] font-mono font-bold text-slate-400 bg-white/5 px-2.5 py-0.5 rounded border border-white/10">
+                                  {cinema.remainingSeatsText}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Cinema Name & Studio */}
+                            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+                              {cinema.name}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-400 font-medium mb-5">
+                              {cinema.studio}
+                            </p>
+
+                            {/* Info List */}
+                            <div className="bg-[#161c28] border border-white/5 rounded-2xl p-4 space-y-2.5 mb-6 text-xs sm:text-sm text-slate-200">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+                                <span className="font-semibold">{activeCityData.dateStr}</span>
+                              </div>
+
+                              <div className="flex items-start gap-2">
+                                <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                                <span>
+                                  <b className="text-amber-300 font-mono text-xs sm:text-sm">
+                                    {Array.isArray(cinema.showTimes) ? cinema.showTimes.join(', ') : cinema.showTimes}
+                                  </b>{' '}
+                                  <span className="text-slate-400 text-xs">
+                                    ({cinema.doorNote || 'Pintu teater dibuka 15 mnt sebelumnya'})
+                                  </span>
+                                </span>
+                              </div>
+
+                              {cinema.address && (
+                                <div className="flex items-start gap-2 text-slate-300">
+                                  <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                                  <span className="text-xs">{cinema.address}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* CTA Button */}
+                          <div>
+                            <div className="w-full bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black py-3.5 px-5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-center uppercase tracking-wide text-xs sm:text-sm cursor-pointer">
+                              <span>NONTON DULUAN DI {cinema.name}</span>
+                              <ExternalLink className="w-4 h-4" />
+                            </div>
+                            <p className="text-[11px] text-slate-400 text-center mt-2.5 flex items-center justify-center gap-1">
+                              <span>Kamu akan diarahkan ke platform ticketing resmi.</span>
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. BOOTH MALL ROADSHOW & PENUKARAN VOUCHER */}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-amber-600" />
+                      <h5 className="font-extrabold text-sm text-slate-900 uppercase">
+                        Titik Booth Mall &amp; Pengambilan Voucher Fisik
+                      </h5>
+                    </div>
+                    <span className="text-[11px] text-slate-500">
+                      Lokasi offline jumpa pemain &amp; konter booth resmi
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label className="block font-bold text-slate-700 uppercase mb-1">
+                        Nama Mall / Venue
+                      </label>
+                      <input
+                        type="text"
+                        value={activeCityData.boothInfo?.venue || ''}
+                        onChange={e => updateBoothInfoInSelectedCity({ venue: e.target.value })}
+                        placeholder="Contoh: THE PARK MALL SEMARANG"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-bold outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 uppercase mb-1">
+                        Lantai / Posisi Booth
+                      </label>
+                      <input
+                        type="text"
+                        value={activeCityData.boothInfo?.floor || ''}
+                        onChange={e => updateBoothInfoInSelectedCity({ floor: e.target.value })}
+                        placeholder="Contoh: Lantai 2 (Area Atrium Depan Eskalator)"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 uppercase mb-1">
+                        Jam Standby Booth
+                      </label>
+                      <input
+                        type="text"
+                        value={activeCityData.boothInfo?.timeStr || ''}
+                        onChange={e => updateBoothInfoInSelectedCity({ timeStr: e.target.value })}
+                        placeholder="Contoh: 16.00 – 17.00 WIB"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-mono outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 uppercase mb-1">
+                        Petunjuk Arah (Directions)
+                      </label>
+                      <input
+                        type="text"
+                        value={activeCityData.boothInfo?.directions || ''}
+                        onChange={e => updateBoothInfoInSelectedCity({ directions: e.target.value })}
+                        placeholder="Contoh: Dekat eskalator tengah lantai 2, cari spanduk oranye..."
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block font-bold text-slate-700 uppercase mb-1">
+                        Peringatan Khusus Penukaran (Notice)
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={activeCityData.boothInfo?.exclusiveNotice || ''}
+                        onChange={e => updateBoothInfoInSelectedCity({ exclusiveNotice: e.target.value })}
+                        placeholder="Contoh: Penukaran voucher fisik resmi hanya berada di The Park Mall Lantai 2... DILARANG menukar di kasir bioskop manapun."
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 outline-none text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. RUNDOWN JADWAL ACARA HARI ITU */}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-amber-600" />
+                      <h5 className="font-extrabold text-sm text-slate-900 uppercase">
+                        Rundown Agenda Hari H Roadshow ({activeCityData.name})
+                      </h5>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={addRundownItem}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition active:scale-95"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Tambah Agenda</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {(activeCityData.rundown?.items || []).map((item, rIdx) => (
+                      <div
+                        key={rIdx}
+                        className="bg-white border border-slate-200/80 rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center text-xs"
+                      >
+                        <div className="sm:col-span-2">
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">
+                            Jam
+                          </label>
+                          <input
+                            type="text"
+                            value={item.time}
+                            onChange={e => updateRundownItem(rIdx, { time: e.target.value })}
+                            placeholder="09.00 - 11.00 WIB"
+                            className="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 font-mono text-slate-900 font-bold outline-none"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">
+                            Kategori
+                          </label>
+                          <select
+                            value={item.category}
+                            onChange={e => updateRundownItem(rIdx, { category: e.target.value as any })}
+                            className="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-slate-900 font-bold outline-none text-[11px]"
+                          >
+                            <option value="Sekolah">Sekolah</option>
+                            <option value="Kampus">Kampus</option>
+                            <option value="Radio">Radio</option>
+                            <option value="Mall & Meet">Mall &amp; Meet</option>
+                            <option value="Screening">Screening</option>
+                            <option value="Acara">Acara</option>
+                          </select>
+                        </div>
+
+                        <div className="sm:col-span-4">
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">
+                            Judul Agenda
+                          </label>
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={e => updateRundownItem(rIdx, { title: e.target.value })}
+                            placeholder="Contoh: Kunjungan Sekolah & Tebar Semangat"
+                            className="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-slate-900 font-bold outline-none"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-3">
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">
+                            Lokasi / Venue
+                          </label>
+                          <input
+                            type="text"
+                            value={item.venue}
+                            onChange={e => updateRundownItem(rIdx, { venue: e.target.value })}
+                            placeholder="Contoh: SMK Negeri 7 Semarang"
+                            className="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-slate-900 outline-none"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-1 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => removeRundownItem(rIdx)}
+                            className="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 transition"
+                            title="Hapus agenda ini"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6. BOTTOM SAVE BAR */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>
+                      Perubahan jadwal Kota <b>{activeCityData.name}</b> akan tersimpan ke server database dan langsung live.
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={handleSaveSettings}
+                      disabled={savingSettings}
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3.5 px-7 rounded-xl transition shadow-lg shadow-emerald-600/20 active:scale-95 disabled:opacity-50"
+                    >
+                      {savingSettings ? <RefreshCw className="w-4 h-4 animate-spin text-white" /> : <Save className="w-4 h-4 text-white" />}
+                      <span>{savingSettings ? 'Menyimpan Perubahan...' : `Simpan Jadwal ${activeCityData.name.toUpperCase()}`}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
+
 
           {/* TAB 4: WAHNOTIF & SCRIPT CHAT (CLEAN WHITE) */}
           {activeTab === 'wahnotif' && (

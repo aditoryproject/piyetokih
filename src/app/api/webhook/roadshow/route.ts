@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
 
     const rosterFormatted = cityData.rosterActual.join(', ');
 
-    const cityCinemas = getCityCinemaTicketLinks(cityData.slug);
+    const cityCinemas = getCityCinemaTicketLinks(cityData.slug, db.settings.roadshowOverrides);
     const cityCinemasText = cityCinemas.length > 0
       ? `\n🎬 *TIKET PRESALE SPECIAL SCREENING BIOSKOP ${cityData.cityName.toUpperCase()}:*\n` +
         cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n')

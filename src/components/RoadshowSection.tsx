@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { CITIES_DATA } from '@/lib/cities';
+import { CITIES_DATA, CityData } from '@/lib/cities';
 import {
   Calendar,
   MapPin,
@@ -18,12 +18,18 @@ import {
 } from 'lucide-react';
 import { trackCityCustomEvent } from '@/lib/pixel';
 
-export default function RoadshowSection() {
+interface RoadshowSectionProps {
+  initialCities?: CityData[];
+}
+
+export default function RoadshowSection({ initialCities }: RoadshowSectionProps = {}) {
   const [activeTab, setActiveTab] = useState<'all' | 'jateng' | 'jatim'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const citiesList = initialCities && initialCities.length > 0 ? initialCities : CITIES_DATA;
+
   const filteredCities = useMemo(() => {
-    return CITIES_DATA.filter(city => {
+    return citiesList.filter(city => {
       // Region filter
       if (activeTab === 'jateng') {
         const isJateng =

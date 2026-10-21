@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
 
       // Check city cinemas or override
       const citySlug = c.city.toLowerCase().trim();
-      const cityCinemas = getCityCinemaTicketLinks(citySlug);
+      const cityCinemas = getCityCinemaTicketLinks(citySlug, db.settings.roadshowOverrides);
       const cityOverride = db.settings.cityLinkOverrides?.[citySlug];
 
       let cinemaLinksText = `• *Cinema XXI (M-TIX):* ${defaultXxi}\n• *TIX ID:* ${defaultTixid}`;

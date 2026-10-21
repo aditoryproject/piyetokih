@@ -1,7 +1,7 @@
 import React from 'react';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { getDb } from '@/lib/db';
+import { getDb, getEffectiveCities } from '@/lib/db';
 import { ADMIN_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
 import ComingSoonView from '@/components/ComingSoonView';
 import RoadshowSection from '@/components/RoadshowSection';
@@ -163,7 +163,7 @@ export default async function HomePage() {
       </section>
 
       {/* 7. ROADSHOW 17 KOTA RESMI (HALAMAN 8 & 9) */}
-      <RoadshowSection />
+      <RoadshowSection initialCities={getEffectiveCities(db)} />
 
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
       <ArticlesSection initialArticles={(db.articles || []).filter(a => a.published)} />

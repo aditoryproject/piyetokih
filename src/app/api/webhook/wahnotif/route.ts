@@ -307,7 +307,7 @@ export async function POST(req: NextRequest) {
           s.cityName.toLowerCase().includes(cityParam) || cityParam.includes(s.slug)
         );
         if (matchedStop) {
-          const cityCinemas = getCityCinemaTicketLinks(matchedStop.slug);
+          const cityCinemas = getCityCinemaTicketLinks(matchedStop.slug, db.settings.roadshowOverrides);
           if (cityCinemas.length > 0) {
             cityNote = `\n🍿 *Bioskop Khusus di ${matchedStop.cityName}:*\n` +
               cityCinemas.map(c => `• ${c.cinemaName} (${c.showTimes.join(', ')}): ${c.ticketUrl}`).join('\n');
