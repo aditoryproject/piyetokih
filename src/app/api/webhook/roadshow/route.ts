@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
+import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
 import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA } from '@/lib/wahnotif';
@@ -75,14 +75,12 @@ export async function POST(req: NextRequest) {
     // (Only trigger general list if a specific city name like 'semarang' or 'solo' is NOT mentioned alongside)
     const effectiveCity = getCityByNameOrSlug(normalizedCity);
     if (!effectiveCity && isGeneralCityQuery) {
-      const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
       const formattedCitiesList = CITIES_DATA.map((c, idx) => {
         const note = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
         return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${note}`;
       }).join('\n');
 
       const replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
 
 🎬 *DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST PIYE TO KIH? THE MOVIE:*
 ${formattedCitiesList}
@@ -151,9 +149,6 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
       manualExpiredCities: manualExpired,
     });
 
-    // Random pantun
-    const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
-
     // SCENARIO A: ROADSHOW CITY EXPIRED (Misal Semarang setelah 22 Okt)
     if (isExpired) {
       return NextResponse.json({
@@ -163,7 +158,7 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
         cityName: cityData.cityName,
         dateStr: cityData.dateStr,
         ticketLinks,
-        replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n${randomPantun}\n\nMaaf banget lur, sesi roadshow temu pemain dan booth voucher fisik di ${cityData.cityName} kemarin (${cityData.dateStr}) sudah rampung terlaksana lur! Jadi penukaran voucher fisik di booth mall sudah selesai dan ditutup ya.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di seluruh bioskop ${cityData.cityName} dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota pas presale dibuka, sini Mas Kidi amankan nomor sampean di Pengingat Prioritas WA. Boleh infokan Nama Lengkap sampean ya lur! ✨`
+        replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nMaaf banget lur, sesi roadshow temu pemain dan booth voucher fisik di ${cityData.cityName} kemarin (${cityData.dateStr}) sudah rampung terlaksana lur! Jadi penukaran voucher fisik di booth mall sudah selesai dan ditutup ya.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di seluruh bioskop ${cityData.cityName} dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota pas presale dibuka, sini Mas Kidi amankan nomor sampean di Pengingat Prioritas WA. Boleh infokan Nama Lengkap sampean ya lur! ✨`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -196,7 +191,6 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
     const replyMessage = `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬
 
 Halo warga ${cityData.cityName} bolo asikku! Piye kabare? 😄
-${randomPantun}
 
 Rombongan film PIYE TO KIH? bakal hadir seru-seruan di kotamu pada:
 📅 *Tanggal:* ${cityData.dateStr}
@@ -216,7 +210,7 @@ ${cinemasTicketSection}
 🔥 *MAU NONTON DULUAN DI DALAM STUDIO BARENG PEMAIN?*
 Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas lur! Baris tengah cepat ludes. Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas dan amankan tiketmu sekarang lur!
 
-Mau sekalian Mas Kidi amankan Kode Booking voucher fisik Rp10.000 buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`;
+Mau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (berlaku seharga tiket penuh di bioskop tanpa biaya tambahan) buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`;
 
     return NextResponse.json({
       success: true,

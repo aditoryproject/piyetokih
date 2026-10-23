@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MASTER_MOVIE_FACTS, FAST_TRACK_TICKET_LINKS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
+import { MASTER_MOVIE_FACTS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
 import { WAHNOTIF_TOOL_MOVIE_SCHEMA } from '@/lib/wahnotif';
 
 const corsHeaders = {
@@ -34,8 +34,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const args = body.arguments || body.parameters || body;
     const topic = String(args.topic || args.query || args.message || 'all').toLowerCase();
-
-    const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
 
     let detailContent = '';
 
@@ -74,7 +72,6 @@ Heri Chandra (Mukidi), Dara Sarasvati (Sukma), Sutrisno Agung (Gendut), Eko Dunu
     }
 
     const replyMessage = `Halo bolo asik! Piye kabare? 😄
-${randomPantun}
 
 ${detailContent}
 

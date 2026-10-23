@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS, MAS_KIDI_PANTUN, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
+import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
 import { getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_TICKETS_SCHEMA } from '@/lib/wahnotif';
@@ -106,7 +106,6 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const isBogoLive = now >= new Date(2026, 10, 15); // Dibuka 15 Nov 2026
 
-    const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
     const randomJoke = MAS_KIDI_JOKES[Math.floor(Math.random() * MAS_KIDI_JOKES.length)];
 
     let cinemaCityNote = '';
@@ -146,7 +145,6 @@ export async function POST(req: NextRequest) {
         : `🎟️ *LINK LANGSUNG CEK HARGA & BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
 
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
 
 🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
 Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran **Rp 30.000 sampai Rp 50.000** per tiket lur!
@@ -156,6 +154,7 @@ Buat cek harga tiket pasti di bioskop kotamu sekaligus langsung amankan kursi in
 ${priceTicketBlock}
 
 🔥 *TIPS HEMAT DARI MAS KIDI:*
+• *Mau Tebus Murah Tiket Rp10.000?* Di 17 kota roadshow, sampean bisa booking voucher online lalu tebus voucher fisik Rp10.000 di booth roadshow mall. Lembaran voucher fisik ini berlaku sebesar harga tiket penuh di seluruh bioskop yang menayangkan PIYE TO KIH? tanggal 19–20 November 2026 (bukan potongan/diskon, penonton tidak perlu bayar sisa tiket lagi di kasir bioskop!).
 • *Mau Nonton Duluan bareng cast sebelum 19 Nov?* Sesi Special Screening di bioskop kota roadshow sudah bisa dibeli tiket presale-nya sekarang lewat link di atas lur!
 • *Promo Buy 1 Get 1 (19 Nov):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID & M-TIX XXI! Mau Mas Kidi amankan slot Pengingat Prioritas H-1 via WA? Cukup infokan Nama & Kota sampean ya lur!
 
@@ -169,7 +168,6 @@ Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`;
         : `🎟️ *LINK LANGSUNG BELI TIKET PRESALE / NONTON DULUAN (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
 
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
 
 🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER? BISA BANGET LUR!* 🎬
 Kabar gembira! Sampean GAK PERLU nunggu sampai penayangan reguler 19 November buat nonton film komedi layar lebar *"PIYE TO KIH?"*!
@@ -184,7 +182,6 @@ Langsung klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya l
     } else if (isBogoInquiry && isBogoLive) {
       // 2. Promo Buy 1 Get 1 on or after 15 Nov 2026 (Live War)
       replyMessage = `Halo bolo asik! Piye kabare? Kabar gembira lur! 😄
-${randomPantun}
 
 🔥 *WAR PROMO BUY 1 GET 1 (BOGO) RESMI DIBUKA HARI INI!* 🔥
 Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayangan perdana 19 November 2026!
@@ -201,7 +198,6 @@ Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayanga
     } else if (isBogoInquiry && !isBogoLive) {
       // 3. Promo Buy 1 Get 1 before 15 Nov 2026: UPSELL PRESALE ROADSHOW DULU!
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
 
 🎟️ *MAU NONTON DULUAN SEKARANG BARENG PEMAIN TANPA PERLU NUNGGU?* 🎟️
 Kenapa harus nunggu sampai 19 November kalau sekarang sampean bisa *NONTON DULUAN* bareng rombongan Mukidi, Sukma, Gendut, dan Penyok di sesi *SPECIAL SCREENING ROADSHOW*!
@@ -223,7 +219,6 @@ Biar gak kehabisan kuota pas loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 
         : `🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*\nBiar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:\n• *Cinema XXI (M-TIX):* ${ticketLinks.xxi}\n• *TIX ID:* ${ticketLinks.tixid}\n• *CGV Cinemas:* ${ticketLinks.cgv}\n• *Cinépolis:* ${ticketLinks.cinepolis}\n• *Website Resmi & Info Kota:* ${ticketLinks.website}${cityLinkNote}${cinemaCityNote}`;
 
       replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
 
 ${randomJoke}
 

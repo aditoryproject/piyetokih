@@ -709,14 +709,23 @@ export const FAST_TRACK_TICKET_LINKS = {
   trailerYoutube: 'https://www.youtube.com/@MIRACLEPICTURES'
 };
 
-export const MAS_KIDI_PANTUN = [
-  'Mangan getuk nang kutha Salatiga, beda alam beda agama tapi tetep bikin ketawa! 🍿',
-  'Tuku klopo menyang Pasar Minggu, nonton Mukidi ben atine gak gampang ngelu! ✨',
-  'Iwak teri kecemplung santen, daripada nonton sendiri mending nonton karo pasangan! (Nek ra duwe pasangan ya tetep gas karo kancane lur 😂)',
-  'Jalan-jalan menyang Malioboro, mampir tuku bakpia. Nonton Mukidi bareng bolo-bolo, dijamin langsung bahagia! 🎬',
-  'Goreng tahu dicocol petis, nonton Mukidi karo Sukma rasane manis romantis! 💖',
-  'Sego pecel lawuhe tempe, nonton film komedi ben uripmu tambah rame! 🥳'
-];
+export const VOUCHER_TEBUS_MURAH_FACTS = {
+  name: 'Tebus Murah Tiket Bioskop Rp 10.000 (Voucher Fisik)',
+  price: 'Rp 10.000',
+  description: 'Program Tebus Murah Tiket Nonton Bioskop film PIYE TO KIH? seharga Rp 10.000.',
+  fullValueNotice: 'Voucher fisik Rp 10.000 ini berlaku sebesar HARGA PENUH di seluruh bioskop yang menayangkan film PIYE TO KIH? pada tanggal 19–20 November 2026. Penonton TIDAK PERLU membayar kekurangan atau sisa harga tiket di bioskop!',
+  notDiscountWarning: 'BUKAN POTONGAN DAN BUKAN DISKON: Dilarang keras menjelaskan voucher ini sebagai diskon atau potongan harga Rp 10.000 (misal: 40rb - 10rb = bayar 30rb ke kasir itu SALAH BESAR). Voucher fisik ini meng-cover PENUH 100% harga tiket normal di bioskop tersebut.',
+  flow: [
+    '1. Calon penonton mendaftar online untuk mendapatkan KODE BOOKING.',
+    '2. Bawa Kode Booking ke konter booth resmi acara Roadshow & Meet and Greet offline di kotanya.',
+    '3. Di booth, bayar/tebus Rp 10.000 untuk mendapatkan LEMBARAN VOUCHER FISIK RESMI seharga Rp 10.000.',
+    '4. Bawa lembaran voucher fisik tersebut ke kasir bioskop manapun yang menayangkan film PIYE TO KIH? pada tanggal 19 atau 20 November 2026.',
+    '5. Di kasir bioskop, voucher fisik seharga Rp 10.000 tersebut digunakan sebagai tiket nonton SEBESAR HARGA PENUH di lokasi bioskop tersebut (tanpa perlu bayar biaya tambahan).'
+  ],
+  boothOnlyWarning: 'Penukaran kode booking menjadi voucher fisik HANYA bisa dilakukan di konter booth roadshow meet & greet offline di mall. Kasir bioskop TIDAK MELAYANI penukaran kode booking di HP!'
+};
+
+export const MAS_KIDI_PANTUN: string[] = [];
 
 export const MAS_KIDI_JOKES = [
   'Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae ragu-ragu? Gas lur! 😂',
@@ -726,3 +735,4 @@ export const MAS_KIDI_JOKES = [
   'Tenang lur, Mas Kidi wonge asik kok, ora galak koyo satpam mall pas nutup pintu keluar.',
   'Udah beda alam, beda agama pula... untung cintanya gak beda frekuensi wifi! 📶'
 ];
+

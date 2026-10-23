@@ -7517,7 +7517,7 @@ export default function AdminDashboardClient() {
                 <div className="bg-emerald-950/40 border border-emerald-500/20 rounded-xl p-3 text-[11px] text-emerald-300/90 leading-relaxed flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <strong>Sistem Anti-Spam & Auto-Stop Pintar:</strong> Setiap pesan menggunakan pantun unik dan sapaan personal. Jika audiens membalas (misal: <em>&quot;sudah beli&quot;, &quot;oke&quot;, &quot;skip&quot;, &quot;tidak jadi&quot;</em>), AI CS otomatis menandai kontak dan <strong>langsung menghentikan follow-up selanjutnya</strong> agar tidak mengganggu penonton.
+                    <strong>Sistem Anti-Spam & Auto-Stop Pintar:</strong> Setiap pesan menggunakan variasi guyonan khas Mukidi dan sapaan personal ramah. Jika audiens membalas (misal: <em>&quot;sudah beli&quot;, &quot;oke&quot;, &quot;skip&quot;, &quot;tidak jadi&quot;</em>), AI CS otomatis menandai kontak dan <strong>langsung menghentikan follow-up selanjutnya</strong> agar tidak mengganggu penonton.
                   </div>
                 </div>
               </div>

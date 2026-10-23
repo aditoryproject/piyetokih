@@ -303,4 +303,28 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
        - Pada `src/lib/wahnotif.ts`, menghapus syarat `required: ["city"]`, menambahkan aturan anti-halusinasi eksplisit yang melarang penyebutan kota fiktif (Kudus, Salatiga, Klaten, Purwokerto, Tegal, Jember, Jakarta), menyinkronkan FAQ #2 menjadi tepat 17 kota, dan menambahkan sample dialog untuk pertanyaan temu cast.
        - Menambahkan proteksi non-roadshow jika audiens menyebut kota lain (Jakarta, Bandung, Medan, Kudus, dll) agar langsung diarahkan ke penayangan serentak 19 November di bioskop kotanya.
 
+21. **Koreksi Fatal Logika Program Tebus Murah Voucher Rp 10.000 (Berlaku Sebesar Harga Tiket Penuh di Bioskop, Anti Diskon/Potongan) & Eliminasi Total Balasan Pantun CS AI Wahnotif**:
+    * **Investigasi & Koreksi Fatal Penjelasan Voucher (Bukti Screenshot WhatsApp)**:
+      - **Kesalahan Fatal Sebelumnya**: Bot AI Wahnotif sebelumnya mengasumsikan kata "voucher fisik potongan Rp 10.000" sebagai diskon nominal. Bot berhalusinasi dan membuat simulasi hitungan keliru di WhatsApp: *"Harga normal bioskop: Rp 40.000, voucher potongan: Rp 10.000, jadi tinggal bayar ke kasir bioskop Rp 40.000 - Rp 10.000 = Rp 30.000"*.
+      - **Logika Bisnis yang Benar & Terkunci**: Program ini adalah **TEBUS MURAH TIKET BIOSKOP RP 10.000**.
+        1. Calon penonton booking online lewat WhatsApp/website untuk mendapatkan Kode Booking resmi.
+        2. Kode Booking ini dibawa ke booth roadshow meet & greet offline di mall, lalu ditebus dengan membayar Rp 10.000 untuk mendapatkan lembaran **Voucher Fisik resmi**.
+        3. Lembaran voucher fisik ini dibawa ke kasir bioskop yang menayangkan film *PIYE TO KIH?* pada tanggal 19–20 November 2026 dan **BERLAKU SEBESAR HARGA TIKET PENUH** di lokasi tersebut (penonton **TIDAK PERLU** membayar sepeser pun lagi di kasir bioskop!).
+      - **Aturan Mutlak Anti-Diskon/Anti-Potongan**: Dilarang keras menyebut atau menjelaskan program ini sebagai diskon atau potongan harga. Dilarang keras membuat simulasi pengurangan harga tiket bioskop.
+      - **Aturan Penukaran Kasir Bioskop**: Kasir bioskop HANYA menerima lembaran voucher fisik asli saat penayangan 19–20 November 2026. Kasir bioskop TIDAK melayani penukaran kode booking di HP. Kode booking WA wajib ditebus dulu di booth mall roadshow.
+    * **Eliminasi Total Balasan Pantun CS AI Wahnotif**:
+      - Seluruh pantun bot dihapus total dari database pengetahuan (`MAS_KIDI_PANTUN = []`), persona Wahnotif, template chat, prompt Gemini multimodal, webhook response, dan auto-followup presale karena dinilai tidak bagus/norak oleh user.
+      - Mas Kidi tetap ramah, guyub, dan humoris dengan bahasa tongkrongan santai khas Jawa tanpa berpantun sama sekali.
+    * **File-File yang Dimodifikasi**:
+      - [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts): Dikosongkan `MAS_KIDI_PANTUN = [];`, ditambahkan `VOUCHER_TEBUS_MURAH_FACTS` yang merinci aturan mutlak tebus murah Rp 10.000 seharga tiket penuh.
+      - [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts): Dihapus referensi pantun dari tone & prompt persona; ditambahkan aturan mutlak di `konteksBisnis`, `teknikClosing`, `dataPengetahuanFAQ`, `systemPrompt`, dan `sampleDialogs`; diperbarui skema tool voucher & roadshow; diperbarui template pesan notifikasi voucher.
+      - [`src/app/api/webhook/wahnotif/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts): Ditambahkan SUB-ROUTER 0.5 interceptor penjelasan voucher tebus murah 10k anti-potongan; dibersihkan `${randomPantun}` dari seluruh balasan; diperbarui prompt multimodal gambar tanpa pantun.
+      - [`src/app/api/webhook/voucher/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/voucher/route.ts): Dihapus `MAS_KIDI_PANTUN` & `randomPantun`, diperbarui deskripsi dan pesan booking voucher tebus murah seharga tiket penuh.
+      - [`src/app/api/webhook/roadshow/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/roadshow/route.ts): Dihapus pantun, diperbarui teks penawaran voucher tebus murah.
+      - [`src/app/api/webhook/tickets/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/tickets/route.ts): Dihapus pantun, ditambahkan poin tips hemat tebus murah voucher fisik Rp 10.000 seharga tiket penuh.
+      - [`src/app/api/webhook/movie-info/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/movie-info/route.ts): Dihapus pantun dari pesan balasan.
+      - [`src/app/api/webhook/ai-brain/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts): Dihapus pantun, ditambahkan handler tebus murah voucher 10k seharga tiket penuh.
+      - [`src/app/api/cron/presale-followup/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/cron/presale-followup/route.ts): Dihapus pantun dari seluruh template follow-up stage 1, 2, dan 3.
+      - [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx): Diperbarui keterangan anti-spam follow-up dari pantun menjadi variasi guyonan khas Mukidi.
+
 

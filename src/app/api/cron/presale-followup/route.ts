@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb } from '@/lib/db';
-import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS, MAS_KIDI_PANTUN } from '@/lib/bot-knowledge';
+import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS } from '@/lib/bot-knowledge';
 import { getCityCinemaTicketLinks } from '@/lib/cities';
 
 export async function GET(req: NextRequest) {
@@ -196,16 +196,14 @@ export async function POST(req: NextRequest) {
         cinemaLinksText = `• *Link Khusus Tiket ${c.city}:* ${cityOverride}\n` + cinemaLinksText;
       }
 
-      const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
-
       let message = '';
       if (stage === 2) {
-        message = `🎬 *WADUH BOLO ASIK ${c.name.toUpperCase()} DI ${c.city.toUpperCase()}!* 🎬\n\n${randomPantun}\n\nKabar darurat santai lur: Kursi studio sesi *NONTON DULUAN (SPECIAL SCREENING)* bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok) di bioskop kotamu *SUDAH MAKIN MENIPIS LUR!* 😱\n\nMukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? Keburu kehabisan kursi tengah sing paling wenak! 😂\n\n🎟️ *LINK LANGSUNG AMANKAN TIKETMU (TINGGAL KLIK):*\n${cinemaLinksText}\n• Cek Rundown Lengkap: https://piyetokihfilm.com\n\nOjo nganti pas kanca-kancamu wis pamer foto bareng Mukidi & Sukma di dalam studio, sampean mung iso ndelok story IG-ne lur!\nSampean udah berhasil checkout belum nih? Mau Mas Kidi bantu arahin? 🍿✨\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+        message = `🎬 *WADUH BOLO ASIK ${c.name.toUpperCase()} DI ${c.city.toUpperCase()}!* 🎬\n\nKabar darurat santai lur: Kursi studio sesi *NONTON DULUAN (SPECIAL SCREENING)* bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok) di bioskop kotamu *SUDAH MAKIN MENIPIS LUR!* 😱\n\nMukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? Keburu kehabisan kursi tengah sing paling wenak! 😂\n\n🎟️ *LINK LANGSUNG AMANKAN TIKETMU (TINGGAL KLIK):*\n${cinemaLinksText}\n• Cek Rundown Lengkap: https://piyetokihfilm.com\n\nOjo nganti pas kanca-kancamu wis pamer foto bareng Mukidi & Sukma di dalam studio, sampean mung iso ndelok story IG-ne lur!\nSampean udah berhasil checkout belum nih? Mau Mas Kidi bantu arahin? 🍿✨\n\n_Miracle Pictures - Piye To Kih The Movie_`;
       } else if (stage === 3) {
-        message = `🎬 *KONFIRMASI TERAKHIR DARI MAS KIDI NIH LUR!* 🎬\n\nHalo lur *${c.name}* di *${c.city}*! 😄\n${randomPantun}\n\nRombongan film *PIYE TO KIH?* sebentar lagi mendarat di kotamu!\nBiar Mas Kidi dan tim bisa data kursi dengan rapi:\n👉 Sampean jadi ikut nonton duluan bareng rombongan artis di bioskop kotamu gak lur?\n\n🎟️ *Link Tiket Langsung:* \n${cinemaLinksText}\n\nBoleh balas singkat ya lur:\nKetik *SUDAH* (kalau sudah punya tiket), *MAU* (kalau mau dibantu linknya), atau *SKIP* (kalau belum sempat ikut sesi ini).\nSuwun sanget ya lur! 🙏🍿\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+        message = `🎬 *KONFIRMASI TERAKHIR DARI MAS KIDI NIH LUR!* 🎬\n\nHalo lur *${c.name}* di *${c.city}*! 😄\n\nRombongan film *PIYE TO KIH?* sebentar lagi mendarat di kotamu!\nBiar Mas Kidi dan tim bisa data kursi dengan rapi:\n👉 Sampean jadi ikut nonton duluan bareng rombongan artis di bioskop kotamu gak lur?\n\n🎟️ *Link Tiket Langsung:* \n${cinemaLinksText}\n\nBoleh balas singkat ya lur:\nKetik *SUDAH* (kalau sudah punya tiket), *MAU* (kalau mau dibantu linknya), atau *SKIP* (kalau belum sempat ikut sesi ini).\nSuwun sanget ya lur! 🙏🍿\n\n_Miracle Pictures - Piye To Kih The Movie_`;
       } else {
         // Stage 1 (Soft Nudge & Cek Tiket)
-        message = `🎬 *MAS KIDI NINGGALIN PESAN PENTING NIH LUR!* 🎬\n\nHalo bolo asik *${c.name}* di Kota *${c.city}*! Piye kabare? 😄\n${randomPantun}\n\nMas Kidi cuma mau ngingetin santai: Tiket Presale sesi *SPECIAL SCREENING (NONTON DULUAN)* bareng langsung rombongan Mukidi, Sukma, Gendut, dan Penyok di bioskop kotamu kursinya *SUDAH MAKIN MENIPIS LUR!* 😱\n\nMukidi wae sing beda alam wani berjuang lur, mosok sampean nonton wae nunda-nunda? Keburu kehabisan kursi tengah sing enak! 😂\n\n🎟️ *KLIK LINK PEMBELIAN SEKARANG SEBELUM LUDES:*\n${cinemaLinksText}\n• *Jadwal & Info Lengkap:* https://piyetokihfilm.com\n\n⚠️ *PENTING:* Kuota kursi terbatas per studio! Gas checkout sekarang juga ya lur ben gak gigit jari pas kanca-kancane wis pamer foto bareng rombongan pemain! 🍿✨\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+        message = `🎬 *MAS KIDI NINGGALIN PESAN PENTING NIH LUR!* 🎬\n\nHalo bolo asik *${c.name}* di Kota *${c.city}*! Piye kabare? 😄\n\nMas Kidi cuma mau ngingetin santai: Tiket Presale sesi *SPECIAL SCREENING (NONTON DULUAN)* bareng langsung rombongan Mukidi, Sukma, Gendut, dan Penyok di bioskop kotamu kursinya *SUDAH MAKIN MENIPIS LUR!* 😱\n\nMukidi wae sing beda alam wani berjuang lur, mosok sampean nonton wae nunda-nunda? Keburu kehabisan kursi tengah sing enak! 😂\n\n🎟️ *KLIK LINK PEMBELIAN SEKARANG SEBELUM LUDES:*\n${cinemaLinksText}\n• *Jadwal & Info Lengkap:* https://piyetokihfilm.com\n\n⚠️ *PENTING:* Kuota kursi terbatas per studio! Gas checkout sekarang juga ya lur ben gak gigit jari pas kanca-kancane wis pamer foto bareng rombongan pemain! 🍿✨\n\n_Miracle Pictures - Piye To Kih The Movie_`;
       }
 
       try {

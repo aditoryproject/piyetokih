@@ -3,7 +3,6 @@ import {
   MASTER_MOVIE_FACTS,
   MASTER_ROADSHOW_STOPS,
   FAST_TRACK_TICKET_LINKS,
-  MAS_KIDI_PANTUN,
   MAS_KIDI_JOKES
 } from '@/lib/bot-knowledge';
 import { getWahnotifPersona, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
@@ -55,7 +54,6 @@ export async function GET(req: NextRequest) {
     master_facts: MASTER_MOVIE_FACTS,
     roadshow_17_cities: MASTER_ROADSHOW_STOPS,
     ticket_links: ticketLinks,
-    pantun_bank: MAS_KIDI_PANTUN,
     jokes_bank: MAS_KIDI_JOKES,
     sample_dialogs: persona.sampleDialogs
   }, { status: 200, headers: corsHeaders });
@@ -66,8 +64,48 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const query = String(body.query || body.message || body.text || '').toLowerCase();
 
-    const randomPantun = MAS_KIDI_PANTUN[Math.floor(Math.random() * MAS_KIDI_PANTUN.length)];
     const randomJoke = MAS_KIDI_JOKES[Math.floor(Math.random() * MAS_KIDI_JOKES.length)];
+
+    // Check voucher tebus murah explanation (ANTI-DISKON / ANTI-POTONGAN)
+    const isVoucherExplanationQuery =
+      query.includes('10k') ||
+      query.includes('10.000') ||
+      query.includes('10rb') ||
+      query.includes('10 ribu') ||
+      query.includes('potongan') ||
+      query.includes('diskon') ||
+      query.includes('tebus murah') ||
+      query.includes('tebus voucher') ||
+      query.includes('cara kerja voucher') ||
+      query.includes('voucher fisik') ||
+      query.includes('kode booking');
+
+    if (isVoucherExplanationQuery) {
+      return NextResponse.json({
+        success: true,
+        action: 'voucher_tebus_murah_explained',
+        isTebusMurah: true,
+        replyMessage: `🎟️ *PROGRAM TEBUS MURAH TIKET BIOSKOP RP 10.000 (BUKAN POTONGAN / DISKON)!* 🎟️
+
+Banyak yang ngira ini potongan harga atau diskon, padahal BUKAN lur! Ini murni program *TEBUS MURAH* tiket bioskop:
+
+1️⃣ *Daftar / Booking Online:*
+Sampean daftar online lewat WhatsApp ini atau website untuk dapat *Kode Booking* resmi.
+
+2️⃣ *Tebus Lembaran Voucher Fisik di Booth Mall:*
+Bawa kode booking ke *Booth Roadshow Meet & Greet Offline* di mall kota roadshow, lalu *tebus Rp 10.000* untuk mendapatkan lembaran *Voucher Fisik resmi*.
+
+3️⃣ *Nonton di Bioskop Sebesar Harga Tiket Penuh:*
+Lembaran voucher fisik itu dibawa ke kasir bioskop yang menayangkan film *PIYE TO KIH?* pada tanggal *19–20 November 2026*. Voucher ini berlaku *SEBESAR HARGA TIKET PENUH* di bioskop tersebut!
+👉 *Sampean TIDAK PERLU bayar sisa tiket lagi di kasir bioskop!* (Jadi bukan potongan 10rb lalu bayar 30rb ya lur, itu SALAH BESAR!). Cukup bayar Rp10.000 pas nebus voucher fisik di booth roadshow, dan tiket bioskop sudah milik sampean seutuhnya! 🍿✨
+
+⚠️ *PENTING BANGET LUR:*
+• Kode booking di HP *TIDAK BISA* langsung dibawa ke kasir bioskop. Harus ditukarkan dulu jadi lembaran voucher fisik di booth mall roadshow!
+• Kasir bioskop hanya menerima *lembaran voucher fisik resmi* saat penayangan 19–20 November 2026.
+
+Mau Mas Kidi amankan Kode Booking voucher kotamu sekarang lur? Sebutkan nama kotamu ya! 😄`
+      }, { status: 200, headers: corsHeaders });
+    }
 
     // Check spoiler guardrail
     if (query.includes('ending') || query.includes('mati') || query.includes('arwah') || query.includes('spoiler') || query.includes('sukma')) {
@@ -134,7 +172,6 @@ export async function POST(req: NextRequest) {
         action: 'ticket_price_info',
         estimatedPriceRange: 'Rp 30.000 – Rp 50.000',
         replyMessage: `Halo bolo asik! Piye kabare? Pas banget lur! 😄
-${randomPantun}
 
 🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
 Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran *Rp 30.000 sampai Rp 50.000* per tiket lur!
@@ -156,10 +193,9 @@ Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`
       }, { status: 200, headers: corsHeaders });
     }
 
-    // Default friendly assistant response
     return NextResponse.json({
       success: true,
-      replyMessage: `Halo bolo asik! Piye kabare? Mas Kidi siap bantu informasi film komedi layar lebar PIYE TO KIH? persembahan MIRACLE Pictures! 😄\n${randomPantun}\n\n${randomJoke}\n\nFilm PIYE TO KIH? tayang serentak di seluruh bioskop Indonesia mulai 19 NOVEMBER 2026!\n🎟️ *Link Beli Tiket Langsung:* ${FAST_TRACK_TICKET_LINKS.xxi} (M-TIX) | ${FAST_TRACK_TICKET_LINKS.tixid} (TIX ID)\n\nAda jadwal kota roadshow, promo Buy 1 Get 1, atau info cast yang pengin kamu tanyakan lur? 🍿`
+      replyMessage: `Halo bolo asik! Piye kabare? Mas Kidi siap bantu informasi film komedi layar lebar PIYE TO KIH? persembahan MIRACLE Pictures! 😄\n\n${randomJoke}\n\nFilm PIYE TO KIH? tayang serentak di seluruh bioskop Indonesia mulai 19 NOVEMBER 2026!\n🎟️ *Link Beli Tiket Langsung:* ${FAST_TRACK_TICKET_LINKS.xxi} (M-TIX) | ${FAST_TRACK_TICKET_LINKS.tixid} (TIX ID)\n\nAda jadwal kota roadshow, voucher tebus murah Rp 10.000, promo Buy 1 Get 1, atau info cast yang pengin kamu tanyakan lur? 🍿`
     }, { status: 200, headers: corsHeaders });
 
   } catch (err: any) {
