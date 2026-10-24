@@ -188,8 +188,7 @@ Buat cek harga pasti di bioskop kotamu sekaligus langsung amankan kursi incaran 
 • Mau Nonton Duluan bareng cast sebelum 19 Nov? Tiket sesi Special Screening sudah bisa dibeli lewat link di atas lur!
 • Buat penayangan serentak 19 November, bakal ada promo Buy 1 Get 1 di TIX ID & M-TIX juga lho!
 
-Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂
-Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`
+Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`
       }, { status: 200, headers: corsHeaders });
     }
 

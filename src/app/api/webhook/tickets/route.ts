@@ -158,8 +158,7 @@ ${priceTicketBlock}
 • *Mau Nonton Duluan bareng cast sebelum 19 Nov?* Sesi Special Screening di bioskop kota roadshow sudah bisa dibeli tiket presale-nya sekarang lewat link di atas lur!
 • *Promo Buy 1 Get 1 (19 Nov):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID & M-TIX XXI! Mau Mas Kidi amankan slot Pengingat Prioritas H-1 via WA? Cukup infokan Nama & Kota sampean ya lur!
 
-Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂
-Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`;
+Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
 
     } else if (isSpecialScreeningOrPresale) {
       // 1. High-Conversion Pitch for Nonton Duluan / Presale Special Screening
@@ -176,8 +175,10 @@ Ada sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop rangkaian roadshow bar
 
 ${ticketBlock}
 
-⚠️ *PENTING LUR:* Kuota kursi Nonton Duluan & Presale ini sangat terbatas per studio! Baris tengah cepat penuh lur. Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae ragu-ragu? 😂
-Langsung klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
+⚠️ *CATATAN PENTING SPECIAL SCREENING:*
+• Jam yang tertera di tiket/web bioskop adalah **JAM FILM DIMULAI**. Pastikan masuk studio tepat waktu ya lur!
+• Rombongan cast/pemain akan hadir langsung di dalam studio untuk greeting, menyapa penonton, ngobrol santai, dan foto bareng saat film selesai (credit title berlangsung).
+• Kuota kursi Special Screening per studio sangat terbatas, klik link di atas dan amankan tiket sampean sekarang sebelum ludes ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
 
     } else if (isBogoInquiry && isBogoLive) {
       // 2. Promo Buy 1 Get 1 on or after 15 Nov 2026 (Live War)
@@ -227,7 +228,7 @@ Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NON
 
 ${generalTicketBlock}
 
-⚠️ *PENTING LUR:* Kuota kursi studio cepat habis lur! Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas sekarang dan amankan kursimu lur!
+⚠️ *PENTING LUR:* Jam bioskop di atas adalah JAM FILM DIMULAI (cast menyapa saat film selesai / credit title). Kuota kursi studio cepat habis lur, klik link di atas sekarang dan amankan kursimu ya lur! 🍿✨
 
 🎁 *INFO PROMO BUY 1 GET 1 (BOGO):*
 Kuota promo: *1.000 tiket di TIX ID* dan *500 tiket di M-TIX (XXI)* dibuka 15-18 November. Mau Mas Kidi amankan slot Notifikasi Pengingat Prioritas H-1 via WA? Cukup sebutkan Nama Lengkap & Kota sampean ya lur! 🍿✨`;

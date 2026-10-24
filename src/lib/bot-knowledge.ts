@@ -119,11 +119,11 @@ export const MASTER_ROADSHOW_STOPS: Record<string, RoadshowStopDetails> = {
     scheduleItems: [
       { time: '10.00 - 11.00 WIB', activity: 'Live Talkshow Radio', venue: 'RRI Pro 2 Yogyakarta', status: 'LOCK', type: 'Radio' },
       { time: '13.00 - 15.00 WIB', activity: 'Campus Roadshow & Sharing', venue: 'AMIKOM Yogyakarta', status: 'LOCK', type: 'Kampus' },
-      { time: '14.30 WIB', activity: 'Nonton Duluan & Greeting Ending', venue: 'Ambarrukmo XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
+      { time: '14.30 WIB', activity: 'Special Screening Nonton Duluan (Film Dimulai 14.30 WIB Sesuai Web Bioskop • Greeting Cast Pas Film Selesai / Credit Title)', venue: 'Plaza Ambarrukmo XXI', status: 'Konfirmasi', type: 'Bioskop', isNontonDuluan: true },
       { time: '17.00 - 18.00 WIB', activity: 'Meet & Greet Mall & Penukaran Voucher Fisik', venue: 'Plaza Ambarrukmo (Ground Floor)', status: 'LOCK', type: 'Mall', isVoucherExchange: true },
-      { time: '16.30 WIB', activity: 'Greeting Ending Penonton', venue: 'Jogja City XXI', status: 'LOCK', type: 'Bioskop', isNontonDuluan: true }
+      { time: '16.30 WIB', activity: 'Special Screening Nonton Duluan (Film Dimulai 16.30 WIB Sesuai Web Bioskop • Greeting Cast Pas Film Selesai / Credit Title)', venue: 'Jogja City XXI', status: 'LOCK', type: 'Bioskop', isNontonDuluan: true }
     ],
-    cinemas: ['Ambarrukmo XXI', 'Jogja City XXI', 'CGV Pakuwon Mall Jogja']
+    cinemas: ['Plaza Ambarrukmo XXI', 'Jogja City XXI', 'CGV Pakuwon Mall Jogja']
   },
 
   magelang: {
@@ -723,6 +723,13 @@ export const VOUCHER_TEBUS_MURAH_FACTS = {
     '5. Di kasir bioskop, voucher fisik seharga Rp 10.000 tersebut digunakan sebagai tiket nonton SEBESAR HARGA PENUH di lokasi bioskop tersebut (tanpa perlu bayar biaya tambahan).'
   ],
   boothOnlyWarning: 'Penukaran kode booking menjadi voucher fisik HANYA bisa dilakukan di konter booth roadshow meet & greet offline di mall. Kasir bioskop TIDAK MELAYANI penukaran kode booking di HP!'
+};
+
+export const SPECIAL_SCREENING_FACTS = {
+  ruleName: 'JADWAL SPECIAL SCREENING WAJIB SESUAI JADWAL FILM DIMULAI DI WEB BIOSKOP (BUKAN JAM CAST MASUK)',
+  description: 'Jadwal jam yang tertera pada Special Screening Nonton Duluan adalah JAM FILM DIMULAI (sesuai showtime di web bioskop M-TIX / Cinema XXI / CGV / Cinépolis). Calon penonton wajib masuk studio tepat waktu.',
+  castGreetingMoment: 'Para cast/pemain (Mukidi, Sukma, Gendut, Penyok, dll) akan hadir menyapa penonton, ngobrol santai, dan foto bersama di dalam studio saat film selesai (tepat saat bagian credit title film berlangsung).',
+  antiMisleadingNotice: 'DILARANG KERAS menginfokan jam cast masuk studio (seperti 16.45 atau 19.15) sebagai jam tayang bioskop, karena calon penonton akan mengira film baru mulai di jam tersebut dan berisiko datang terlambat saat film sudah selesai. Jam yang wajib disampaikan adalah JAM FILM DIMULAI sesuai web bioskop!'
 };
 
 export const MAS_KIDI_PANTUN: string[] = [];

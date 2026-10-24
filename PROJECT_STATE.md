@@ -327,4 +327,17 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
       - [`src/app/api/cron/presale-followup/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/cron/presale-followup/route.ts): Dihapus pantun dari seluruh template follow-up stage 1, 2, dan 3.
       - [`src/components/AdminDashboardClient.tsx`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/components/AdminDashboardClient.tsx): Diperbarui keterangan anti-spam follow-up dari pantun menjadi variasi guyonan khas Mukidi.
 
+22. **Reduksi Pengulangan Slogan FOMO "Mukidi Beda Alam" (Cukup 1x Saja) & Penyelarasan Jam Special Screening Sesuai Jam Film Dimulai di Web Bioskop (Anti-Misleading)**:
+     * **Reduksi Kalimat FOMO "Mukidi Beda Alam"**:
+       - Kalimat *"Ibaratnya Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? Gasik lur ben gak kentekan! 😂 Mending amankan kursi favoritmu sekarang juga sebelum beneran kehabisan!"* sebelumnya selalu berulang di setiap pesan balasan bot.
+       - Diberikan aturan tegas di [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts): Kalimat FOMO ini **HANYA BOLEH DIKELUARKAN MAKSIMAL 1 KALI SAJA** saat pertama kali menawarkan tiket. Pada chat lanjutan, bot dilarang mengulanginya dan wajib menggunakan penutup ramah biasa yang natural (*"Ada yang mau ditanyakan lagi lur?"*, *"Mau Mas Kidi bantu cek apa lagi lur?"*, *"Sampai ketemu di bioskop nggih! 🍿✨"*).
+       - Menghapus pengulangan hardcoded slogan tersebut di seluruh endpoint webhook ([`/api/webhook/wahnotif`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts), [`/api/webhook/tickets`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/tickets/route.ts), [`/api/webhook/roadshow`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/roadshow/route.ts), dan [`/api/webhook/ai-brain`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts)).
+     * **Penyelarasan Jam Special Screening Sesuai Web Bioskop (Anti-Misleading)**:
+       - **Akar Masalah**: Bot sebelumnya menginfokan jam cast masuk menyapa saat film selesai (misal 16.45 WIB Ambarrukmo XXI dan 19.15 WIB Jogja City XXI), sehingga penonton mengira itu adalah jam film dimulai dan berisiko datang terlambat saat film sudah selesai.
+       - **Koreksi & Aturan Mutlak**:
+         1. Jam yang ditampilkan untuk Special Screening **WAJIB MENGIKUTI JAM FILM DIMULAI DI WEB BIOSKOP** (M-TIX / XXI / CGV / Cinepolis).
+         2. Di Yogyakarta: **Plaza Ambarrukmo XXI dimulai jam 14.30 WIB** dan **Jogja City XXI dimulai jam 16.30 WIB**.
+         3. Diberikan briefing jelas kepada penonton: Penonton wajib masuk studio tepat waktu sesuai jam film dimulai. Rombongan cast (Mukidi, Sukma, Gendut, Penyok, dll) akan hadir menyapa penonton, ngobrol santai, dan foto bersama saat film selesai (credit title).
+       - Diperbarui pada [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts), [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts), [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts), serta seluruh endpoint webhook.
+
 

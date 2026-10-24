@@ -667,7 +667,7 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
           leadSpeaker: cityData.leadSpeaker,
           schedule: cityData.scheduleItems,
           cinemas: cityCinemas,
-          replyMessage: `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬\n\nHalo warga ${cityData.cityName} bolo asikku! Piye kabare? 😄\n\nRombongan film PIYE TO KIH? bakal hadir di kotamu pada:\n📅 *Tanggal:* ${cityData.dateStr}\n👥 *Pemain yang Hadir:* ${cityData.rosterActual.join(', ')}\n\n📋 *RUNDOWN JADWAL KEGIATAN:*\n${scheduleFormatted}\n\n📍 *LOKASI PENUKARAN VOUCHER (BOOTH ROADSHOW OFFLINE):*\n• Acara: *Konter Booth Resmi Roadshow & Meet and Greet*\n${cityData.boothMall ? `• Lokasi: *${cityData.boothMall.venue}* (${cityData.boothMall.floor}) jam *${cityData.boothMall.time}*` : '• Jadwal & lokasi mengikuti rundown resmi di website.'}\n\n🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline ya lur.\n\n🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n${cinemasListText}\n• Cek Rundown Lengkap: ${siteOrigin}/city/${cityData.slug}\n• TIX ID: ${tixidLink}\n\nMau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (berlaku seharga tiket penuh di bioskop) buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`
+          replyMessage: `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬\n\nHalo warga ${cityData.cityName} bolo asikku! Piye kabare? 😄\n\nRombongan film PIYE TO KIH? bakal hadir di kotamu pada:\n📅 *Tanggal:* ${cityData.dateStr}\n👥 *Pemain yang Hadir:* ${cityData.rosterActual.join(', ')}\n\n📋 *RUNDOWN JADWAL KEGIATAN:*\n${scheduleFormatted}\n\n📍 *LOKASI PENUKARAN VOUCHER (BOOTH ROADSHOW OFFLINE):*\n• Acara: *Konter Booth Resmi Roadshow & Meet and Greet*\n${cityData.boothMall ? `• Lokasi: *${cityData.boothMall.venue}* (${cityData.boothMall.floor}) jam *${cityData.boothMall.time}*` : '• Jadwal & lokasi mengikuti rundown resmi di website.'}\n\n🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline ya lur.\n\n🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n${cinemasListText}\n• Cek Rundown Lengkap: ${siteOrigin}/city/${cityData.slug}\n• TIX ID: ${tixidLink}\n\n⚠️ *PENTING LUR:* Jam bioskop di atas adalah JAM FILM DIMULAI sesuai web bioskop. Penonton wajib masuk studio tepat waktu ya! Rombongan cast/pemain akan hadir langsung di studio untuk greeting, menyapa penonton, dan foto bareng saat film selesai (credit title).\n\nMau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (berlaku seharga tiket penuh di bioskop) buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`
         }, { status: 200, headers: corsHeaders });
       }
     }
@@ -789,8 +789,7 @@ ${priceTicketBlock}
 • *Voucher Tebus Murah Rp 10.000:* Sampean bisa tebus voucher fisik seharga Rp 10.000 di booth roadshow mall, dan vouchernya berlaku seharga tiket penuh di bioskop penayang film Piye To Kih!
 • *Promo Buy 1 Get 1 (19 Nov):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID & M-TIX XXI! Mau Mas Kidi amankan slot Pengingat Prioritas H-1 via WA? Cukup infokan Nama & Kota sampean ya lur!
 
-Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂
-Mau Mas Kidi bantu arahin beli di XXI atau TIX ID lur? 🍿✨`;
+Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
 
       } else if (isSpecialScreeningOrPresale) {
         // High-Conversion Pitch Nonton Duluan / Special Screening Presale
@@ -807,8 +806,10 @@ Ada sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop rangkaian roadshow bar
 
 ${ticketSection}
 
-⚠️ *PENTING LUR:* Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas! Baris tengah cepat ludes lur. Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? 😂
-Langsung klik link di atas dan amankan tiket sampean sekarang ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
+⚠️ *CATATAN PENTING SPECIAL SCREENING:*
+• Jam yang tertera di tiket adalah **JAM FILM DIMULAI** sesuai web bioskop. Pastikan masuk studio tepat waktu ya lur!
+• Rombongan cast/pemain akan hadir langsung di dalam studio untuk greeting, menyapa penonton, ngobrol santai, dan foto bareng saat film selesai (credit title berlangsung).
+• Kuota kursi Special Screening per studio sangat terbatas, klik link di atas dan amankan tiket sampean sekarang ya lur! Mau Mas Kidi bantu arahin beli di mana? 🍿✨`;
 
       } else if (isBogoInquiry && isBogoLive) {
         // Promo BOGO on or after 15 Nov 2026
@@ -860,7 +861,7 @@ Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NON
 
 ${generalLinksBlock}
 
-⚠️ *PENTING LUR:* Kuota kursi studio cepat habis lur! Mukidi wae wani berjuang beda alam, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas sekarang dan amankan kursimu lur!
+⚠️ *PENTING LUR:* Jam bioskop di atas adalah JAM FILM DIMULAI (rombongan cast akan hadir menyapa & foto bareng saat film selesai / credit title). Kuota kursi studio cepat habis lur, klik link di atas dan amankan tiketmu ya lur! 🍿✨
 
 🎁 *INFO PROMO BUY 1 GET 1 (BOGO):*
 Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 November. Mau Mas Kidi amankan nomor sampean di Pengingat Prioritas H-1 via WA? Cukup infokan Nama Lengkap & Kota sampean ya lur! 🍿✨`;

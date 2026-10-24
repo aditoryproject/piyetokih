@@ -173,7 +173,7 @@ export const CITIES_DATA: CityData[] = [
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 1)",
           "venue": "Plaza Ambarrukmo XXI Jogja",
-          "note": "Special Screening sesi 1 bersama pemain film (Wajib bertiket)"
+          "note": "Special Screening sesi 1: Film dimulai 14.30 WIB (sesuai web bioskop). Cast menyapa & foto bareng saat film selesai (credit title)."
         },
         {
           "time": "17.00 – 18.00 WIB",
@@ -188,7 +188,7 @@ export const CITIES_DATA: CityData[] = [
           "category": "Screening",
           "title": "NONTON DULUAN + GREETING CAST (SESI 2)",
           "venue": "Jogja City Mall XXI",
-          "note": "Special Screening sesi 2 greeting ending cast (Wajib bertiket)"
+          "note": "Special Screening sesi 2: Film dimulai 16.30 WIB (sesuai web bioskop). Cast menyapa & foto bareng saat film selesai (credit title)."
         }
       ]
     },
@@ -199,7 +199,7 @@ export const CITIES_DATA: CityData[] = [
         "studio": "Studio 4",
         "seats": 182,
         "remainingSeatsText": "±35 kursi tersisa",
-        "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
+        "doorNote": "Pintu teater dibuka 15 mnt sebelumnya • Greeting cast pas film selesai",
         "address": "Plaza Ambarrukmo Lt. 3, Jl. Laksda Adisucipto No. 80",
         "showTimes": [
           "14.30 WIB"
@@ -212,7 +212,7 @@ export const CITIES_DATA: CityData[] = [
         "studio": "Studio 4",
         "seats": 149,
         "remainingSeatsText": "±22 kursi tersisa",
-        "doorNote": "Pintu teater dibuka 15 mnt sebelumnya",
+        "doorNote": "Pintu teater dibuka 15 mnt sebelumnya • Greeting cast pas film selesai",
         "address": "Jogja City Mall Lt. 2, Jl. Magelang Km. 6 No. 18",
         "showTimes": [
           "16.30 WIB"

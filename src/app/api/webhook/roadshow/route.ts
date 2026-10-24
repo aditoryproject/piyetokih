@@ -207,8 +207,12 @@ ${cityData.boothMall ? `• Acara: *Konter Booth Resmi Roadshow & Meet and Greet
 
 ${cinemasTicketSection}
 
+⚠️ *CATATAN PENTING SPECIAL SCREENING:*
+• Jam bioskop yang tertera adalah **JAM FILM DIMULAI** sesuai web bioskop. Pastikan masuk studio tepat waktu ya lur!
+• Rombongan cast/pemain akan hadir langsung di dalam studio untuk greeting, menyapa penonton, ngobrol santai, dan foto bareng saat film selesai (credit title berlangsung).
+
 🔥 *MAU NONTON DULUAN DI DALAM STUDIO BARENG PEMAIN?*
-Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas lur! Baris tengah cepat ludes. Mukidi wae sing beda alam wani berjuang, mosok sampean tuku tiket wae nunda-nunda? 😂 Klik link di atas dan amankan tiketmu sekarang lur!
+Kuota kursi Special Screening Nonton Duluan per studio sangat terbatas lur! Baris tengah cepat ludes. Klik link di atas dan amankan tiketmu sekarang ya lur!
 
 Mau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (berlaku seharga tiket penuh di bioskop tanpa biaya tambahan) buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`;
 
