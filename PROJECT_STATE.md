@@ -341,3 +341,22 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
        - Diperbarui pada [`src/lib/bot-knowledge.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/bot-knowledge.ts), [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts), [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts), serta seluruh endpoint webhook.
 
 
+
+23. **Perbaikan Presisi Router Roadshow & Narasi Khas Piye To Kih Untuk Kota Expired (Pengalihan ke BOGO 19 Nov)**:
+     * **Investigasi Masalah & Intersepsi Keliru**:
+       - Pesan bawaan widget (*"Halo Mas Kidi! Mau tanya jadwal lengkap roadshow, temu pemain, & booth voucher di kotaku dong."*) sebelumnya keliru diintersepsi oleh sub-router penjelasan voucher karena mencocokkan kata "voucher" secara agresif.
+       - Pesan jawaban kota singkat (seperti *"Semarang ak"*, *"Semarang"*, *"di semarang"*) sebelumnya terlewat ke welcome prompt generic karena `isRoadshowAction` mewajibkan kata kunci spesifik seperti "jadwal/kapan".
+     * **Perbaikan Alur Webhook & Router**:
+       - Membatasi sub-router penjelasan voucher agar hanya aktif bila audiens benar-benar bertanya mekanisme/definisi diskon/potongan/tebus murah, dan tidak mengintersepsi pertanyaan jadwal roadshow.
+       - Setiap penyebutan nama kota secara otomatis mengaktifkan action roadshow kota tersebut.
+       - Pertanyaan jadwal roadshow tanpa nama kota (atau bilang *"di kotaku dong"*) langsung disambut ramah dengan menanyakan balik nama kotanya disertai daftar 17 kota roadshow.
+     * **Narasi Khas Piye To Kih Untuk Kota Roadshow yang Sudah Selesai (Expired)**:
+       - Ketika audiens bertanya kota yang jadwal roadshow-nya sudah lewat (contoh: Semarang 22 Okt, Yogyakarta 23 Okt, Magelang 24 Okt):
+         Bot Mas Kidi secara otomatis menjelaskan dengan nada medok dan santai bahwa rombongan roadshow temu pemain kemarin sudah rampung dikunjungi dan booth voucher di mall resmi ditutup.
+       - Audiens langsung diarahkan dengan penuh semangat (*"Ojo cilik ati! Mukidi wae sing beda alam wani berjuang..."*) ke penayangan serentak bioskop 19 November 2026 di kota tersebut dengan Promo Buy 1 Get 1 (BOGO).
+       - Menyediakan tautan cepat bioskop kota tersebut dan mengajak pendaftaran Pengingat Prioritas H-1 via WA.
+     * **File-File Terkait**:
+       - [`src/app/api/webhook/wahnotif/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts)
+       - [`src/app/api/webhook/roadshow/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/roadshow/route.ts)
+       - [`src/app/api/webhook/ai-brain/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts)
+       - [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts)

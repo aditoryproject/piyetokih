@@ -151,6 +151,15 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
 
     // SCENARIO A: ROADSHOW CITY EXPIRED (Misal Semarang setelah 22 Okt)
     if (isExpired) {
+      const cityCinemas = getCityCinemaTicketLinks(
+        cityData.slug,
+        db.settings.roadshowOverrides,
+        db.settings.cityLinkOverrides
+      );
+      const cinemasNameList = cityCinemas.length > 0
+        ? cityCinemas.map(c => c.cinemaName).join(', ')
+        : `bioskop jaringan XXI, CGV, & Cinépolis ${cityData.cityName}`;
+
       return NextResponse.json({
         success: true,
         isRoadshowCity: true,
@@ -158,7 +167,7 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
         cityName: cityData.cityName,
         dateStr: cityData.dateStr,
         ticketLinks,
-        replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nMaaf banget lur, sesi roadshow temu pemain dan booth voucher fisik di ${cityData.cityName} kemarin (${cityData.dateStr}) sudah rampung terlaksana lur! Jadi penukaran voucher fisik di booth mall sudah selesai dan ditutup ya.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di seluruh bioskop ${cityData.cityName} dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota pas presale dibuka, sini Mas Kidi amankan nomor sampean di Pengingat Prioritas WA. Boleh infokan Nama Lengkap sampean ya lur! ✨`
+        replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nNyuwun sewu banget lur, rombongan Mas Kidi, Mukidi, lan para cast wingi wis rampung ngancani dulur-dulur ${cityData.cityName} pas tanggal ${cityData.dateStr}! Dadi sesi roadshow temu pemain lan konter tebus voucher fisik ning mall wis resmi ditutup lur.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PATAH ARANG?* 😂\nKabar apike, sampean TETAP BISA NONTON film komedi "PIYE TO KIH?" pas penayangan serentak mulai *19 NOVEMBER 2026* ning bioskop ${cityData.cityName} (${cinemasNameList}) nganggo *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota war tiket promo BOGO (1.000 tiket TIX ID & 500 tiket M-TIX) pas loket dibuka nanti, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS H-1 VIA WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas promo aktif! 🍿✨`
       }, { status: 200, headers: corsHeaders });
     }
 

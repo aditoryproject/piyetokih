@@ -473,25 +473,26 @@ Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kid
         status: 'success',
         success: true,
         action: 'image_contextual_explanation',
-        replyMessage: contextualExplanation
-      }, { status: 200, headers: corsHeaders });
-    }
-
-    // =========================================================================
+        replyMessage: contextual    // =========================================================================
     // SUB-ROUTER 0.5: PENJELASAN VOUCHER FISIK TEBUS MURAH RP 10.000 (BUKAN POTONGAN / DISKON)
     // =========================================================================
     const isVoucherInquiry =
       !args.phone &&
+      !queryText.includes('jadwal') &&
+      !queryText.includes('roadshow') &&
+      !queryText.includes('temu pemain') &&
+      !queryText.includes('kapan') &&
+      !queryText.includes('kotaku') &&
       (
-        queryText.includes('voucher') ||
-        queryText.includes('voucer') ||
-        queryText.includes('vucer') ||
         queryText.includes('tebus murah') ||
-        queryText.includes('tebus') ||
+        queryText.includes('cara kerja voucher') ||
+        queryText.includes('cara tebus') ||
+        queryText.includes('maksud voucher') ||
+        queryText.includes('penjelasan voucher') ||
         queryText.includes('potongan') ||
         queryText.includes('diskon') ||
-        ((queryText.includes('10rb') || queryText.includes('10k') || queryText.includes('10.000') || queryText.includes('sepuluh ribu')) &&
-         (queryText.includes('maksud') || queryText.includes('gimana') || queryText.includes('cara') || queryText.includes('apa') || queryText.includes('penjelasan') || queryText.includes('pakai') || queryText.includes('tukar') || queryText.includes('tiket')))
+        ((queryText.includes('voucher') || queryText.includes('voucer') || queryText.includes('vucer') || queryText.includes('10rb') || queryText.includes('10k') || queryText.includes('10.000') || queryText.includes('sepuluh ribu')) &&
+         (queryText.includes('maksud') || queryText.includes('gimana') || queryText.includes('cara') || queryText.includes('apa') || queryText.includes('penjelasan') || queryText.includes('maksudnya') || queryText.includes('syarat') || queryText.includes('aturan') || queryText.includes('pakai') || queryText.includes('tukar')))
       );
 
     if (isVoucherInquiry) {
@@ -548,6 +549,8 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
       queryText.includes('17 kota') ||
       queryText.includes('temu cast') ||
       queryText.includes('meet and greet') ||
+      queryText.includes('di kotaku') ||
+      queryText.includes('kotaku dong') ||
       cityParam === 'all' ||
       cityParam === 'list' ||
       cityParam === 'semua';
@@ -556,6 +559,12 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
       action.includes('roadshow') ||
       action.includes('jadwal') ||
       action.includes('schedule') ||
+      hasSpecificCity ||
+      queryText.includes('roadshow') ||
+      queryText.includes('jadwal') ||
+      queryText.includes('temu pemain') ||
+      queryText.includes('di kotaku') ||
+      queryText.includes('kotaku dong') ||
       Boolean(detectedCityRes && (queryText.includes('jadwal') || queryText.includes('kapan') || queryText.includes('pemain') || queryText.includes('cast') || queryText.includes('roadshow') || queryText.includes('jam')));
 
     // CASE 1A: GENERAL CITY LIST INQUIRY (17 KOTA RESMI SESUAI WEBSITE)
@@ -567,7 +576,11 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
 
       const reply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-🎬 *DAFTAR RESMI 17 KOTA ROADSHOW & TEMU CAST PIYE TO KIH? THE MOVIE:*
+Wah mantap tenan semangatmu pengin ketemu Mas Kidi, Mukidi, lan rombongan cast film komedi "PIYE TO KIH? THE MOVIE"!
+
+Biar Mas Kidi cekkan jadwal roadshow, temu pemain, lan info bioskop terdekat, sampean rencana nonton di kota mana nih lur?
+
+🎬 *PILIHAN 17 KOTA ROADSHOW:*
 ${citiesFormatted}
 
 🍿 *INFO PENTING BUAT BOLO ASIK:*
@@ -580,7 +593,7 @@ Di 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)
 • Cinépolis: ${cinepolisLink}
 • Cek Rundown Lengkap di Web: ${siteOrigin}/#roadshow
 
-Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutkan nama kotamu ya! 🍿✨`;
+Sebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll), langsung Mas Kidi infokan detail jadwal lengkape! 🍿✨`;
 
       return NextResponse.json({
         status: 'success',
@@ -626,13 +639,24 @@ Sampean mau cek rundown jadwal jam atau beli tiket di kota mana nih lur? Sebutka
         });
 
         if (isExpired) {
+          const cityCinemas = getCityCinemaTicketLinks(
+            cityData.slug,
+            db.settings.roadshowOverrides,
+            db.settings.cityLinkOverrides
+          );
+          const cinemasNameList = cityCinemas.length > 0
+            ? cityCinemas.map(c => c.cinemaName).join(', ')
+            : `bioskop jaringan XXI, CGV, & Cinépolis ${cityData.cityName}`;
+
           return NextResponse.json({
             status: 'success',
             success: true,
             action: 'roadshow_expired',
             cityName: cityData.cityName,
             dateStr: cityData.dateStr,
-            replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nMaaf banget lur, sesi roadshow temu pemain dan booth voucher fisik di ${cityData.cityName} kemarin (${cityData.dateStr}) sudah selesai ya lur!\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di bioskop ${cityData.cityName} dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n\nBiar gak kehabisan kuota pas presale dibuka, sini Mas Kidi amankan nomor sampean di Pengingat Prioritas WA. Boleh sebutkan Nama Lengkap sampean ya lur! ✨`
+            replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nNyuwun sewu banget lur, rombongan Mas Kidi, Mukidi, lan para cast wingi wis rampung ngancani dulur-dulur ${cityData.cityName} pas tanggal ${cityData.dateStr}! Dadi sesi roadshow temu pemain lan konter tebus voucher fisik ning mall wis resmi ditutup lur.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PATAH ARANG?* 😂\nKabar apike, sampean TETAP BISA NONTON film komedi "PIYE TO KIH?" pas penayangan serentak mulai *19 NOVEMBER 2026* ning bioskop ${cityData.cityName} (${cinemasNameList}) nganggo *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n\nBiar gak kehabisan kuota war tiket promo BOGO (1.000 tiket TIX ID & 500 tiket M-TIX) pas loket dibuka nanti, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS H-1 VIA WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas promo aktif! 🍿✨`
+          }, { status: 200, headers: corsHeaders });
+        }sale dibuka, sini Mas Kidi amankan nomor sampean di Pengingat Prioritas WA. Boleh sebutkan Nama Lengkap sampean ya lur! ✨`
           }, { status: 200, headers: corsHeaders });
         }
 

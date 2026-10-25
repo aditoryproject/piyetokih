@@ -7,6 +7,7 @@ import {
 } from '@/lib/bot-knowledge';
 import { getWahnotifPersona, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
 import { getDb } from '@/lib/db';
+import { CITIES_DATA, isCityRoadshowExpired, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -189,6 +190,116 @@ Buat cek harga pasti di bioskop kotamu sekaligus langsung amankan kursi incaran 
 • Buat penayangan serentak 19 November, bakal ada promo Buy 1 Get 1 di TIX ID & M-TIX juga lho!
 
 Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // Check roadshow / city inquiry
+    const detectedCityRes = getCityByNameOrSlug(query);
+    const hasSpecificCity = Boolean(detectedCityRes && !['all', 'list', 'semua'].includes(detectedCityRes.slug));
+    const isRoadshowQuery =
+      hasSpecificCity ||
+      query.includes('roadshow') ||
+      query.includes('jadwal') ||
+      query.includes('temu pemain') ||
+      query.includes('temu cast') ||
+      query.includes('meet and greet') ||
+      query.includes('di kotaku') ||
+      query.includes('kotaku dong') ||
+      query.includes('kota mana') ||
+      query.includes('mana saja');
+
+    if (isRoadshowQuery) {
+      const db = getDb();
+      const origin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+      const effectiveOrigin = (origin.includes('localhost') || origin.includes('127.0.0.1'))
+        ? 'https://piyetokihfilm.com'
+        : origin;
+
+      const ticketLinks = {
+        xxi: db.settings.bogoCinemaLinks?.xxi || FAST_TRACK_TICKET_LINKS.xxi,
+        tixid: db.settings.bogoCinemaLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid,
+        cgv: db.settings.bogoCinemaLinks?.cgv || FAST_TRACK_TICKET_LINKS.cgv,
+        cinepolis: db.settings.bogoCinemaLinks?.cinepolis || FAST_TRACK_TICKET_LINKS.cinepolis,
+        website: FAST_TRACK_TICKET_LINKS.website,
+      };
+
+      if (hasSpecificCity && detectedCityRes) {
+        const targetSlug = detectedCityRes.slug === 'jogja' ? 'yogyakarta' : detectedCityRes.slug;
+        const cityData = MASTER_ROADSHOW_STOPS[targetSlug] || Object.values(MASTER_ROADSHOW_STOPS).find(s =>
+          s.cityName.toLowerCase() === targetSlug.toLowerCase() ||
+          s.cityName.toLowerCase() === detectedCityRes.name.toLowerCase()
+        );
+
+        if (cityData) {
+          const isExpired = isCityRoadshowExpired(cityData.dateStr, {
+            cityName: cityData.cityName,
+            manualExpiredCities: db.settings.expiredRoadshowCities || [],
+          });
+
+          if (isExpired) {
+            const cityCinemas = getCityCinemaTicketLinks(
+              cityData.slug,
+              db.settings.roadshowOverrides,
+              db.settings.cityLinkOverrides
+            );
+            const cinemasNameList = cityCinemas.length > 0
+              ? cityCinemas.map(c => c.cinemaName).join(', ')
+              : `bioskop jaringan XXI, CGV, & Cinépolis ${cityData.cityName}`;
+
+            return NextResponse.json({
+              success: true,
+              action: 'roadshow_expired',
+              isExpired: true,
+              cityName: cityData.cityName,
+              dateStr: cityData.dateStr,
+              replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nNyuwun sewu banget lur, rombongan Mas Kidi, Mukidi, lan para cast wingi wis rampung ngancani dulur-dulur ${cityData.cityName} pas tanggal ${cityData.dateStr}! Dadi sesi roadshow temu pemain lan konter tebus voucher fisik ning mall wis resmi ditutup lur.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PATAH ARANG?* 😂\nKabar apike, sampean TETAP BISA NONTON film komedi "PIYE TO KIH?" pas penayangan serentak mulai *19 NOVEMBER 2026* ning bioskop ${cityData.cityName} (${cinemasNameList}) nganggo *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota war tiket promo BOGO (1.000 tiket TIX ID & 500 tiket M-TIX) pas loket dibuka nanti, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS H-1 VIA WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas promo aktif! 🍿✨`
+            }, { status: 200, headers: corsHeaders });
+          }
+
+          // Active / upcoming roadshow
+          const scheduleFormatted = cityData.scheduleItems
+            .map(item => `• *${item.time}*: ${item.activity} @ ${item.venue}`)
+            .join('\n');
+
+          const cityCinemas = getCityCinemaTicketLinks(
+            cityData.slug,
+            db.settings.roadshowOverrides,
+            db.settings.cityLinkOverrides
+          );
+
+          let cinemasTicketSection = '';
+          if (cityCinemas.length > 0) {
+            cinemasTicketSection = `🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n` +
+              cityCinemas.map(c => {
+                const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
+                return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
+              }).join('\n') +
+              `\n• Cek Rundown Lengkap: ${effectiveOrigin}/city/${cityData.slug}\n• TIX ID: ${ticketLinks.tixid}`;
+          } else {
+            cinemasTicketSection = `🎟️ *LINK BELI TIKET PRESALE:* Cinema XXI: ${ticketLinks.xxi} | TIX ID: ${ticketLinks.tixid}`;
+          }
+
+          return NextResponse.json({
+            success: true,
+            action: 'get_roadshow_schedule',
+            cityName: cityData.cityName,
+            dateStr: cityData.dateStr,
+            roster: cityData.rosterActual,
+            replyMessage: `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬\n\nHalo warga ${cityData.cityName} bolo asikku! Piye kabare? 😄\n\nRombongan film PIYE TO KIH? bakal hadir di kotamu pada:\n📅 *Tanggal:* ${cityData.dateStr}\n👥 *Pemain yang Hadir:* ${cityData.rosterActual.join(', ')}\n\n📋 *RUNDOWN JADWAL KEGIATAN:*\n${scheduleFormatted}\n\n📍 *LOKASI PENUKARAN VOUCHER (BOOTH ROADSHOW OFFLINE):*\n• Acara: *Konter Booth Resmi Roadshow & Meet and Greet*\n${cityData.boothMall ? `• Lokasi: *${cityData.boothMall.venue}* (${cityData.boothMall.floor}) jam *${cityData.boothMall.time}*` : '• Jadwal & lokasi mengikuti rundown resmi di website.'}\n\n🚫 *PERINGATAN PENTING:* DILARANG & TIDAK DILAYANI penukaran voucher di area bioskop maupun kasir bioskop! Penukaran HANYA di booth roadshow meet & greet offline ya lur.\n\n${cinemasTicketSection}\n\n⚠️ *PENTING LUR:* Jam bioskop di atas adalah JAM FILM DIMULAI sesuai web bioskop. Penonton wajib masuk studio tepat waktu ya! Rombongan cast/pemain akan hadir langsung di studio untuk greeting, menyapa penonton, dan foto bareng saat film selesai (credit title).\n\nMau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (berlaku seharga tiket penuh di bioskop) buat diambil di konter booth roadshow lur? Boleh infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`
+          }, { status: 200, headers: corsHeaders });
+        }
+      }
+
+      // General roadshow list inquiry
+      const citiesFormatted = CITIES_DATA.map((c, idx) => {
+        const extraNote = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
+        return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${extraNote}`;
+      }).join('\n');
+
+      return NextResponse.json({
+        success: true,
+        action: 'roadshow_general_list',
+        replyMessage: `Halo bolo asik! Piye kabare? Pas banget lur! 😄\n\nWah mantap tenan semangatmu pengin ketemu Mas Kidi, Mukidi, lan rombongan cast film komedi "PIYE TO KIH? THE MOVIE"!\n\nBiar Mas Kidi cekkan jadwal roadshow, temu pemain, lan info bioskop terdekat, sampean rencana nonton di kota mana nih lur?\n\n🎬 *PILIHAN 17 KOTA ROADSHOW:*\n${citiesFormatted}\n\n🍿 *INFO PENTING BUAT BOLO ASIK:*\nDi 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)** di dalam studio bioskop bareng langsung rombongan cast sebelum tayang serentak 19 November!\n🎟️ Cinema XXI (M-TIX): ${ticketLinks.xxi}\n🎟️ TIX ID: ${ticketLinks.tixid}\n🎟️ CGV: ${ticketLinks.cgv}\n🎟️ Cinépolis: ${ticketLinks.cinepolis}\n🎟️ Cek Rundown Lengkap di Web: ${effectiveOrigin}/#roadshow\n\nSebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll), langsung Mas Kidi infokan detail jadwal lengkape! 🍿✨`
       }, { status: 200, headers: corsHeaders });
     }
 
