@@ -473,7 +473,11 @@ Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kid
         status: 'success',
         success: true,
         action: 'image_contextual_explanation',
-        replyMessage: contextual    // =========================================================================
+        replyMessage: contextualExplanation
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // =========================================================================
     // SUB-ROUTER 0.5: PENJELASAN VOUCHER FISIK TEBUS MURAH RP 10.000 (BUKAN POTONGAN / DISKON)
     // =========================================================================
     const isVoucherInquiry =
