@@ -342,21 +342,19 @@ Tidak perlu membaca seluruh file source code, cukup rujuk file berikut sesuai ke
 
 
 
-23. **Perbaikan Presisi Router Roadshow & Narasi Khas Piye To Kih Untuk Kota Expired (Pengalihan ke BOGO 19 Nov)**:
-     * **Investigasi Masalah & Intersepsi Keliru**:
-       - Pesan bawaan widget (*"Halo Mas Kidi! Mau tanya jadwal lengkap roadshow, temu pemain, & booth voucher di kotaku dong."*) sebelumnya keliru diintersepsi oleh sub-router penjelasan voucher karena mencocokkan kata "voucher" secara agresif.
-       - Pesan jawaban kota singkat (seperti *"Semarang ak"*, *"Semarang"*, *"di semarang"*) sebelumnya terlewat ke welcome prompt generic karena `isRoadshowAction` mewajibkan kata kunci spesifik seperti "jadwal/kapan".
-     * **Perbaikan Alur Webhook & Router**:
-       - Membatasi sub-router penjelasan voucher agar hanya aktif bila audiens benar-benar bertanya mekanisme/definisi diskon/potongan/tebus murah, dan tidak mengintersepsi pertanyaan jadwal roadshow.
-       - Setiap penyebutan nama kota secara otomatis mengaktifkan action roadshow kota tersebut.
-       - Pertanyaan jadwal roadshow tanpa nama kota (atau bilang *"di kotaku dong"*) langsung disambut ramah dengan menanyakan balik nama kotanya disertai daftar 17 kota roadshow.
-     * **Narasi Khas Piye To Kih Untuk Kota Roadshow yang Sudah Selesai (Expired)**:
-       - Ketika audiens bertanya kota yang jadwal roadshow-nya sudah lewat (contoh: Semarang 22 Okt, Yogyakarta 23 Okt, Magelang 24 Okt):
-         Bot Mas Kidi secara otomatis menjelaskan dengan nada medok dan santai bahwa rombongan roadshow temu pemain kemarin sudah rampung dikunjungi dan booth voucher di mall resmi ditutup.
-       - Audiens langsung diarahkan dengan penuh semangat (*"Ojo cilik ati! Mukidi wae sing beda alam wani berjuang..."*) ke penayangan serentak bioskop 19 November 2026 di kota tersebut dengan Promo Buy 1 Get 1 (BOGO).
-       - Menyediakan tautan cepat bioskop kota tersebut dan mengajak pendaftaran Pengingat Prioritas H-1 via WA.
-     * **File-File Terkait**:
-       - [`src/app/api/webhook/wahnotif/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts)
-       - [`src/app/api/webhook/roadshow/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/roadshow/route.ts)
-       - [`src/app/api/webhook/ai-brain/route.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/ai-brain/route.ts)
-       - [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts)
+24. **Injeksi Acuan Waktu Real-Time (WIB), Klasifikasi Dinamis 17 Kota & Eliminasi Total Halusinasi Tanggal Roadshow (Kasus Nganjuk 30 Oktober 2026)**:
+     * **Investigasi Akar Masalah**:
+       - Audiens di WhatsApp menanyakan jadwal roadshow Nganjuk ("Kpn dimna").
+       - Bot AI Wahnotif menjawab keliru: *"Untuk sesi Roadshow Temu Pemain film PIYE TO KIH? di Nganjuk itu sudah dilaksanakan pada: Tanggal 30 Oktober 2026... Jadi untuk sesi temu pemain langsung di Nganjuk sudah lewat ya lur."*
+       - **Penyebab Utama**:
+         1. **AI (LLM) Tidak Memiliki Jam Real-Time Internal**: Model AI pada Wahnotif tidak tahu tanggal hari ini secara realtime kecuali diinjeksikan secara eksplisit di system prompt.
+         2. **Prompt Sebelumnya Statis Tanpa Tanggal Acuan Realtime**: Prompt sebelumnya hanya menulis daftar tanggal kota dan memberikan contoh aturan kota expired (*"Kondisi A: Kota roadshow sudah terlewat misal Semarang setelah 22 Okt..."*). Akibatnya, AI berhalusinasi mengira seluruh jadwal roadshow Oktober (termasuk Nganjuk 30 Oktober) sudah lewat.
+         3. **Slang / Singkatan Chat Obrolan ("kpn dimna")**: Pertanyaan singkat seperti *"kpn dimna"* sebelumnya belum dinormalisasi ke *"kapan dimana"*, sehingga Wahnotif AI menjawab mandiri dari bobot LLM tanpa memanggil tool/webhook.
+     * **Solusi & Perbaikan Komprehensif**:
+       - **Perhitungan Waktu Real-Time Dinamis (WIB)**: Di [`src/lib/cities.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/cities.ts), ditambahkan helper `getCityRoadshowTemporalStatus` yang membandingkan tanggal kota roadshow terhadap jam real-time server dalam zona WIB (UTC+7) ke dalam 3 kategori presisi: `'expired'`, `'today'`, atau `'upcoming'`.
+       - **Injeksi Kalender Real-Time ke Persona Wahnotif**: Di [`src/lib/wahnotif.ts`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/lib/wahnotif.ts), `getWahnotifPersona()` kini secara otomatis menyuntikkan tanggal hari ini dalam format bahasa Indonesia (misal: *Kamis, 29 Oktober 2026*) serta memecah daftar 17 kota roadshow menjadi:
+         1. KOTA SUDAH LEWAT / EXPIRED
+         2. KOTA HARI INI (SEDANG BERLANGSUNG)
+         3. KOTA AKAN DATANG / BELUM LEWAT (UPCOMING)
+       - **Guardrail Tegas Anti-Salah Nganjuk & Kota Upcoming**: Ditambahkan peringatan mutlak pada Kotak 1, Kotak 4, Master Prompt, dan `/api/wahnotif/persona` bahwa NGANJUK (30 Oktober 2026) dan kota upcoming lainnya **BELUM LEWAT**, serta DILARANG KERAS menyatakan Nganjuk sudah lewat atau sudah dilaksanakan. Roadshow Nganjuk diadakan di Luwes Nganjuk & Sam's Studio Nganjuk.
+       - **Normalisasi Singkatan Chat (Slang)**: Di [`/api/webhook/wahnotif`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/wahnotif/route.ts) dan [`/api/webhook/roadshow`](file:///Users/maulanaadipriatna/Documents/Miracleweb/src/app/api/webhook/roadshow/route.ts), ditambahkan normalisasi otomatis untuk kata: *kpn -> kapan*, *dimna/dmn/dmana -> dimana*, *brapa/brp -> berapa*, sehingga query singkat seperti *"kpn dimna"* langsung dikenali dan di-route secara akurat.

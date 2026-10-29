@@ -43,7 +43,12 @@ export async function POST(req: NextRequest) {
     const args = body.arguments || body.parameters || body;
 
     const rawCity = args.city || args.kota || args.query || args.message || '';
-    const normalizedCity = String(rawCity).toLowerCase().trim();
+    const cleanCityStr = String(rawCity).toLowerCase().trim();
+    const normalizedCity = cleanCityStr
+      .replace(/\bkpn\b/g, 'kapan')
+      .replace(/\bdimna\b/g, 'dimana')
+      .replace(/\bdmn\b/g, 'dimana')
+      .replace(/\bdmana\b/g, 'dimana');
 
     const db = getDb();
     const manualExpired = db.settings.expiredRoadshowCities || [];

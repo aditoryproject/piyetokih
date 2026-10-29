@@ -1586,6 +1586,50 @@ export function parseIndonesianDateStr(dateStr: string): Date | null {
 }
 
 /**
+ * Check roadshow status relative to current time in WIB (UTC+7):
+ * 'expired'  : date has passed before today
+ * 'today'    : date is happening today
+ * 'upcoming' : date is tomorrow or in the future
+ */
+export function getCityRoadshowTemporalStatus(
+  dateStr: string,
+  options?: {
+    cityName?: string;
+    manualExpiredCities?: string[];
+    currentTimeMs?: number;
+  }
+): 'expired' | 'today' | 'upcoming' {
+  if (options?.cityName && options?.manualExpiredCities && options.manualExpiredCities.length > 0) {
+    const norm = options.cityName.toLowerCase().trim();
+    if (options.manualExpiredCities.some(c => c.toLowerCase().trim() === norm)) {
+      return 'expired';
+    }
+  }
+
+  const months: Record<string, number> = {
+    januari: 0, februari: 1, maret: 2, april: 3, mei: 4, juni: 5,
+    juli: 6, agustus: 7, september: 8, oktober: 9, november: 10, desember: 11
+  };
+  const parts = dateStr.trim().split(/\s+/);
+  if (parts.length < 3) return 'upcoming';
+
+  const day = parseInt(parts[0], 10);
+  const month = months[parts[1].toLowerCase()];
+  const year = parseInt(parts[2], 10);
+  if (isNaN(day) || month === undefined || isNaN(year)) return 'upcoming';
+
+  // Calculate WIB timestamps (WIB is UTC+7)
+  const eventStartMs = Date.UTC(year, month, day, 0, 0, 0) - (7 * 3600 * 1000); // 00:00:00 WIB
+  const eventEndMs = Date.UTC(year, month, day, 23, 59, 59, 999) - (7 * 3600 * 1000); // 23:59:59.999 WIB
+
+  const now = options?.currentTimeMs ?? Date.now();
+
+  if (now > eventEndMs) return 'expired';
+  if (now >= eventStartMs && now <= eventEndMs) return 'today';
+  return 'upcoming';
+}
+
+/**
  * Check if a roadshow city date has already passed
  */
 export function isCityRoadshowExpired(
@@ -1596,16 +1640,7 @@ export function isCityRoadshowExpired(
     currentTimeMs?: number;
   }
 ): boolean {
-  if (options?.cityName && options?.manualExpiredCities && options.manualExpiredCities.length > 0) {
-    const norm = options.cityName.toLowerCase().trim();
-    if (options.manualExpiredCities.some(c => c.toLowerCase().trim() === norm)) {
-      return true;
-    }
-  }
-  const date = parseIndonesianDateStr(dateStr);
-  if (!date) return false;
-  const now = options?.currentTimeMs ?? Date.now();
-  return now > date.getTime();
+  return getCityRoadshowTemporalStatus(dateStr, options) === 'expired';
 }
 
 /**

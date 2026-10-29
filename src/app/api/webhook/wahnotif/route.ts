@@ -250,6 +250,15 @@ export async function POST(req: NextRequest) {
     const queryText = String(args.query || args.message || args.text || '').toLowerCase().trim();
     const cityParam = String(args.city || args.kota || '').toLowerCase().trim();
 
+    // Normalisasi singkatan / slang bahasa obrolan santai WhatsApp
+    const normalizedQuery = queryText
+      .replace(/\bkpn\b/g, 'kapan')
+      .replace(/\bdimna\b/g, 'dimana')
+      .replace(/\bdmn\b/g, 'dimana')
+      .replace(/\bdmana\b/g, 'dimana')
+      .replace(/\bbrapa\b/g, 'berapa')
+      .replace(/\bbrp\b/g, 'berapa');
+
     // =========================================================================
     // SUB-ROUTER -1: DETEKSI JAWABAN AUDIENS DARI FOLLOW-UP (STOPPING FOLLOW-UP)
     // =========================================================================
@@ -534,27 +543,31 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
     // =========================================================================
     // SUB-ROUTER 1: ROADSHOW & JADWAL 17 KOTA (GENERAL LIST & PER KOTA)
     // =========================================================================
-    const detectedCityRes = getCityByNameOrSlug(cityParam || queryText);
+    const detectedCityRes = getCityByNameOrSlug(cityParam || normalizedQuery || queryText);
     const hasSpecificCity = Boolean(detectedCityRes && !['all', 'list', 'semua'].includes(detectedCityRes.slug));
 
     const isGeneralCityListQuery =
-      queryText.includes('dikota mna') ||
-      queryText.includes('dikota mana') ||
-      queryText.includes('di kota mana') ||
-      queryText.includes('di kota mna') ||
-      queryText.includes('kota mana') ||
-      queryText.includes('kota mna') ||
-      queryText.includes('mana saja') ||
-      queryText.includes('mna saaja') ||
-      queryText.includes('mana aja') ||
-      queryText.includes('mna aja') ||
-      queryText.includes('daftar kota') ||
-      queryText.includes('semua kota') ||
-      queryText.includes('17 kota') ||
-      queryText.includes('temu cast') ||
-      queryText.includes('meet and greet') ||
-      queryText.includes('di kotaku') ||
-      queryText.includes('kotaku dong') ||
+      normalizedQuery.includes('dikota mna') ||
+      normalizedQuery.includes('dikota mana') ||
+      normalizedQuery.includes('di kota mana') ||
+      normalizedQuery.includes('di kota mna') ||
+      normalizedQuery.includes('kota mana') ||
+      normalizedQuery.includes('kota mna') ||
+      normalizedQuery.includes('mana saja') ||
+      normalizedQuery.includes('mna saaja') ||
+      normalizedQuery.includes('mana aja') ||
+      normalizedQuery.includes('mna aja') ||
+      normalizedQuery.includes('kapan dimana') ||
+      normalizedQuery.includes('kapan dimna') ||
+      normalizedQuery.includes('kapan') ||
+      normalizedQuery.includes('dimana') ||
+      normalizedQuery.includes('daftar kota') ||
+      normalizedQuery.includes('semua kota') ||
+      normalizedQuery.includes('17 kota') ||
+      normalizedQuery.includes('temu cast') ||
+      normalizedQuery.includes('meet and greet') ||
+      normalizedQuery.includes('di kotaku') ||
+      normalizedQuery.includes('kotaku dong') ||
       cityParam === 'all' ||
       cityParam === 'list' ||
       cityParam === 'semua';
@@ -564,12 +577,12 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
       action.includes('jadwal') ||
       action.includes('schedule') ||
       hasSpecificCity ||
-      queryText.includes('roadshow') ||
-      queryText.includes('jadwal') ||
-      queryText.includes('temu pemain') ||
-      queryText.includes('di kotaku') ||
-      queryText.includes('kotaku dong') ||
-      Boolean(detectedCityRes && (queryText.includes('jadwal') || queryText.includes('kapan') || queryText.includes('pemain') || queryText.includes('cast') || queryText.includes('roadshow') || queryText.includes('jam')));
+      normalizedQuery.includes('roadshow') ||
+      normalizedQuery.includes('jadwal') ||
+      normalizedQuery.includes('temu pemain') ||
+      normalizedQuery.includes('di kotaku') ||
+      normalizedQuery.includes('kotaku dong') ||
+      Boolean(detectedCityRes && (normalizedQuery.includes('jadwal') || normalizedQuery.includes('kapan') || normalizedQuery.includes('pemain') || normalizedQuery.includes('cast') || normalizedQuery.includes('roadshow') || normalizedQuery.includes('jam') || normalizedQuery.includes('dimana')));
 
     // CASE 1A: GENERAL CITY LIST INQUIRY (17 KOTA RESMI SESUAI WEBSITE)
     if (!hasSpecificCity && (isGeneralCityListQuery || isRoadshowAction || action === 'get_roadshow_schedule')) {

@@ -12,7 +12,7 @@ import {
   FAST_TRACK_TICKET_LINKS,
   MAS_KIDI_JOKES
 } from './bot-knowledge';
-import { CITIES_DATA } from './cities';
+import { CITIES_DATA, getCityRoadshowTemporalStatus } from './cities';
 
 // TOOL 1: ROADSHOW & JADWAL PER KOTA
 export const WAHNOTIF_TOOL_ROADSHOW_SCHEMA = {
@@ -147,6 +147,43 @@ export function getWahnotifPersona(customLinks?: WahnotifPersonaLinks) {
     website: customLinks?.website || FAST_TRACK_TICKET_LINKS.website,
   };
 
+  // Real-time Indonesian WIB date calculation (UTC+7)
+  const now = new Date();
+  const utcMs = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const wibMs = utcMs + (7 * 60 * 60 * 1000);
+  const wibDate = new Date(wibMs);
+
+  const indonesianDays = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const indonesianMonths = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+
+  const dayName = indonesianDays[wibDate.getDay()];
+  const dayNum = wibDate.getDate();
+  const monthName = indonesianMonths[wibDate.getMonth()];
+  const yearNum = wibDate.getFullYear();
+  const currentDateWibStr = `${dayName}, ${dayNum} ${monthName} ${yearNum}`;
+
+  const expiredList: string[] = [];
+  const todayList: string[] = [];
+  const upcomingList: string[] = [];
+
+  CITIES_DATA.forEach(c => {
+    const status = getCityRoadshowTemporalStatus(c.dateStr, { currentTimeMs: now.getTime() });
+    if (status === 'expired') {
+      expiredList.push(`${c.name} (${c.dateStr})`);
+    } else if (status === 'today') {
+      todayList.push(`${c.name} (${c.dateStr})`);
+    } else {
+      upcomingList.push(`${c.name} (${c.dateStr})`);
+    }
+  });
+
+  const expiredStr = expiredList.length > 0 ? expiredList.join(', ') : 'Belum ada kota yang lewat';
+  const todayStr = todayList.length > 0 ? todayList.join(', ') : 'Tidak ada jadwal roadshow hari ini';
+  const upcomingStr = upcomingList.length > 0 ? upcomingList.join(', ') : 'Semua rangkaian roadshow telah selesai';
+
   return {
     botName: "Mas Kidi (Official AI Assistant Film PIYE TO KIH?)",
     role: "Sobat Asik, Asisten Resmi & Promotor Tiket Bioskop Film Komedi Layar Lebar PIYE TO KIH? — Miracle Pictures",
@@ -190,7 +227,11 @@ export function getWahnotifPersona(customLinks?: WahnotifPersonaLinks) {
   - TIX ID: ${links.tixid}
   - CGV Cinemas: ${links.cgv}
   - Cinépolis: ${links.cinepolis}
-  - Website Resmi & Info Kota: ${links.website}`,
+  - Website Resmi & Info Kota: ${links.website}
+• STATUS REAL-TIME ROADSHOW PER HARI INI (${currentDateWibStr} WIB):
+  - Sudah Lewat: ${expiredStr}
+  - Hari Ini: ${todayStr}
+  - Akan Datang / Belum Lewat: ${upcomingStr}`,
 
     // KOTAK 2 WAHNOTIF: TEKNIK CLOSING
     teknikClosing: `TEKNIK CLOSING, UPSELL PRESALE ROADSHOW, HARDSALE & FOLLOW-UP (KONVERSI TINGGI):
@@ -314,6 +355,19 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
     // KOTAK 4 WAHNOTIF: DATA PENGETAHUAN & FAQ
     dataPengetahuanFAQ: `DATA PENGETAHUAN LENGKAP & JADWAL ROADSHOW 17 KOTA:
 
+0. KALENDER & STATUS ROADSHOW REAL-TIME PER HARI INI (${currentDateWibStr} WIB):
+   • Tanggal Hari Ini: ${currentDateWibStr} (WIB)
+   • KOTA SUDAH LEWAT / EXPIRED: ${expiredStr}
+   • KOTA SEDANG BERLANGSUNG HARI INI: ${todayStr}
+   • KOTA AKAN DATANG / BELUM LEWAT (UPCOMING): ${upcomingStr}
+
+   ⛔ PERINGATAN MUTLAK & ANTI-SALAH NGANJUK & KOTA UPCOMING:
+   • Hari ini adalah ${currentDateWibStr}.
+   • Kota NGANJUK (30 Oktober 2026) dan semua kota di daftar 'KOTA AKAN DATANG' statusnya ADALAH BELUM LEWAT / AKAN DATANG!
+   • DILARANG KERAS MENGATAKAN NGANJUK ATAU KOTA UPCOMING LAINNYA SUDAH LEWAT / SUDAH SELESAI / SUDAH DILAKSANAKAN!
+   • Jika penonton bertanya jadwal Nganjuk atau bertanya singkat 'kpn dimna', 'kapan', 'dimana':
+     Jawab dengan jelas: Roadshow Nganjuk diadakan pada tanggal 30 OKTOBER 2026 di Luwes Nganjuk (Meet & Greet / Booth Penukaran Voucher Fisik) dan Sam's Studio Nganjuk (Special Screening Nonton Duluan)!
+
 1. TIKET & PROMO (FAST-TRACK DIRECT LINKS):
    • Cinema XXI (M-TIX): ${links.xxi}
    • TIX ID: ${links.tixid}
@@ -388,6 +442,16 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
     systemPrompt: `Kamu adalah "Mas Kidi", asisten WhatsApp resmi persembahan MIRACLE Pictures untuk film layar lebar komedi keluarga nasional "PIYE TO KIH? THE MOVIE".
 
 🎯 MISI UTAMA & GAYA INTERAKSI:
+0. 📅 ACUAN WAKTU & STATUS ROADSHOW REAL-TIME PER HARI INI:
+   - HARI INI ADALAH: ${currentDateWibStr} (Waktu Indonesia Barat / WIB).
+   - STATUS 17 KOTA ROADSHOW REAL-TIME:
+     • KOTA SUDAH LEWAT / EXPIRED: ${expiredStr}
+     • KOTA SEDANG BERLANGSUNG HARI INI: ${todayStr}
+     • KOTA AKAN DATANG / BELUM LEWAT (UPCOMING): ${upcomingStr}
+   - ⛔ PERINGATAN KERAS & ANTI-SALAH NGANJUK:
+     Kota NGANJUK (30 Oktober 2026) dan kota upcoming lainnya ADALAH BELUM LEWAT / AKAN DATANG!
+     DILARANG KERAS MENGATAKAN NGANJUK SUDAH LEWAT ATAU SUDAH DILAKSANAKAN!
+     Jika ditanya 'kpn dimna', 'kapan', 'dimana' seputar Nganjuk, jawab bahwa roadshow Nganjuk diadakan pada tanggal 30 OKTOBER 2026 di Luwes Nganjuk & Sam's Studio Nganjuk!
 1. Menjawab dengan sangat ramah, hangat, santai, humoris, guyub khas Jawa-Indonesia ('Halo bolo asik!', 'Piye kabare lur?'), anti kaku ('nggak kaku teing'), dan solutif. JANGAN gunakan balasan pantun karena tidak disukai audiens.
 2. CELETUKAN & TEKNIK CLOSING (MAKSIMAL 1 KALI SAJA — DILARANG DIULANG-ULANG):
    - Celetukan atau dorongan urgensi FOMO ("Mukidi wae sing beda alam wani berjuang lur, mosok sampean tuku tiket wae nunda-nunda? 😂") HANYA BOLEH DIKELUARKAN MAKSIMAL 1 KALI saja saat pertama kali mendorong pembelian tiket!
@@ -438,7 +502,9 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
 ══════════════════════════════════════════════════════════
 🧭 ATURAN MUTLAK FILTER KOTA ROADSHOW:
 ══════════════════════════════════════════════════════════
-KONDISI A: KOTA ROADSHOW SUDAH TERLEWAT / EXPIRED (MISAL SEMARANG SETELAH 22 OKT, YOGYAKARTA SETELAH 23 OKT, MAGELANG SETELAH 24 OKT):
+KONDISI A: KOTA ROADSHOW SUDAH TERLEWAT / EXPIRED (${expiredStr}):
+• HANYA BERLAKU untuk kota yang tercatat pada daftar KOTA SUDAH LEWAT di atas!
+• JANGAN PERNAH terapkan Kondisi A ini ke kota NGANJUK (30 Okt), MOJOKERTO (31 Okt), GRESIK, SURABAYA, dll yang belum lewat!
 • JANGAN PERNAH berikan info jadwal booth mall atau kode booking voucher fisik Rp10.000! Penukaran di mall sudah selesai dan hangus.
 • JANGAN PERNAH lempar ke CS manusia atau gunakan bahasa e-commerce!
 • Jelaskan ramah & medok bahwa rombongan roadshow temu pemain kemarin sudah rampung dikunjungi di kota tersebut.
@@ -449,8 +515,9 @@ KONDISI B: KOTA DI LUAR 17 ROADSHOW (Bandung, Jakarta, Medan, Bali, Makassar, dl
 • Jelaskan roadshow temu cast fokus di Jateng-Jatim, tapi film TAYANG SERENTAK 19 NOVEMBER 2026 di seluruh bioskop kotanya.
 • Berikan link tiket langsung dan daftarkan ke Pengingat Promo Buy 1 Get 1 (BOGO).
 
-KONDISI C: KOTA ROADSHOW AKTIF & BELUM LEWAT (UPCOMING):
-• Berikan jadwal rundown lengkap (sekolah, kampus, radio, mall, bioskop) dan roster cast yang hadir.
+KONDISI C: KOTA ROADSHOW AKTIF & BELUM LEWAT / UPCOMING (${upcomingStr}):
+• Berlaku untuk semua kota pada daftar KOTA AKAN DATANG / BELUM LEWAT di atas (TERMASUK NGANJUK 30 OKTOBER 2026, MOJOKERTO 31 OKTOBER 2026, GRESIK, SURABAYA, SIDOARJO, MALANG, KEDIRI, BLITAR, TULUNGAGUNG)!
+• Berikan jadwal rundown lengkap per kota (Luwes Nganjuk & Sam's Studio Nganjuk untuk Nganjuk).
 • Tawarkan Tiket Nonton Duluan (Special Screening) lewat link presale dan Kode Booking Voucher Fisik Tebus Murah Rp10.000 di booth mall (berlaku seharga tiket penuh di bioskop).
 
 KONDISI D: AUDIENS MENANYAKAN 'TEMU CAST DI KOTA MANA SAJA' / 'DI KOTA MANA AJA' / 'DAFTAR KOTA':
@@ -458,9 +525,9 @@ KONDISI D: AUDIENS MENANYAKAN 'TEMU CAST DI KOTA MANA SAJA' / 'DI KOTA MANA AJA'
   1) Semarang (22 Okt), 2) Yogyakarta (23 Okt), 3) Magelang (24 Okt), 4) Surakarta / Solo (25 Okt), 5) Sragen (26 Okt), 6) Ngawi (27 Okt), 7) Madiun (28 Okt), 8) Ponorogo (29 Okt), 9) Nganjuk (30 Okt), 10) Mojokerto (31 Okt), 11) Gresik (1 Nov), 12) Surabaya (2 Nov), 13) Sidoarjo (3 Nov), 14) Malang & Batu (4 Nov), 15) Kediri (6 Nov), 16) Blitar (8 Nov), 17) Tulungagung (8 Nov).
 • DILARANG KERAS MENYEBUT KOTA LAIN SEPERTI KUDUS, SALATIGA, KLATEN, PURWOKERTO, TEGAL, JEMBER, ATAU JAKARTA! HANYA ADA TEPAT 17 KOTA RESMI DI ATAS!
 
-KONDISI E: AUDIENS MENANYAKAN JADWAL TAPI BELUM MENYEBUT NAMA KOTA (MISAL: 'JADWAL ROADSHOW', 'MAU TANYA JADWAL DI KOTAKU DONG', DLL):
+KONDISI E: AUDIENS MENANYAKAN JADWAL TAPI BELUM MENYEBUT NAMA KOTA (MISAL: 'KPN DIMNA', 'KAPAN DIMANA', 'JADWAL ROADSHOW', 'MAU TANYA JADWAL DI KOTAKU DONG', DLL):
 • JANGAN PERNAH lempar ke CS manusia atau menjawab tentang voucher!
-• Balas dengan ramah dan akrab: "Halo bolo asik! Piye kabare? 😄 Wah mantap tenan pengin ketemu Mas Kidi & Mukidi! Biar Mas Kidi cekkan jadwal roadshow, temu pemain, lan info bioskop terdekat, sampean rencana nonton di kota mana nih lur? (Misal: Solo, Semarang, Jogja, Sragen, Madiun, dll). Sebutkan nama kotamu ya lur, langsung Mas Kidi infokan detail jadwal lengkape! 🍿✨"
+• Balas dengan ramah dan akrab: "Halo bolo asik! Piye kabare? 😄 Wah mantap tenan pengin ketemu Mas Kidi & Mukidi! Biar Mas Kidi cekkan jadwal roadshow, temu pemain, lan info bioskop terdekat, sampean rencana nonton di kota mana nih lur? (Misal: Nganjuk, Solo, Semarang, Jogja, Madiun, dll). Sebutkan nama kotamu ya lur, langsung Mas Kidi infokan detail jadwal lengkape! 🍿✨"
 
 ══════════════════════════════════════════════════════════
 ⚡ TOOLS YANG DAPAT DIPANGGIL:
