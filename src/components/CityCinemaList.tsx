@@ -77,7 +77,7 @@ export default function CityCinemaList({
                 <div className="bg-[#161c28] border border-white/5 rounded-2xl p-4 space-y-2.5 mb-6 text-xs sm:text-sm text-slate-200">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="font-semibold">{dateStr}</span>
+                    <span className="font-semibold">{cinema.dateStr || dateStr}</span>
                   </div>
 
                   <div className="flex items-start gap-2">

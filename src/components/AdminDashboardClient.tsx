@@ -5236,6 +5236,23 @@ export default function AdminDashboardClient() {
                             />
                           </div>
 
+                          {/* Tanggal Penayangan Bioskop (Kustom) */}
+                          <div>
+                            <label className="block font-bold text-slate-700 uppercase mb-1">
+                              Tanggal Penayangan
+                            </label>
+                            <input
+                              type="text"
+                              value={cinema.dateStr || ''}
+                              onChange={e => updateCinemaInSelectedCity(cIdx, { dateStr: e.target.value })}
+                              placeholder={`Default: ${activeCityData.dateStr}`}
+                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-semibold outline-none"
+                            />
+                            <span className="text-[10px] text-slate-500 mt-0.5 block">
+                              Bisa custom per bioskop. Kosongkan jika sama ({activeCityData.dateStr}).
+                            </span>
+                          </div>
+
                           {/* Jam Tayang */}
                           <div>
                             <label className="block font-bold text-slate-700 uppercase mb-1">
@@ -5404,7 +5421,7 @@ export default function AdminDashboardClient() {
                             <div className="bg-[#161c28] border border-white/5 rounded-2xl p-4 space-y-2.5 mb-6 text-xs sm:text-sm text-slate-200">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-                                <span className="font-semibold">{activeCityData.dateStr}</span>
+                                <span className="font-semibold">{cinema.dateStr || activeCityData.dateStr}</span>
                               </div>
 
                               <div className="flex items-start gap-2">

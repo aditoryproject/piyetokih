@@ -9,6 +9,7 @@ export interface CinemaVenue {
   remainingSeatsText?: string;
   doorNote?: string;
   badgeText?: string;
+  dateStr?: string; // Tanggal penayangan kustom per bioskop (opsional, fallback ke dateStr kota)
 }
 
 export interface CityRundownItem {
@@ -1695,6 +1696,7 @@ export function getCityCinemaTicketLinks(
   chain: string;
   showTimes: string[];
   ticketUrl: string;
+  dateStr?: string;
 }> {
   if (!query) return [];
   const city = getEffectiveCity(query, overrides);
@@ -1742,6 +1744,7 @@ export function getCityCinemaTicketLinks(
         chain: c.chain,
         showTimes: c.showTimes || [],
         ticketUrl: targetUrl,
+        dateStr: c.dateStr || city.dateStr,
       };
     })
     .filter(c => Boolean(c.ticketUrl && c.ticketUrl.trim().length > 0));
