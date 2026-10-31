@@ -1032,6 +1032,7 @@ export default function AdminDashboardClient() {
       chain: 'XXI',
       studio: 'Studio 1 Premiere Sound',
       seats: 150,
+      dateStr: activeCityData.dateStr,
       showTimes: ['14.30 WIB'],
       ticketUrl: 'https://m.21cineplex.com',
       address: `Mall Kota ${activeCityData.name}`,
@@ -5166,7 +5167,7 @@ export default function AdminDashboardClient() {
                         className="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 relative"
                       >
                         <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-black flex items-center justify-center">
                               {cIdx + 1}
                             </span>
@@ -5175,6 +5176,10 @@ export default function AdminDashboardClient() {
                             </span>
                             <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded">
                               {cinema.chain}
+                            </span>
+                            <span className="bg-white border border-amber-300 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                              <Calendar className="w-3 h-3 text-amber-600" />
+                              <span>{cinema.dateStr || activeCityData.dateStr}</span>
                             </span>
                           </div>
 
@@ -5237,19 +5242,25 @@ export default function AdminDashboardClient() {
                           </div>
 
                           {/* Tanggal Penayangan Bioskop (Kustom) */}
-                          <div>
-                            <label className="block font-bold text-slate-700 uppercase mb-1">
-                              Tanggal Penayangan
+                          <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-3">
+                            <label className="block font-black text-amber-950 uppercase mb-1 flex items-center justify-between text-xs">
+                              <span className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Tanggal Penayangan Bioskop</span>
+                              </span>
+                              <span className="text-[10px] text-amber-700 font-bold lowercase bg-amber-200/70 px-1.5 py-0.5 rounded">
+                                kustom per bioskop
+                              </span>
                             </label>
                             <input
                               type="text"
                               value={cinema.dateStr || ''}
                               onChange={e => updateCinemaInSelectedCity(cIdx, { dateStr: e.target.value })}
-                              placeholder={`Default: ${activeCityData.dateStr}`}
-                              className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-semibold outline-none"
+                              placeholder={`Contoh: 6 November 2026 (Default: ${activeCityData.dateStr})`}
+                              className="w-full bg-white border border-amber-300 focus:border-slate-900 rounded-lg px-3 py-2 text-slate-900 font-bold outline-none text-xs"
                             />
-                            <span className="text-[10px] text-slate-500 mt-0.5 block">
-                              Bisa custom per bioskop. Kosongkan jika sama ({activeCityData.dateStr}).
+                            <span className="text-[10px] text-amber-800 mt-1 block leading-tight">
+                              Bisa diset berbeda per bioskop jika dalam 1 kota jadwalnya 2 hari (misal Hari 1 vs Hari 2).
                             </span>
                           </div>
 
