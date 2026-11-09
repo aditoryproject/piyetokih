@@ -87,6 +87,63 @@ export default async function CityRoadshowPage({ params }: Props) {
 
   const movieSettings = db.settings.movieSettings;
   const customLinks = db.settings.cityLinkOverrides || {};
+  const isRoadshowActive = Boolean(db.settings.isRoadshowActive);
+
+  if (!isRoadshowActive) {
+    return (
+      <div className="relative min-h-screen">
+        <CityViewTracker cityName={city.name} slug={city.slug} />
+        <section className="relative pt-12 pb-16 px-4 sm:px-6 overflow-hidden text-center">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[420px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+          <div className="max-w-2xl mx-auto flex flex-col items-center">
+            <div className="mb-5">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold transition"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Kembali ke halaman utama</span>
+              </Link>
+            </div>
+            <Link href="/" title="PIYE TO KIH? THE MOVIE" className="mb-4 inline-block">
+              <img
+                src="/logo-ptk.webp"
+                alt="Logo Resmi PIYE TO KIH? THE MOVIE"
+                width={300}
+                height={188}
+                className="w-40 sm:w-48 h-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]"
+              />
+            </Link>
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-black uppercase tracking-wider mb-4">
+              Roadshow {city.name} Telah Selesai
+            </span>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-4 leading-tight">
+              TERIMA KASIH WARGA {city.name.toUpperCase()}!
+            </h1>
+            <p className="text-xs sm:text-base text-slate-300 leading-relaxed mb-6">
+              Rangkaian acara Roadshow &amp; Special Screening di <strong className="text-white">{city.name}</strong> ({city.dateStr}) telah selesai dilaksanakan. Kini saatnya bersiap menyambut penayangan serentak <strong className="text-amber-400">PIYE TO KIH? THE MOVIE</strong> di seluruh bioskop mulai <strong className="text-emerald-400">19 NOVEMBER 2026</strong>!
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+              <Link
+                href="/#presale"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition"
+              >
+                <span>KLAIM PROMO BUY 1 GET 1 (19 NOV)</span>
+              </Link>
+              <Link
+                href="/"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/10 font-bold text-xs uppercase tracking-wider transition"
+              >
+                <span>KE HALAMAN UTAMA</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+        <MovieStorySection movieSettings={movieSettings || undefined} />
+        <Footer socialLinks={db.settings.socialLinks} />
+      </div>
+    );
+  }
 
   const currentClaimed = db.leads.length;
   const remainingStock = Math.max(0, db.settings.totalQuota - currentClaimed);

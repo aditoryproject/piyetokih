@@ -74,6 +74,8 @@ export interface AppSettings {
   bogoHeadline: string;
   bogoSubtitle: string;
   bogoDefaultTicketLink: string;
+  bogoPresaleDatesText?: string;
+  bogoPromoDatesText?: string;
   bogoCinemaLinks: {
     xxi?: string;
     cgv?: string;
@@ -85,6 +87,9 @@ export interface AppSettings {
   isMaintenanceMode?: boolean;
   maintenanceHeadline?: string;
   maintenanceSubtitle?: string;
+
+  // Roadshow Section Visibility (Toggleable ON/OFF via Dashboard)
+  isRoadshowActive?: boolean;
 
   // Social Media Links (Editable via Dashboard)
   socialLinks?: {
@@ -231,6 +236,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   totalQuota: 500,
   initialStock: 500,
   isWarOpen: true,
+  isRoadshowActive: false,
   countdownTarget: '2026-10-22T13:00:00+07:00', // Hari H Roadshow
   warHeadline: 'WAR VOUCHER NONTON FILM PIYE TO KIH',
   warSubtitle: 'Klaim e-voucher resmi! Ambil Voucher Fisik di booth roadshow offline untuk penayangan perdana film.',
@@ -265,6 +271,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   bogoHeadline: 'PROMO BUY 1 GET 1: NONTON BERDUA BAYAR 1 TIKET',
   bogoSubtitle: 'Ajak pasangan, keluarga, atau bestie nonton film PIYE TO KIH di bioskop kesayanganmu!',
   bogoDefaultTicketLink: 'https://m.21cineplex.com',
+  bogoPresaleDatesText: '12-18 November 2026',
+  bogoPromoDatesText: '19-20 November 2026',
   bogoCinemaLinks: {
     xxi: 'https://m.21cineplex.com/id/movies/16PTKH',
     cgv: 'https://www.cgv.id',

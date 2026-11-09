@@ -21,9 +21,15 @@ interface PresaleBogoSectionProps {
     tixid?: string;
     xxi?: string;
   };
+  initialPresaleDatesText?: string;
+  initialPromoDatesText?: string;
 }
 
-export default function PresaleBogoSection({ initialCinemaLinks }: PresaleBogoSectionProps = {}) {
+export default function PresaleBogoSection({
+  initialCinemaLinks,
+  initialPresaleDatesText,
+  initialPromoDatesText,
+}: PresaleBogoSectionProps = {}) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -36,17 +42,21 @@ export default function PresaleBogoSection({ initialCinemaLinks }: PresaleBogoSe
 
   const [tixidUrl, setTixidUrl] = useState(initialCinemaLinks?.tixid || 'https://rb.gy/l28pzj');
   const [mtixUrl, setMtixUrl] = useState(initialCinemaLinks?.xxi || 'https://m.21cineplex.com/id/movies/16PTKH');
+  const [presaleDatesText, setPresaleDatesText] = useState(initialPresaleDatesText || '12-18 November 2026');
+  const [promoDatesText, setPromoDatesText] = useState(initialPromoDatesText || '19-20 November 2026');
 
   useEffect(() => {
-    if (initialCinemaLinks) return; // Do not fetch if already provided by SSR
+    if (initialCinemaLinks && initialPresaleDatesText && initialPromoDatesText) return;
     fetch('/api/admin/settings')
       .then(r => r.json())
       .then(d => {
         if (d.settings?.bogoCinemaLinks?.tixid) setTixidUrl(d.settings.bogoCinemaLinks.tixid);
         if (d.settings?.bogoCinemaLinks?.xxi) setMtixUrl(d.settings.bogoCinemaLinks.xxi);
+        if (d.settings?.bogoPresaleDatesText) setPresaleDatesText(d.settings.bogoPresaleDatesText);
+        if (d.settings?.bogoPromoDatesText) setPromoDatesText(d.settings.bogoPromoDatesText);
       })
       .catch(() => {});
-  }, [initialCinemaLinks]);
+  }, [initialCinemaLinks, initialPresaleDatesText, initialPromoDatesText]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,12 +225,12 @@ export default function PresaleBogoSection({ initialCinemaLinks }: PresaleBogoSe
             <div className="mt-4 p-3 rounded-2xl bg-black/50 border border-white/10 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs text-slate-300">
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                <span>Presale dibuka: <strong className="text-white">15-18 November 2026</strong></span>
+                <span>Presale dibuka: <strong className="text-white">{presaleDatesText}</strong></span>
               </span>
               <span className="hidden sm:inline text-white/20">•</span>
               <span className="flex items-center gap-1.5">
                 <Ticket className="w-3.5 h-3.5 text-red-400" />
-                <span>Buy 1 Get 1 dibuka: <strong className="text-white">19-20 November 2026</strong></span>
+                <span>Buy 1 Get 1 dibuka: <strong className="text-white">{promoDatesText}</strong></span>
               </span>
             </div>
           </div>
@@ -288,7 +298,7 @@ export default function PresaleBogoSection({ initialCinemaLinks }: PresaleBogoSe
                   className="w-full bg-[#090A0D] border border-white/10 focus:border-amber-400 rounded-xl px-4 py-3 text-white text-sm outline-none transition placeholder:text-slate-600"
                 />
                 <span className="block text-[11px] text-slate-500 mt-1">
-                  *Notifikasi link presale akan dikirimkan otomatis ke WhatsApp ini pada 15 November 2026.
+                  *Notifikasi link presale akan dikirimkan otomatis ke WhatsApp ini saat periode presale ({presaleDatesText}) dibuka.
                 </span>
               </div>
 

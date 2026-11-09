@@ -143,12 +143,14 @@ export default function AdminDashboardClient() {
   const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
   const [followupTarget, setFollowupTarget] = useState<'all' | 'leads' | 'reminders'>('all');
   const [followupCity, setFollowupCity] = useState<string>('all');
-  const [followupStage, setFollowupStage] = useState<number>(1);
-  const [followupDelay, setFollowupDelay] = useState<number>(8); // Safe anti-spam delay in seconds
+  const [followupStage, setFollowupStage] = useState<number>(4);
+  const [followupDelay, setFollowupDelay] = useState<number>(20); // Safe anti-spam delay in seconds
+  const [followupBatchPause, setFollowupBatchPause] = useState<number>(10); // Jeda 10-15 menit per gelombang (25 nomor)
   const [followupForceResend, setFollowupForceResend] = useState<boolean>(false);
   const [followupPreviewText, setFollowupPreviewText] = useState<string>('');
   const [followupEligibleCount, setFollowupEligibleCount] = useState<number>(0);
   const [loadingFollowupPreview, setLoadingFollowupPreview] = useState<boolean>(false);
+  const [followupBgJob, setFollowupBgJob] = useState<any>(null);
 
   // Settings state
   const [settings, setSettings] = useState<any>({
@@ -321,6 +323,7 @@ export default function AdminDashboardClient() {
   const [visitorEventFilter, setVisitorEventFilter] = useState('all');
   const [visitorPlatformFilter, setVisitorPlatformFilter] = useState('all');
   const [visitorSearch, setVisitorSearch] = useState('');
+  const [visitorDisplayLimit, setVisitorDisplayLimit] = useState(250);
 
   // Copied states
   const [copiedPrompt, setCopiedPrompt] = useState(false);
@@ -475,12 +478,41 @@ export default function AdminDashboardClient() {
       if (res.ok && data.success) {
         setFollowupPreviewText(data.sampleMessagePreview || '');
         setFollowupEligibleCount(data.totalPendingFollowup || 0);
+        if (data.backgroundJob) setFollowupBgJob(data.backgroundJob);
       }
     } catch (e) {
       console.error('Error fetching followup preview:', e);
     } finally {
       setLoadingFollowupPreview(false);
     }
+  };
+
+  useEffect(() => {
+    if (!isFollowupModalOpen && !followupBgJob?.isRunning) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/cron/presale-followup?city=${encodeURIComponent(followupCity)}&target=${encodeURIComponent(followupTarget)}&stage=${followupStage}`);
+        const data = await res.json();
+        if (res.ok && data.backgroundJob) {
+          setFollowupBgJob(data.backgroundJob);
+          setFollowupEligibleCount(data.totalPendingFollowup || 0);
+        }
+      } catch {}
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isFollowupModalOpen, followupBgJob?.isRunning, followupCity, followupTarget, followupStage]);
+
+  const handleStopFollowupJob = async () => {
+    if (!confirm('Hentikan proses pengiriman Follow-Up yang sedang berjalan di background?')) return;
+    try {
+      const res = await fetch('/api/cron/presale-followup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'stop' }),
+      });
+      const data = await res.json();
+      if (data.backgroundJob) setFollowupBgJob(data.backgroundJob);
+    } catch {}
   };
 
   const openFollowupModal = (target: 'all' | 'leads' | 'reminders' = 'all') => {
@@ -491,7 +523,10 @@ export default function AdminDashboardClient() {
 
   const handleExecutePresaleFollowup = async () => {
     const targetLabel = followupCity === 'all' ? 'SEMUA KOTA' : `KOTA ${followupCity.toUpperCase()}`;
-    if (!confirm(`Mulai kirim Follow-Up Presale (Stage ${followupStage}) ke ${targetLabel} dengan jeda aman ${followupDelay} detik per nomor?\n\nTarget: ${followupTarget.toUpperCase()}\nJumlah kontak siap kirim: ${followupEligibleCount} nomor`)) {
+    const batchDesc = followupBatchPause > 0
+      ? `\nJeda Gelombang (Batch): Istirahat ${followupBatchPause} menit setiap 25 nomor`
+      : '';
+    if (!confirm(`Mulai kirim Follow-Up Presale (Stage ${followupStage}) ke ${targetLabel} dengan jeda aman ${followupDelay} detik per nomor?${batchDesc}\n\nTarget: ${followupTarget.toUpperCase()}\nJumlah kontak siap kirim: ${followupEligibleCount} nomor`)) {
       return;
     }
     setFollowingUpPresale(true);
@@ -505,19 +540,26 @@ export default function AdminDashboardClient() {
           city: followupCity,
           stage: followupStage,
           delaySeconds: followupDelay,
+          batchSize: 25,
+          batchPauseMinutes: followupBatchPause,
           forceResend: followupForceResend,
-          limit: 250,
+          limit: 1000,
         }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setFollowupResult({
-          total: data.totalProcessed,
-          sent: data.sentCount,
-          failed: data.failCount,
-        });
-        alert(`Follow-up WA Selesai!\nTotal diproses: ${data.totalProcessed}\nBerhasil terkirim: ${data.sentCount}\nGagal: ${data.failCount}`);
-        setIsFollowupModalOpen(false);
+        if (data.backgroundJob) setFollowupBgJob(data.backgroundJob);
+        if (data.background) {
+          alert(data.message);
+        } else {
+          setFollowupResult({
+            total: data.totalProcessed,
+            sent: data.sentCount,
+            failed: data.failCount,
+          });
+          alert(`Follow-up WA Selesai!\nTotal diproses: ${data.totalProcessed}\nBerhasil terkirim: ${data.sentCount}\nGagal: ${data.failCount}`);
+          setIsFollowupModalOpen(false);
+        }
         fetchReminders();
         fetchLeads();
       } else {
@@ -747,6 +789,28 @@ export default function AdminDashboardClient() {
         setTimeout(() => setSettingsSuccess(false), 3000);
       } else {
         alert('Gagal mengubah mode.');
+      }
+    } catch {
+      alert('Terjadi kesalahan jaringan.');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleQuickToggleRoadshow = async (newVal: boolean) => {
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isRoadshowActive: newVal }),
+      });
+      if (res.ok) {
+        setSettings((prev: any) => ({ ...prev, isRoadshowActive: newVal }));
+        setSettingsSuccess(true);
+        setTimeout(() => setSettingsSuccess(false), 3000);
+      } else {
+        alert('Gagal mengubah status fitur Roadshow.');
       }
     } catch {
       alert('Terjadi kesalahan jaringan.');
@@ -1691,6 +1755,45 @@ export default function AdminDashboardClient() {
                   <button onClick={() => setFollowupResult(null)} className="text-rose-600 hover:text-rose-900 font-bold ml-4">Tutup</button>
                 </div>
               )}
+
+              {/* PENGATURAN CEPAT TANGGAL PRESALE & BUY 1 GET 1 DI KOTAK FORM REMINDER */}
+              <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-black uppercase text-amber-900 tracking-wider mb-1">
+                      📅 Teks Tanggal &quot;Presale dibuka:&quot; (Tampil di Web)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.bogoPresaleDatesText ?? '12-18 November 2026'}
+                      onChange={e => setSettings({ ...settings, bogoPresaleDatesText: e.target.value })}
+                      placeholder="Contoh: 12-18 November 2026"
+                      className="w-full bg-white border border-amber-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black uppercase text-amber-900 tracking-wider mb-1">
+                      🎟️ Teks Tanggal &quot;Buy 1 Get 1 dibuka:&quot; (Tampil di Web)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.bogoPromoDatesText ?? '19-20 November 2026'}
+                      onChange={e => setSettings({ ...settings, bogoPromoDatesText: e.target.value })}
+                      placeholder="Contoh: 19-20 November 2026"
+                      className="w-full bg-white border border-amber-300 focus:border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 outline-none"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition shrink-0"
+                >
+                  <Save className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{savingSettings ? 'Menyimpan...' : 'Simpan Tanggal'}</span>
+                </button>
+              </div>
 
               {/* Status Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -3772,6 +3875,57 @@ export default function AdminDashboardClient() {
                 </div>
               )}
 
+              {/* SECTION: KONTROL ON / OFF FITUR ROADSHOW 17 KOTA */}
+              <div className="bg-slate-900 border-2 border-slate-800 rounded-2xl p-5 space-y-4 text-white">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="p-1 rounded bg-amber-500 text-slate-950">
+                        <Calendar className="w-4 h-4" />
+                      </span>
+                      <label className="block text-xs font-black uppercase text-white tracking-wider">
+                        Sakelar ON / OFF Fitur Roadshow 17 Kota
+                      </label>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      Jika di-OFF-kan (karena rangkaian Roadshow 17 Kota sudah selesai), seksi Roadshow &amp; Nonton Duluan di halaman utama akan disembunyikan dan tampilan website otomatis fokus penuh ke <b>Penayangan Serentak 19 November 2026 &amp; Promo Buy 1 Get 1</b>.
+                    </p>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shrink-0 ${
+                    settings.isRoadshowActive ? 'bg-emerald-500 text-slate-950 shadow-sm' : 'bg-rose-600 text-white shadow-sm'
+                  }`}>
+                    {settings.isRoadshowActive ? '🟢 ROADSHOW ON (TAMPIL)' : '🔴 ROADSHOW OFF (SELESAI)'}
+                  </span>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickToggleRoadshow(false)}
+                    disabled={savingSettings}
+                    className={`flex-1 py-3 px-4 rounded-xl font-black text-xs border transition flex items-center justify-center gap-2 ${
+                      !settings.isRoadshowActive
+                        ? 'bg-rose-600 text-white border-rose-500 shadow-md ring-2 ring-rose-400/40'
+                        : 'bg-white/5 text-slate-300 border-white/15 hover:bg-white/10'
+                    }`}
+                  >
+                    <span>🔴 OFF — MATIKAN FITUR ROADSHOW (FOKUS TAYANG 19 NOV)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickToggleRoadshow(true)}
+                    disabled={savingSettings}
+                    className={`flex-1 py-3 px-4 rounded-xl font-black text-xs border transition flex items-center justify-center gap-2 ${
+                      settings.isRoadshowActive
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md ring-2 ring-emerald-400/40'
+                        : 'bg-white/5 text-slate-300 border-white/15 hover:bg-white/10'
+                    }`}
+                  >
+                    <span>🟢 ON — TAMPILKAN FITUR ROADSHOW 17 KOTA</span>
+                  </button>
+                </div>
+              </div>
+
               {/* SECTION: KONTROL MODE COMING SOON / MAINTENANCE */}
               <div className="bg-amber-500/10 border-2 border-amber-500/40 rounded-2xl p-5 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
@@ -4448,6 +4602,44 @@ export default function AdminDashboardClient() {
                   </div>
                 </div>
 
+                {/* 1.5 PENGATURAN TANGGAL PRESALE & BUY 1 GET 1 DI KOTAK FORM REMINDER */}
+                <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 space-y-3">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      Jadwal Tanggal Presale &amp; Buy 1 Get 1 (Tampil di Kotak Form Pengingat Website)
+                    </label>
+                    <p className="text-[11px] text-slate-600 mt-0.5">
+                      Ubah teks tanggal <b>&quot;Presale dibuka:&quot;</b> dan <b>&quot;Buy 1 Get 1 dibuka:&quot;</b> yang muncul di kotak form pengingat halaman utama.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                        📅 Teks Tanggal &quot;Presale dibuka:&quot;
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.bogoPresaleDatesText ?? '12-18 November 2026'}
+                        onChange={e => setSettings({ ...settings, bogoPresaleDatesText: e.target.value })}
+                        placeholder="Contoh: 12-18 November 2026"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                        🎟️ Teks Tanggal &quot;Buy 1 Get 1 dibuka:&quot;
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.bogoPromoDatesText ?? '19-20 November 2026'}
+                        onChange={e => setSettings({ ...settings, bogoPromoDatesText: e.target.value })}
+                        placeholder="Contoh: 19-20 November 2026"
+                        className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* 2. BANNER VISUAL PROMO BOGO (UPLOAD LANGSUNG / OTOMATIS IKUT POSTER FILM) */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -4973,6 +5165,62 @@ export default function AdminDashboardClient() {
           {/* TAB 3: PENGATURAN JADWAL ROADSHOW & BIOSKOP 17 KOTA */}
           {activeTab === 'cities' && (
             <div className="space-y-6">
+              {/* SAKELAR ON / OFF FITUR ROADSHOW 17 KOTA */}
+              <div className={`border-2 rounded-2xl p-5 sm:p-6 shadow-sm transition-all ${
+                settings.isRoadshowActive
+                  ? 'bg-emerald-50/70 border-emerald-300'
+                  : 'bg-rose-50/80 border-rose-300'
+              }`}>
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
+                        settings.isRoadshowActive
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-rose-600 text-white'
+                      }`}>
+                        {settings.isRoadshowActive ? '🟢 FITUR ROADSHOW: ON (AKTIF)' : '🔴 FITUR ROADSHOW: OFF (NON-AKTIF)'}
+                      </span>
+                      <h4 className="text-sm sm:text-base font-black text-slate-900">
+                        Sakelar Tampilan Roadshow 17 Kota di Website Publik
+                      </h4>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed max-w-3xl">
+                      {settings.isRoadshowActive
+                        ? 'Saat ini seksi Jadwal Roadshow 17 Kota & tombol Nonton Duluan sedang DITAMPILKAN di halaman depan website. Klik tombol OFF di samping jika rangkaian acara roadshow sudah selesai.'
+                        : 'Saat ini fitur Roadshow 17 Kota sedang DI-OFF-KAN (disembunyikan dari halaman utama) karena rangkaian acara roadshow telah selesai. Pengunjung website kini difokuskan penuh ke Penayangan Serentak 19 November 2026 & Promo Buy 1 Get 1.'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleQuickToggleRoadshow(false)}
+                      disabled={savingSettings}
+                      className={`px-4 py-2.5 rounded-xl font-black text-xs border transition flex items-center gap-1.5 ${
+                        !settings.isRoadshowActive
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-md'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>🔴 OFF (Matikan Roadshow)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickToggleRoadshow(true)}
+                      disabled={savingSettings}
+                      className={`px-4 py-2.5 rounded-xl font-black text-xs border transition flex items-center gap-1.5 ${
+                        settings.isRoadshowActive
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>🟢 ON (Aktifkan Roadshow)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Header Box */}
               <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -6666,7 +6914,7 @@ export default function AdminDashboardClient() {
                         </td>
                       </tr>
                     ) : (
-                      filteredVisitors.map(v => {
+                      filteredVisitors.slice(0, visitorDisplayLimit).map(v => {
                         const isAddToCart = v.event?.toLowerCase().includes('addtocart');
                         const isPageView = v.event?.toLowerCase().includes('pageview');
                         const isViewCity = v.event?.toLowerCase().includes('viewcity');
@@ -6729,6 +6977,30 @@ export default function AdminDashboardClient() {
                   </tbody>
                 </table>
               </div>
+
+              {filteredVisitors.length > visitorDisplayLimit && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-600">
+                  <span>
+                    Menampilkan <b>{visitorDisplayLimit}</b> dari total <b>{filteredVisitors.length}</b> log trafik.
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setVisitorDisplayLimit(prev => prev + 250)}
+                      className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
+                    >
+                      + Tampilkan 250 Lagi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVisitorDisplayLimit(filteredVisitors.length)}
+                      className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold text-xs transition"
+                    >
+                      Tampilkan Semua ({filteredVisitors.length})
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -7409,8 +7681,8 @@ export default function AdminDashboardClient() {
                   >
                     <option value="all">Semua Kota (17 Kota Roadshow)</option>
                     {CITIES_DATA.map((c) => (
-                      <option key={c.city} value={c.city}>
-                        {c.city} ({c.date} - {c.status === 'done' ? 'Selesai' : c.status === 'today' ? 'Hari Ini' : 'Mendatang'})
+                      <option key={c.slug} value={c.name}>
+                        {c.name} ({c.dateStr})
                       </option>
                     ))}
                   </select>
@@ -7421,9 +7693,31 @@ export default function AdminDashboardClient() {
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
                   <Activity className="w-4 h-4 text-cyan-400" />
-                  Pilih Stage Nurturing Follow-Up
+                  Pilih Template Pesan Follow-Up (Otomatis Variasi Sapaan &amp; Pantun Anti-Spam)
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFollowupStage(4);
+                      fetchFollowupPreview(followupCity, followupTarget, 4);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left transition ${
+                      followupStage === 4
+                        ? 'bg-amber-500/15 border-amber-400 text-white shadow-lg shadow-amber-500/10 ring-1 ring-amber-400/50'
+                        : 'bg-slate-800/50 border-slate-700/60 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-black text-amber-400">🔥 PRESALE 12 NOV</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-black">Utama</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-100">Link Presale &amp; BOGO Dibuka</div>
+                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                      Kirim link pembelian TIX ID &amp; M-TIX saat Presale dibuka (12 Nov) ke semua leads &amp; pendaftar BOGO.
+                    </p>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => {
@@ -7432,17 +7726,17 @@ export default function AdminDashboardClient() {
                     }}
                     className={`p-3.5 rounded-2xl border text-left transition ${
                       followupStage === 1
-                        ? 'bg-amber-500/10 border-amber-500/50 text-white shadow-lg shadow-amber-500/10'
+                        ? 'bg-sky-500/10 border-sky-500/50 text-white shadow-lg shadow-sky-500/10'
                         : 'bg-slate-800/50 border-slate-700/60 text-slate-400 hover:border-slate-600'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-black text-amber-400">STAGE 1</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Soft Nudge</span>
+                      <span className="text-xs font-black text-sky-400">STAGE 1</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">Soft Nudge</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-200">Cek Tiket & Sapa Santai</div>
+                    <div className="text-xs font-bold text-slate-200">Pengingat Santai Presale</div>
                     <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
-                      Menyapa bolo asik, infokan presale special screening bareng cast sudah dibuka di kotanya.
+                      Menyapa bolo asik &amp; mengingatkan tiket presale 19 Nov sudah bisa diamankan.
                     </p>
                   </button>
 
@@ -7462,9 +7756,9 @@ export default function AdminDashboardClient() {
                       <span className="text-xs font-black text-rose-400">STAGE 2</span>
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">Urgensi Kuota</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-200">Kursi Studio Menipis</div>
+                    <div className="text-xs font-bold text-slate-200">Kuota BOGO Menipis</div>
                     <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
-                      Eskalasi urgensi: kursi nonton bareng makin tipis, amankan kursi tengah sebelum ludes.
+                      Eskalasi urgensi: kuota promo Buy 1 Get 1 makin tipis, amankan sebelum habis.
                     </p>
                   </button>
 
@@ -7486,7 +7780,7 @@ export default function AdminDashboardClient() {
                     </div>
                     <div className="text-xs font-bold text-slate-200">Konfirmasi (SUDAH/MAU/SKIP)</div>
                     <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
-                      Minta kepastian singkat: balas SUDAH (sudah beli), MAU (butuh link), atau SKIP (batal/lewatkan).
+                      Minta kepastian singkat: balas SUDAH (sudah beli), MAU (butuh link), atau SKIP.
                     </p>
                   </button>
                 </div>
@@ -7498,36 +7792,94 @@ export default function AdminDashboardClient() {
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-emerald-400" />
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                      Pengaturan Anti-Spam & Jeda Waktu (Delay)
+                      1. Jeda Antar Nomor &amp; 2. Jeda Istirahat Gelombang (10–15 Menit)
                     </span>
                   </div>
                   <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5" /> Auto-Jitter 0-2 dtk aktif
+                    <CheckCircle className="w-3.5 h-3.5" /> Auto-Spintax &amp; Jitter Aktif
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {[
-                    { label: '8 Detik', value: 8, tag: 'Standar Cepat' },
-                    { label: '20 Detik', value: 20, tag: 'Sangat Aman' },
-                    { label: '45 Detik', value: 45, tag: 'Human Pace' },
-                    { label: '360 Detik (6 Menit)', value: 360, tag: 'Ultra Safe Meta' },
-                  ].map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setFollowupDelay(opt.value)}
-                      className={`p-2.5 rounded-xl border text-center transition ${
-                        followupDelay === opt.value
-                          ? 'bg-emerald-500/20 border-emerald-500 text-white font-bold'
-                          : 'bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="text-xs font-bold">{opt.label}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{opt.tag}</div>
-                    </button>
-                  ))}
+                <div>
+                  <span className="block text-[11px] font-semibold text-slate-300 mb-1.5">
+                    ⏱️ Jeda Antar Nomor WhatsApp:
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {[
+                      { label: '10 Detik', value: 10, tag: 'Cepat + Jitter' },
+                      { label: '20 Detik', value: 20, tag: 'Rekomendasi Aman' },
+                      { label: '45 Detik', value: 45, tag: 'Human Pace' },
+                      { label: '90 Detik', value: 90, tag: 'Ekstra Santai' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFollowupDelay(opt.value)}
+                        className={`p-2.5 rounded-xl border text-center transition ${
+                          followupDelay === opt.value
+                            ? 'bg-emerald-500/20 border-emerald-500 text-white font-bold'
+                            : 'bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-600'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{opt.label}</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{opt.tag}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                <div>
+                  <span className="block text-[11px] font-semibold text-slate-300 mb-1.5">
+                    🛡️ Jeda Istirahat Otomatis Setiap 25 Nomor (Anti-Banned Meta WA):
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {[
+                      { label: 'Tanpa Jeda Gelombang', value: 0, tag: 'Langsung jalan terus' },
+                      { label: 'Istirahat 10 Menit / 25 Nomor', value: 10, tag: '⭐ Rekomendasi 12 Nov' },
+                      { label: 'Istirahat 15 Menit / 25 Nomor', value: 15, tag: 'Ultra Aman Anti-Spam' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFollowupBatchPause(opt.value)}
+                        className={`p-2.5 rounded-xl border text-center transition ${
+                          followupBatchPause === opt.value
+                            ? 'bg-amber-500/20 border-amber-400 text-white font-bold'
+                            : 'bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-600'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{opt.label}</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{opt.tag}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {followupBgJob && (followupBgJob.isRunning || followupBgJob.processed > 0) && (
+                  <div className="p-3.5 rounded-xl bg-slate-950 border border-amber-500/40 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-amber-400 flex items-center gap-1.5">
+                        {followupBgJob.isRunning && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                        <span>Status Antrean Background Server (Gelombang #{followupBgJob.currentBatch || 1})</span>
+                      </span>
+                      <span className="font-mono font-bold text-white">
+                        {followupBgJob.sent} Terkirim / {followupBgJob.totalTarget} Total ({followupBgJob.failed} Gagal)
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300">{followupBgJob.statusMessage}</p>
+                    {followupBgJob.isRunning && (
+                      <div className="pt-1 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={handleStopFollowupJob}
+                          className="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px] transition"
+                        >
+                          ⏹ Hentikan Pengiriman
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 pt-1 text-xs text-slate-400">
                   <input

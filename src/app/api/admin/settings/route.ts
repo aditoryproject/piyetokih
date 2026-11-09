@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     if (body.totalQuota !== undefined) db.settings.totalQuota = Number(body.totalQuota);
     if (body.isWarOpen !== undefined) db.settings.isWarOpen = Boolean(body.isWarOpen);
+    if (body.isRoadshowActive !== undefined) db.settings.isRoadshowActive = Boolean(body.isRoadshowActive);
     if (body.isMaintenanceMode !== undefined) db.settings.isMaintenanceMode = Boolean(body.isMaintenanceMode);
     if (body.maintenanceHeadline !== undefined) db.settings.maintenanceHeadline = String(body.maintenanceHeadline);
     if (body.maintenanceSubtitle !== undefined) db.settings.maintenanceSubtitle = String(body.maintenanceSubtitle);
@@ -74,6 +75,8 @@ export async function POST(req: NextRequest) {
     if (body.bogoHeadline !== undefined) db.settings.bogoHeadline = String(body.bogoHeadline);
     if (body.bogoSubtitle !== undefined) db.settings.bogoSubtitle = String(body.bogoSubtitle);
     if (body.bogoDefaultTicketLink !== undefined) db.settings.bogoDefaultTicketLink = String(body.bogoDefaultTicketLink);
+    if (body.bogoPresaleDatesText !== undefined) db.settings.bogoPresaleDatesText = String(body.bogoPresaleDatesText);
+    if (body.bogoPromoDatesText !== undefined) db.settings.bogoPromoDatesText = String(body.bogoPromoDatesText);
     if (body.bogoCinemaLinks !== undefined) db.settings.bogoCinemaLinks = { ...db.settings.bogoCinemaLinks, ...body.bogoCinemaLinks };
 
     // Kabar & Galeri + Media Center Global Settings

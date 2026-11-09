@@ -26,6 +26,7 @@ export default async function HomePage() {
 
   const db = getDb();
   const isMaintenanceMode = Boolean(db.settings.isMaintenanceMode);
+  const isRoadshowActive = Boolean(db.settings.isRoadshowActive);
 
 
   // Jika Mode Coming Soon aktif dan bukan admin, tampilkan Coming Soon
@@ -123,12 +124,21 @@ export default async function HomePage() {
             >
               <span>PRESALE &amp; BELI 1 GRATIS 1</span>
             </a>
-            <a
-              href="#roadshow"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
-            >
-              <span>JADWAL ROADSHOW &amp; NONTON DULUAN</span>
-            </a>
+            {isRoadshowActive ? (
+              <a
+                href="#roadshow"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
+              >
+                <span>JADWAL ROADSHOW &amp; NONTON DULUAN</span>
+              </a>
+            ) : (
+              <a
+                href="#trailer"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
+              >
+                <span>NONTON TRAILER RESMI</span>
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -140,7 +150,11 @@ export default async function HomePage() {
       <OfficialTrailerSection movieSettings={movieSettings || undefined} />
 
       {/* 4. PRESALE BUY 1 GET 1 (BOGO) SECTION DENGAN KUOTA & REMINDER */}
-      <PresaleBogoSection initialCinemaLinks={db.settings.bogoCinemaLinks} />
+      <PresaleBogoSection
+        initialCinemaLinks={db.settings.bogoCinemaLinks}
+        initialPresaleDatesText={db.settings.bogoPresaleDatesText}
+        initialPromoDatesText={db.settings.bogoPromoDatesText}
+      />
 
       {/* 5. PEMERAN & KARAKTER RESMI (14 CAST SESUAI HALAMAN 6) */}
       <CastSection castList={movieSettings?.cast} />
@@ -166,8 +180,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. ROADSHOW 17 KOTA RESMI (HALAMAN 8 & 9) */}
-      <RoadshowSection initialCities={getEffectiveCities(db)} />
+      {/* 7. ROADSHOW 17 KOTA RESMI (HALAMAN 8 & 9 - HANYA TAMPIL JIKA FITUR ROADSHOW ON) */}
+      {isRoadshowActive && (
+        <RoadshowSection initialCities={getEffectiveCities(db)} />
+      )}
 
       {/* 8. KABAR & DOKUMENTASI TERKINI */}
       <ArticlesSection initialArticles={(db.articles || []).filter(a => a.published)} />
