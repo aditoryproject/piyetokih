@@ -251,7 +251,7 @@ export async function POST(req: NextRequest) {
           phone: cleanInboundPhone,
           email: '',
           city: String(args.city || args.kota || 'Nasional').trim() || 'Nasional',
-          createdAt: new Date().toISOString(),
+          registeredAt: new Date().toISOString(),
           reminderStatus: 'pending',
         });
         saveDb(db);
@@ -608,46 +608,61 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
       normalizedQuery.includes('kotaku dong') ||
       Boolean(detectedCityRes && (normalizedQuery.includes('jadwal') || normalizedQuery.includes('kapan') || normalizedQuery.includes('pemain') || normalizedQuery.includes('cast') || normalizedQuery.includes('roadshow') || normalizedQuery.includes('jam') || normalizedQuery.includes('dimana')));
 
-    // CASE 1A: GENERAL CITY LIST INQUIRY (17 KOTA RESMI SESUAI WEBSITE)
+    const presaleDates = db.settings.bogoPresaleDatesText || '12-18 November 2026';
+    const bogoDates = db.settings.bogoPromoDatesText || '19-20 November 2026';
+
+    // CASE 1A: GENERAL CITY LIST INQUIRY (TANPA TANGGAL ROADSHOW LAMA)
     if (!hasSpecificCity && (isGeneralCityListQuery || isRoadshowAction || action === 'get_roadshow_schedule')) {
       const citiesFormatted = CITIES_DATA.map((c, idx) => {
-        const extraNote = c.slug === 'kediri' ? ' — Puncak Home Premiere' : '';
-        return `${idx + 1}. 📍 *${c.name}* (${c.dateStr})${extraNote}`;
+        const cityCinemas = getCityCinemaTicketLinks(
+          c.slug,
+          db.settings.roadshowOverrides,
+          db.settings.cityLinkOverrides
+        );
+        const cinemaNames = cityCinemas.length > 0
+          ? cityCinemas.map(cin => cin.cinemaName).join(', ')
+          : c.cinemas.map(cin => cin.name).join(', ');
+        return `${idx + 1}. 📍 *${c.name}* — ${cinemaNames}`;
       }).join('\n');
 
       const reply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-Wah mantap tenan semangatmu pengin ketemu Mas Kidi, Mukidi, lan rombongan cast film komedi "PIYE TO KIH? THE MOVIE"!
+🎬 *JADWAL PENAYANGAN SERENTAK FILM "PIYE TO KIH? THE MOVIE":*
+Film komedi keluarga *"PIYE TO KIH?"* tayang serentak di bioskop seluruh Indonesia mulai **19 NOVEMBER 2026**!
 
-Biar Mas Kidi cekkan jadwal roadshow, temu pemain, lan info bioskop terdekat, sampean rencana nonton di kota mana nih lur?
+📅 *CATAT TANGGAL PENTINGNYA LUR:*
+• **Presale Tiket Dibuka:** ${presaleDates}
+• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)
+• **Tayang Serentak di Bioskop:** Mulai 19 November 2026
 
-🎬 *PILIHAN 17 KOTA ROADSHOW:*
+🍿 *DAFTAR KOTA & JARINGAN BIOSKOP UTAMA:*
 ${citiesFormatted}
+*(Serta tayang serentak di 25 jaringan bioskop mitra di kota-kota lainnya seluruh Indonesia!)*
 
-🍿 *INFO PENTING BUAT BOLO ASIK:*
-Di 17 kota di atas, sampean bisa ikutan sesi **NONTON DULUAN (SPECIAL SCREENING)** di dalam studio bioskop bareng langsung rombongan cast sebelum tayang serentak 19 November lho!
-
-🎟️ *LINK LANGSUNG BELI TIKET PRESALE RESMI (TINGGAL KLIK):*
+🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*
 • Cinema XXI (M-TIX): ${xxiLink}
 • TIX ID: ${tixidLink}
 • CGV: ${cgvLink}
 • Cinépolis: ${cinepolisLink}
-• Cek Rundown Lengkap di Web: ${siteOrigin}/#roadshow
+• Website Resmi: ${siteOrigin}
 
-Sebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll), langsung Mas Kidi infokan detail jadwal lengkape! 🍿✨`;
+Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, atau balas dengan **Nama Lengkap & Kota** biar Mas Kidi daftarkan ke **Pengingat Prioritas WA** saat Presale dibuka! 🍿✨`;
 
       return NextResponse.json({
         status: 'success',
         success: true,
         action: 'get_roadshow_schedule',
         city: 'all',
+        releaseDate: '19 November 2026',
+        presaleDates,
+        bogoDates,
         totalCities: CITIES_DATA.length,
-        cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, dateStr: c.dateStr })),
+        cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, releaseDate: '19 November 2026' })),
         replyMessage: reply
       }, { status: 200, headers: corsHeaders });
     }
 
-    // CASE 1B: NON-ROADSHOW CITIES CHECK (Bandung, Jakarta, Kudus, Salatiga, Klaten, dll)
+    // CASE 1B: OTHER CITIES CHECK (Bandung, Jakarta, Kudus, Salatiga, Klaten, dll)
     const knownNonRoadshowCities = [
       'jakarta', 'bandung', 'medan', 'bali', 'denpasar', 'makassar', 'palembang', 'batam',
       'bekasi', 'bogor', 'depok', 'tangerang', 'kudus', 'salatiga', 'klaten', 'purwokerto',
@@ -662,7 +677,10 @@ Sebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll),
         success: true,
         action: 'roadshow_non_active_city',
         cityName: cityNameDisplay,
-        replyMessage: `Halo bolo asik di ${cityNameDisplay}! Piye kabare? 😄\n\nUntuk rangkaian roadshow temu cast saat ini memang lagi keliling 17 kota Jateng & Jatim lur (Semarang, Jogja, Magelang, Solo, Sragen, Ngawi, Madiun, Ponorogo, Nganjuk, Mojokerto, Gresik, Surabaya, Sidoarjo, Malang, Kediri, Blitar, Tulungagung).\n\n🍿 *TAPI TENANG! TANGGAL 19 NOVEMBER 2026 PIYE TO KIH? TAYANG SERENTAK DI BIOSKOP KOTAMU!*\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n\nBakal ada Promo Buy 1 Get 1 (BOGO) juga lho! Mau Mas Kidi daftarkan nomor sampean buat Pengingat Prioritas H-1 via WA? Cukup infokan Nama Lengkap sampean ya lur! ✨`
+        releaseDate: '19 November 2026',
+        presaleDates,
+        bogoDates,
+        replyMessage: `Halo bolo asik di ${cityNameDisplay}! Piye kabare? 😄\n\n🍿 *KABAR GEMBIRA! FILM "PIYE TO KIH? THE MOVIE" TAYANG SERENTAK MULAI 19 NOVEMBER 2026 DI BIOSKOP ${cityNameDisplay}!*\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI)\n• **Tayang Serentak:** Mulai 19 November 2026\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n\nBiar gak kehabisan kuota pas Presale & Promo Buy 1 Get 1 dibuka, mau Mas Kidi daftarkan nomor sampean buat *Pengingat Prioritas WA*? Cukup infokan *Nama Lengkap* sampean ya lur! ✨`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -674,7 +692,8 @@ Sebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll),
       );
 
       if (cityData) {
-        const isExpired = isCityRoadshowExpired(cityData.dateStr, {
+        const isRoadshowModeOff = db.settings.isRoadshowActive === false;
+        const isExpired = isRoadshowModeOff || isCityRoadshowExpired(cityData.dateStr, {
           cityName: cityData.cityName,
           manualExpiredCities: db.settings.expiredRoadshowCities || [],
         });
@@ -686,16 +705,18 @@ Sebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll),
             db.settings.cityLinkOverrides
           );
           const cinemasNameList = cityCinemas.length > 0
-            ? cityCinemas.map(c => c.cinemaName).join(', ')
-            : `bioskop jaringan XXI, CGV, & Cinépolis ${cityData.cityName}`;
+            ? cityCinemas.map(c => `• *${c.cinemaName}*`).join('\n')
+            : `• *Bioskop jaringan XXI, CGV, & Cinépolis ${cityData.cityName}*`;
 
           return NextResponse.json({
             status: 'success',
             success: true,
-            action: 'roadshow_expired',
+            action: 'city_cinema_schedule',
             cityName: cityData.cityName,
-            dateStr: cityData.dateStr,
-            replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nNyuwun sewu banget lur, rombongan Mas Kidi, Mukidi, lan para cast wingi wis rampung ngancani dulur-dulur ${cityData.cityName} pas tanggal ${cityData.dateStr}! Dadi sesi roadshow temu pemain lan konter tebus voucher fisik ning mall wis resmi ditutup lur.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PATAH ARANG?* 😂\nKabar apike, sampean TETAP BISA NONTON film komedi "PIYE TO KIH?" pas penayangan serentak mulai *19 NOVEMBER 2026* ning bioskop ${cityData.cityName} (${cinemasNameList}) nganggo *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n\nBiar gak kehabisan kuota war tiket promo BOGO (1.000 tiket TIX ID & 500 tiket M-TIX) pas loket dibuka nanti, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS H-1 VIA WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas promo aktif! 🍿✨`
+            releaseDate: '19 November 2026',
+            presaleDates,
+            bogoDates,
+            replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare lur? 😄\n\n🎬 *INFO PENAYANGAN BIOSKOP ${cityData.cityName.toUpperCase()} — PIYE TO KIH? THE MOVIE:*\nFilm komedi keluarga *"PIYE TO KIH?"* tayang serentak mulai **19 NOVEMBER 2026** di bioskop kesayangan warga ${cityData.cityName}:\n${cinemasNameList}\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)\n• **Tayang Serentak:** Mulai 19 November 2026\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Website Resmi: ${siteOrigin}\n\nBiar gak kehabisan kuota war tiket Presale (${presaleDates}) & Promo Buy 1 Get 1, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas loket dibuka! 🍿✨`
           }, { status: 200, headers: corsHeaders });
         }
 
@@ -835,51 +856,47 @@ Sebutkan nama kotamu ya lur (misal: *Solo*, *Semarang*, *Jogja*, *Sragen*, dll),
       if (isPriceInquiry) {
         // Price / HTM Inquiry: Estimated 30-50k + Direct Links from Landing Page
         const priceTicketBlock = cityCinemasList
-          ? `🎟️ *LINK CEK HARGA PASTI & BELI TIKET BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${siteOrigin}${matchedStopSlug ? `/city/${matchedStopSlug}` : ''}\n• *TIX ID:* ${tixidLink}`
-          : `🎟️ *LINK LANGSUNG CEK HARGA & BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website Resmi & Jadwal Kota:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
+          ? `🎟️ *LINK CEK HARGA PASTI & BELI TIKET BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *TIX ID:* ${tixidLink}\n• *Website Resmi:* ${siteOrigin}`
+          : `🎟️ *LINK LANGSUNG CEK HARGA & BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website Resmi:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
 
         ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
 🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
-Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran **Rp 30.000 sampai Rp 50.000** per tiket lur!
-*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, menyesuaikan kota/lokasi dan hari tayang weekday atau weekend).*
+Untuk harga tiket nonton di bioskop pada penayangan serentak mulai **19 November 2026**, rentang perkiraannya ada di kisaran **Rp 30.000 sampai Rp 50.000** per tiket lur!
+*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, Sam's Studio, Golden Theater menyesuaikan kota/lokasi dan hari tayang weekday atau weekend).*
 
-Buat cek harga tiket pasti di bioskop kotamu sekaligus langsung amankan kursi incaran sampean biar gak kehabisan, ini Mas Kidi kasih tautan resmi bioskopnya lur (tinggal klik sesuai yang ada di website):
+Buat cek harga tiket pasti di bioskop kotamu sekaligus langsung amankan kursi incaran sampean biar gak kehabisan, ini Mas Kidi kasih tautan resmi bioskopnya lur:
 ${priceTicketBlock}
 
 🔥 *TIPS HEMAT DARI MAS KIDI:*
-• *Mau Nonton Duluan bareng cast sebelum 19 Nov?* Sesi Special Screening di bioskop kota roadshow sudah bisa dibeli tiket presale-nya sekarang lewat link di atas lur!
-• *Voucher Tebus Murah Rp 10.000:* Sampean bisa tebus voucher fisik seharga Rp 10.000 di booth roadshow mall, dan vouchernya berlaku seharga tiket penuh di bioskop penayang film Piye To Kih!
-• *Promo Buy 1 Get 1 (19 Nov):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID & M-TIX XXI! Mau Mas Kidi amankan slot Pengingat Prioritas H-1 via WA? Cukup infokan Nama & Kota sampean ya lur!
+• *Tiket Presale (${presaleDates}):* Amankan kursi tengah paling wenak lebih awal sebelum antrean penuh!
+• *Promo Buy 1 Get 1 (${bogoDates}):* Beli 1 tiket harga reguler, gratis 1 tiket tambahan di TIX ID (1.000 kuota) & M-TIX XXI (500 kuota)! Mau Mas Kidi amankan slot Pengingat Prioritas WA? Cukup infokan Nama Lengkap & Kota sampean ya lur!
 
-Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`;
+Langsung klik link di atas buat amankan kursi favorit sampean ya lur! 🍿✨`;
 
       } else if (isSpecialScreeningOrPresale) {
-        // High-Conversion Pitch Nonton Duluan / Special Screening Presale
+        // Presale Inquiry (12-18 November 2026) for 19 November Release
         const ticketSection = cityCinemasList
-          ? `🎟️ *LINK TIKET PRESALE SPECIAL SCREENING ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cek Rundown & Panggung:* ${siteOrigin}${matchedStopSlug ? `/city/${matchedStopSlug}` : ''}\n• *TIX ID:* ${tixidLink}`
-          : `🎟️ *LINK LANGSUNG BELI TIKET PRESALE / NONTON DULUAN (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website Resmi & Info Kota:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
+          ? `🎟️ *LINK TIKET PRESALE BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *TIX ID:* ${tixidLink}\n• *Website Resmi:* ${siteOrigin}`
+          : `🎟️ *LINK LANGSUNG BELI TIKET PRESALE RESMI (TINGGAL KLIK):*\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website Resmi:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
 
         ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER? BISA BANGET LUR!* 🎬
-Kabar gembira! Sampean GAK PERLU nunggu sampai penayangan reguler 19 November buat nonton film komedi layar lebar *"PIYE TO KIH?"*!
-
-Ada sesi **NONTON DULUAN (SPECIAL SCREENING)** di bioskop rangkaian roadshow bareng langsung rombongan pemain (Mukidi, Sukma, Gendut, Penyok)!
+🎬 *JADWAL TIKET PRESALE & TAYANG SERENTAK "PIYE TO KIH? THE MOVIE":* 🎬
+• **Presale Tiket Dibuka:** ${presaleDates}
+• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)
+• **Tayang Serentak Nasional di Bioskop:** Mulai **19 NOVEMBER 2026**
 
 ${ticketSection}
 
-⚠️ *CATATAN PENTING SPECIAL SCREENING:*
-• Jam yang tertera di tiket adalah **JAM FILM DIMULAI** sesuai web bioskop. Pastikan masuk studio tepat waktu ya lur!
-• Rombongan cast/pemain akan hadir langsung di dalam studio untuk greeting, menyapa penonton, ngobrol santai, dan foto bareng saat film selesai (credit title berlangsung).
-• Kuota kursi Special Screening per studio sangat terbatas, klik link di atas dan amankan tiket sampean sekarang ya lur! Mau Mas Kidi bantu arahin beli di mana? 🍿✨`;
+📲 Biar sampean langsung dikirimi notifikasi WA begitu loket Presale (${presaleDates}) & Promo Buy 1 Get 1 dibuka, mau Mas Kidi daftarkan nomor sampean ke **Pengingat Prioritas WA**? Cukup balas sebutkan **Nama Lengkap & Kota** sampean ya lur! 🍿✨`;
 
       } else if (isBogoInquiry && isBogoLive) {
-        // Promo BOGO on or after 15 Nov 2026
+        // Promo BOGO Live
         ticketReply = `Halo bolo asik! Piye kabare? Kabar gembira lur! 😄
 
-🔥 *WAR PROMO BUY 1 GET 1 (BOGO) RESMI DIBUKA HARI INI!* 🔥
-Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayangan perdana 19 November 2026!
+🔥 *WAR PROMO BUY 1 GET 1 (BOGO) RESMI DIBUKA!* 🔥
+Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayangan perdana **${bogoDates}**!
 
 🎟️ *LINK LANGSUNG BELI TIKET PROMO BOGO (KLIK SEKARANG SEBELUM KUOTA HABIS):*
 • *TIX ID (Kuota 1.000 Tiket):* ${tixidLink}
@@ -888,46 +905,45 @@ Tiket promo Buy 1 Get 1 film *"PIYE TO KIH?"* sudah resmi dibuka untuk penayanga
 • *Cinépolis:* ${cinepolisLink}
 • *Website Resmi:* ${siteOrigin}${cityOverrideNote}${cityNote}
 
-⚠️ Kuota promo sangat terbatas (1.000 di TIX ID & 500 di M-TIX), langsung klik link di atas sekarang juga ya lur ben gak kehabisan kuota! Jangan sampai nyesel kehabisan lur! 🍿✨`;
+⚠️ Kuota promo sangat terbatas (1.000 di TIX ID & 500 di M-TIX), langsung klik link di atas sekarang juga ya lur ben gak kehabisan kuota! 🍿✨`;
 
       } else if (isBogoInquiry && !isBogoLive) {
-        // Promo BOGO before 15 Nov 2026: UPSELL PRESALE ROADSHOW FIRST, then offer BOGO Reminder!
+        // Promo BOGO & Presale Info
         const presaleLinksBlock = cityCinemasList
-          ? `🎟️ *TIKET PRESALE NONTON DULUAN ${matchedStopName.toUpperCase() || 'KOTAMU'}:*\n${cityCinemasList}\n• *Cek Jadwal Kota:* ${siteOrigin}${matchedStopSlug ? `/city/${matchedStopSlug}` : ''}`
-          : `• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *Website Resmi & Jadwal Kota:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
+          ? `🎟️ *LINK RESMI BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'}:*\n${cityCinemasList}\n• *Website Resmi:* ${siteOrigin}`
+          : `• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *Website Resmi:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
 
         ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-🎟️ *MAU NONTON DULUAN SEKARANG BARENG PEMAIN TANPA PERLU NUNGGU?* 🎟️
-Kenapa harus nunggu sampai 19 November kalau sekarang sampean bisa *NONTON DULUAN* bareng rombongan Mukidi, Sukma, Gendut, dan Penyok di sesi *SPECIAL SCREENING ROADSHOW*!
-Tiket Presale Nonton Duluan sudah resmi dibuka dan bisa dibeli sekarang lewat link ini:
-${presaleLinksBlock}
-⚠️ *Kursi studio terbatas banget lur, amankan posisi favorit sampean sekarang sebelum ludes!*
+🎁 *JADWAL RESMI PRESALE & PROMO BUY 1 GET 1 (BOGO):*
+• **Presale Tiket Dibuka:** ${presaleDates}
+• **Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)
+• **Tayang Serentak di Bioskop:** Mulai **19 NOVEMBER 2026**
 
-🎁 *INFO PROMO BUY 1 GET 1 (BOGO) PENAYANGAN PERDANA 19 NOVEMBER:*
-Kalau sampean tetep mau war promo Buy 1 Get 1 (kuota 1.000 tiket TIX ID & 500 tiket M-TIX), loket baru dibuka pada *15 - 18 November 2026*.
-Biar gak kehabisan kuota pas loket dibuka nanti, DAFTAR PENGINGAT PRIORITAS H-1 SEKARANG LUR! Mas Kidi bakal kirim link langsung via WA pas dibuka!
-📲 Cukup balas dengan sebutkan *Nama Lengkap & Kota* sampean ya lur! Mau Mas Kidi daftarkan sekarang? 🍿✨`;
+🎟️ *LINK LOKET TIKET BIOSKOP RESMI:*
+${presaleLinksBlock}
+
+📲 Biar gak kehabisan kuota pas loket Presale (${presaleDates}) & Promo Buy 1 Get 1 dibuka nanti, DAFTAR PENGINGAT PRIORITAS WA SEKARANG LUR! Mas Kidi bakal japri link langsung via WA pas dibuka!
+Cukup balas dengan sebutkan *Nama Lengkap & Kota* sampean ya lur! Mau Mas Kidi daftarkan sekarang? 🍿✨`;
 
       } else {
-        // General Ticket Inquiry: UPSELL PRESALE FIRST + HARDSALE CLOSING
+        // General Ticket Inquiry
         const generalLinksBlock = cityCinemasList
-          ? `🎟️ *LINK TIKET BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *Website & Info Lengkap:* ${siteOrigin}${matchedStopSlug ? `/city/${matchedStopSlug}` : ''}`
-          : `🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*\nBiar gak repot buka aplikasi bioskop lalu nyari-nyari manual, ini Mas Kidi kasih link langsungnya:\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website & Info Lengkap:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
+          ? `🎟️ *LINK TIKET BIOSKOP ${matchedStopName.toUpperCase() || 'KOTAMU'} (TINGGAL KLIK):*\n${cityCinemasList}\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *Website & Info Lengkap:* ${siteOrigin}`
+          : `🎟️ *LINK LANGSUNG BELI TIKET & PRESALE RESMI (TINGGAL KLIK LUR):*\n• *Cinema XXI (M-TIX):* ${xxiLink}\n• *TIX ID:* ${tixidLink}\n• *CGV Cinemas:* ${cgvLink}\n• *Cinépolis:* ${cinepolisLink}\n• *Website & Info Lengkap:* ${siteOrigin}${cityOverrideNote}${cityNote}`;
 
         ticketReply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
 ${randomJoke}
 
-🎬 *MAU NONTON DULUAN SEBELUM 19 NOVEMBER BARENG PEMAIN?*
-Gak perlu nunggu sampai penayangan reguler lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* di bioskop kota roadshow bareng rombongan cast (Mukidi, Sukma, Gendut, Penyok)! Tiket presale sudah bisa langsung dibeli sekarang!
+🎬 *JADWAL TAYANG SERENTAK & TIKET PRESALE "PIYE TO KIH? THE MOVIE":*
+• **Presale Tiket Dibuka:** ${presaleDates}
+• **Promo Buy 1 Get 1 (BOGO):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI)
+• **Tayang Serentak Nasional di Bioskop:** Mulai **19 NOVEMBER 2026**
 
 ${generalLinksBlock}
 
-⚠️ *PENTING LUR:* Jam bioskop di atas adalah JAM FILM DIMULAI (rombongan cast akan hadir menyapa & foto bareng saat film selesai / credit title). Kuota kursi studio cepat habis lur, klik link di atas dan amankan tiketmu ya lur! 🍿✨
-
-🎁 *INFO PROMO BUY 1 GET 1 (BOGO):*
-Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 November. Mau Mas Kidi amankan nomor sampean di Pengingat Prioritas H-1 via WA? Cukup infokan Nama Lengkap & Kota sampean ya lur! 🍿✨`;
+📲 Mau Mas Kidi amankan nomor sampean di **Pengingat Prioritas WA** biar langsung dijapri saat loket Presale (${presaleDates}) & Promo Buy 1 Get 1 dibuka? Cukup infokan **Nama Lengkap & Kota** sampean ya lur! 🍿✨`;
       }
 
       return NextResponse.json({
@@ -1025,9 +1041,10 @@ Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 Novem
       args.is_bogo === true ||
       args.reminder === true;
 
-    // Check if roadshow city is EXPIRED
+    // Check if roadshow city is EXPIRED (or roadshow mode is OFF)
     const isCityExpired =
-      Boolean(roadshowCity) &&
+      db.settings.isRoadshowActive === false ||
+      (Boolean(roadshowCity) &&
       (
         args.is_expired === true ||
         (db.settings.expiredRoadshowCities || []).some(
@@ -1037,11 +1054,11 @@ Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 Novem
           cityName: roadshowCity!.name,
           manualExpiredCities: db.settings.expiredRoadshowCities || []
         })
-      );
+      ));
 
     const isRoadshowBooking = Boolean(roadshowCity) && !isExplicitBogo && !isCityExpired;
 
-    // SCENARIO 4A: EXPIRED ROADSHOW CITY OR NON-ROADSHOW CITY -> BOGO REMINDER
+    // SCENARIO 4A: POST-ROADSHOW / BOGO & PRESALE REMINDER REGISTRATION
     if (!isRoadshowBooking) {
       const targetCityName = roadshowCity ? roadshowCity.name : String(cityLocation);
 
@@ -1064,31 +1081,18 @@ Kuota promo: 1.000 tiket di TIX ID & 500 tiket di M-TIX (XXI) dibuka 15-18 Novem
         saveDb(db);
       }
 
-      if (isCityExpired && roadshowCity) {
-        return NextResponse.json({
-          status: 'success',
-          success: true,
-          action: 'bogo_reminder_registered',
-          isRoadshowExpired: true,
-          name,
-          city: roadshowCity.name,
-          roadshowDate: roadshowCity.dateStr,
-          phone,
-          ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-          replyMessage: `🎬 *ROADSHOW ${roadshowCity.name.toUpperCase()} SUDAH SELESAI — NOMOR KAMU DIALIHKAN KE PENGINGAT BUY 1 GET 1!* 🎬\n\nHalo *${name}*, bolo asikku! Piye kabare? 😄\n\nKarena tanggal roadshow ${roadshowCity.name} kemarin (${roadshowCity.dateStr}) sudah terlaksana, penukaran kode booking ke voucher fisik di booth mall sudah selesai ya lur.\n\n🍿 *TAPI OJO CILIK ATI LUR! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di seluruh bioskop ${roadshowCity.name} dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI DIAMANKAN di Pengingat Prioritas BOGO*. Nanti begitu kuota presale dibuka, kami langsung japri via WA! Ajak ayang atau kawan tongkrongan ya lur! ✨`
-        }, { status: 200, headers: corsHeaders });
-      }
-
-      // Non-roadshow city (Bandung, Jakarta, Medan, dll)
       return NextResponse.json({
         status: 'success',
         success: true,
         action: 'bogo_reminder_registered',
         name,
-        city: cityLocation,
+        city: targetCityName,
         phone,
+        releaseDate: '19 November 2026',
+        presaleDates,
+        bogoDates,
         ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-        replyMessage: `🎬 *PENDAFTARAN PENGINGAT BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${cityLocation}! Piye kabare lur? 😄\n\nUntuk roadshow temu cast saat ini memang lagi keliling 17 kota Jateng-Jatim lur. TAPI TENANG! Tanggal *19 NOVEMBER 2026* film PIYE TO KIH? *TAYANG SERENTAK* di bioskop kesayangan kotamu (XXI, CGV, Cinépolis)!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas Promo BUY 1 GET 1 (BOGO)*. Nanti pas presale dibuka, kami langsung kirimkan notifikasi WA lur! Sampai ketemu di bioskop! 🍿🎉`
+        replyMessage: `🎬 *PENDAFTARAN PENGINGAT PRIORITAS PRESALE & BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${targetCityName}! Piye kabare lur? 😄\n\nFilm komedi keluarga *"PIYE TO KIH? THE MOVIE"* *TAYANG SERENTAK* mulai **19 NOVEMBER 2026** di bioskop kesayangan kotamu!\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas WA*. Begitu loket Presale (${presaleDates}) & Promo Buy 1 Get 1 dibuka, Mas Kidi langsung japri via WA lur! Sampai ketemu di bioskop! 🍿🎉`
       }, { status: 200, headers: corsHeaders });
     }
 

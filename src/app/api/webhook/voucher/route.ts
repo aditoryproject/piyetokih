@@ -81,8 +81,12 @@ export async function POST(req: NextRequest) {
       ? 'https://piyetokihfilm.com'
       : rawOrigin;
 
+    const presaleDates = db.settings.bogoPresaleDatesText || '12-18 November 2026';
+    const bogoDates = db.settings.bogoPromoDatesText || '19-20 November 2026';
+
     const isCityExpired =
-      Boolean(roadshowCity) &&
+      db.settings.isRoadshowActive === false ||
+      (Boolean(roadshowCity) &&
       (
         args.is_expired === true ||
         (db.settings.expiredRoadshowCities || []).some(
@@ -92,11 +96,11 @@ export async function POST(req: NextRequest) {
           cityName: roadshowCity!.name,
           manualExpiredCities: db.settings.expiredRoadshowCities || []
         })
-      );
+      ));
 
     const isRoadshowBooking = Boolean(roadshowCity) && !isExplicitBogo && !isCityExpired;
 
-    // CASE 1: EXPIRED ROADSHOW CITY OR NON-ROADSHOW CITY -> BOGO REMINDER
+    // CASE 1: POST-ROADSHOW / BOGO & PRESALE REMINDER REGISTRATION
     if (!isRoadshowBooking) {
       const targetCityName = roadshowCity ? roadshowCity.name : String(cityLocation);
 
@@ -119,31 +123,18 @@ export async function POST(req: NextRequest) {
         saveDb(db);
       }
 
-      if (isCityExpired && roadshowCity) {
-        return NextResponse.json({
-          status: 'success',
-          success: true,
-          action: 'bogo_reminder_registered',
-          isRoadshowExpired: true,
-          name,
-          city: roadshowCity.name,
-          roadshowDate: roadshowCity.dateStr,
-          phone,
-          ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-          replyMessage: `🎬 *ROADSHOW ${roadshowCity.name.toUpperCase()} SUDAH SELESAI — NOMOR KAMU DIALIHKAN KE PENGINGAT BUY 1 GET 1!* 🎬\n\nHalo *${name}*, bolo asikku! Piye kabare? 😄\n\nKarena tanggal roadshow ${roadshowCity.name} kemarin (${roadshowCity.dateStr}) sudah rampung terlaksana, penukaran voucher fisik di booth mall sudah selesai ya lur.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN PUTUS ASA?* 😂\nSampean tetap bisa nonton film PIYE TO KIH? serentak mulai *19 NOVEMBER 2026* di seluruh bioskop ${roadshowCity.name} dengan *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI DIAMANKAN di Pengingat Prioritas BOGO*. Nanti begitu kuota presale dibuka, kami langsung japri via WA! Ajak ayang atau kawan tongkrongan ya lur! ✨`
-        }, { status: 200, headers: corsHeaders });
-      }
-
-      // Non-roadshow city
       return NextResponse.json({
         status: 'success',
         success: true,
         action: 'bogo_reminder_registered',
         name,
-        city: cityLocation,
+        city: targetCityName,
         phone,
+        releaseDate: '19 November 2026',
+        presaleDates,
+        bogoDates,
         ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-        replyMessage: `🎬 *PENDAFTARAN PENGINGAT BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${cityLocation}! Piye kabare lur? 😄\n\nUntuk roadshow temu cast saat ini memang lagi keliling 17 kota Jateng-Jatim lur. TAPI TENANG! Tanggal *19 NOVEMBER 2026* film PIYE TO KIH? *TAYANG SERENTAK* di bioskop kesayangan kotamu (XXI, CGV, Cinépolis)!\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas Promo BUY 1 GET 1 (BOGO)*. Nanti pas presale dibuka, kami langsung kirimkan notifikasi WA lur! Sampai ketemu di bioskop! 🍿🎉`
+        replyMessage: `🎬 *PENDAFTARAN PENGINGAT PRIORITAS PRESALE & BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${targetCityName}! Piye kabare lur? 😄\n\nFilm komedi keluarga *"PIYE TO KIH? THE MOVIE"* *TAYANG SERENTAK* mulai **19 NOVEMBER 2026** di bioskop kesayangan kotamu!\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas WA*. Begitu loket Presale (${presaleDates}) & Promo Buy 1 Get 1 dibuka, Mas Kidi langsung japri via WA lur! Sampai ketemu di bioskop! 🍿🎉`
       }, { status: 200, headers: corsHeaders });
     }
 

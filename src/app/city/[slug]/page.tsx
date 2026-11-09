@@ -140,7 +140,7 @@ export default async function CityRoadshowPage({ params }: Props) {
           </div>
         </section>
         <MovieStorySection movieSettings={movieSettings || undefined} />
-        <Footer socialLinks={db.settings.socialLinks} />
+        <Footer initialSocialLinks={db.settings.socialLinks} />
       </div>
     );
   }

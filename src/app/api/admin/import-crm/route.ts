@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
         phone: cleanPhone,
         email: '',
         city: finalCity,
-        createdAt: new Date().toISOString(),
+        registeredAt: new Date().toISOString(),
         reminderStatus: 'pending',
       };
 
@@ -230,3 +230,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
