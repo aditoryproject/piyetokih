@@ -152,6 +152,16 @@ export default function AdminDashboardClient() {
   const [loadingFollowupPreview, setLoadingFollowupPreview] = useState<boolean>(false);
   const [followupBgJob, setFollowupBgJob] = useState<any>(null);
 
+  // Import CRM Wahnotif (CSV / Paste) Modal State
+  const [isImportCrmModalOpen, setIsImportCrmModalOpen] = useState<boolean>(false);
+  const [crmImportText, setCrmImportText] = useState<string>('');
+  const [crmImporting, setCrmImporting] = useState<boolean>(false);
+  const [crmImportResult, setCrmImportResult] = useState<{
+    message: string;
+    addedCount: number;
+    duplicateCount: number;
+  } | null>(null);
+
   // Settings state
   const [settings, setSettings] = useState<any>({
     totalQuota: 500,
@@ -519,6 +529,50 @@ export default function AdminDashboardClient() {
     setFollowupTarget(target);
     setIsFollowupModalOpen(true);
     fetchFollowupPreview(followupCity, target, followupStage);
+  };
+
+  const handleCrmCsvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const content = String(ev.target?.result || '');
+      setCrmImportText(content);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleSubmitCrmImport = async () => {
+    if (!crmImportText.trim()) {
+      alert('Silakan pilih file CSV dari Wahnotif atau tempel (paste) daftar nomor WhatsApp terlebih dahulu.');
+      return;
+    }
+    setCrmImporting(true);
+    setCrmImportResult(null);
+    try {
+      const res = await fetch('/api/admin/import-crm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rawText: crmImportText }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCrmImportResult({
+          message: data.message,
+          addedCount: data.addedCount,
+          duplicateCount: data.duplicateCount,
+        });
+        setCrmImportText('');
+        fetchReminders();
+        fetchFollowupPreview(followupCity, followupTarget, followupStage);
+      } else {
+        alert(data.error || 'Gagal mengimpor kontak CRM.');
+      }
+    } catch {
+      alert('Terjadi kendala jaringan saat mengimpor kontak.');
+    } finally {
+      setCrmImporting(false);
+    }
   };
 
   const handleExecutePresaleFollowup = async () => {
@@ -1724,6 +1778,18 @@ export default function AdminDashboardClient() {
                   >
                     <Download className="w-3.5 h-3.5 text-slate-600" />
                     <span>Export CSV</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setCrmImportResult(null);
+                      setIsImportCrmModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition shadow-sm"
+                    title="Import CSV 1.260 Kontak CRM dari Wahnotif agar terkumpul 1 pintu tanpa duplikat"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>📥 Import CSV CRM Wahnotif</span>
                   </button>
 
                   <button
@@ -7641,6 +7707,24 @@ export default function AdminDashboardClient() {
 
             {/* Content Form */}
             <div className="mt-6 space-y-6">
+              {/* Banner Satu Pintu Import CRM Wahnotif */}
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="text-xs text-slate-200 leading-relaxed">
+                  <strong className="text-emerald-400">💡 Sistem Blasting 1 Pintu (Web + CRM Wahnotif):</strong> Punya 1.260 kontak di menu CRM Wahnotif? Import CSV-nya ke sini agar otomatis disaring tanpa duplikat dan dikirim bertahap dengan proteksi Anti-Banned.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCrmImportResult(null);
+                    setIsImportCrmModalOpen(true);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shrink-0 transition flex items-center gap-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>📥 Import Kontak CRM Wahnotif</span>
+                </button>
+              </div>
+
               {/* Target & City Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Target Audience */}
@@ -7965,6 +8049,95 @@ export default function AdminDashboardClient() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL IMPORT CSV / PASTE KONTAK CRM WAHNOTIF (1 PINTU ANTI-DUPLIKAT) */}
+      {isImportCrmModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-xl my-8 bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 text-slate-900 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900">
+                    Import Kontak CRM Wahnotif (1 Pintu)
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Gabungkan 1.260+ kontak CRM Wahnotif ke antrean Web (otomatis hapus nomor kembar/duplikat).
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsImportCrmModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {crmImportResult && (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-1">
+                <div className="font-black flex items-center gap-1.5 text-emerald-700">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Berhasil Diimpor ke Antrean Satu Pintu!</span>
+                </div>
+                <p>{crmImportResult.message}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <label className="block text-xs font-black uppercase text-slate-800">
+                  Cara 1: Upload File CSV / TXT dari Export CRM Wahnotif
+                </label>
+                <input
+                  type="file"
+                  accept=".csv,.txt,.tsv"
+                  onChange={handleCrmCsvFileUpload}
+                  className="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer"
+                />
+                <p className="text-[11px] text-slate-500">
+                  Sistem otomatis mendeteksi kolom Nomor WA (`08xx` / `628xx`), Nama Kontak, dan Kota dari format CSV apapun.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1.5">
+                  Cara 2: Atau Copy-Paste Langsung Daftar Nomor / Tabel Excel di Bawah Ini
+                </label>
+                <textarea
+                  rows={6}
+                  value={crmImportText}
+                  onChange={(e) => setCrmImportText(e.target.value)}
+                  placeholder={`Contoh format bebas (bisa nomor saja atau Nomor, Nama, Kota):\n6281234567890, Budi Santoso, Kediri\n085712345678, Siti Aminah\n6281398765432`}
+                  className="w-full rounded-2xl bg-slate-50 border border-slate-300 focus:border-slate-900 p-3.5 text-xs font-mono text-slate-800 outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsImportCrmModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitCrmImport}
+                disabled={crmImporting || !crmImportText.trim()}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition disabled:opacity-50"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>{crmImporting ? 'Memproses Import...' : 'Simpan & Gabungkan Kontak'}</span>
+              </button>
             </div>
           </div>
         </div>

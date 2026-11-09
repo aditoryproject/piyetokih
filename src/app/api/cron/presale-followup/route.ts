@@ -27,12 +27,21 @@ const bgJob: BackgroundJobState = {
   shouldCancel: false,
 };
 
+const HEADER_VARIATIONS = [
+  '🎬 *KABAR GEMBIRA! LINK TIKET PRESALE & BUY 1 GET 1 RESMI DIBUKA!* 🎬',
+  '🍿 *INFO RESMI MAS KIDI: LOKET PRESALE & BUY 1 GET 1 SUDAH BUKA LUR!* 🍿',
+  '🎟️ *SIAP NONTON RAME-RAME? LINK PRESALE & PROMO BOGO RESMI AKTIF!* 🎟️',
+  '🔥 *WAR TIKET PRESALE & BUY 1 GET 1 FILM PIYE TO KIH RESMI DIMULAI!* 🔥',
+  '✨ *KABAR SPESIAL DARI MAS KIDI: TIKET PRESALE & BUY 1 GET 1 SUDAH BISA DIAMANKAN!* ✨',
+];
+
 const GREETING_VARIATIONS = [
   'Halo bolo asik',
   'Halo lur',
   'Piye kabare bolo asik',
   'Halo sedulur',
   'Sugeng rahayu bolo asik',
+  'Halo kanca asik',
 ];
 
 const PANTUN_VARIATIONS = [
@@ -40,7 +49,45 @@ const PANTUN_VARIATIONS = [
   'Tuku mendoan anget nang pinggir dalan, ayo amankan kursi bioskop bareng konco tenanan! 🎬',
   'Ngombe dawet ayu karo mangan klepon, film Piye To Kih siap bikin ngakak satu stadion! 😄',
   'Mlaku-mlaku sore nang alun-alun kutha, nonton berdua cukup bayar siji tiket wae lho! 🎟️',
+  'Tuku tahu takwa oleh-oleh khas Kediri, nonton Piye To Kih bareng keluarga bikin happy! ✨',
+  'Nongkrong santai ngombe kopi tubruk, ayo amankan kursi tengah sakdurunge keburu entuk! 🍿',
 ];
+
+const CLOSING_VARIATIONS = [
+  'Kalau ada kendala pas buka linknya, langsung balas chat ini ya lur, Mas Kidi siap bantu!',
+  'Yen butuh bantuan milih bioskop atau cara klaim promonya, tinggal balas chat ini wae ya lur!',
+  'Sampai ketemu di bioskop bareng rombongan pecah ketawa ya lur! Kalau ada yang mau ditanyakan langsung chat Mas Kidi nggih!',
+  'Ayo kabari konco, pasangan, atau keluargamu sekarang lur! Kalau bingung cara belinya, balas chat ini aja ya!',
+];
+
+function formatNaturalSalutation(greeting: string, rawName: string, rawCity: string): string {
+  const cleanName = (rawName || '').trim();
+  const isGenericName =
+    !cleanName ||
+    /^bolo asik$/i.test(cleanName) ||
+    /^user\s*\d+/i.test(cleanName) ||
+    /^unknown$/i.test(cleanName) ||
+    cleanName.replace(/[^0-9]/g, '').length >= 7;
+
+  const cleanCity = (rawCity || '').trim();
+  const isGenericCity =
+    !cleanCity ||
+    /^nasional$/i.test(cleanCity) ||
+    /^indonesia$/i.test(cleanCity) ||
+    /^semua kota$/i.test(cleanCity) ||
+    cleanCity === '-';
+
+  if (isGenericName && isGenericCity) {
+    return `${greeting} sedulurku! Piye kabare lur? 😄`;
+  }
+  if (isGenericName && !isGenericCity) {
+    return `${greeting} sedulurku di *${cleanCity}*! Piye kabare lur? 😄`;
+  }
+  if (!isGenericName && isGenericCity) {
+    return `${greeting} *${cleanName}*! Piye kabare lur? 😄`;
+  }
+  return `${greeting} *${cleanName}* di *${cleanCity}*! 😄`;
+}
 
 function buildFollowupMessage(params: {
   stage: number;
@@ -67,34 +114,38 @@ function buildFollowupMessage(params: {
     variantIndex = 0,
   } = params;
 
-  const greeting = GREETING_VARIATIONS[variantIndex % GREETING_VARIATIONS.length];
-  const pantun = PANTUN_VARIATIONS[variantIndex % PANTUN_VARIATIONS.length];
+  const header = HEADER_VARIATIONS[variantIndex % HEADER_VARIATIONS.length];
+  const greeting = GREETING_VARIATIONS[(variantIndex * 3) % GREETING_VARIATIONS.length];
+  const pantun = PANTUN_VARIATIONS[(variantIndex * 5) % PANTUN_VARIATIONS.length];
+  const closing = CLOSING_VARIATIONS[(variantIndex * 7) % CLOSING_VARIATIONS.length];
+  const salutation = formatNaturalSalutation(greeting, name, city);
+  const uniqueRef = `PTK-${((variantIndex + 101) * 17).toString(36).toUpperCase()}`;
 
   if (customTemplate && customTemplate.trim()) {
     return customTemplate
-      .replace(/\{nama\}/gi, name)
-      .replace(/\{kota\}/gi, city)
+      .replace(/\{nama\}/gi, name || 'Bolo Asik')
+      .replace(/\{kota\}/gi, city && city !== 'Nasional' ? city : 'Kotamu')
       .replace(/\{link_tixid\}/gi, tixidUrl)
       .replace(/\{link_mtix\}/gi, mtixUrl)
       .replace(/\{tanggal_presale\}/gi, presaleDatesText)
-      .replace(/\{tanggal_bogo\}/gi, promoDatesText);
+      .replace(/\{tanggal_bogo\}/gi, promoDatesText) + `\n\n_Ref: #${uniqueRef}_`;
   }
 
   // Stage 4: KHUSUS PEMBUKAAN LINK PRESALE & BUY 1 GET 1 (12 NOVEMBER -> TAYANG 19 NOV)
   if (stage === 4) {
-    return `🎬 *KABAR GEMBIRA! LINK TIKET PRESALE & BUY 1 GET 1 RESMI DIBUKA!* 🎬\n\n${greeting} *${name}* di *${city}*! 😄\n${pantun}\n\nSesuai janji Mas Kidi kemarin, hari ini loket pembelian tiket *PRESALE (${presaleDatesText})* & *PROMO BUY 1 GET 1 (${promoDatesText})* untuk penayangan serentak film *PIYE TO KIH? THE MOVIE* (Tayang Perdana *19 November 2026*) sudah *RESMI DIBUKA LUR!* 🎉\n\n🎟️ *PILIH LINK PEMBELIAN RESMI SEBELUM KUOTA PROMO HABIS:*\n• *TIX ID (Promo Buy 1 Get 1):*\n  👉 ${tixidUrl}\n• *Cinema XXI / M-TIX (Promo Buy 1 Get 1):*\n  👉 ${mtixUrl}\n\n⚠️ *PENTING:* Kuota promo *Nonton Berdua Bayar 1 Tiket* sangat terbatas per harinya. Yuk langsung klik link di atas dan amankan kursi tengah favoritmu bareng pasangan, keluarga, atau bestie sekarang juga! 🍿✨\n\nKalau ada kendala pas buka linknya, langsung balas chat ini ya lur, Mas Kidi siap bantu!\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+    return `${header}\n\n${salutation}\n${pantun}\n\nSesuai janji Mas Kidi, loket pembelian tiket *PRESALE (${presaleDatesText})* & *PROMO BUY 1 GET 1 (${promoDatesText})* untuk penayangan serentak film *PIYE TO KIH? THE MOVIE* (Tayang Perdana *19 November 2026*) sudah *RESMI DIBUKA LUR!* 🎉\n\n🎟️ *PILIH LINK PEMBELIAN RESMI SEBELUM KUOTA PROMO HABIS:*\n• *TIX ID (Promo Buy 1 Get 1):*\n  👉 ${tixidUrl}\n• *Cinema XXI / M-TIX (Promo Buy 1 Get 1):*\n  👉 ${mtixUrl}\n\n⚠️ *PENTING:* Kuota promo *Nonton Berdua Bayar 1 Tiket* sangat terbatas per harinya. Yuk langsung klik link di atas dan amankan kursi tengah favoritmu bareng pasangan, keluarga, atau bestie sekarang juga! 🍿✨\n\n${closing}\n\n_Miracle Pictures • Ref #${uniqueRef}_`;
   }
 
   if (stage === 2) {
-    return `🎬 *WADUH BOLO ASIK ${name.toUpperCase()} DI ${city.toUpperCase()}!* 🎬\n\n${pantun}\n\nKabar darurat santai lur: Kuota tiket *PRESALE & PROMO BUY 1 GET 1* film *PIYE TO KIH?* untuk penayangan *19 November 2026* di bioskop kotamu *SUDAH MAKIN MENIPIS LUR!* 😱\n\n🎟️ *LINK LANGSUNG AMANKAN TIKETMU (TINGGAL KLIK):*\n• *TIX ID:* ${tixidUrl}\n• *M-TIX (Cinema XXI):* ${mtixUrl}\n\nOjo nganti kehabisan kuota promonya ya lur! Sampean udah berhasil checkout belum nih? Mau Mas Kidi bantu arahin? 🍿✨\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+    return `🎬 *INFO KUOTA TIKET DARI MAS KIDI LUR!* 🎬\n\n${salutation}\n${pantun}\n\nKabar darurat santai lur: Kuota tiket *PRESALE & PROMO BUY 1 GET 1* film *PIYE TO KIH?* untuk penayangan *19 November 2026* di bioskop *SUDAH MAKIN MENIPIS LUR!* 😱\n\n🎟️ *LINK LANGSUNG AMANKAN TIKETMU (TINGGAL KLIK):*\n• *TIX ID:* ${tixidUrl}\n• *M-TIX (Cinema XXI):* ${mtixUrl}\n\nOjo nganti kehabisan kuota promonya ya lur! Sampean udah berhasil checkout belum nih? Mau Mas Kidi bantu arahin? 🍿✨\n\n_Miracle Pictures • Ref #${uniqueRef}_`;
   }
 
   if (stage === 3) {
-    return `🎬 *KONFIRMASI TERAKHIR DARI MAS KIDI NIH LUR!* 🎬\n\n${greeting} *${name}* di *${city}*! 😄\n${pantun}\n\nPenayangan perdana *PIYE TO KIH? THE MOVIE* tanggal *19 November 2026* sebentar lagi dimulai!\nBiar Mas Kidi bisa bantu cek kuota promo *Buy 1 Get 1* di kotamu:\n👉 Sampean sudah berhasil amankan tiket presale di TIX ID / M-TIX belum lur?\n\n🎟️ *Link Tiket Langsung:*\n• *TIX ID:* ${tixidUrl}\n• *M-TIX XXI:* ${mtixUrl}\n\nBoleh balas singkat ya lur:\nKetik *SUDAH* (kalau sudah punya tiket), *MAU* (kalau mau dibantu linknya), atau *SKIP* (kalau belum sempat).\nSuwun sanget ya lur! 🙏🍿\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+    return `🎬 *KONFIRMASI TERAKHIR DARI MAS KIDI NIH LUR!* 🎬\n\n${salutation}\n${pantun}\n\nPenayangan perdana *PIYE TO KIH? THE MOVIE* tanggal *19 November 2026* sebentar lagi dimulai!\nBiar Mas Kidi bisa bantu cek kuota promo *Buy 1 Get 1*:\n👉 Sampean sudah berhasil amankan tiket presale di TIX ID / M-TIX belum lur?\n\n🎟️ *Link Tiket Langsung:*\n• *TIX ID:* ${tixidUrl}\n• *M-TIX XXI:* ${mtixUrl}\n\nBoleh balas singkat ya lur:\nKetik *SUDAH* (kalau sudah punya tiket), *MAU* (kalau mau dibantu linknya), atau *SKIP* (kalau belum sempat).\nSuwun sanget ya lur! 🙏🍿\n\n_Miracle Pictures • Ref #${uniqueRef}_`;
   }
 
   // Stage 1: Soft Nudge & Link Pembelian Presale
-  return `🎬 *MAS KIDI NINGGALIN PESAN PENTING NIH LUR!* 🎬\n\n${greeting} *${name}* di Kota *${city}*! 😄\n${pantun}\n\nMas Kidi cuma mau ngingetin santai: Tiket *PRESALE (${presaleDatesText})* & *PROMO BUY 1 GET 1 (${promoDatesText})* untuk penayangan serentak film *PIYE TO KIH?* mulai *19 November 2026* sudah bisa diamankan sekarang lur!\n\n🎟️ *KLIK LINK PEMBELIAN RESMI SEBELUM LUDES:*\n${cinemaLinksText}\n• *TIX ID (Promo BOGO):* ${tixidUrl}\n• *Info Lengkap:* https://piyetokihfilm.com/#presale\n\n⚠️ *PENTING:* Kuota promo terbatas! Gas checkout sekarang juga ya lur ben gak kehabisan kursi favorit! 🍿✨\n\n_Miracle Pictures - Piye To Kih The Movie_`;
+  return `🎬 *MAS KIDI NINGGALIN PESAN PENTING NIH LUR!* 🎬\n\n${salutation}\n${pantun}\n\nMas Kidi cuma mau ngingetin santai: Tiket *PRESALE (${presaleDatesText})* & *PROMO BUY 1 GET 1 (${promoDatesText})* untuk penayangan serentak film *PIYE TO KIH?* mulai *19 November 2026* sudah bisa diamankan sekarang lur!\n\n🎟️ *KLIK LINK PEMBELIAN RESMI SEBELUM LUDES:*\n${cinemaLinksText}\n• *TIX ID (Promo BOGO):* ${tixidUrl}\n• *Info Lengkap:* https://piyetokihfilm.com/#presale\n\n⚠️ *PENTING:* Kuota promo terbatas! Gas checkout sekarang juga ya lur ben gak kehabisan kursi favorit! 🍿✨\n\n_Miracle Pictures • Ref #${uniqueRef}_`;
 }
 
 export async function GET(req: NextRequest) {
@@ -191,11 +242,11 @@ export async function POST(req: NextRequest) {
     const db = getDb();
     const targetType = body.target || 'all'; // 'all' | 'leads' | 'reminders'
     const targetCity = (body.city || body.targetCity || 'all').toLowerCase().trim();
-    const stage = Number(body.stage || 4); // 4: Pembukaan Link Presale 12 Nov, 1: Soft Nudge, 2: Urgensi, 3: Konfirmasi
-    const delaySeconds = typeof body.delaySeconds === 'number' ? Math.max(0, body.delaySeconds) : 20;
+    const stage = Number(body.stage || 4);
+    const delaySeconds = typeof body.delaySeconds === 'number' ? Math.max(5, body.delaySeconds) : 25;
     const batchSize = typeof body.batchSize === 'number' ? Math.max(5, body.batchSize) : 25;
     const batchPauseMinutes = typeof body.batchPauseMinutes === 'number' ? Math.max(0, body.batchPauseMinutes) : 10;
-    const limit = typeof body.limit === 'number' ? body.limit : 500;
+    const limit = typeof body.limit === 'number' ? body.limit : 2000;
     const forceResend = Boolean(body.forceResend);
     const customTemplate = typeof body.customTemplate === 'string' ? body.customTemplate : '';
 
@@ -237,7 +288,7 @@ export async function POST(req: NextRequest) {
     const contacts: FollowupContact[] = [];
     const seenPhones = new Set<string>();
 
-    // Utamakan Pendaftar Reminder BOGO terlebih dahulu, lalu Leads Voucher (tanpa duplikat nomor WA)
+    // Utamakan Pendaftar Reminder BOGO & Kontak CRM terlebih dahulu, lalu Leads Voucher (tanpa duplikat nomor WA)
     if (targetType === 'all' || targetType === 'reminders') {
       for (const rem of db.bogoReminders) {
         if (isCityEligible(rem.city) && isContactEligible(rem)) {
@@ -288,7 +339,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Jika estimasi durasi > 25 detik (karena jeda anti-spam / batch 10-15 menit), jalankan di Background Server agar tidak timeout!
     const runInBackground = processList.length * delaySeconds > 20 || (batchPauseMinutes > 0 && processList.length > batchSize);
 
     const executeQueue = async () => {
@@ -306,11 +356,11 @@ export async function POST(req: NextRequest) {
         for (let i = 0; i < processList.length; i++) {
           if (bgJob.shouldCancel) break;
 
-          // Cek apakah masuk ke gelombang/batch berikutnya dan perlu istirahat 10-15 menit
+          // Istirahat otomatis per gelombang (Batch Cooling Anti-Banned)
           if (i > 0 && batchPauseMinutes > 0 && i % batchSize === 0) {
             bgJob.currentBatch = Math.floor(i / batchSize) + 1;
             const pauseMs = batchPauseMinutes * 60 * 1000;
-            bgJob.statusMessage = `Istirahat Anti-Spam ${batchPauseMinutes} menit sebelum lanjut ke Gelombang (Batch) #${bgJob.currentBatch}... (${bgJob.sent}/${bgJob.totalTarget} terkirim)`;
+            bgJob.statusMessage = `🛡️ Istirahat Anti-Banned ${batchPauseMinutes} menit sebelum lanjut ke Gelombang #${bgJob.currentBatch}... (${bgJob.sent}/${bgJob.totalTarget} terkirim)`;
             const stepMs = 5000;
             let waited = 0;
             while (waited < pauseMs && !bgJob.shouldCancel) {
@@ -319,14 +369,16 @@ export async function POST(req: NextRequest) {
             }
             if (bgJob.shouldCancel) break;
           } else if (i > 0 && delaySeconds > 0) {
-            const jitter = Math.floor(Math.random() * 4000) + 1000; // 1-5s natural human jitter
-            bgJob.statusMessage = `Menunggu jeda aman ${delaySeconds} dtk sebelum mengirim ke kontak #${i + 1} (${processList[i].name})...`;
-            await new Promise(resolve => setTimeout(resolve, (delaySeconds * 1000) + jitter));
+            // Natural human jitter (3 - 10 detik tambahan acak) agar ritme tidak seperti robot
+            const jitterMs = (Math.floor(Math.random() * 8) + 3) * 1000;
+            const totalWaitSec = Math.round((delaySeconds * 1000 + jitterMs) / 1000);
+            bgJob.statusMessage = `⏱️ Jeda natural ${totalWaitSec} detik sebelum mengirim ke kontak #${i + 1} (${processList[i].name})...`;
+            await new Promise(resolve => setTimeout(resolve, (delaySeconds * 1000) + jitterMs));
             if (bgJob.shouldCancel) break;
           }
 
           const c = processList[i];
-          bgJob.statusMessage = `Mengirim WhatsApp ke ${c.name} (${c.city}) [${i + 1}/${processList.length}]...`;
+          bgJob.statusMessage = `📤 Mengirim WhatsApp ke ${c.name} (${c.phone}) [${i + 1}/${processList.length}]...`;
 
           const currentDb = getDb();
           const citySlug = c.city.toLowerCase().trim();
@@ -413,7 +465,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         background: true,
-        message: `Pengiriman Follow-Up ke ${processList.length} kontak telah dimulai di background server dengan jeda anti-spam (${delaySeconds} detik/pesan & istirahat ${batchPauseMinutes} menit setiap ${batchSize} nomor). Anda dapat memantau progresnya secara langsung atau menutup halaman ini dengan aman.`,
+        message: `Pengiriman Satu Pintu ke ${processList.length} kontak telah dimulai di background server (Jeda acak ${delaySeconds}+ detik/pesan & istirahat ${batchPauseMinutes} menit setiap ${batchSize} nomor). Anda dapat menutup halaman ini dengan aman — server VPS akan tetap mengirimkannya secara bertahap sampai tuntas!`,
         totalProcessed: processList.length,
         sentCount: 0,
         failCount: 0,

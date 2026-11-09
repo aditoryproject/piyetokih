@@ -234,6 +234,30 @@ export async function POST(req: NextRequest) {
     ).toLowerCase();
 
     const db = getDb();
+
+    // Auto-capture nomor WhatsApp dari inbound webhook Wahnotif ke antrean 1 pintu jika belum terdaftar
+    const inboundRawPhone = String(body._wahnotif_phone || body.phone || args._wahnotif_phone || args.phone || '').replace(/[^0-9]/g, '');
+    if (inboundRawPhone.length >= 10) {
+      const cleanInboundPhone = inboundRawPhone.startsWith('0') ? '62' + inboundRawPhone.slice(1) : inboundRawPhone;
+      const alreadyExists =
+        db.bogoReminders.some(r => r.phone.replace(/[^0-9]/g, '').replace(/^0/, '62') === cleanInboundPhone) ||
+        db.leads.some(l => l.phone.replace(/[^0-9]/g, '').replace(/^0/, '62') === cleanInboundPhone);
+      if (!alreadyExists) {
+        const rawSenderName = String(body.name || args.name || '').trim();
+        const isGenericSender = !rawSenderName || /^user\s*\d+/i.test(rawSenderName) || /^unknown$/i.test(rawSenderName);
+        db.bogoReminders.unshift({
+          id: `WA-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          name: isGenericSender ? 'Bolo Asik' : rawSenderName,
+          phone: cleanInboundPhone,
+          email: '',
+          city: String(args.city || args.kota || 'Nasional').trim() || 'Nasional',
+          createdAt: new Date().toISOString(),
+          reminderStatus: 'pending',
+        });
+        saveDb(db);
+      }
+    }
+
     const xxiLink = db.settings.bogoCinemaLinks?.xxi || FAST_TRACK_TICKET_LINKS.xxi;
     const tixidLink = db.settings.bogoCinemaLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid;
     const cgvLink = db.settings.bogoCinemaLinks?.cgv || FAST_TRACK_TICKET_LINKS.cgv;
