@@ -154,6 +154,7 @@ export default async function HomePage() {
         initialCinemaLinks={db.settings.bogoCinemaLinks}
         initialPresaleDatesText={db.settings.bogoPresaleDatesText}
         initialPromoDatesText={db.settings.bogoPromoDatesText}
+        initialIsReminderFormActive={db.settings.isBogoReminderFormActive ?? false}
       />
 
       {/* 5. PEMERAN & KARAKTER RESMI (14 CAST SESUAI HALAMAN 6) */}
@@ -174,7 +175,7 @@ export default async function HomePage() {
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition active:scale-95"
             >
               <Ticket className="w-4 h-4" />
-              <span>Pasang Pengingat Presale &amp; Buy 1 Get 1</span>
+              <span>{db.settings.isBogoReminderFormActive ? 'Pasang Pengingat Presale & Buy 1 Get 1' : 'Beli Tiket Presale & Buy 1 Get 1 Sekarang'}</span>
             </a>
           </div>
         </div>

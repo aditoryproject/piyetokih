@@ -23,12 +23,14 @@ interface PresaleBogoSectionProps {
   };
   initialPresaleDatesText?: string;
   initialPromoDatesText?: string;
+  initialIsReminderFormActive?: boolean;
 }
 
 export default function PresaleBogoSection({
   initialCinemaLinks,
   initialPresaleDatesText,
   initialPromoDatesText,
+  initialIsReminderFormActive,
 }: PresaleBogoSectionProps = {}) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -44,9 +46,17 @@ export default function PresaleBogoSection({
   const [mtixUrl, setMtixUrl] = useState(initialCinemaLinks?.xxi || 'https://m.21cineplex.com/id/movies/16PTKH');
   const [presaleDatesText, setPresaleDatesText] = useState(initialPresaleDatesText || '12-18 November 2026');
   const [promoDatesText, setPromoDatesText] = useState(initialPromoDatesText || '19-20 November 2026');
+  const [isReminderFormActive, setIsReminderFormActive] = useState<boolean>(initialIsReminderFormActive ?? false);
 
   useEffect(() => {
-    if (initialCinemaLinks && initialPresaleDatesText && initialPromoDatesText) return;
+    if (
+      initialCinemaLinks &&
+      initialPresaleDatesText !== undefined &&
+      initialPromoDatesText !== undefined &&
+      initialIsReminderFormActive !== undefined
+    ) {
+      return;
+    }
     fetch('/api/admin/settings')
       .then(r => r.json())
       .then(d => {
@@ -54,9 +64,12 @@ export default function PresaleBogoSection({
         if (d.settings?.bogoCinemaLinks?.xxi) setMtixUrl(d.settings.bogoCinemaLinks.xxi);
         if (d.settings?.bogoPresaleDatesText) setPresaleDatesText(d.settings.bogoPresaleDatesText);
         if (d.settings?.bogoPromoDatesText) setPromoDatesText(d.settings.bogoPromoDatesText);
+        if (d.settings?.isBogoReminderFormActive !== undefined) {
+          setIsReminderFormActive(Boolean(d.settings.isBogoReminderFormActive));
+        }
       })
       .catch(() => {});
-  }, [initialCinemaLinks, initialPresaleDatesText, initialPromoDatesText]);
+  }, [initialCinemaLinks, initialPresaleDatesText, initialPromoDatesText, initialIsReminderFormActive]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +160,7 @@ export default function PresaleBogoSection({
         </p>
 
         {/* 2 ACTION BUTTONS: TIX ID & M-TIX */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-14">
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto ${isReminderFormActive ? 'mb-14' : 'mb-2'}`}>
           {/* Tombol 1: TIX ID */}
           <a
             href={tixidUrl}
@@ -207,7 +220,8 @@ export default function PresaleBogoSection({
           </a>
         </div>
 
-        {/* FORMULIR REMINDER WAR PRESALE BUY 1 GET 1 */}
+        {/* FORMULIR REMINDER WAR PRESALE BUY 1 GET 1 (BISA DI-ON/OFF DARI ADMIN) */}
+        {isReminderFormActive && (
         <div className="max-w-xl mx-auto bg-[#101217] border border-white/[0.12] rounded-3xl p-6 sm:p-8 shadow-2xl text-left relative">
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-amber-400 text-xs font-bold uppercase mb-2">
@@ -343,7 +357,7 @@ export default function PresaleBogoSection({
                 ) : (
                   <span className="flex items-center gap-2">
                     <Bell className="w-4 h-4" />
-                    PASANG PENGINGAT PRESALE 15 NOVEMBER
+                    PASANG PENGINGAT PRESALE &amp; BUY 1 GET 1
                   </span>
                 )}
               </button>
@@ -359,6 +373,7 @@ export default function PresaleBogoSection({
             </form>
           )}
         </div>
+        )}
       </div>
     </section>
   );

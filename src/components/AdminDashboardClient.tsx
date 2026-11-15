@@ -873,6 +873,28 @@ export default function AdminDashboardClient() {
     }
   };
 
+  const handleQuickToggleBogoForm = async (newVal: boolean) => {
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isBogoReminderFormActive: newVal }),
+      });
+      if (res.ok) {
+        setSettings((prev: any) => ({ ...prev, isBogoReminderFormActive: newVal }));
+        setSettingsSuccess(true);
+        setTimeout(() => setSettingsSuccess(false), 3000);
+      } else {
+        alert('Gagal mengubah status tampilan Form Pengingat Presale & BOGO.');
+      }
+    } catch {
+      alert('Terjadi kesalahan jaringan.');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const handleTestEmail = async () => {
     if (!testEmailTo) {
       alert('Masukkan alamat email penerima untuk pengujian!');
@@ -1821,6 +1843,58 @@ export default function AdminDashboardClient() {
                   <button onClick={() => setFollowupResult(null)} className="text-rose-600 hover:text-rose-900 font-bold ml-4">Tutup</button>
                 </div>
               )}
+
+              {/* SAKELAR ON/OFF FORMULIR PENGINGAT PRESALE & BUY 1 GET 1 DI LANDING PAGE */}
+              <div className="bg-slate-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md border border-slate-800">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                      🔘 Tampilan Kotak Form &quot;Tiket Presale &amp; Buy 1 Get 1 Belum Tersedia?&quot; di Landing Page
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                        settings.isBogoReminderFormActive
+                          ? 'bg-emerald-500 text-slate-950'
+                          : 'bg-rose-600 text-white'
+                      }`}
+                    >
+                      {settings.isBogoReminderFormActive ? '🟢 FORM ON (TAMPIL)' : '🔴 FORM OFF (DISEMBUNYIKAN)'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 mt-1">
+                    {settings.isBogoReminderFormActive
+                      ? 'Kotak formulir isian Pengingat WA & Email sedang DITAMPILKAN di halaman utama.'
+                      : 'Kotak formulir isian Pengingat WA & Email DISEMBUNYIKAN dari halaman utama (hanya tombol langsung Beli di TIX ID & M-TIX yang tampil).'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={savingSettings}
+                    onClick={() => handleQuickToggleBogoForm(true)}
+                    className={`px-4 py-2 rounded-xl text-xs font-black transition ${
+                      settings.isBogoReminderFormActive
+                        ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                    }`}
+                  >
+                    ON (Tampilkan Form)
+                  </button>
+                  <button
+                    type="button"
+                    disabled={savingSettings}
+                    onClick={() => handleQuickToggleBogoForm(false)}
+                    className={`px-4 py-2 rounded-xl text-xs font-black transition ${
+                      !settings.isBogoReminderFormActive
+                        ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                    }`}
+                  >
+                    OFF (Sembunyikan Form)
+                  </button>
+                </div>
+              </div>
 
               {/* PENGATURAN CEPAT TANGGAL PRESALE & BUY 1 GET 1 DI KOTAK FORM REMINDER */}
               <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
@@ -4664,6 +4738,47 @@ export default function AdminDashboardClient() {
                       }`}
                     >
                       Nonaktifkan
+                    </button>
+                  </div>
+                </div>
+
+                {/* 1.2 SAKELAR ON/OFF FORM PENGINGAT PRESALE & BOGO DI LANDING PAGE */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                      2. Tampilan Form &quot;Tiket Presale &amp; Buy 1 Get 1 Belum Tersedia?&quot; di Landing Page
+                    </label>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      {settings.isBogoReminderFormActive
+                        ? '🟢 FORM DITAMPILKAN — Pengunjung dapat mengisi form pengingat WA & Email di bawah tombol TIX ID / M-TIX.'
+                        : '🔴 FORM DISEMBUNYIKAN — Kotak form pengingat dimatikan, halaman utama hanya menampilkan tombol beli tiket TIX ID & M-TIX.'}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleQuickToggleBogoForm(true)}
+                      disabled={savingSettings}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                        settings.isBogoReminderFormActive
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-white text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      ON (Tampilkan Form)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickToggleBogoForm(false)}
+                      disabled={savingSettings}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                        !settings.isBogoReminderFormActive
+                          ? 'bg-rose-600 text-white'
+                          : 'bg-white text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      OFF (Sembunyikan Form)
                     </button>
                   </div>
                 </div>
