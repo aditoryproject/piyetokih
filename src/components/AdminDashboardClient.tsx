@@ -895,6 +895,28 @@ export default function AdminDashboardClient() {
     }
   };
 
+  const handleQuickToggleTicketButton = async (key: 'showTixidButton' | 'showMtixButton', newVal: boolean) => {
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: newVal }),
+      });
+      if (res.ok) {
+        setSettings((prev: any) => ({ ...prev, [key]: newVal }));
+        setSettingsSuccess(true);
+        setTimeout(() => setSettingsSuccess(false), 3000);
+      } else {
+        alert('Gagal mengubah status tampilan tombol tiket.');
+      }
+    } catch {
+      alert('Terjadi kesalahan jaringan.');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const handleTestEmail = async () => {
     if (!testEmailTo) {
       alert('Masukkan alamat email penerima untuk pengujian!');
@@ -1834,6 +1856,111 @@ export default function AdminDashboardClient() {
                   <button onClick={() => setFollowupResult(null)} className="text-rose-600 hover:text-rose-900 font-bold ml-4">Tutup</button>
                 </div>
               )}
+
+              {/* SAKELAR ON/OFF TOMBOL TIX ID & M-TIX XXI DI LANDING PAGE */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Sakelar Tombol 1: TIX ID */}
+                <div className="bg-slate-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md border border-slate-800">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                        🎟️ Tombol &quot;Beli di TIX ID&quot;
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          settings.showTixidButton
+                            ? 'bg-emerald-500 text-slate-950'
+                            : 'bg-rose-600 text-white'
+                        }`}
+                      >
+                        {settings.showTixidButton ? 'ON (TAMPIL)' : 'OFF (SEMBUNYI)'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      {settings.showTixidButton
+                        ? 'Tombol kartu TIX ID sedang ditampilkan di Landing Page.'
+                        : 'Tombol kartu TIX ID disembunyikan (aktifkan saat 19 Nov).'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      disabled={savingSettings}
+                      onClick={() => handleQuickToggleTicketButton('showTixidButton', true)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition ${
+                        settings.showTixidButton
+                          ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      ON
+                    </button>
+                    <button
+                      type="button"
+                      disabled={savingSettings}
+                      onClick={() => handleQuickToggleTicketButton('showTixidButton', false)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition ${
+                        !settings.showTixidButton
+                          ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      OFF
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sakelar Tombol 2: M-TIX (XXI) */}
+                <div className="bg-slate-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md border border-slate-800">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                        🎟️ Tombol &quot;Beli di M-TIX (XXI)&quot;
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          settings.showMtixButton !== false
+                            ? 'bg-emerald-500 text-slate-950'
+                            : 'bg-rose-600 text-white'
+                        }`}
+                      >
+                        {settings.showMtixButton !== false ? 'ON (TAMPIL)' : 'OFF (SEMBUNYI)'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      {settings.showMtixButton !== false
+                        ? 'Tombol kartu M-TIX (XXI) sedang ditampilkan di Landing Page.'
+                        : 'Tombol kartu M-TIX (XXI) sedang disembunyikan.'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      disabled={savingSettings}
+                      onClick={() => handleQuickToggleTicketButton('showMtixButton', true)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition ${
+                        settings.showMtixButton !== false
+                          ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      ON
+                    </button>
+                    <button
+                      type="button"
+                      disabled={savingSettings}
+                      onClick={() => handleQuickToggleTicketButton('showMtixButton', false)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition ${
+                        settings.showMtixButton === false
+                          ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      OFF
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {/* SAKELAR ON/OFF FORMULIR PENGINGAT PRESALE & BUY 1 GET 1 DI LANDING PAGE */}
               <div className="bg-slate-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md border border-slate-800">
@@ -4730,6 +4857,89 @@ export default function AdminDashboardClient() {
                     >
                       Nonaktifkan
                     </button>
+                  </div>
+                </div>
+
+                {/* 1.1 SAKELAR ON/OFF TOMBOL KARTU TIX ID & M-TIX XXI DI LANDING PAGE */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* TIX ID Toggle */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                        Tombol Kartu &quot;Beli di TIX ID&quot;
+                      </label>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        {settings.showTixidButton
+                          ? '🟢 DITAMPILKAN di Landing Page'
+                          : '🔴 DISEMBUNYIKAN (Aktifkan saat 19 Nov)'}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickToggleTicketButton('showTixidButton', true)}
+                        disabled={savingSettings}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                          settings.showTixidButton
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-white text-slate-600 border border-slate-200'
+                        }`}
+                      >
+                        ON
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickToggleTicketButton('showTixidButton', false)}
+                        disabled={savingSettings}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                          !settings.showTixidButton
+                            ? 'bg-rose-600 text-white'
+                            : 'bg-white text-slate-600 border border-slate-200'
+                        }`}
+                      >
+                        OFF
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* M-TIX XXI Toggle */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
+                        Tombol Kartu &quot;Beli di M-TIX (XXI)&quot;
+                      </label>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        {settings.showMtixButton !== false
+                          ? '🟢 DITAMPILKAN di Landing Page'
+                          : '🔴 DISEMBUNYIKAN dari Landing Page'}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickToggleTicketButton('showMtixButton', true)}
+                        disabled={savingSettings}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                          settings.showMtixButton !== false
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-white text-slate-600 border border-slate-200'
+                        }`}
+                      >
+                        ON
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickToggleTicketButton('showMtixButton', false)}
+                        disabled={savingSettings}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition shadow-sm ${
+                          settings.showMtixButton === false
+                            ? 'bg-rose-600 text-white'
+                            : 'bg-white text-slate-600 border border-slate-200'
+                        }`}
+                      >
+                        OFF
+                      </button>
+                    </div>
                   </div>
                 </div>
 

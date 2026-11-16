@@ -72,6 +72,8 @@ export interface AppSettings {
   // Buy One Get One (BOGO) Campaign Configuration
   isBogoActive: boolean;
   isBogoReminderFormActive?: boolean;
+  showTixidButton?: boolean;
+  showMtixButton?: boolean;
   bogoHeadline: string;
   bogoSubtitle: string;
   bogoDefaultTicketLink: string;
@@ -270,6 +272,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   // BOGO Promo Defaults
   isBogoActive: true,
   isBogoReminderFormActive: false,
+  showTixidButton: false,
+  showMtixButton: true,
   bogoHeadline: 'PROMO BUY 1 GET 1: NONTON BERDUA BAYAR 1 TIKET',
   bogoSubtitle: 'Ajak pasangan, keluarga, atau bestie nonton film PIYE TO KIH di bioskop kesayanganmu!',
   bogoDefaultTicketLink: 'https://m.21cineplex.com',

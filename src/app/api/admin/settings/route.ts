@@ -73,6 +73,8 @@ export async function POST(req: NextRequest) {
     // BOGO Promo settings
     if (body.isBogoActive !== undefined) db.settings.isBogoActive = Boolean(body.isBogoActive);
     if (body.isBogoReminderFormActive !== undefined) db.settings.isBogoReminderFormActive = Boolean(body.isBogoReminderFormActive);
+    if (body.showTixidButton !== undefined) db.settings.showTixidButton = Boolean(body.showTixidButton);
+    if (body.showMtixButton !== undefined) db.settings.showMtixButton = Boolean(body.showMtixButton);
     if (body.bogoHeadline !== undefined) db.settings.bogoHeadline = String(body.bogoHeadline);
     if (body.bogoSubtitle !== undefined) db.settings.bogoSubtitle = String(body.bogoSubtitle);
     if (body.bogoDefaultTicketLink !== undefined) db.settings.bogoDefaultTicketLink = String(body.bogoDefaultTicketLink);

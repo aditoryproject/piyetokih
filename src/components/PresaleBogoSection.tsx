@@ -24,6 +24,8 @@ interface PresaleBogoSectionProps {
   initialPresaleDatesText?: string;
   initialPromoDatesText?: string;
   initialIsReminderFormActive?: boolean;
+  initialShowTixidButton?: boolean;
+  initialShowMtixButton?: boolean;
 }
 
 export default function PresaleBogoSection({
@@ -31,6 +33,8 @@ export default function PresaleBogoSection({
   initialPresaleDatesText,
   initialPromoDatesText,
   initialIsReminderFormActive,
+  initialShowTixidButton,
+  initialShowMtixButton,
 }: PresaleBogoSectionProps = {}) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -47,13 +51,17 @@ export default function PresaleBogoSection({
   const [presaleDatesText, setPresaleDatesText] = useState(initialPresaleDatesText || '12-18 November 2026');
   const [promoDatesText, setPromoDatesText] = useState(initialPromoDatesText || '19-20 November 2026');
   const [isReminderFormActive, setIsReminderFormActive] = useState<boolean>(initialIsReminderFormActive ?? false);
+  const [showTixidButton, setShowTixidButton] = useState<boolean>(initialShowTixidButton ?? false);
+  const [showMtixButton, setShowMtixButton] = useState<boolean>(initialShowMtixButton ?? true);
 
   useEffect(() => {
     if (
       initialCinemaLinks &&
       initialPresaleDatesText !== undefined &&
       initialPromoDatesText !== undefined &&
-      initialIsReminderFormActive !== undefined
+      initialIsReminderFormActive !== undefined &&
+      initialShowTixidButton !== undefined &&
+      initialShowMtixButton !== undefined
     ) {
       return;
     }
@@ -67,9 +75,22 @@ export default function PresaleBogoSection({
         if (d.settings?.isBogoReminderFormActive !== undefined) {
           setIsReminderFormActive(Boolean(d.settings.isBogoReminderFormActive));
         }
+        if (d.settings?.showTixidButton !== undefined) {
+          setShowTixidButton(Boolean(d.settings.showTixidButton));
+        }
+        if (d.settings?.showMtixButton !== undefined) {
+          setShowMtixButton(Boolean(d.settings.showMtixButton));
+        }
       })
       .catch(() => {});
-  }, [initialCinemaLinks, initialPresaleDatesText, initialPromoDatesText, initialIsReminderFormActive]);
+  }, [
+    initialCinemaLinks,
+    initialPresaleDatesText,
+    initialPromoDatesText,
+    initialIsReminderFormActive,
+    initialShowTixidButton,
+    initialShowMtixButton,
+  ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,66 +180,76 @@ export default function PresaleBogoSection({
           Promonya terbatas banget Jadi jangan sampai kehabisan!
         </p>
 
-        {/* 2 ACTION BUTTONS: TIX ID & M-TIX */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto ${isReminderFormActive ? 'mb-14' : 'mb-2'}`}>
-          {/* Tombol 1: TIX ID */}
-          <a
-            href={tixidUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackMetaEvent('AddToCart', { channel: 'TIX_ID', promo: 'BOGO', content_name: 'Tiket BOGO TIX ID' })}
-            className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
+        {/* 2 ACTION BUTTONS: TIX ID & M-TIX (MASING-MASING BISA DI-ON/OFF DARI ADMIN) */}
+        {(showTixidButton || showMtixButton) && (
+          <div
+            className={`grid grid-cols-1 ${
+              showTixidButton && showMtixButton ? 'sm:grid-cols-2 max-w-2xl' : 'max-w-md'
+            } gap-4 mx-auto ${isReminderFormActive ? 'mb-14' : 'mb-2'}`}
           >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
-                  TIX ID
-                </span>
-                <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1 font-mono">
-                  <Sparkles className="w-3 h-3 text-amber-400" />
-                  <span>Promo Terbatas</span>
-                </span>
-              </div>
-              <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
-                Beli tiket Buy 1 Get 1 di TIX ID selama persediaan masih ada.
-              </h3>
-            </div>
+            {/* Tombol 1: TIX ID */}
+            {showTixidButton && (
+              <a
+                href={tixidUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackMetaEvent('AddToCart', { channel: 'TIX_ID', promo: 'BOGO', content_name: 'Tiket BOGO TIX ID' })}
+                className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+                      TIX ID
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1 font-mono">
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>Promo Terbatas</span>
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                    Beli tiket Buy 1 Get 1 di TIX ID selama persediaan masih ada.
+                  </h3>
+                </div>
 
-            <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
-              <span>Beli di TIX ID</span>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </a>
+                <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
+                  <span>Beli di TIX ID</span>
+                  <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </a>
+            )}
 
-          {/* Tombol 2: M-TIX (XXI) */}
-          <a
-            href={mtixUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackMetaEvent('AddToCart', { channel: 'MTIX_XXI', promo: 'BOGO', content_name: 'Tiket BOGO M-TIX XXI' })}
-            className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                  M-TIX (XXI)
-                </span>
-                <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1 font-mono">
-                  <Sparkles className="w-3 h-3 text-amber-400" />
-                  <span>Promo Terbatas</span>
-                </span>
-              </div>
-              <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
-                Beli tiket Buy 1 Get 1 di M-TIX selama persediaan masih ada.
-              </h3>
-            </div>
+            {/* Tombol 2: M-TIX (XXI) */}
+            {showMtixButton && (
+              <a
+                href={mtixUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackMetaEvent('AddToCart', { channel: 'MTIX_XXI', promo: 'BOGO', content_name: 'Tiket BOGO M-TIX XXI' })}
+                className="group relative bg-[#111318] border border-white/10 hover:border-amber-400/50 rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-500/10 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                      M-TIX (XXI)
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1 font-mono">
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>Promo Terbatas</span>
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                    Beli tiket Buy 1 Get 1 di M-TIX selama persediaan masih ada.
+                  </h3>
+                </div>
 
-            <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
-              <span>Beli di M-TIX XXI</span>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </a>
-        </div>
+                <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400 group-hover:text-amber-300">
+                  <span>Beli di M-TIX XXI</span>
+                  <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </a>
+            )}
+          </div>
+        )}
 
         {/* FORMULIR REMINDER WAR PRESALE BUY 1 GET 1 (BISA DI-ON/OFF DARI ADMIN) */}
         {isReminderFormActive && (

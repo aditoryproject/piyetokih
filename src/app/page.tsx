@@ -155,6 +155,8 @@ export default async function HomePage() {
         initialPresaleDatesText={db.settings.bogoPresaleDatesText}
         initialPromoDatesText={db.settings.bogoPromoDatesText}
         initialIsReminderFormActive={db.settings.isBogoReminderFormActive ?? false}
+        initialShowTixidButton={db.settings.showTixidButton ?? false}
+        initialShowMtixButton={db.settings.showMtixButton ?? true}
       />
 
       {/* 5. PEMERAN & KARAKTER RESMI (14 CAST SESUAI HALAMAN 6) */}
