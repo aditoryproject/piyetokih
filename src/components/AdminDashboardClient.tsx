@@ -1817,20 +1817,11 @@ export default function AdminDashboardClient() {
                   <button
                     onClick={() => handleTriggerPresaleFollowup('reminders')}
                     disabled={followingUpPresale}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-black shadow-md shadow-rose-500/20 transition active:scale-95 disabled:opacity-50"
-                    title="Kirim follow-up WhatsApp hardselling presale roadshow gaya Mas Kidi"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white text-xs font-black shadow-md shadow-rose-500/20 transition active:scale-95 disabled:opacity-50"
+                    title="Kirim Blast / Follow-Up WhatsApp Anti-Banned Satu Pintu gaya Mas Kidi"
                   >
                     <Send className={`w-3.5 h-3.5 ${followingUpPresale ? 'animate-pulse' : ''}`} />
-                    <span>{followingUpPresale ? 'Mengirim Follow-Up...' : '🔥 Follow-Up Presale (WA)'}</span>
-                  </button>
-
-                  <button
-                    onClick={handleTriggerBlast}
-                    disabled={blastingReminder}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black shadow-md shadow-amber-500/20 transition active:scale-95 disabled:opacity-50"
-                  >
-                    <Send className={`w-3.5 h-3.5 ${blastingReminder ? 'animate-pulse' : ''}`} />
-                    <span>{blastingReminder ? 'Mengirim Blast...' : '🚀 Blast Reminder (WA & Email)'}</span>
+                    <span>{followingUpPresale ? 'Mengirim Follow-Up...' : '🚀 Blast / Follow-Up Presale (WA Anti-Banned)'}</span>
                   </button>
                 </div>
               </div>

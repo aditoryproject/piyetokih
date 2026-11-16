@@ -64,7 +64,7 @@ ${mtixUrl}
 
 _Miracle Pictures - Piye Toh Kih Official_`;
 
-          await fetch('https://api.wahnotif.com/api/send-message', {
+          const waRes = await fetch('https://app.wahnotif.com/api/send-message', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -76,6 +76,10 @@ _Miracle Pictures - Piye Toh Kih Official_`;
               message: blastMessage,
             }),
           });
+          const waData = await waRes.json().catch(() => ({}));
+          if (!waRes.ok || waData.success === false) {
+            throw new Error(waData.message || 'Gagal kirim via Wahnotif');
+          }
           rem.whatsappSentAt = new Date().toISOString();
         }
 

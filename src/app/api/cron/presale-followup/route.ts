@@ -409,7 +409,7 @@ export async function POST(req: NextRequest) {
           });
 
           try {
-            const res = await fetch('https://api.wahnotif.com/api/send-message', {
+            const res = await fetch('https://app.wahnotif.com/api/send-message', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -422,7 +422,10 @@ export async function POST(req: NextRequest) {
               }),
             });
 
-            if (res.ok) {
+            const resData = await res.json().catch(() => ({}));
+            const isSentOk = res.ok && resData.success !== false;
+
+            if (isSentOk) {
               bgJob.sent++;
               if (c.type === 'lead') {
                 const leadRec = currentDb.leads.find(l => l.id === c.id);
@@ -443,7 +446,15 @@ export async function POST(req: NextRequest) {
               }
               saveDb(currentDb);
             } else {
+              console.error('[Presale Followup Rejected for ' + c.phone + ']:', resData);
               bgJob.failed++;
+              if (c.type === 'reminder') {
+                const remRec = currentDb.bogoReminders.find(r => r.id === c.id);
+                if (remRec && remRec.reminderStatus !== 'sent') {
+                  remRec.reminderStatus = 'failed';
+                  saveDb(currentDb);
+                }
+              }
             }
           } catch (e) {
             console.error('[Presale Followup Error for ' + c.phone + ']:', e);

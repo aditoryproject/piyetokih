@@ -585,7 +585,7 @@ _Miracle Pictures - Piye Toh Kih Film Official_`;
   }
 
   try {
-    const response = await fetch('https://api.wahnotif.com/api/send-message', {
+    const response = await fetch('https://app.wahnotif.com/api/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -598,9 +598,9 @@ _Miracle Pictures - Piye Toh Kih Film Official_`;
       }),
     });
 
-    const resJson = await response.json();
+    const resJson = await response.json().catch(() => ({}));
     return {
-      success: response.ok,
+      success: response.ok && resJson.success !== false,
       data: resJson,
       mode: 'live',
     };

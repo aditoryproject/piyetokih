@@ -112,7 +112,7 @@ _Miracle Pictures - Official Film "PIYE TO KIH?"_`;
       let waTarget = cleanPhone;
       if (waTarget.startsWith('0')) waTarget = '62' + waTarget.slice(1);
 
-      fetch('https://api.wahnotif.com/api/send-message', {
+      fetch('https://app.wahnotif.com/api/send-message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
