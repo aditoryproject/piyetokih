@@ -9,7 +9,6 @@ import {
   ChevronRight,
   ZoomIn,
   Film,
-  Instagram,
   ExternalLink,
   Sparkles,
 } from 'lucide-react';
@@ -241,7 +240,11 @@ export default function CinemaFlyersGallery({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-amber-500 text-white font-bold text-xs shadow-lg hover:opacity-95 transition"
                 >
-                  <Instagram className="w-4 h-4" />
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                  </svg>
                   <span>Pantau Instagram @piyetokihfilm.official</span>
                 </a>
               </div>
@@ -311,7 +314,11 @@ export default function CinemaFlyersGallery({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white font-black text-xs uppercase tracking-wider shadow-lg hover:opacity-95 transition"
           >
-            <Instagram className="w-4 h-4" />
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
             <span>Follow Instagram Resmi</span>
           </a>
           <a
