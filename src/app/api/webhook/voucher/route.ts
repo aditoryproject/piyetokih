@@ -3,7 +3,7 @@ import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } 
 import { sendVoucherEmail } from '@/lib/email';
 import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName } from '@/lib/cities';
 import { FAST_TRACK_TICKET_LINKS, MASTER_ROADSHOW_STOPS } from '@/lib/bot-knowledge';
-import { WAHNOTIF_TOOL_VOUCHER_SCHEMA } from '@/lib/wahnotif';
+import { WAHNOTIF_TOOL_VOUCHER_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -74,15 +74,14 @@ export async function POST(req: NextRequest) {
     const tixidLink = db.settings.bogoCinemaLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid;
     const cgvLink = db.settings.bogoCinemaLinks?.cgv || FAST_TRACK_TICKET_LINKS.cgv;
     const cinepolisLink = db.settings.bogoCinemaLinks?.cinepolis || FAST_TRACK_TICKET_LINKS.cinepolis;
-    const defaultTicketLink = db.settings.bogoDefaultTicketLink || xxiLink;
 
     const rawOrigin = req.nextUrl?.origin || 'https://piyetokihfilm.com';
     const siteOrigin = (rawOrigin.includes('localhost') || rawOrigin.includes('127.0.0.1'))
       ? 'https://piyetokihfilm.com'
       : rawOrigin;
 
-    const presaleDates = db.settings.bogoPresaleDatesText || '12-18 November 2026';
-    const bogoDates = db.settings.bogoPromoDatesText || '19-20 November 2026';
+    const liveConfig = buildLiveWebsiteBotConfig(db.settings, siteOrigin);
+    const { presaleDates, bogoDates, activeLinksText, activeTicketLinks, aiMandatoryInstruction } = liveConfig;
 
     const isCityExpired =
       db.settings.isRoadshowActive === false ||
@@ -126,6 +125,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         status: 'success',
         success: true,
+        important_ai_instruction: aiMandatoryInstruction,
         action: 'bogo_reminder_registered',
         name,
         city: targetCityName,
@@ -133,8 +133,8 @@ export async function POST(req: NextRequest) {
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
-        ticketLinks: { xxi: xxiLink, tixid: tixidLink, cgv: cgvLink, cinepolis: cinepolisLink, website: siteOrigin },
-        replyMessage: `🎬 *PENDAFTARAN PENGINGAT PRIORITAS PRESALE & BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${targetCityName}! Piye kabare lur? 😄\n\nFilm komedi keluarga *"PIYE TO KIH? THE MOVIE"* *TAYANG SERENTAK* mulai **19 NOVEMBER 2026** di bioskop kesayangan kotamu!\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${xxiLink}\n• TIX ID: ${tixidLink}\n• CGV Cinemas: ${cgvLink}\n• Cinépolis: ${cinepolisLink}\n• Info Lengkap: ${siteOrigin}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas WA*. Begitu loket Presale (${presaleDates}) & Promo Buy 1 Get 1 dibuka, Mas Kidi langsung japri via WA lur! Sampai ketemu di bioskop! 🍿🎉`
+        ticketLinks: activeTicketLinks,
+        replyMessage: `🎬 *PENDAFTARAN PENGINGAT PRIORITAS PRESALE & BUY 1 GET 1 BERHASIL!* 🎬\n\nHalo *${name}*, bolo asik dari Kota ${targetCityName}! Piye kabare lur? 😄\n\nFilm komedi keluarga *"PIYE TO KIH? THE MOVIE"* *TAYANG SERENTAK* mulai **19 NOVEMBER 2026** di bioskop kesayangan kotamu!\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates}\n\n🎟️ *LINK LANGSUNG BELI TIKET & PROMO (TINGGAL KLIK LUR):*\n${activeLinksText}\n\n📌 *Status:* Nomor kamu (${phone}) sudah *RESMI TERDAFTAR dalam Pengingat Prioritas WA*. Sampai ketemu di bioskop! 🍿🎉`
       }, { status: 200, headers: corsHeaders });
     }
 

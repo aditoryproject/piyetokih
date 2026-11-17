@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_MOVIE_FACTS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
-import { WAHNOTIF_TOOL_MOVIE_SCHEMA } from '@/lib/wahnotif';
+import { getDb } from '@/lib/db';
+import { WAHNOTIF_TOOL_MOVIE_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -71,23 +72,31 @@ Heri Chandra (Mukidi), Dara Sarasvati (Sukma), Sutrisno Agung (Gendut), Eko Dunu
 🎵 *4 SOUNDTRACK (Lek Dahlan):* Sigaran Nyowo, Kelangan, Gemati, Piye To Kih? (Cek YouTube MIRACLE Pictures).`;
     }
 
+    const db = getDb();
+    const liveConfig = buildLiveWebsiteBotConfig(db.settings, FAST_TRACK_TICKET_LINKS.website);
+
     const replyMessage = `Halo bolo asik! Piye kabare? 😄
 
 ${detailContent}
 
-🎟️ *Link Langsung Tiket Bioskop:*
-• Cinema XXI: ${FAST_TRACK_TICKET_LINKS.xxi}
-• TIX ID: ${FAST_TRACK_TICKET_LINKS.tixid}
-• CGV: ${FAST_TRACK_TICKET_LINKS.cgv}
-• Cinépolis: ${FAST_TRACK_TICKET_LINKS.cinepolis}
-• Info Lengkap: ${FAST_TRACK_TICKET_LINKS.website}
+📅 *JADWAL RESMI PENAYANGAN & PROMO:*
+• *Presale Tiket:* ${liveConfig.presaleDates}
+• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}
+• *Tayang Serentak di Bioskop:* Mulai 19 NOVEMBER 2026
 
-Ada lagi yang pengin kamu tanyakan seputar film PIYE TO KIH? atau mau Mas Kidi amankan tiketnya lur? 🍿✨`;
+🎟️ *Link Langsung Tiket Bioskop:*
+${liveConfig.activeLinksText}
+
+${liveConfig.closingActionText}`;
 
     return NextResponse.json({
       success: true,
+      important_ai_instruction: liveConfig.aiMandatoryInstruction,
       topic,
       facts: MASTER_MOVIE_FACTS,
+      ticketLinks: liveConfig.activeTicketLinks,
+      presaleDates: liveConfig.presaleDates,
+      bogoPromoDates: liveConfig.bogoDates,
       replyMessage
     }, { status: 200, headers: corsHeaders });
 

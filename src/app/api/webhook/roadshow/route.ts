@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
 import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
-import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA } from '@/lib/wahnotif';
+import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,14 +52,8 @@ export async function POST(req: NextRequest) {
 
     const db = getDb();
     const manualExpired = db.settings.expiredRoadshowCities || [];
-
-    const ticketLinks = {
-      xxi: db.settings.bogoCinemaLinks?.xxi || FAST_TRACK_TICKET_LINKS.xxi,
-      tixid: db.settings.bogoCinemaLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid,
-      cgv: db.settings.bogoCinemaLinks?.cgv || FAST_TRACK_TICKET_LINKS.cgv,
-      cinepolis: db.settings.bogoCinemaLinks?.cinepolis || FAST_TRACK_TICKET_LINKS.cinepolis,
-      website: FAST_TRACK_TICKET_LINKS.website,
-    };
+    const liveConfig = buildLiveWebsiteBotConfig(db.settings, FAST_TRACK_TICKET_LINKS.website);
+    const { presaleDates, bogoDates, activeLinksText, activeTicketLinks, closingActionText, aiMandatoryInstruction } = liveConfig;
 
     // Check first if user is asking for general roadshow list, all cities, or temu cast in general
     const isGeneralCityQuery =
@@ -75,9 +69,6 @@ export async function POST(req: NextRequest) {
       normalizedCity.includes('jadwal') ||
       normalizedCity.includes('daftar') ||
       normalizedCity.includes('rundown');
-
-    const presaleDates = db.settings.bogoPresaleDatesText || '12-18 November 2026';
-    const bogoDates = db.settings.bogoPromoDatesText || '19-20 November 2026';
 
     // SCENARIO 0: GENERAL CITIES & CINEMA SCHEDULE INQUIRY
     const effectiveCity = getCityByNameOrSlug(normalizedCity);
@@ -101,7 +92,7 @@ Film layar lebar komedi keluarga *"PIYE TO KIH?"* tayang serentak di bioskop sel
 
 📅 *CATAT TANGGAL PENTINGNYA LUR:*
 • **Presale Tiket Dibuka:** ${presaleDates}
-• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)
+• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates}
 • **Tayang Serentak di Bioskop:** Mulai 19 November 2026
 
 🍿 *DAFTAR KOTA & JARINGAN BIOSKOP UTAMA:*
@@ -109,16 +100,13 @@ ${formattedCitiesList}
 *(Serta tayang serentak di 25 jaringan bioskop mitra di kota-kota lainnya seluruh Indonesia!)*
 
 🎟️ *LINK RESMI PEMBELIAN TIKET BIOSKOP (TINGGAL KLIK):*
-• Cinema XXI (M-TIX): ${ticketLinks.xxi}
-• TIX ID: ${ticketLinks.tixid}
-• CGV: ${ticketLinks.cgv}
-• Cinépolis: ${ticketLinks.cinepolis}
-• Website Resmi: ${ticketLinks.website}
+${activeLinksText}
 
-Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, atau balas dengan **Nama Lengkap & Kota** biar Mas Kidi daftarkan ke **Pengingat Prioritas WA** saat Presale dibuka! 🍿✨`;
+${closingActionText}`;
 
       return NextResponse.json({
         success: true,
+        important_ai_instruction: aiMandatoryInstruction,
         isRoadshowCity: true,
         isGeneralList: true,
         releaseDate: '19 November 2026',
@@ -126,7 +114,7 @@ Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, atau balas
         bogoDates,
         totalCities: CITIES_DATA.length,
         cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, releaseDate: '19 November 2026' })),
-        ticketLinks,
+        ticketLinks: activeTicketLinks,
         replyMessage
       }, { status: 200, headers: corsHeaders });
     }
@@ -160,14 +148,15 @@ Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, atau balas
       const cityNameDisplay = rawCity ? String(rawCity).toUpperCase() : 'KOTA KAMU';
       return NextResponse.json({
         success: true,
+        important_ai_instruction: aiMandatoryInstruction,
         isRoadshowCity: false,
         cityName: cityNameDisplay,
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
-        message: `Film PIYE TO KIH? TAYANG SERENTAK mulai 19 NOVEMBER 2026 di seluruh bioskop ${cityNameDisplay} (XXI, CGV, Cinépolis)! Presale dibuka ${presaleDates} & Promo Buy 1 Get 1 pada ${bogoDates}.`,
-        ticketLinks,
-        replyMessage: `Halo bolo asik di ${cityNameDisplay}! Piye kabare? 😄\n\n🍿 *KABAR GEMBIRA! FILM "PIYE TO KIH? THE MOVIE" TAYANG SERENTAK MULAI 19 NOVEMBER 2026 DI BIOSKOP ${cityNameDisplay}!*\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI)\n• **Tayang Serentak:** Mulai 19 November 2026\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota pas Presale & Promo Buy 1 Get 1 dibuka, mau Mas Kidi daftarkan nomor sampean ke *Pengingat Prioritas WA*? Cukup infokan *Nama Lengkap* sampean ya lur! ✨`
+        message: `Film PIYE TO KIH? TAYANG SERENTAK mulai 19 NOVEMBER 2026 di seluruh bioskop ${cityNameDisplay}! Presale dibuka ${presaleDates} & Promo Buy 1 Get 1 pada ${bogoDates}.`,
+        ticketLinks: activeTicketLinks,
+        replyMessage: `Halo bolo asik di ${cityNameDisplay}! Piye kabare? 😄\n\n🍿 *KABAR GEMBIRA! FILM "PIYE TO KIH? THE MOVIE" TAYANG SERENTAK MULAI 19 NOVEMBER 2026 DI BIOSKOP ${cityNameDisplay}!*\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates}\n• **Tayang Serentak:** Mulai 19 November 2026\n\n🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*\n${activeLinksText}\n\n${closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -191,14 +180,15 @@ Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, atau balas
 
       return NextResponse.json({
         success: true,
+        important_ai_instruction: aiMandatoryInstruction,
         isRoadshowCity: true,
         isExpired: true,
         cityName: cityData.cityName,
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
-        ticketLinks,
-        replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare lur? 😄\n\n🎬 *INFO PENAYANGAN BIOSKOP ${cityData.cityName.toUpperCase()} — PIYE TO KIH? THE MOVIE:*\nFilm komedi keluarga *"PIYE TO KIH?"* tayang serentak mulai **19 NOVEMBER 2026** di bioskop kesayangan warga ${cityData.cityName}:\n${cinemasNameList}\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket):** ${bogoDates} (Kuota 1.000 tiket di TIX ID & 500 tiket di M-TIX XXI!)\n• **Tayang Serentak:** Mulai 19 November 2026\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n• Website Resmi: ${ticketLinks.website}\n\nBiar gak kehabisan kuota war tiket Presale (${presaleDates}) & Promo Buy 1 Get 1, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas loket dibuka! 🍿✨`
+        ticketLinks: activeTicketLinks,
+        replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare lur? 😄\n\n🎬 *INFO PENAYANGAN BIOSKOP ${cityData.cityName.toUpperCase()} — PIYE TO KIH? THE MOVIE:*\nFilm komedi keluarga *"PIYE TO KIH?"* tayang serentak mulai **19 NOVEMBER 2026** di bioskop kesayangan warga ${cityData.cityName}:\n${cinemasNameList}\n\n📅 *JADWAL PENTING TIKET & PROMO:*\n• **Presale Tiket Dibuka:** ${presaleDates}\n• **Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket):** ${bogoDates}\n• **Tayang Serentak:** Mulai 19 November 2026\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n${activeLinksText}\n\n${closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -222,10 +212,9 @@ Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, atau balas
           const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
           return `• *${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
         }).join('\n') +
-        `\n• Cek Rundown Lengkap: ${ticketLinks.website}/city/${cityData.slug}\n• TIX ID: ${ticketLinks.tixid}`;
+        `\n${activeLinksText}`;
     } else {
-      const directCityLink = db.settings.cityLinkOverrides?.[cityData.slug] || ticketLinks.xxi;
-      cinemasTicketSection = `🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n• Cinema XXI (M-TIX): ${directCityLink}\n• Cek Rundown Lengkap: ${ticketLinks.website}/city/${cityData.slug}\n• TIX ID: ${ticketLinks.tixid}`;
+      cinemasTicketSection = `🎟️ *LINK INFORMASI & TIKET PRESALE (SPECIAL SCREENING):*\n${activeLinksText}`;
     }
 
     const replyMessage = `🎬 *JADWAL RESMI ROADSHOW PIYE TO KIH? — KOTA ${cityData.cityName.toUpperCase()}* 🎬
@@ -258,6 +247,7 @@ Mau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (b
 
     return NextResponse.json({
       success: true,
+      important_ai_instruction: aiMandatoryInstruction,
       isRoadshowCity: true,
       isExpired: false,
       stopNumber: cityData.stopNumber,
@@ -271,7 +261,7 @@ Mau sekalian Mas Kidi amankan Kode Booking voucher fisik tebus murah Rp10.000 (b
       boothMall: cityData.boothMall,
       scheduleItems: cityData.scheduleItems,
       cinemas: cityData.cinemas,
-      ticketLinks,
+      ticketLinks: activeTicketLinks,
       replyMessage
     }, { status: 200, headers: corsHeaders });
 

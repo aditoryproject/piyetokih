@@ -235,8 +235,21 @@ export default function AdminDashboardClient() {
       cgv: settings.bogoCinemaLinks?.cgv,
       cinepolis: settings.bogoCinemaLinks?.cinepolis,
       website: siteOrigin || 'https://piyetokihfilm.com',
+      presaleDatesText: settings.bogoPresaleDatesText,
+      promoDatesText: settings.bogoPromoDatesText,
+      showTixidButton: Boolean(settings.showTixidButton),
+      showMtixButton: settings.showMtixButton !== false,
+      isBogoReminderFormActive: Boolean(settings.isBogoReminderFormActive),
     });
-  }, [settings.bogoCinemaLinks, siteOrigin]);
+  }, [
+    settings.bogoCinemaLinks,
+    settings.bogoPresaleDatesText,
+    settings.bogoPromoDatesText,
+    settings.showTixidButton,
+    settings.showMtixButton,
+    settings.isBogoReminderFormActive,
+    siteOrigin,
+  ]);
   const [uploadingBackdrop, setUploadingBackdrop] = useState(false);
   const [uploadingHeroCover, setUploadingHeroCover] = useState(false);
   const [uploadingCastIdx, setUploadingCastIdx] = useState<number | null>(null);

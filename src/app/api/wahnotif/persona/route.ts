@@ -16,9 +16,14 @@ export async function GET() {
     default: db.settings.bogoDefaultTicketLink || FAST_TRACK_TICKET_LINKS.xxi,
     xxi: db.settings.bogoCinemaLinks?.xxi || FAST_TRACK_TICKET_LINKS.xxi,
     tixid: db.settings.bogoCinemaLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid,
-    cgv: db.settings.bogoCinemaLinks?.cgv || FAST_TRACK_TICKET_LINKS.cgv,
-    cinepolis: db.settings.bogoCinemaLinks?.cinepolis || FAST_TRACK_TICKET_LINKS.cinepolis,
+    cgv: db.settings.bogoCinemaLinks?.cgv || '',
+    cinepolis: db.settings.bogoCinemaLinks?.cinepolis || '',
     website: FAST_TRACK_TICKET_LINKS.website,
+    presaleDatesText: db.settings.bogoPresaleDatesText || '12 November 2026',
+    promoDatesText: db.settings.bogoPromoDatesText || '19-24 November 2026',
+    showTixidButton: Boolean(db.settings.showTixidButton),
+    showMtixButton: db.settings.showMtixButton !== false,
+    isBogoReminderFormActive: Boolean(db.settings.isBogoReminderFormActive),
   };
 
   const dynamicPersona = getWahnotifPersona(ticketLinks);
