@@ -16,6 +16,7 @@ import {
   WAHNOTIF_ALL_TOOLS,
   buildLiveWebsiteBotConfig
 } from '@/lib/wahnotif';
+import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -620,38 +621,87 @@ Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu 
       showTixid
     } = liveConfig;
 
-    // CASE 1A: GENERAL CITY LIST INQUIRY (TANPA TANGGAL ROADSHOW LAMA)
+    // Lookup against the 9 Official Cinema List Flyers (95+ Cities & All Cinema Chains)
+    const flyerLookup = lookupNationalCinemaFlyers(`${cityParam} ${normalizedQuery} ${queryText}`.trim(), siteOrigin);
+    const isRoadshowModeOff = db.settings.isRoadshowActive === false;
+
+    // CASE 1-FLYER: SPECIFIC CITY OR CINEMA CHAIN MATCH FROM 9 OFFICIAL FLYERS
+    if (isRoadshowModeOff && flyerLookup.found && (isRoadshowAction || isGeneralCityListQuery || hasSpecificCity || cityParam)) {
+      const flyerLinksBlock = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Lihat Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
+
+      await sendFlyerImageToWhatsAppIfPossible({
+        phone: cleanSender || inboundRawPhone,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}\n\n📅 Tayang Serentak: Mulai *19 NOVEMBER 2026*`,
+        apiKey: db.settings.wahnotifApiKey,
+      });
+
+      const reply = `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄
+
+🎬 *${flyerLookup.title.toUpperCase()}:*
+Film komedi keluarga *"PIYE TO KIH? THE MOVIE"* resmi tayang serentak mulai **19 NOVEMBER 2026** di bioskop:
+${flyerLookup.formattedCinemaList}
+
+🖼️ *FLYER RESMI DAFTAR BIOSKOP:*
+${flyerLinksBlock}
+
+📅 *JADWAL PENTING TIKET & PROMO:*
+• **Presale Tiket Dibuka:** ${presaleDates}
+• **Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket):** ${bogoDates}
+• **Tayang Serentak di Bioskop:** Mulai 19 November 2026
+
+🎟️ *LINK RESMI PEMBELIAN TIKET (TINGGAL KLIK LUR):*
+${activeLinksText}
+
+${closingActionText}`;
+
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`,
+        action: 'city_cinema_schedule',
+        cityName: flyerLookup.cityOrChainName,
+        releaseDate: '19 November 2026',
+        presaleDates,
+        bogoDates,
+        cinemas: flyerLookup.cinemas,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        image_url: flyerLookup.primaryFlyerUrl,
+        mediaUrl: flyerLookup.primaryFlyerUrl,
+        flyerUrls: flyerLookup.flyerUrls,
+        ticketLinks: activeTicketLinks,
+        replyMessage: reply
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // CASE 1A: GENERAL CITY LIST INQUIRY (ALL 9 OFFICIAL FLYERS)
     if (!hasSpecificCity && (isGeneralCityListQuery || isRoadshowAction || action === 'get_roadshow_schedule')) {
-      const citiesFormatted = CITIES_DATA.map((c, idx) => {
-        const cityCinemas = getCityCinemaTicketLinks(
-          c.slug,
-          db.settings.roadshowOverrides,
-          db.settings.cityLinkOverrides
-        );
-        const cinemaNames = cityCinemas.length > 0
-          ? cityCinemas.map(cin => cin.cinemaName).join(', ')
-          : c.cinemas.map(cin => cin.name).join(', ');
-        return `${idx + 1}. 📍 *${c.name}* — ${cinemaNames}`;
-      }).join('\n');
+      await sendFlyerImageToWhatsAppIfPossible({
+        phone: cleanSender || inboundRawPhone,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        caption: `🎬 *Daftar Lengkap Bioskop Penayangan Serentak 19 November 2026 — PIYE TO KIH? THE MOVIE*`,
+        apiKey: db.settings.wahnotifApiKey,
+      });
+
+      const allFlyersBlock = flyerLookup.flyerUrls.map((u, idx) => `• Flyer ${idx + 1}: ${u}`).join('\n');
 
       const reply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-🎬 *JADWAL PENAYANGAN SERENTAK FILM "PIYE TO KIH? THE MOVIE":*
-Film komedi keluarga *"PIYE TO KIH?"* tayang serentak di bioskop seluruh Indonesia mulai **19 NOVEMBER 2026**!
+🎬 *DAFTAR LENGKAP BIOSKOP PENAYANGAN SERENTAK 19 NOVEMBER 2026 — "PIYE TO KIH? THE MOVIE":*
+${flyerLookup.formattedCinemaList}
+
+🖼️ *LIHAT FLYER RESMI DAFTAR BIOSKOP:*
+${allFlyersBlock}
 
 📅 *CATAT TANGGAL PENTINGNYA LUR:*
 • **Presale Tiket Dibuka:** ${presaleDates}
 • **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates}
 • **Tayang Serentak di Bioskop:** Mulai 19 November 2026
 
-🍿 *DAFTAR KOTA & JARINGAN BIOSKOP UTAMA:*
-${citiesFormatted}
-*(Serta tayang serentak di 25 jaringan bioskop mitra di kota-kota lainnya seluruh Indonesia!)*
-
 🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*
 ${activeLinksText}
 
-${closingActionText}`;
+Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, langsung Mas Kidi cekkan nama bioskop & kirimkan flyernya! 🍿✨`;
 
       return NextResponse.json({
         status: 'success',
@@ -662,9 +712,11 @@ ${closingActionText}`;
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        image_url: flyerLookup.primaryFlyerUrl,
+        mediaUrl: flyerLookup.primaryFlyerUrl,
+        flyerUrls: flyerLookup.flyerUrls,
         ticketLinks: activeTicketLinks,
-        totalCities: CITIES_DATA.length,
-        cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, releaseDate: '19 November 2026' })),
         replyMessage: reply
       }, { status: 200, headers: corsHeaders });
     }
@@ -701,7 +753,6 @@ ${closingActionText}`;
       );
 
       if (cityData) {
-        const isRoadshowModeOff = db.settings.isRoadshowActive === false;
         const isExpired = isRoadshowModeOff || isCityRoadshowExpired(cityData.dateStr, {
           cityName: cityData.cityName,
           manualExpiredCities: db.settings.expiredRoadshowCities || [],
@@ -819,46 +870,42 @@ ${closingActionText}`;
       queryText.includes('tiket bioskop');
 
     if (isTicketAction && !args.phone) {
-      const now = new Date();
-      const isBogoLive = now >= new Date(2026, 10, 15); // Dibuka 15 Nov 2026
-
       let cityNote = '';
       let cityOverrideNote = '';
       let cityCinemasList = '';
       let matchedStopName = '';
-      let matchedStopSlug = '';
 
-      const detectedTicketCity = getCityByNameOrSlug(cityParam || queryText);
-      if (detectedTicketCity) {
-        matchedStopName = detectedTicketCity.name;
-        matchedStopSlug = detectedTicketCity.slug;
-        const cityCinemas = getCityCinemaTicketLinks(
-          detectedTicketCity.slug,
-          db.settings.roadshowOverrides,
-          db.settings.cityLinkOverrides
-        );
-        if (cityCinemas.length > 0) {
-          cityCinemasList = cityCinemas.map(c => {
-            const times = c.showTimes.length > 0 ? ` (${c.showTimes.join(', ')})` : '';
-            const isQueriedCinema =
-              queryText.includes(c.cinemaName.toLowerCase()) ||
-              (queryText.includes('amplaz') && c.cinemaName.toLowerCase().includes('ambarrukmo')) ||
-              (queryText.includes('jcm') && c.cinemaName.toLowerCase().includes('jogja city')) ||
-              (queryText.includes('empire') && c.cinemaName.toLowerCase().includes('empire')) ||
-              (queryText.includes('paragon') && c.cinemaName.toLowerCase().includes('paragon')) ||
-              (queryText.includes('the park') && c.cinemaName.toLowerCase().includes('the park')) ||
-              (queryText.includes('matos') && c.cinemaName.toLowerCase().includes('matos')) ||
-              (queryText.includes('artos') && c.cinemaName.toLowerCase().includes('artos'));
-            const prefix = isQueriedCinema ? '🔥 ' : '• ';
-            return `${prefix}*${c.cinemaName}*${times}:\n  👉 ${c.ticketUrl}`;
-          }).join('\n');
-          cityNote = `\n🍿 *Bioskop Khusus di ${matchedStopName}:*\n` + cityCinemasList;
-        } else if (detectedTicketCity.cinemas?.length > 0) {
-          cityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStopName}:* ${detectedTicketCity.cinemas.map(c => c.name).join(', ')}`;
-        }
-        const cityOverride = db.settings.cityLinkOverrides?.[detectedTicketCity.slug] || (detectedTicketCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
-        if (cityOverride) {
-          cityOverrideNote = `\n🎟️ *Link Khusus Tiket ${matchedStopName}:* ${cityOverride}`;
+      if (flyerLookup.found) {
+        matchedStopName = flyerLookup.cityOrChainName;
+        cityCinemasList = flyerLookup.formattedCinemaList;
+        const flyerLinks = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
+        cityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n${flyerLinks}`;
+
+        await sendFlyerImageToWhatsAppIfPossible({
+          phone: cleanSender || inboundRawPhone,
+          imageUrl: flyerLookup.primaryFlyerUrl,
+          caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}`,
+          apiKey: db.settings.wahnotifApiKey,
+        });
+      } else {
+        const detectedTicketCity = getCityByNameOrSlug(cityParam || queryText);
+        if (detectedTicketCity) {
+          matchedStopName = detectedTicketCity.name;
+          const cityCinemas = getCityCinemaTicketLinks(
+            detectedTicketCity.slug,
+            db.settings.roadshowOverrides,
+            db.settings.cityLinkOverrides
+          );
+          if (cityCinemas.length > 0) {
+            cityCinemasList = cityCinemas.map(c => `• *${c.cinemaName}*`).join('\n');
+            cityNote = `\n🍿 *Bioskop Khusus di ${matchedStopName}:*\n` + cityCinemasList;
+          } else if (detectedTicketCity.cinemas?.length > 0) {
+            cityNote = `\n🍿 *Bioskop Rekomendasi di ${matchedStopName}:* ${detectedTicketCity.cinemas.map(c => c.name).join(', ')}`;
+          }
+          const cityOverride = db.settings.cityLinkOverrides?.[detectedTicketCity.slug] || (detectedTicketCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
+          if (cityOverride) {
+            cityOverrideNote = `\n🎟️ *Link Khusus Tiket ${matchedStopName}:* ${cityOverride}`;
+          }
         }
       }
 

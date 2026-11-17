@@ -3,6 +3,7 @@ import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowle
 import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
+import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -55,6 +56,64 @@ export async function POST(req: NextRequest) {
     const liveConfig = buildLiveWebsiteBotConfig(db.settings, FAST_TRACK_TICKET_LINKS.website);
     const { presaleDates, bogoDates, activeLinksText, activeTicketLinks, closingActionText, aiMandatoryInstruction } = liveConfig;
 
+    const senderPhone = String(
+      body._wahnotif_phone || body.phone || body.number || body.sender || args._wahnotif_phone || args.phone || args.number || ''
+    ).trim();
+
+    // Lookup against the 9 Official Cinema List Flyers (95+ Cities & All Cinema Chains)
+    const flyerLookup = lookupNationalCinemaFlyers(normalizedCity || cleanCityStr, FAST_TRACK_TICKET_LINKS.website);
+    const isRoadshowModeOff = db.settings.isRoadshowActive === false;
+
+    // If Roadshow Mode is OFF and we found a matching city or cinema chain in the 9 Official Flyers:
+    if (isRoadshowModeOff && flyerLookup.found) {
+      const flyerLinksBlock = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Lihat Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
+
+      // Auto-send flyer image directly to user's WhatsApp if phone is present
+      await sendFlyerImageToWhatsAppIfPossible({
+        phone: senderPhone,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}\n\n📅 Tayang Serentak: Mulai *19 NOVEMBER 2026*`,
+        apiKey: db.settings.wahnotifApiKey,
+      });
+
+      const replyMessage = `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄
+
+🎬 *${flyerLookup.title.toUpperCase()}:*
+Film komedi keluarga *"PIYE TO KIH? THE MOVIE"* resmi tayang serentak mulai **19 NOVEMBER 2026** di bioskop:
+${flyerLookup.formattedCinemaList}
+
+🖼️ *FLYER RESMI DAFTAR BIOSKOP:*
+${flyerLinksBlock}
+
+📅 *JADWAL PENTING TIKET & PROMO:*
+• **Presale Tiket Dibuka:** ${presaleDates}
+• **Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket):** ${bogoDates}
+• **Tayang Serentak di Bioskop:** Mulai 19 November 2026
+
+🎟️ *LINK RESMI PEMBELIAN TIKET (TINGGAL KLIK LUR):*
+${activeLinksText}
+
+${closingActionText}`;
+
+      return NextResponse.json({
+        success: true,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`,
+        isRoadshowCity: true,
+        isExpired: true,
+        cityName: flyerLookup.cityOrChainName,
+        releaseDate: '19 November 2026',
+        presaleDates,
+        bogoDates,
+        cinemas: flyerLookup.cinemas,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        image_url: flyerLookup.primaryFlyerUrl,
+        mediaUrl: flyerLookup.primaryFlyerUrl,
+        flyerUrls: flyerLookup.flyerUrls,
+        ticketLinks: activeTicketLinks,
+        replyMessage
+      }, { status: 200, headers: corsHeaders });
+    }
+
     // Check first if user is asking for general roadshow list, all cities, or temu cast in general
     const isGeneralCityQuery =
       !normalizedCity ||
@@ -64,45 +123,43 @@ export async function POST(req: NextRequest) {
       normalizedCity.includes('mana') ||
       normalizedCity.includes('mna') ||
       normalizedCity.includes('kota') ||
+      normalizedCity.includes('bioskop') ||
+      normalizedCity.includes('lokasi') ||
       normalizedCity.includes('temu') ||
       normalizedCity.includes('cast') ||
       normalizedCity.includes('jadwal') ||
       normalizedCity.includes('daftar') ||
       normalizedCity.includes('rundown');
 
-    // SCENARIO 0: GENERAL CITIES & CINEMA SCHEDULE INQUIRY
+    // SCENARIO 0: GENERAL CITIES & CINEMA SCHEDULE INQUIRY (ALL 9 FLYERS)
     const effectiveCity = getCityByNameOrSlug(normalizedCity);
     if (!effectiveCity && isGeneralCityQuery) {
-      const formattedCitiesList = CITIES_DATA.map((c, idx) => {
-        const cityCinemas = getCityCinemaTicketLinks(
-          c.slug,
-          db.settings.roadshowOverrides,
-          db.settings.cityLinkOverrides
-        );
-        const cinemaNames = cityCinemas.length > 0
-          ? cityCinemas.map(cin => cin.cinemaName).join(', ')
-          : c.cinemas.map(cin => cin.name).join(', ');
-        return `${idx + 1}. 📍 *${c.name}* — ${cinemaNames}`;
-      }).join('\n');
+      await sendFlyerImageToWhatsAppIfPossible({
+        phone: senderPhone,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        caption: `🎬 *Daftar Lengkap Bioskop Penayangan Serentak 19 November 2026 — PIYE TO KIH? THE MOVIE*`,
+        apiKey: db.settings.wahnotifApiKey,
+      });
+
+      const allFlyersBlock = flyerLookup.flyerUrls.map((u, idx) => `• Flyer ${idx + 1}: ${u}`).join('\n');
 
       const replyMessage = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-🎬 *JADWAL PENAYANGAN SERENTAK FILM "PIYE TO KIH? THE MOVIE":*
-Film layar lebar komedi keluarga *"PIYE TO KIH?"* tayang serentak di bioskop seluruh Indonesia mulai **19 NOVEMBER 2026**!
+🎬 *DAFTAR LENGKAP BIOSKOP PENAYANGAN SERENTAK 19 NOVEMBER 2026 — "PIYE TO KIH? THE MOVIE":*
+${flyerLookup.formattedCinemaList}
+
+🖼️ *LIHAT FLYER RESMI DAFTAR BIOSKOP:*
+${allFlyersBlock}
 
 📅 *CATAT TANGGAL PENTINGNYA LUR:*
 • **Presale Tiket Dibuka:** ${presaleDates}
 • **Promo Buy 1 Get 1 (Beli 1 Gratis 1):** ${bogoDates}
 • **Tayang Serentak di Bioskop:** Mulai 19 November 2026
 
-🍿 *DAFTAR KOTA & JARINGAN BIOSKOP UTAMA:*
-${formattedCitiesList}
-*(Serta tayang serentak di 25 jaringan bioskop mitra di kota-kota lainnya seluruh Indonesia!)*
-
 🎟️ *LINK RESMI PEMBELIAN TIKET BIOSKOP (TINGGAL KLIK):*
 ${activeLinksText}
 
-${closingActionText}`;
+Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, langsung Mas Kidi cekkan nama bioskop & kirimkan flyernya! 🍿✨`;
 
       return NextResponse.json({
         success: true,
@@ -112,8 +169,10 @@ ${closingActionText}`;
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
-        totalCities: CITIES_DATA.length,
-        cities: CITIES_DATA.map(c => ({ name: c.name, slug: c.slug, releaseDate: '19 November 2026' })),
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        image_url: flyerLookup.primaryFlyerUrl,
+        mediaUrl: flyerLookup.primaryFlyerUrl,
+        flyerUrls: flyerLookup.flyerUrls,
         ticketLinks: activeTicketLinks,
         replyMessage
       }, { status: 200, headers: corsHeaders });
@@ -161,7 +220,6 @@ ${closingActionText}`;
     }
 
     const cityData = MASTER_ROADSHOW_STOPS[matchedSlug];
-    const isRoadshowModeOff = db.settings.isRoadshowActive === false;
     const isExpired = isRoadshowModeOff || isCityRoadshowExpired(cityData.dateStr, {
       cityName: cityData.cityName,
       manualExpiredCities: manualExpired,

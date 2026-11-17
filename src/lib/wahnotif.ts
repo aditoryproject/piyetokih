@@ -401,26 +401,48 @@ ${activePersonaLinksList}
 ${activePersonaLinksList}
    ${!showTixid ? `• Catatan Penting: Tombol TIX ID saat ini sedang OFF di website karena promo di TIX ID baru dibuka pada ${promoDates}. Jangan berikan link TIX ID sebelum tanggal tersebut!` : ''}
 
-2. DAFTAR BIOSKOP KOTA UTAMA PENAYANGAN SERENTAK (MULAI 19 NOVEMBER 2026):
-   *(Catatan: Sebutkan hanya nama bioskopnya untuk jadwal Tayang Serentak 19 November 2026, JANGAN sebut tanggal roadshow lama!)*
-   • SEMARANG: The Park XXI, Citra XXI, DP Mall XXI, Central City XXI, Cinépolis Java Supermall
-   • YOGYAKARTA: Ambarrukmo XXI (Amplaz), Jogja City XXI, Empire XXI, Sleman City Hall XXI, CGV Jwalk / Hartono Mall, Cinépolis Lippo Plaza Jogja
-   • MAGELANG: The Aloon-Aloon XXI, Platinum Cineplex Artos Mall
-   • SURAKARTA / SOLO: Solo Paragon XXI, Solo Square XXI, The Park XXI Solo Baru, Platinum Cineplex Pakuwon Mall Solo Baru
-   • SRAGEN: Platinum Cineplex Plaza Atrium Sragen
-   • NGAWI: NSC Ultima Ngawi
-   • MADIUN: Suncity Madiun XXI, CGV Plaza Lawu Madiun, NSC Timbul Jaya
-   • PONOROGO: Cinépolis Ponorogo City Center (PCC)
-   • NGANJUK: Sam's Studio Nganjuk
-   • MOJOKERTO: CGV Sunrise Mall Mojokerto
-   • GRESIK: Gressmall XXI, CGV Icon Mall Gresik
-   • SURABAYA: Pakuwon Mall XXI, Royal XXI, Tunjungan 5 XXI, Ciputra World XXI, Galaxy XXI, CGV Marvell City / BG Junction, Cinépolis City of Tomorrow (Cito)
-   • SIDOARJO: Ciplaz Sidoarjo XXI, Transmart Sidoarjo XXI, Platinum Cineplex Suncity Mall Sidoarjo, Cinépolis Lippo Plaza Sidoarjo
-   • MALANG & BATU: Dieng XXI, Mandala XXI, Transmart MX Mall XXI, Matos Cinépolis, CGV Malang City Point, Moviemax Dinoyo / Sarinah, Cinépolis Lippo Plaza Batu
-   • KEDIRI: Ciplaz Kediri XXI, CGV Kediri Mall, Golden Theater Kediri
-   • BLITAR: CGV Blitar Square
-   • TULUNGAGUNG: Golden Theatre Tulungagung
-   • KOTA LAINNYA SELURUH INDONESIA (Jakarta, Bandung, Medan, Bali, Makassar, Kudus, Salatiga, Klaten, Purwokerto, Tegal, Jember, dll.): Tayang serentak mulai 19 November 2026 di jaringan bioskop mitra terdekat!
+2. DAFTAR RESMI SELURUH KOTA & BIOSKOP PENAYANGAN SERENTAK (MULAI 19 NOVEMBER 2026 SESUAI 9 FLYER RESMI):
+   • CINEMA XXI (30 KOTA):
+     - JAKARTA: Blok M Square 21, Daan Mogot XXI, Mal Atrium Senen XXI, Cipinang XXI, Ciplaz Klender XXI, PGC XXI
+     - BANDUNG: Ciwalk XXI | BOGOR: Mall BTM XXI, Cibinong City XXI | DEPOK: Ciplaz Depok XXI, Cinere 21
+     - TANGERANG: Plaza Bintaro XXI, Balekota XXI, Ciplaz Ciledug XXI | CILEGON: Transmart Cilegon XXI
+     - BEKASI & CIKARANG: Mega Bekasi XXI, Pondok Gede XXI, Chadstone XXI | CIREBON: Ramayana Cirebon XXI
+     - SEMARANG: DP Mall XXI, Uptown Mall BSB City XXI, Central City XXI | PEKALONGAN: Pekalongan XXI
+     - YOGYAKARTA: Jogja City XXI | KLATEN: Klaten Town Square XXI | SOLO: Grand XXI Solo
+     - SURABAYA: Tunjungan 3 XXI, PTC XXI, Royal XXI, Transmart Rungkut XXI | SIDOARJO: Ciplaz Sidoarjo XXI
+     - MALANG: Araya XXI | KEDIRI: Kediri XXI | JEMBER: Transmart Jember XXI | GRESIK: Gressmall XXI | TUBAN: Citimall Tuban XXI
+     - LUAR JAWA: Suzuya Plaza XXI (Medan), Suzuya Rantau Prapat XXI, Nagoya Hill Mall XXI (Batam), Ciplaz Lampung XXI, OPI Mall XXI (Palembang), SKA XXI (Pekanbaru), WTC XXI (Jambi), Mega 21 (Bengkulu), Samarinda Square XXI
+     - Flyer XXI: ${links.website}/flyers/PYTK_LIST_XXI_1.jpg & ${links.website}/flyers/PYTK_LIST_XXI_2.jpg
+   • CGV CINEMAS (11 KOTA):
+     - TEGAL: Transmart Tegal CGV | PURWOKERTO: Rita Supermall CGV | YOGYAKARTA: Jwalk Jogja CGV, Transmart Maguwo CGV
+     - SOLO: Transmart Solo CGV | MADIUN: Plaza Lawu Madiun CGV | MOJOKERTO: Sunrise Mall CGV
+     - SURABAYA: BG Junction CGV, Maspion Square CGV | BLITAR: Blitar Square CGV | KEDIRI: Kediri Mall CGV
+     - JEMBER: Roxy Square Jember CGV | GRESIK: Icon Mall Gresik CGV
+     - Flyer CGV: ${links.website}/flyers/PYTK_LIST_CGV.jpg
+   • CINÉPOLIS (8 KOTA):
+     - BEKASI: Cinépolis Blu Plaza Bekasi, Cinépolis Distrik 1 Meikarta | TEGAL: Cinépolis Pacific Mall Tegal
+     - SEMARANG: Cinépolis Java Supermal | BATU (MALANG): Cinépolis Lippo Plaza Batu | SURABAYA: Cinépolis City of Tomorrow (Cito)
+     - JEMBER: Cinépolis Lippo Plaza Jember | MEDAN: Cinépolis Plaza Medan Fair | BALI: Cinépolis Lippo Plaza Sunset
+     - Flyer Cinépolis: ${links.website}/flyers/PYTK_LIST_CINEPOLIS.jpg
+   • SAM'S STUDIOS (17 KOTA — samsstudios.id / TIX ID):
+     - Cianjur, Cibadak, Gombong, Indramayu, Jalur, Kebumen, Klaten, Nganjuk, Pasuruan, Pekalongan, Pemalang, Probolinggo, Salatiga, Solo, Subang, Ungaran, Labuan Bajo
+     - Flyer Sam's Studios: ${links.website}/flyers/PYTK_LIST_SAMS.jpg
+   • NEW STAR CINEPLEX / NSC (30 KOTA — nsc8.com):
+     - JAWA TENGAH: NSC Purbalingga, NSC Wonosobo, NSC Purworejo, NSC Temanggung, NSC Salatiga, NSC Demak, NSC Mangkang, NSC Kendal, NSC Kudus, NSC Jepara, NSC Pati, NSC Rembang, NSC Cepu, NSC Purwodadi, NSC Pemalang
+     - YOGYAKARTA: NSC Kulonprogo, NSC Wonosari
+     - JAWA TIMUR: NSC Tuban, NSC Bojonegoro, NSC Ngawi, NSC Lamongan, NSC Nganjuk, NSC Jombang, NSC Trenggalek, NSC Kepanjen, NSC Pasuruan, NSC Genteng, NSC Banyuwangi, NSC Jajag, NSC Sumenep
+     - Flyer NSC: ${links.website}/flyers/PYTK_LIST_NSC.jpg
+   • PLATINUM CINEPLEX (18 KOTA):
+     - Platinum Batang, Platinum Baturaja (OKU), Platinum Berau, Platinum Blora, Platinum BSD Eastavara (Tangerang), Platinum Cibitung (Bekasi), Platinum Kebumen, Platinum Kolaka, Platinum Lahat, Platinum Magelang, Platinum Majenang (Cilacap), Platinum Palopo, Platinum Pangkalanbun (Kotawaringin Barat), Platinum Pandan Sibolga (Tapanuli Tengah), Platinum Sidoarjo, Platinum Solo, Platinum Batulicin (Tanah Bumbu), Platinum Cineplex Sragen
+     - Flyer Platinum: ${links.website}/flyers/PYTK_LIST_PLATINUM.jpg
+   • BIOSKOP MITRA NASIONAL LAINNYA:
+     - GOLDEN THEATER: Kediri, Tulungagung | DAKOTA CINEMA: Cilacap, Sengkang | DENPASAR CINEPLEX: Denpasar Bali
+     - SURYA YUDHA CINEPLEX: Banjarnegara | GAJAH MADA CINEMA: Tegal | LTD9 CINEMA: Bangka Belitung
+     - FLIX CINEMA: Grand Galaxy Park Bekasi | BES CINEMA: Pangkal Pinang, Metro Lampung
+     - MSB CINEMA: Bulakamba (Brebes), Slawi (Tegal), Brebes, Bumiayu (Brebes) | JIG CINEMA: Purwodadi
+     - PLANET CINEMA: Bone | LOCAL CINEMA: Manado, Mataram | SENA MOVIEMAX: Kroya
+     - KOTA CINEMA MALL (KCM): KCM Greenland, KCM Situbondo, KCM Jember, KCM Pamekasan
+     - Flyer Bioskop Mitra: ${links.website}/flyers/PYTK_LIST_MIX.jpg
 
 3. INFO PEMEGANG VOUCHER FISIK RP 10.000 (BAGI YANG SUDAH MENUKAR SAAT ROADSHOW):
    • Pembagian kode booking baru & booth penukaran voucher fisik di mall sudah ditutup karena rangkaian roadshow sudah selesai.

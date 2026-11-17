@@ -3,6 +3,7 @@ import { FAST_TRACK_TICKET_LINKS, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
 import { getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_TICKETS_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
+import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -104,21 +105,44 @@ export async function POST(req: NextRequest) {
     let cityCinemasList = '';
     let matchedCityName = '';
 
-    const effectiveCity = getCityByNameOrSlug(requestedCity || queryText);
-    if (effectiveCity) {
-      matchedCityName = effectiveCity.name;
-      const cityCinemas = getCityCinemaTicketLinks(
-        effectiveCity.slug,
-        db.settings.roadshowOverrides,
-        db.settings.cityLinkOverrides
-      );
-      if (cityCinemas.length > 0) {
-        cityCinemasList = cityCinemas.map(c => `• *${c.cinemaName}*`).join('\n');
-        cinemaCityNote = `\n\n🍿 *Daftar Bioskop di ${effectiveCity.name}:*\n` + cityCinemasList;
-      }
-      const cityOverride = db.settings.cityLinkOverrides?.[effectiveCity.slug] || (effectiveCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
-      if (cityOverride) {
-        cityLinkNote = `\n• *Link Khusus ${effectiveCity.name}:* ${cityOverride}`;
+    const senderPhone = String(
+      body._wahnotif_phone || body.phone || body.number || body.sender || args._wahnotif_phone || args.phone || args.number || ''
+    ).trim();
+
+    const flyerLookup = lookupNationalCinemaFlyers(
+      `${requestedCity} ${requestedChain !== 'all' ? requestedChain : ''} ${queryText}`.trim(),
+      FAST_TRACK_TICKET_LINKS.website
+    );
+
+    if (flyerLookup.found) {
+      matchedCityName = flyerLookup.cityOrChainName;
+      cityCinemasList = flyerLookup.formattedCinemaList;
+      const flyerLinks = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
+      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n${flyerLinks}`;
+
+      await sendFlyerImageToWhatsAppIfPossible({
+        phone: senderPhone,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}`,
+        apiKey: db.settings.wahnotifApiKey,
+      });
+    } else {
+      const effectiveCity = getCityByNameOrSlug(requestedCity || queryText);
+      if (effectiveCity) {
+        matchedCityName = effectiveCity.name;
+        const cityCinemas = getCityCinemaTicketLinks(
+          effectiveCity.slug,
+          db.settings.roadshowOverrides,
+          db.settings.cityLinkOverrides
+        );
+        if (cityCinemas.length > 0) {
+          cityCinemasList = cityCinemas.map(c => `• *${c.cinemaName}*`).join('\n');
+          cinemaCityNote = `\n\n🍿 *Daftar Bioskop di ${effectiveCity.name}:*\n` + cityCinemasList;
+        }
+        const cityOverride = db.settings.cityLinkOverrides?.[effectiveCity.slug] || (effectiveCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
+        if (cityOverride) {
+          cityLinkNote = `\n• *Link Khusus ${effectiveCity.name}:* ${cityOverride}`;
+        }
       }
     }
 
@@ -176,15 +200,22 @@ ${closingActionText}`;
 
     return NextResponse.json({
       success: true,
-      important_ai_instruction: liveConfig.aiMandatoryInstruction,
+      important_ai_instruction: flyerLookup.found
+        ? `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`
+        : liveConfig.aiMandatoryInstruction,
       ticketLinks: activeTicketLinks,
       presaleDates,
       bogoPromoDates: bogoDates,
       showTixidButton: liveConfig.showTixid,
       showMtixButton: liveConfig.showMtix,
       isReminderFormActive: liveConfig.isReminderFormActive,
-      requestedCity: requestedCity || 'Nasional',
+      requestedCity: matchedCityName || requestedCity || 'Nasional',
       requestedChain,
+      cinemas: flyerLookup.found ? flyerLookup.cinemas : undefined,
+      imageUrl: flyerLookup.primaryFlyerUrl,
+      image_url: flyerLookup.primaryFlyerUrl,
+      mediaUrl: flyerLookup.primaryFlyerUrl,
+      flyerUrls: flyerLookup.flyerUrls,
       action: isPriceInquiry ? 'ticket_price_info' : 'get_ticket_links',
       estimatedPriceRange: isPriceInquiry ? 'Rp 30.000 – Rp 50.000' : undefined,
       nationalReleaseDate: '19 November 2026',
