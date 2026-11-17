@@ -157,7 +157,7 @@ export default async function RootLayout({
         )}
 
         {/* Cinematic Clean Header (Hanya tampil di publik jika TIDAK dalam mode Coming Soon, atau jika Admin) */}
-        {!showComingSoon && <PublicHeader showHeader={true} />}
+        {!showComingSoon && <PublicHeader showHeader={true} isRoadshowActive={Boolean(db.settings.isRoadshowActive)} />}
 
         {/* Main Content: Tampilkan Coming Soon untuk seluruh rute publik jika mode Coming Soon aktif */}
         <main className="min-h-screen">

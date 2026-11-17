@@ -40,6 +40,16 @@ export async function GET(req: NextRequest) {
     filtered = filtered.filter(l => (l.cityLocation || '').toLowerCase() === city.toLowerCase());
   }
 
+  const cityDemands = Array.isArray(db.cityDemands) ? db.cityDemands : [];
+  const cityDemandBreakdown: Record<string, number> = {};
+  cityDemands.forEach((d) => {
+    const key = d.city.trim();
+    if (key) cityDemandBreakdown[key] = (cityDemandBreakdown[key] || 0) + 1;
+  });
+  const cityDemandSummary = Object.entries(cityDemandBreakdown)
+    .map(([cityName, count]) => ({ city: cityName, count }))
+    .sort((a, b) => b.count - a.count);
+
   return NextResponse.json({
     leads: filtered,
     total: filtered.length,
@@ -48,6 +58,8 @@ export async function GET(req: NextRequest) {
     cityBreakdown,
     // Only return cities that have actual form submissions
     availableCities: Array.from(citySet).sort((a, b) => a.localeCompare(b)),
+    cityDemands,
+    cityDemandSummary,
   });
 }
 

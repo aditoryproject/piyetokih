@@ -132,12 +132,20 @@ export default async function HomePage() {
                 <span>JADWAL ROADSHOW &amp; NONTON DULUAN</span>
               </a>
             ) : (
-              <a
-                href="#trailer"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
-              >
-                <span>NONTON TRAILER RESMI</span>
-              </a>
+              <>
+                <Link
+                  href="/lokasi-bioskop"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
+                >
+                  <span>CEK LOKASI BIOSKOP</span>
+                </Link>
+                <a
+                  href="#trailer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-white/10 font-bold text-xs uppercase tracking-wider shadow-lg transition-all duration-200 active:scale-95"
+                >
+                  <span>NONTON TRAILER RESMI</span>
+                </a>
+              </>
             )}
           </div>
         </div>

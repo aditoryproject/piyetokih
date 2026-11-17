@@ -128,6 +128,8 @@ export default function AdminDashboardClient() {
   const [sourceFilter, setSourceFilter] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');
   const [cityBreakdown, setCityBreakdown] = useState<Record<string, number>>({});
+  const [cityDemands, setCityDemands] = useState<Array<{ id: string; city: string; phone: string; name: string; query: string; requestedAt: string }>>([]);
+  const [cityDemandSummary, setCityDemandSummary] = useState<Array<{ city: string; count: number }>>([]);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [loadingLeads, setLoadingLeads] = useState(true);
 
@@ -414,6 +416,8 @@ export default function AdminDashboardClient() {
         setLeads(data.leads || []);
         if (data.cityBreakdown) setCityBreakdown(data.cityBreakdown);
         if (data.availableCities) setAvailableCities(data.availableCities);
+        if (Array.isArray(data.cityDemands)) setCityDemands(data.cityDemands);
+        if (Array.isArray(data.cityDemandSummary)) setCityDemandSummary(data.cityDemandSummary);
       })
       .finally(() => setLoadingLeads(false));
   };
@@ -1627,6 +1631,71 @@ export default function AdminDashboardClient() {
                     ))
                   )}
                 </div>
+              </div>
+
+              {/* REKAP PERMINTAAN KOTA BELUM TAYANG (CITY DEMAND LEADS DARI WA) */}
+              <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 shadow-sm space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-amber-200/80 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-extrabold uppercase text-amber-950 tracking-wider">
+                      Permintaan Kota Belum Tayang (City Demand Leads — WA)
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-amber-800 font-semibold">
+                    Total {cityDemands.length} permintaan dari {cityDemandSummary.length} kota
+                  </span>
+                </div>
+
+                {cityDemandSummary.length === 0 ? (
+                  <p className="text-xs text-amber-900/70 italic">
+                    Belum ada permintaan kota di luar 9 flyer yang tercatat dari webhook WhatsApp.
+                  </p>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap gap-2">
+                      {cityDemandSummary.map((item) => (
+                        <span
+                          key={item.city}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-bold text-slate-800 shadow-xs"
+                        >
+                          <MapPin className="w-3 h-3 text-amber-600" />
+                          <span>{item.city}</span>
+                          <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black">
+                            {item.count}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="overflow-x-auto bg-white border border-amber-200/80 rounded-xl mt-2">
+                      <table className="w-full text-left text-[11px] text-slate-700">
+                        <thead className="bg-amber-100/60 text-amber-950 uppercase font-bold text-[10px]">
+                          <tr>
+                            <th className="py-2 px-3">Kota Diminta</th>
+                            <th className="py-2 px-3">Nama</th>
+                            <th className="py-2 px-3">No. WhatsApp</th>
+                            <th className="py-2 px-3">Pertanyaan</th>
+                            <th className="py-2 px-3">Waktu</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {cityDemands.slice(0, 20).map((d) => (
+                            <tr key={d.id} className="hover:bg-amber-50/40">
+                              <td className="py-2 px-3 font-bold text-amber-900">{d.city}</td>
+                              <td className="py-2 px-3 font-medium">{d.name}</td>
+                              <td className="py-2 px-3 font-mono">{d.phone}</td>
+                              <td className="py-2 px-3 text-slate-500 max-w-xs truncate">{d.query || '-'}</td>
+                              <td className="py-2 px-3 text-slate-400 whitespace-nowrap">
+                                {new Date(d.requestedAt).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* SEARCH & FILTERS BAR */}

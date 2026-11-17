@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MASTER_ROADSHOW_STOPS, FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
 import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
-import { getDb } from '@/lib/db';
+import { getDb, recordCityDemandLead } from '@/lib/db';
 import { WAHNOTIF_TOOL_ROADSHOW_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
-import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible } from '@/lib/cinema-flyers';
+import {
+  lookupNationalCinemaFlyers,
+  sendFlyerImageToWhatsAppIfPossible,
+  extractRequestedUnlistedCity,
+  buildUnlistedCityInstagramReply
+} from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -111,6 +116,45 @@ ${closingActionText}`;
         flyerUrls: flyerLookup.flyerUrls,
         ticketLinks: activeTicketLinks,
         replyMessage
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // If Roadshow Mode is OFF and requested city is NOT in the 9 Official Flyers -> record demand lead & send Instagram info
+    const requestedUnlistedCity =
+      isRoadshowModeOff && !flyerLookup.found
+        ? extractRequestedUnlistedCity(String(args.city || args.kota || ''), normalizedCity || cleanCityStr)
+        : null;
+
+    if (requestedUnlistedCity) {
+      const instagramUrl =
+        db.settings.socialLinks?.instagram ||
+        'https://www.instagram.com/piyetokihfilm.official/';
+
+      recordCityDemandLead(db, {
+        city: requestedUnlistedCity,
+        phone: senderPhone,
+        name: String(body.name || args.name || 'Bolo Asik'),
+        query: cleanCityStr,
+        source: 'whatsapp',
+      });
+
+      const unlistedReply = buildUnlistedCityInstagramReply({
+        cityName: requestedUnlistedCity,
+        instagramUrl,
+        siteOrigin: FAST_TRACK_TICKET_LINKS.website,
+        presaleDates,
+        bogoDates,
+        activeLinksText,
+      });
+
+      return NextResponse.json({
+        success: true,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. Kota ${requestedUnlistedCity} BELUM ada di 9 flyer rilis awal 19 Nov, tapi TIDAK MENUTUP KEMUNGKINAN akan tayang! WAJIB ajak penonton pantau Instagram resmi ${instagramUrl}.`,
+        action: 'unlisted_city_demand_recorded',
+        cityName: requestedUnlistedCity,
+        instagramUrl,
+        ticketLinks: activeTicketLinks,
+        replyMessage: unlistedReply,
       }, { status: 200, headers: corsHeaders });
     }
 

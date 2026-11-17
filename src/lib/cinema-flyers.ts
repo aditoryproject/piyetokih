@@ -1052,6 +1052,103 @@ export function lookupNationalCinemaFlyers(
   };
 }
 
+const KNOWN_UNLISTED_INDONESIAN_CITIES = [
+  'banda aceh', 'aceh', 'lhokseumawe', 'binjai', 'pematangsiantar', 'padang', 'bukittinggi',
+  'dumai', 'tanjungpinang', 'tanjung pinang', 'lubuklinggau', 'prabumulih', 'garut', 'tasikmalaya',
+  'tasik', 'sukabumi', 'karawang', 'purwakarta', 'sumedang', 'kuningan', 'majalengka', 'banjar',
+  'pangandaran', 'wonogiri', 'karanganyar', 'boyolali', 'lumajang', 'bondowoso', 'bangkalan',
+  'sampang', 'pacitan', 'magetan', 'pontianak', 'singkawang', 'palangkaraya', 'palangka raya',
+  'banjarmasin', 'banjarbaru', 'balikpapan', 'bontang', 'tarakan', 'makassar', 'ujung pandang',
+  'parepare', 'palu', 'kendari', 'baubau', 'gorontalo', 'mamuju', 'kupang', 'maumere', 'ende',
+  'ambon', 'ternate', 'jayapura', 'sorong', 'manokwari', 'timika', 'merauke', 'lombok',
+];
+
+const UNLISTED_CITY_STOPWORDS = new Set([
+  'mana', 'mna', 'mana aja', 'mana saja', 'bioskop', 'bioskopnya', 'kota', 'kotamu', 'kotaku',
+  'indonesia', 'sana', 'sini', 'situ', 'xxi', 'cgv', 'cinepolis', 'nsc', 'platinum', 'sams',
+  'tix', 'tix id', 'mtix', 'm-tix', 'website', 'web', 'link', 'promo', 'presale', 'tiket',
+  'film', 'tempat', 'daerah', 'lokasi', 'semua', 'seluruh', 'tayang', 'ada', 'belum', 'kapan',
+  'nonton', 'bogo', 'buy 1 get 1', 'dalam', 'luar', 'atas', 'bawah', 'studio', 'mall', 'kasir',
+]);
+
+function toTitleCaseCity(str: string): string {
+  return str
+    .trim()
+    .split(/\s+/)
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : ''))
+    .join(' ');
+}
+
+export function extractRequestedUnlistedCity(cityParam: string, queryText: string): string | null {
+  const cleanParam = String(cityParam || '').trim().toLowerCase();
+  if (
+    cleanParam &&
+    !['all', 'list', 'semua', 'nasional', 'indonesia', 'bioskop', 'kota'].includes(cleanParam) &&
+    !UNLISTED_CITY_STOPWORDS.has(cleanParam)
+  ) {
+    return toTitleCaseCity(cleanParam);
+  }
+
+  const q = String(queryText || '').toLowerCase().trim();
+  if (!q) return null;
+
+  for (const city of KNOWN_UNLISTED_INDONESIAN_CITIES) {
+    const regex = new RegExp(`\\b${city.replace(/\s+/g, '\\s+')}\\b`, 'i');
+    if (regex.test(q)) {
+      return toTitleCaseCity(city);
+    }
+  }
+
+  const match = q.match(/(?:di|kota|kabupaten|wilayah|daerah)\s+([a-z]{3,18}(?:\s+[a-z]{3,14})?)/i);
+  if (match && match[1]) {
+    const candidate = match[1]
+      .replace(/\b(ada|gak|ga|nggak|tidak|tayang|bioskop|xxi|cgv|ya|kah|dong|lur|mas)\b/gi, '')
+      .trim()
+      .toLowerCase();
+    if (
+      candidate.length >= 3 &&
+      !UNLISTED_CITY_STOPWORDS.has(candidate) &&
+      !candidate.includes('mana')
+    ) {
+      return toTitleCaseCity(candidate);
+    }
+  }
+
+  return null;
+}
+
+export function buildUnlistedCityInstagramReply(params: {
+  cityName: string;
+  instagramUrl: string;
+  siteOrigin: string;
+  presaleDates: string;
+  bogoDates: string;
+  activeLinksText: string;
+}): string {
+  const { cityName, instagramUrl, siteOrigin, presaleDates, bogoDates, activeLinksText } = params;
+  return `Halo bolo asik dari *${cityName}*! Piye kabare lur? 😄
+
+🙏 *INFO PENAYANGAN KOTA ${cityName.toUpperCase()}:*
+Untuk daftar 9 Flyer resmi rilis awal penayangan serentak **19 November 2026**, wilayah *${cityName}* saat ini memang belum tercantum di daftar bioskop rilis awal ya lur.
+
+🔥 *TAPI TENANG LUR, TIDAK MENUTUP KEMUNGKINAN BAKAL TAYANG DI KOTAMU!*
+Daftar bioskop & kota masih terus berkembang! Permintaan nonton dari *${cityName}* sudah Mas Kidi catat masuk ke data tim kami agar jadi prioritas pertimbangan ekspansi layar berikutnya! 🙌🍿
+
+📲 *PANTENGIN TERUS INSTAGRAM OFFICIAL PIYE TO KIH?:*
+Untuk update penambahan kota & daftar bioskop terbaru setiap harinya, pantengin terus Instagram resmi kami di sini ya lur:
+👉 *Instagram Official:* ${instagramUrl}
+
+🖼️ *Cek Juga Daftar Lengkap 9 Flyer Bioskop yang Sudah Tayang:*
+👉 ${siteOrigin}/lokasi-bioskop
+
+📅 *JADWAL TIKET & PROMO (JIKA MAU NONTON DI KOTA TERDEKAT):*
+• *Presale Tiket Dibuka:* ${presaleDates}
+• *Promo Buy 1 Get 1:* ${bogoDates}
+${activeLinksText}
+
+Terima kasih semangatnya bolo *${cityName}*! Pantengin terus Instagram resminya ya lur! 🍿✨`;
+}
+
 // Cooldown cache so we don't spam the same WhatsApp number with duplicate flyer images within 45 seconds
 const recentFlyerSentCache = new Map<string, number>();
 

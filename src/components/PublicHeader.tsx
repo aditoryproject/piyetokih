@@ -6,9 +6,10 @@ import { usePathname } from 'next/navigation';
 
 interface PublicHeaderProps {
   showHeader: boolean;
+  isRoadshowActive?: boolean;
 }
 
-export default function PublicHeader({ showHeader }: PublicHeaderProps) {
+export default function PublicHeader({ showHeader, isRoadshowActive = false }: PublicHeaderProps) {
   const pathname = usePathname();
 
   // Jangan pernah render header publik di halaman admin
@@ -42,7 +43,7 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
           </div>
         </Link>
 
-        {/* Desktop Nav: HALAMAN UTAMA, JADWAL ROADSHOW & NONTON DULUAN, KABAR & GALERI (Uppercase) */}
+        {/* Desktop Nav: HALAMAN UTAMA, LOKASI BIOSKOP (atau JADWAL ROADSHOW saat aktif), KABAR & GALERI (Uppercase) */}
         <div className="hidden md:flex items-center gap-2 lg:gap-4 text-xs font-bold tracking-wider uppercase">
           <Link
             href="/"
@@ -50,11 +51,23 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
           >
             HALAMAN UTAMA
           </Link>
+          {isRoadshowActive && (
+            <Link
+              href="/#roadshow"
+              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition"
+            >
+              JADWAL ROADSHOW &amp; NONTON DULUAN
+            </Link>
+          )}
           <Link
-            href="/#roadshow"
-            className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition"
+            href="/lokasi-bioskop"
+            className={`px-3 py-1.5 rounded-lg transition ${
+              pathname === '/lokasi-bioskop'
+                ? 'text-amber-300 bg-white/10'
+                : 'text-slate-300 hover:text-amber-300 hover:bg-white/5'
+            }`}
           >
-            JADWAL ROADSHOW &amp; NONTON DULUAN
+            LOKASI BIOSKOP
           </Link>
           <Link
             href="/kabar-galeri"
@@ -72,12 +85,23 @@ export default function PublicHeader({ showHeader }: PublicHeaderProps) {
           >
             HALAMAN UTAMA
           </Link>
-          <Link
-            href="/#roadshow"
-            className="px-2 py-1 rounded-lg text-slate-300 hover:text-white"
-          >
-            ROADSHOW &amp; NONTON DULUAN
-          </Link>
+          {isRoadshowActive ? (
+            <Link
+              href="/#roadshow"
+              className="px-2 py-1 rounded-lg text-slate-300 hover:text-white"
+            >
+              ROADSHOW
+            </Link>
+          ) : (
+            <Link
+              href="/lokasi-bioskop"
+              className={`px-2 py-1 rounded-lg ${
+                pathname === '/lokasi-bioskop' ? 'text-amber-300' : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              LOKASI BIOSKOP
+            </Link>
+          )}
           <Link
             href="/kabar-galeri"
             className="px-2 py-1 rounded-lg text-amber-300"

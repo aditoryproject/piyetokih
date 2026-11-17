@@ -212,12 +212,23 @@ export interface BogoReminderRecord {
   presaleFollowupResponse?: 'pending' | 'responded' | 'bought' | 'declined' | 'oke';
 }
 
+export interface CityDemandRecord {
+  id: string;
+  city: string;
+  phone: string;
+  name: string;
+  query: string;
+  source: 'whatsapp' | 'web';
+  requestedAt: string;
+}
+
 export interface DatabaseSchema {
   settings: AppSettings;
   leads: LeadRecord[];
   visitors: VisitorLog[];
   articles: ArticleRecord[];
   bogoReminders: BogoReminderRecord[];
+  cityDemands?: CityDemandRecord[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -531,12 +542,19 @@ function ensureDb(): DatabaseSchema {
     visitors = backup.visitors;
   }
 
+  // Merge cityDemands:
+  let cityDemands = Array.isArray(parsed.cityDemands) ? parsed.cityDemands : [];
+  if (Array.isArray(backup?.cityDemands) && backup.cityDemands.length > cityDemands.length) {
+    cityDemands = backup.cityDemands;
+  }
+
   const currentDb: DatabaseSchema = {
     settings,
     leads,
     visitors,
     articles,
     bogoReminders,
+    cityDemands,
   };
 
   // Sync to all backup locations
@@ -547,6 +565,52 @@ function ensureDb(): DatabaseSchema {
 
 export function getDb(): DatabaseSchema {
   return ensureDb();
+}
+
+export function recordCityDemandLead(
+  db: DatabaseSchema,
+  params: { city: string; phone?: string; name?: string; query?: string; source?: 'whatsapp' | 'web' }
+) {
+  const cleanCity = params.city.trim();
+  if (!cleanCity) return;
+
+  const rawPhone = String(params.phone || '').replace(/[^0-9]/g, '');
+  const cleanPhone = rawPhone.startsWith('0') ? '62' + rawPhone.slice(1) : rawPhone;
+
+  if (!db.cityDemands) db.cityDemands = [];
+
+  const existingIdx = db.cityDemands.findIndex(
+    (d) =>
+      d.city.toLowerCase() === cleanCity.toLowerCase() &&
+      ((cleanPhone && d.phone === cleanPhone) || (!cleanPhone && d.phone === ''))
+  );
+
+  if (existingIdx !== -1) {
+    db.cityDemands[existingIdx].requestedAt = new Date().toISOString();
+    if (params.query) db.cityDemands[existingIdx].query = params.query;
+  } else {
+    db.cityDemands.unshift({
+      id: `city-demand-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      city: cleanCity,
+      phone: cleanPhone || 'anonymous',
+      name: (params.name || 'Bolo Asik').trim() || 'Bolo Asik',
+      query: params.query || '',
+      source: params.source || 'whatsapp',
+      requestedAt: new Date().toISOString(),
+    });
+  }
+
+  // Also update bogoReminders city if previously captured as 'Nasional'
+  if (cleanPhone.length >= 8) {
+    const matchedReminder = db.bogoReminders.find((r) =>
+      r.phone.replace(/[^0-9]/g, '').endsWith(cleanPhone.slice(-8))
+    );
+    if (matchedReminder && (!matchedReminder.city || matchedReminder.city === 'Nasional')) {
+      matchedReminder.city = `${cleanCity} (Request Tayang)`;
+    }
+  }
+
+  saveDb(db);
 }
 
 export function saveDb(data: DatabaseSchema) {

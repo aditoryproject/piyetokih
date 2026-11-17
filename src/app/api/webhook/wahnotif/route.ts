@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb, saveDb, generateVoucherSerial, LeadRecord, BogoReminderRecord } from '@/lib/db';
+import { getDb, saveDb, generateVoucherSerial, recordCityDemandLead, LeadRecord, BogoReminderRecord } from '@/lib/db';
 import { sendVoucherEmail } from '@/lib/email';
 import { CITIES_DATA, isCityRoadshowExpired, cleanVenueToMallName, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import {
@@ -16,7 +16,12 @@ import {
   WAHNOTIF_ALL_TOOLS,
   buildLiveWebsiteBotConfig
 } from '@/lib/wahnotif';
-import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible } from '@/lib/cinema-flyers';
+import {
+  lookupNationalCinemaFlyers,
+  sendFlyerImageToWhatsAppIfPossible,
+  extractRequestedUnlistedCity,
+  buildUnlistedCityInstagramReply
+} from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -664,6 +669,46 @@ ${closingActionText}`;
         flyerUrls: flyerLookup.flyerUrls,
         ticketLinks: activeTicketLinks,
         replyMessage: reply
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // CASE 1-UNLISTED: CITY NOT YET IN THE 9 OFFICIAL FLYERS -> RECORD DEMAND LEAD + INSTAGRAM UPDATE
+    const requestedUnlistedCity =
+      isRoadshowModeOff && !flyerLookup.found
+        ? extractRequestedUnlistedCity(cityParam, normalizedQuery || queryText)
+        : null;
+
+    if (requestedUnlistedCity) {
+      const instagramUrl =
+        db.settings.socialLinks?.instagram ||
+        'https://www.instagram.com/piyetokihfilm.official/';
+
+      recordCityDemandLead(db, {
+        city: requestedUnlistedCity,
+        phone: cleanSender || inboundRawPhone,
+        name: String(body.name || args.name || 'Bolo Asik'),
+        query: queryText,
+        source: 'whatsapp',
+      });
+
+      const unlistedReply = buildUnlistedCityInstagramReply({
+        cityName: requestedUnlistedCity,
+        instagramUrl,
+        siteOrigin,
+        presaleDates,
+        bogoDates,
+        activeLinksText,
+      });
+
+      return NextResponse.json({
+        status: 'success',
+        success: true,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. Kota ${requestedUnlistedCity} BELUM ada di 9 flyer rilis awal 19 Nov, tapi TIDAK MENUTUP KEMUNGKINAN akan tayang! WAJIB ajak penonton pantau Instagram resmi ${instagramUrl} dan sampaikan bahwa permintaan kota ${requestedUnlistedCity} sudah dicatat!`,
+        action: 'unlisted_city_demand_recorded',
+        cityName: requestedUnlistedCity,
+        instagramUrl,
+        ticketLinks: activeTicketLinks,
+        replyMessage: unlistedReply,
       }, { status: 200, headers: corsHeaders });
     }
 
