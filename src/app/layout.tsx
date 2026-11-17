@@ -175,6 +175,8 @@ export default async function RootLayout({
         {/* Floating WhatsApp Official Widget (Mas Kidi - Universal Fast Track) */}
         <FloatingWhatsAppWidget
           whatsappNumber={db.settings.wahnotifSenderNumber || '6285220954750'}
+          presaleDatesText={db.settings.bogoPresaleDatesText || '12 November 2026'}
+          promoDatesText={db.settings.bogoPromoDatesText || '19-24 November 2026'}
         />
       </body>
     </html>

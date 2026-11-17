@@ -16,10 +16,14 @@ import { trackMetaEvent } from '@/lib/pixel';
 
 interface FloatingWhatsAppWidgetProps {
   whatsappNumber?: string;
+  presaleDatesText?: string;
+  promoDatesText?: string;
 }
 
 export default function FloatingWhatsAppWidget({
   whatsappNumber = '6285220954750',
+  presaleDatesText = '12 November 2026',
+  promoDatesText = '19-24 November 2026',
 }: FloatingWhatsAppWidgetProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -132,51 +136,51 @@ export default function FloatingWhatsAppWidget({
     setIsOpen(false);
   };
 
-  // 4 Pilihan Cepat Khas Mas Kidi
+  // 4 Pilihan Cepat Khas Mas Kidi (Fase Tayang Serentak 19 Nov 2026, Presale & Promo BOGO)
   const quickActions = [
     {
-      id: 'presale',
+      id: 'beli_tiket',
       icon: Ticket,
       badge: 'Paling Diminati 🔥',
       badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-      title: 'Beli Tiket Presale & Nonton Duluan',
-      desc: 'Nonton duluan sebelum 19 Nov bareng cast di bioskop kota roadshow!',
+      title: 'Info Pembelian Tiket & Presale',
+      desc: `Link resmi beli tiket & amankan kursi tayang serentak 19 Nov (Presale: ${presaleDatesText})`,
       prefill: currentCityName
-        ? `Halo Mas Kidi! Mau nonton duluan sebelum 19 Nov di Kota ${currentCityName}, bisa beli tiket presale nya di mana ya? 🍿`
-        : `Halo Mas Kidi! Mau nonton duluan sebelum 19 Nov, bisa beli tiket presale nya di mana ya? 🍿`,
-    },
-    {
-      id: 'roadshow',
-      icon: MapPin,
-      badge: currentCityName ? `Kota ${currentCityName} 📍` : '17 Kota 📍',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-      title: currentCityName
-        ? `Jadwal Roadshow Kota ${currentCityName}`
-        : 'Cek Jadwal Roadshow di Kotaku',
-      desc: currentCityName
-        ? `Rundown jam, temu pemain, & penukaran voucher fisik di ${currentCityName}`
-        : 'Rundown sekolah, kampus, radio, meet & greet mall, & roster pemain',
-      prefill: currentCityName
-        ? `Halo Mas Kidi! Mau tanya jadwal lengkap Roadshow, Nonton Duluan, & booth voucher film Piye To Kih di ${currentCityName} dong!`
-        : `Halo Mas Kidi! Mau tanya jadwal lengkap roadshow, temu pemain, & booth voucher di kotaku dong.`,
+        ? `Halo Mas Kidi! Mau beli tiket film PIYE TO KIH? di Kota ${currentCityName}, boleh minta link pembelian tiket resmi yang aktif sekarang ya? 🎟️🍿`
+        : `Halo Mas Kidi! Mau beli tiket film PIYE TO KIH? THE MOVIE dong, boleh minta link pembelian tiket resmi yang aktif sekarang? 🎟️🍿`,
     },
     {
       id: 'bogo',
       icon: Gift,
-      badge: 'Promo 15 Nov 🎁',
+      badge: 'Promo BOGO 🎁',
       badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
       title: 'Info Promo Buy 1 Get 1 (BOGO)',
-      desc: 'Daftar pengingat H-1 kuota 1.000 TIX ID & 500 M-TIX XXI 19 Nov',
-      prefill: `Halo Mas Kidi! Mau info promo Buy 1 Get 1 (BOGO) tiket bioskop penayangan 19 November dong. Mau amankan kuota reminder WA! 🎟️`,
+      desc: `Nonton berdua bayar 1 tiket! Cek jadwal & cara ikut promonya (${promoDatesText})`,
+      prefill: `Halo Mas Kidi! Mau info lengkap promo Buy 1 Get 1 (BOGO) tiket bioskop PIYE TO KIH? dong! Berlaku kapan dan lewat mana aja ya? 🎁🎟️`,
+    },
+    {
+      id: 'lokasi_bioskop',
+      icon: MapPin,
+      badge: currentCityName ? `Kota ${currentCityName} 📍` : '95+ Kota 📍',
+      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      title: currentCityName
+        ? `Lokasi Bioskop di ${currentCityName}`
+        : 'Cek Lokasi Bioskop di Kotaku',
+      desc: currentCityName
+        ? `Daftar bioskop penayang & flyer resmi di ${currentCityName}`
+        : "XXI, CGV, Cinépolis, Sam's Studios, NSC, Platinum & flyer bioskop resmi",
+      prefill: currentCityName
+        ? `Halo Mas Kidi! Film PIYE TO KIH? tayang di bioskop mana aja di ${currentCityName} ya? Boleh cek daftar bioskop & flyernya dong! 📍🎬`
+        : `Halo Mas Kidi! Film PIYE TO KIH? tayang di bioskop mana aja di kotaku ya? Boleh cek daftar bioskop & flyernya dong! 📍🎬`,
     },
     {
       id: 'general',
       icon: Smile,
       badge: 'Tanya Bebas 💬',
       badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      title: 'Tanya Bebas / Ngobrol Mas Kidi',
-      desc: 'Sinopsis film, pemain, OST Lek Dahlan, atau jokes santai',
-      prefill: `Halo Mas Kidi! Piye kabare? Mau tanya-tanya seputar film komedi PIYE TO KIH? THE MOVIE dong lur! 😄`,
+      title: 'Tanya Harga, Nobar & Ngobrol Mas Kidi',
+      desc: 'Info HTM tiket, acara nonton bareng (nobar), sinopsis, cast & OST',
+      prefill: `Halo Mas Kidi! Piye kabare? Mau tanya-tanya seputar harga tiket, nobar, atau info film PIYE TO KIH? THE MOVIE dong lur! 😄`,
     },
   ];
 
@@ -246,8 +250,8 @@ export default function FloatingWhatsAppWidget({
                   Halo, Dulur! Piye kabare?☺️
                 </p>
                 <p className="text-slate-300 text-[11px] leading-relaxed">
-                  Mau cari tiket presale nonton duluan, cek jadwal kota, atau promo Buy 1 Get 1? 
-                  <strong className="text-white"> Klik pilihan di bawah ya lur ben cepet Mas Kidi jawab:</strong>
+                  Mau beli tiket bioskop, cek promo Buy 1 Get 1, atau cari lokasi bioskop di kotamu?{' '}
+                  <strong className="text-white">Klik pilihan di bawah ya lur ben cepet Mas Kidi jawab:</strong>
                 </p>
               </div>
             </div>
