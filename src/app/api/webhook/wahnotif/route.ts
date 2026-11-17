@@ -535,34 +535,27 @@ Ada kendala lain atau ada yang mau ditanyakan lagi seputar tiketnya lur? Mas Kid
       );
 
     if (isVoucherInquiry) {
+      const voucherLiveConfig = buildLiveWebsiteBotConfig(db.settings, siteOrigin);
       return NextResponse.json({
         status: 'success',
         success: true,
+        important_ai_instruction: voucherLiveConfig.aiMandatoryInstruction,
         action: 'voucher_tebus_murah_explanation',
+        ticketLinks: voucherLiveConfig.activeTicketLinks,
         replyMessage: `Halo bolo asik! Piye kabare? Mas Kidi jelaskan ya lur biar gamblang dan gak salah paham: 😄
 
-🎟️ *PROGRAM TEBUS MURAH TIKET BIOSKOP RP 10.000 (BUKAN POTONGAN / DISKON)!*
-Banyak yang ngira ini potongan harga atau diskon, padahal BUKAN lur! Ini murni program *TEBUS MURAH* tiket bioskop:
+🎟️ *KETENTUAN VOUCHER FISIK RP 10.000 (BUKAN POTONGAN / DISKON):*
+Bagi sampean yang SUDAH memegang lembaran *Voucher Fisik Resmi Rp 10.000* dari acara roadshow sebelumnya:
+1. *Bawa ke Kasir Bioskop:* Bawa lembaran voucher fisik tersebut ke kasir bioskop yang menayangkan film *"PIYE TO KIH?"* pada tanggal penayangan perdana *19 atau 20 November 2026*.
+2. *Berlaku Sebesar Harga Tiket Penuh:* Di kasir bioskop, lembaran voucher fisik Rp 10.000 tersebut *BISA DIGUNAKAN SEBESAR HARGA TIKET PENUH* di masing-masing lokasi bioskop tersebut! Sampean *TIDAK PERLU bayar sisa atau kekurangan tiket lagi di kasir bioskop!*
+   *(Contohnya: Jika tiket bioskop di lokasimu normalnya Rp 40.000 atau Rp 50.000, semuanya sudah ter-cover PENUH 100% oleh voucher fisik tersebut tanpa biaya tambahan).*
 
-📋 *ALURNYA SIMPLE TENAN LUR:*
-1. *Dapat Kode Booking:* Sampean mendaftar online (di website atau lewat Mas Kidi) untuk mendapatkan KODE BOOKING.
-2. *Tebus Voucher Fisik Rp 10.000:* Bawa kode booking ini ke konter booth resmi saat acara Roadshow & Meet and Greet offline di kotamu. Tunjukkan kode ke petugas booth kami, bayar/tebus Rp 10.000, dan sampean akan menerima lembaran VOUCHER FISIK RESMI seharga Rp 10.000.
-3. *Pakai Nonton di Bioskop:* Bawa lembaran voucher fisik tersebut ke kasir bioskop mana pun yang menayangkan film "PIYE TO KIH?" pada penayangan serentak tanggal 19 atau 20 November 2026.
-4. *Berlaku Sebesar Harga Tiket Penuh:* Di kasir bioskop, lembaran voucher fisik Rp 10.000 tersebut *BISA DIGUNAKAN SEBESAR HARGA TIKET PENUH* di masing-masing lokasi bioskop tersebut! Sampean *TIDAK PERLU bayar sisa atau kekurangan tiket lagi di kasir bioskop!*
-   *(Contohnya: Jika tiket bioskop di lokasimu normalnya seharga Rp 40.000 atau Rp 50.000, semuanya sudah ter-cover PENUH 100% oleh voucher fisik tersebut tanpa biaya tambahan sepeser pun).*
+🚫 *PERINGATAN PENTING:* Pembagian kode booking & booth roadshow saat ini sudah selesai. Bagi yang belum punya voucher fisik, sampean tetap bisa hemat lewat *Presale (${voucherLiveConfig.presaleDates})* dan *Promo Buy 1 Get 1 (${voucherLiveConfig.bogoDates})*!
 
-🚫 *PERINGATAN PENTING:* Kasir bioskop DILARANG & TIDAK MELAYANI penukaran kode booking di HP. Kode booking WAJIB ditukarkan ke lembaran voucher fisik di booth roadshow mall terlebih dahulu ya lur!
+🎟️ *LINK RESMI BELI TIKET BIOSKOP (TINGGAL KLIK LUR):*
+${voucherLiveConfig.activeLinksText}
 
-🔥 *EITS LUR! MAU NONTON DULUAN SEKARANG DI DALAM STUDIO BARENG PEMAIN?*
-Sampean GAK PERLU nunggu sampai 19 November lur! Ada sesi *SPECIAL SCREENING (NONTON DULUAN)* bareng langsung rombongan Mukidi, Sukma, Gendut, dan Penyok di bioskop roadshow! Tiket presale sudah bisa langsung dibeli sekarang:
-• Cinema XXI (M-TIX): ${xxiLink}
-• TIX ID: ${tixidLink}
-• CGV: ${cgvLink}
-• Cinépolis: ${cinepolisLink}
-• Info Lengkap: ${siteOrigin}
-⚠️ *Kuota kursi per studio sangat terbatas lur!*
-
-Mau sekalian Mas Kidi bantu amankan Kode Booking Tebus Murah Rp10.000 di kotamu lur? Cukup infokan Nama Lengkap & Nomor WhatsApp sampean ya! 🍿✨`
+${voucherLiveConfig.closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 

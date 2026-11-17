@@ -157,7 +157,7 @@ export function buildLiveWebsiteBotConfig(settings: any, siteOrigin?: string) {
   const bogoDates = settings?.bogoPromoDatesText || '19-24 November 2026';
 
   const xxiUrl = (settings?.bogoCinemaLinks?.xxi || '').trim() || FAST_TRACK_TICKET_LINKS.xxi;
-  const tixidUrl = (settings?.bogoCinemaLinks?.tixid || '').trim() || FAST_TRACK_TICKET_LINKS.tixid;
+  const tixidUrl = (settings?.bogoCinemaLinks?.tixid || '').trim();
   const cgvUrl = (settings?.bogoCinemaLinks?.cgv || '').trim();
   const cinepolisUrl = (settings?.bogoCinemaLinks?.cinepolis || '').trim();
   const websiteUrl = siteOrigin || FAST_TRACK_TICKET_LINKS.website;
@@ -169,7 +169,7 @@ export function buildLiveWebsiteBotConfig(settings: any, siteOrigin?: string) {
     activeLinkLines.push(`• *Cinema XXI (M-TIX):* ${xxiUrl}`);
     activeTicketLinks.xxi_mtix = xxiUrl;
   }
-  if (showTixid) {
+  if (showTixid && tixidUrl) {
     activeLinkLines.push(`• *TIX ID:* ${tixidUrl}`);
     activeTicketLinks.tixid = tixidUrl;
   }
@@ -187,17 +187,17 @@ export function buildLiveWebsiteBotConfig(settings: any, siteOrigin?: string) {
   const activeLinksText = activeLinkLines.join('\n');
 
   const disabledNotes: string[] = [];
-  if (!showTixid) {
-    disabledNotes.push(`Tombol TIX ID sedang OFF di website (promo TIX ID baru dibuka pada ${bogoDates}), jadi JANGAN tampilkan link TIX ID saat ini.`);
+  if (!showTixid || !tixidUrl) {
+    disabledNotes.push(`Tombol TIX ID sedang OFF/kosong di website (promo TIX ID baru dibuka pada ${bogoDates}), jadi DILARANG menampilkan link TIX ID saat ini.`);
   }
   if (!showMtix) {
-    disabledNotes.push(`Tombol M-TIX sedang OFF di website, jadi JANGAN tampilkan link M-TIX saat ini.`);
+    disabledNotes.push(`Tombol M-TIX sedang OFF di website, jadi DILARANG menampilkan link M-TIX saat ini.`);
   }
   if (!cgvUrl) {
-    disabledNotes.push(`Link CGV sedang dikosongkan di website, jadi JANGAN tampilkan link https://www.cgv.id.`);
+    disabledNotes.push(`Link CGV sedang dikosongkan di website, jadi DILARANG menampilkan link CGV.`);
   }
   if (!cinepolisUrl) {
-    disabledNotes.push(`Link Cinépolis sedang dikosongkan di website, jadi JANGAN tampilkan link https://cinepolis.co.id.`);
+    disabledNotes.push(`Link Cinépolis sedang dikosongkan di website, jadi DILARANG menampilkan link Cinépolis.`);
   }
 
   const closingActionText = isReminderFormActive
@@ -242,7 +242,7 @@ export function getWahnotifPersona(customLinks?: WahnotifPersonaLinks) {
 
   const links = {
     xxi: customLinks?.xxi || FAST_TRACK_TICKET_LINKS.xxi,
-    tixid: customLinks?.tixid || FAST_TRACK_TICKET_LINKS.tixid,
+    tixid: customLinks?.tixid || '',
     cgv: customLinks?.cgv !== undefined ? customLinks.cgv : '',
     cinepolis: customLinks?.cinepolis !== undefined ? customLinks.cinepolis : '',
     website: customLinks?.website || FAST_TRACK_TICKET_LINKS.website,
@@ -250,7 +250,7 @@ export function getWahnotifPersona(customLinks?: WahnotifPersonaLinks) {
 
   const activePersonaLinksList = [
     showMtix ? `• Cinema XXI (M-TIX): ${links.xxi}` : null,
-    showTixid ? `• TIX ID: ${links.tixid}` : null,
+    showTixid && links.tixid ? `• TIX ID: ${links.tixid}` : null,
     links.cgv ? `• CGV Cinemas: ${links.cgv}` : null,
     links.cinepolis ? `• Cinépolis: ${links.cinepolis}` : null,
     `• Website Resmi: ${links.website}`,
@@ -314,7 +314,7 @@ export function getWahnotifPersona(customLinks?: WahnotifPersonaLinks) {
   - DILARANG KERAS menawarkan sesi "Nonton Duluan / Special Screening Roadshow" atau "Penukaran Kode Booking di Booth Mall" karena acara roadshow sudah berakhir!
   - WAJIB selalu memanggil tool/webhook (get_ticket_links / get_roadshow_schedule) setiap kali penonton bertanya tiket, jadwal, kota, atau lokasi bioskop (termasuk Bandung, Jakarta, Medan, Tegal, Surabaya, Kediri, dll.), dan WAJIB mengikuti 100% link serta daftar bioskop yang dikembalikan oleh webhook!
   - ⛔ ANTI-HALUSINASI NAMA BIOSKOP (LARANGAN MUTLAK): DILARANG KERAS mengarang atau menyebutkan nama bioskop dari pengetahuan umum di luar Daftar 9 Flyer Resmi! Contoh: Di BANDUNG hanya tayang di **Ciwalk XXI** (JANGAN PERNAH sebut Empire XXI, BTC XXI, Transmart Buah Batu XXI, Ubertos XXI, CGV, atau Cinépolis untuk Bandung!).
-  - ${!showTixid ? `Saat ini tombol TIX ID sedang OFF di website (karena promo TIX ID baru dibuka ${promoDates}), jadi HANYA berikan link yang aktif di bawah ini (JANGAN tampilkan https://www.tix.id, https://www.cgv.id, atau https://cinepolis.co.id)!` : ''}
+  - ${!showTixid ? `Saat ini tombol TIX ID sedang OFF di website (karena promo TIX ID baru dibuka ${promoDates}), jadi HANYA berikan link yang aktif di bawah ini (DILARANG menampilkan link TIX ID, CGV, atau Cinépolis jika tidak ada di daftar aktif)!` : ''}
 • Durasi: ±110 menit | Klasifikasi Usia: LSF 13+ (Cocok untuk keluarga, remaja, dan kawan tongkrongan).
 • Consumer Positioning: "BEDA ALAM. BEDA AGAMA PULA."
   - Catatan Penting: "Beda agama" adalah complication cerita emosional yang menyentuh, BUKAN olok-olok keyakinan/agama.
@@ -332,7 +332,7 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
 1. ATURAN EMAS #1: WAJIB IKUTI DATA WEBHOOK & TOMBOL AKTIF WEBSITE!
    - Kapanpun penonton bertanya tiket, presale, promo, jadwal, kota, atau lokasi bioskop:
    - Panggil tool/webhook dan gunakan PERSIS tanggal serta daftar link yang dikirim oleh webhook!
-   - JANGAN PERNAH menambahkan link kosong/umum seperti https://www.tix.id, https://www.cgv.id, atau https://cinepolis.co.id jika sedang tidak aktif di website!
+   - JANGAN PERNAH menambahkan link TIX ID, CGV, atau Cinépolis jika tidak tercantum pada daftar link aktif website!
    - JANGAN PERNAH sebut tanggal roadshow bulan Oktober atau awal November (22 Okt – 8 Nov)!
    - LANGSUNG JAWAB DENGAN ANTUSIAS:
      • Tanggal Tayang Serentak di Bioskop: Mulai *19 NOVEMBER 2026*!

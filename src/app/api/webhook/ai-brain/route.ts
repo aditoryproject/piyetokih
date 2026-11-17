@@ -5,9 +5,10 @@ import {
   FAST_TRACK_TICKET_LINKS,
   MAS_KIDI_JOKES
 } from '@/lib/bot-knowledge';
-import { getWahnotifPersona, WAHNOTIF_ALL_TOOLS } from '@/lib/wahnotif';
+import { getWahnotifPersona, WAHNOTIF_ALL_TOOLS, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
 import { getDb } from '@/lib/db';
 import { CITIES_DATA, isCityRoadshowExpired, getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
+import { lookupNationalCinemaFlyers } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -70,6 +71,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const query = String(body.query || body.message || body.text || '').toLowerCase();
 
+    const db = getDb();
+    const origin = req.nextUrl.origin || 'https://piyetokihfilm.com';
+    const effectiveOrigin = (origin.includes('localhost') || origin.includes('127.0.0.1'))
+      ? 'https://piyetokihfilm.com'
+      : origin;
+    const liveConfig = buildLiveWebsiteBotConfig(db.settings, effectiveOrigin);
+
     const randomJoke = MAS_KIDI_JOKES[Math.floor(Math.random() * MAS_KIDI_JOKES.length)];
 
     // Check voucher tebus murah explanation (ANTI-DISKON / ANTI-POTONGAN)
@@ -117,8 +125,10 @@ Mau Mas Kidi amankan Kode Booking voucher kotamu sekarang lur? Sebutkan nama kot
     if (query.includes('ending') || query.includes('mati') || query.includes('arwah') || query.includes('spoiler') || query.includes('sukma')) {
       return NextResponse.json({
         success: true,
+        important_ai_instruction: liveConfig.aiMandatoryInstruction,
         isSpoiler: true,
-        replyMessage: `Waduh lur, kalau yang itu masuk wilayah spoiler rahasia tingkat tinggi 😄\nBiar sensasi emosi, baper, dan lucunya tetap nampol pas nonton bareng kawan tongkrongan, temukan jawabannya langsung di bioskop 19 November 2026 nanti ya lur! 🍿✨\n\nNih link langsung pesan tiketnya: ${FAST_TRACK_TICKET_LINKS.xxi}`
+        ticketLinks: liveConfig.activeTicketLinks,
+        replyMessage: `Waduh lur, kalau yang itu masuk wilayah spoiler rahasia tingkat tinggi 😄\nBiar sensasi emosi, baper, dan lucunya tetap nampol pas nonton bareng kawan tongkrongan, temukan jawabannya langsung di bioskop 19 November 2026 nanti ya lur! 🍿✨\n\n🎟️ *Link Beli Tiket Resmi:*\n${liveConfig.activeLinksText}`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -175,26 +185,39 @@ Mau Mas Kidi amankan Kode Booking voucher kotamu sekarang lur? Sebutkan nama kot
     if (isPriceQuery) {
       return NextResponse.json({
         success: true,
+        important_ai_instruction: liveConfig.aiMandatoryInstruction,
         action: 'ticket_price_info',
         estimatedPriceRange: 'Rp 30.000 – Rp 50.000',
+        ticketLinks: liveConfig.activeTicketLinks,
         replyMessage: `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
 🍿 *RENTANG PERKIRAAN HARGA TIKET (HTM) FILM "PIYE TO KIH?":*
-Untuk harga tiket nonton di bioskop, rentang perkiraannya ada di kisaran *Rp 30.000 sampai Rp 50.000* per tiket lur!
-*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, sesuai kota dan hari tayang weekday atau weekend).*
+Untuk harga tiket nonton di bioskop mulai 19 November 2026, rentang perkiraannya ada di kisaran *Rp 30.000 sampai Rp 50.000* per tiket lur!
+*(Besaran harga tiket ditentukan oleh pihak jaringan bioskop seperti XXI, CGV, Cinépolis, Platinum, NSC, Sam's Studio, Golden Theater sesuai kota dan hari tayang weekday atau weekend).*
 
-Buat cek harga pasti di bioskop kotamu sekaligus langsung amankan kursi incaran sampean biar gak kehabisan, ini Mas Kidi kasih link langsung websitenya lur (tinggal klik sesuai yang ada di website):
-🎟️ Cinema XXI (M-TIX): ${FAST_TRACK_TICKET_LINKS.xxi}
-🎟️ TIX ID: ${FAST_TRACK_TICKET_LINKS.tixid}
-🎟️ CGV Cinemas: ${FAST_TRACK_TICKET_LINKS.cgv}
-🎟️ Cinépolis: ${FAST_TRACK_TICKET_LINKS.cinepolis}
-🎟️ Website Resmi: ${FAST_TRACK_TICKET_LINKS.website}
+📅 *JADWAL RESMI SESUAI WEBSITE:*
+• *Presale Tiket Dibuka:* ${liveConfig.presaleDates}
+• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}
 
-🔥 *TIPS HEMAT DARI MAS KIDI:*
-• Mau Nonton Duluan bareng cast sebelum 19 Nov? Tiket sesi Special Screening sudah bisa dibeli lewat link di atas lur!
-• Buat penayangan serentak 19 November, bakal ada promo Buy 1 Get 1 di TIX ID & M-TIX juga lho!
+🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*
+${liveConfig.activeLinksText}
 
-Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Kidi bantu arahin beli di XXI atau TIX ID? 🍿✨`
+${liveConfig.closingActionText}`
+      }, { status: 200, headers: corsHeaders });
+    }
+
+    // Check flyer / city / cinema inquiry first
+    const flyerLookup = lookupNationalCinemaFlyers(query, effectiveOrigin);
+    if (flyerLookup.found && db.settings.isRoadshowActive === false) {
+      const flyerLinksBlock = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
+      return NextResponse.json({
+        success: true,
+        important_ai_instruction: `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`,
+        action: 'city_cinema_schedule',
+        cityName: flyerLookup.cityOrChainName,
+        imageUrl: flyerLookup.primaryFlyerUrl,
+        ticketLinks: liveConfig.activeTicketLinks,
+        replyMessage: `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄\n\n🎬 *${flyerLookup.title.toUpperCase()}:*\nFilm *"PIYE TO KIH? THE MOVIE"* tayang serentak mulai **19 NOVEMBER 2026** di:\n${flyerLookup.formattedCinemaList}\n\n${flyerLinksBlock}\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}\n\n🎟️ *LINK RESMI PEMBELIAN TIKET:*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -253,11 +276,12 @@ Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Ki
 
             return NextResponse.json({
               success: true,
+              important_ai_instruction: liveConfig.aiMandatoryInstruction,
               action: 'roadshow_expired',
               isExpired: true,
               cityName: cityData.cityName,
-              dateStr: cityData.dateStr,
-              replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare? 😄\n\nNyuwun sewu banget lur, rombongan Mas Kidi, Mukidi, lan para cast wingi wis rampung ngancani dulur-dulur ${cityData.cityName} pas tanggal ${cityData.dateStr}! Dadi sesi roadshow temu pemain lan konter tebus voucher fisik ning mall wis resmi ditutup lur.\n\n🍿 *TAPI OJO CILIK ATI! MUKIDI WAE SING BEDA ALAM WANI BERJUANG, MOSOK SAMPEAN NONTON WAE PATAH ARANG?* 😂\nKabar apike, sampean TETAP BISA NONTON film komedi "PIYE TO KIH?" pas penayangan serentak mulai *19 NOVEMBER 2026* ning bioskop ${cityData.cityName} (${cinemasNameList}) nganggo *PROMO BUY 1 GET 1 (BOGO)*!\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n• Cinema XXI (M-TIX): ${ticketLinks.xxi}\n• TIX ID: ${ticketLinks.tixid}\n• CGV: ${ticketLinks.cgv}\n• Cinépolis: ${ticketLinks.cinepolis}\n\nBiar gak kehabisan kuota war tiket promo BOGO (1.000 tiket TIX ID & 500 tiket M-TIX) pas loket dibuka nanti, sini Mas Kidi daftarkan nomormu ke *PENGINGAT PRIORITAS H-1 VIA WHATSAPP*!\nCukup balas chat ini sebutkan *Nama Lengkap* sampean ya lur! Mas Kidi japri langsung pas promo aktif! 🍿✨`
+              ticketLinks: liveConfig.activeTicketLinks,
+              replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare lur? 😄\n\n🎬 *INFO PENAYANGAN BIOSKOP ${cityData.cityName.toUpperCase()} — PIYE TO KIH? THE MOVIE:*\nFilm komedi *"PIYE TO KIH?"* tayang serentak mulai *19 NOVEMBER 2026* di bioskop ${cityData.cityName} (${cinemasNameList})!\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale Tiket Dibuka:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1 (BOGO):* ${liveConfig.bogoDates}\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
             }, { status: 200, headers: corsHeaders });
           }
 
@@ -310,7 +334,9 @@ Langsung klik link di atas buat amankan kursi favorit sampean ya lur! Mau Mas Ki
 
     return NextResponse.json({
       success: true,
-      replyMessage: `Halo bolo asik! Piye kabare? Mas Kidi siap bantu informasi film komedi layar lebar PIYE TO KIH? persembahan MIRACLE Pictures! 😄\n\n${randomJoke}\n\nFilm PIYE TO KIH? tayang serentak di seluruh bioskop Indonesia mulai 19 NOVEMBER 2026!\n🎟️ *Link Beli Tiket Langsung:* ${FAST_TRACK_TICKET_LINKS.xxi} (M-TIX) | ${FAST_TRACK_TICKET_LINKS.tixid} (TIX ID)\n\nAda jadwal kota roadshow, voucher tebus murah Rp 10.000, promo Buy 1 Get 1, atau info cast yang pengin kamu tanyakan lur? 🍿`
+      important_ai_instruction: liveConfig.aiMandatoryInstruction,
+      ticketLinks: liveConfig.activeTicketLinks,
+      replyMessage: `Halo bolo asik! Piye kabare? Mas Kidi siap bantu informasi film komedi layar lebar PIYE TO KIH? persembahan MIRACLE Pictures! 😄\n\n${randomJoke}\n\nFilm PIYE TO KIH? tayang serentak di seluruh bioskop Indonesia mulai 19 NOVEMBER 2026!\n• *Presale:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}\n\n🎟️ *Link Beli Tiket Langsung:*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
     }, { status: 200, headers: corsHeaders });
 
   } catch (err: any) {
