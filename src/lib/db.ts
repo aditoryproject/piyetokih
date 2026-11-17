@@ -85,6 +85,16 @@ export interface AppSettings {
     cinepolis?: string;
     tixid?: string;
   };
+  flyerLinks?: {
+    XXI_1?: string;
+    XXI_2?: string;
+    CGV?: string;
+    CINEPOLIS?: string;
+    SAMS?: string;
+    NSC?: string;
+    PLATINUM?: string;
+    MIX?: string;
+  };
 
   // Maintenance / Coming Soon Mode (Toggleable via Dashboard)
   isMaintenanceMode?: boolean;
@@ -295,6 +305,16 @@ const DEFAULT_SETTINGS: AppSettings = {
     cgv: 'https://www.cgv.id',
     cinepolis: 'https://cinepolis.co.id',
     tixid: 'https://rb.gy/l28pzj',
+  },
+  flyerLinks: {
+    XXI_1: '',
+    XXI_2: '',
+    CGV: '',
+    CINEPOLIS: '',
+    SAMS: '',
+    NSC: '',
+    PLATINUM: '',
+    MIX: '',
   },
 
   // Mode Maintenance / Coming Soon (Toggleable)

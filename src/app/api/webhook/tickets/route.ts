@@ -3,7 +3,7 @@ import { FAST_TRACK_TICKET_LINKS, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
 import { getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_TICKETS_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
-import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible } from '@/lib/cinema-flyers';
+import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible, buildFlyerTicketLinksText } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -118,12 +118,13 @@ export async function POST(req: NextRequest) {
       matchedCityName = flyerLookup.cityOrChainName;
       cityCinemasList = flyerLookup.formattedCinemaList;
       const flyerLinks = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
-      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n${flyerLinks}`;
+      const perFlyerTicketLinks = buildFlyerTicketLinksText(flyerLookup.cinemas, db.settings.flyerLinks);
+      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n${flyerLinks}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket Khusus Jaringan Bioskop:*\n${perFlyerTicketLinks}` : ''}`;
 
       await sendFlyerImageToWhatsAppIfPossible({
         phone: senderPhone,
         imageUrl: flyerLookup.primaryFlyerUrl,
-        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}`,
+        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket:*\n${perFlyerTicketLinks}` : ''}`,
         apiKey: db.settings.wahnotifApiKey,
       });
     } else {

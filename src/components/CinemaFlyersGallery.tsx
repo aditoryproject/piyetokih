@@ -28,13 +28,6 @@ interface FlyerMeta {
 
 const FLYER_CARDS: FlyerMeta[] = [
   {
-    key: 'COVER',
-    title: 'Daftar Bioskop Tayang (Cover Resmi)',
-    subtitle: 'Tayang Serentak Nasional Mulai 19 November 2026',
-    badge: 'OFFICIAL COVER',
-    image: FLYER_PATHS.COVER,
-  },
-  {
     key: 'XXI_1',
     title: 'Cinema XXI — Bagian 1',
     subtitle: 'Jabodetabek, Bandung, Bogor, Depok, Tangerang, Cilegon, Bekasi, Cirebon, Semarang, Pekalongan, Jogja, Solo, Klaten',
@@ -95,12 +88,18 @@ const FLYER_CARDS: FlyerMeta[] = [
 interface CinemaFlyersGalleryProps {
   instagramUrl?: string;
   ticketUrl?: string;
+  flyerLinks?: Partial<Record<FlyerKey, string>>;
 }
 
 export default function CinemaFlyersGallery({
   instagramUrl = 'https://www.instagram.com/piyetokihfilm.official/',
   ticketUrl = 'https://m.21cineplex.com',
+  flyerLinks = {},
 }: CinemaFlyersGalleryProps) {
+  const getFlyerTicketUrl = (key: FlyerKey) => {
+    const custom = (flyerLinks?.[key] || '').trim();
+    return custom || ticketUrl;
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFlyerIdx, setSelectedFlyerIdx] = useState<number | null>(null);
 
@@ -211,13 +210,25 @@ export default function CinemaFlyersGallery({
                               className="text-xs text-slate-200 flex items-center justify-between gap-2"
                             >
                               <span className="font-semibold">• {cin.name}</span>
-                              <button
-                                type="button"
-                                onClick={() => openFlyerByKey(cin.flyerKey)}
-                                className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 hover:bg-amber-500 hover:text-slate-950 font-bold transition shrink-0"
-                              >
-                                Lihat Flyer
-                              </button>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => openFlyerByKey(cin.flyerKey)}
+                                  className="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 hover:bg-amber-500 hover:text-slate-950 font-bold transition"
+                                >
+                                  Flyer
+                                </button>
+                                {(flyerLinks?.[cin.flyerKey] || '').trim() && (
+                                  <a
+                                    href={(flyerLinks?.[cin.flyerKey] || '').trim()}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 font-bold transition"
+                                  >
+                                    Tiket
+                                  </a>
+                                )}
+                              </div>
                             </li>
                           ))}
                         </ul>
@@ -408,12 +419,12 @@ export default function CinemaFlyersGallery({
                 {activeFlyer.subtitle}
               </p>
               <a
-                href={ticketUrl}
+                href={getFlyerTicketUrl(activeFlyer.key)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shrink-0 transition"
               >
-                <span>Beli Tiket Bioskop</span>
+                <span>Beli Tiket ({activeFlyer.badge})</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

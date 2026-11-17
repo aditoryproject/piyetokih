@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
     if (body.bogoPresaleDatesText !== undefined) db.settings.bogoPresaleDatesText = String(body.bogoPresaleDatesText);
     if (body.bogoPromoDatesText !== undefined) db.settings.bogoPromoDatesText = String(body.bogoPromoDatesText);
     if (body.bogoCinemaLinks !== undefined) db.settings.bogoCinemaLinks = { ...db.settings.bogoCinemaLinks, ...body.bogoCinemaLinks };
+    if (body.flyerLinks !== undefined) db.settings.flyerLinks = { ...(db.settings.flyerLinks || {}), ...body.flyerLinks };
 
     // Kabar & Galeri + Media Center Global Settings
     if (body.kabarGaleriSettings) {

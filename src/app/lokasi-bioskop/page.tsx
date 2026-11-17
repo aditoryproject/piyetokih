@@ -45,7 +45,7 @@ export default function LokasiBioskopPage() {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-black uppercase tracking-widest">
             <MapPin className="w-3.5 h-3.5" />
-            <span>9 Flyer Resmi Bioskop Indonesia</span>
+            <span>8 Flyer Resmi Bioskop Indonesia</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
             Lokasi Bioskop <span className="text-amber-400">PIYE TO KIH?</span>
@@ -63,10 +63,11 @@ export default function LokasiBioskopPage() {
           </div>
         </div>
 
-        {/* Interactive Search + 9 Flyers Gallery + Lightbox Popup */}
+        {/* Interactive Search + 8 Flyers Gallery + Lightbox Popup */}
         <CinemaFlyersGallery
           instagramUrl={instagramUrl}
           ticketUrl={ticketUrl}
+          flyerLinks={db.settings.flyerLinks}
         />
       </div>
     </div>

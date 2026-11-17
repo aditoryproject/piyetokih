@@ -1149,6 +1149,34 @@ ${activeLinksText}
 Terima kasih semangatnya bolo *${cityName}*! Pantengin terus Instagram resminya ya lur! 🍿✨`;
 }
 
+const FLYER_LABEL_MAP: Record<FlyerKey, string> = {
+  COVER: 'Daftar Bioskop Tayang',
+  XXI_1: 'Cinema XXI (Bagian 1)',
+  XXI_2: 'Cinema XXI (Bagian 2)',
+  CGV: 'CGV Cinemas',
+  CINEPOLIS: 'Cinépolis Cinemas',
+  SAMS: "Sam's Studios",
+  NSC: 'New Star Cineplex (NSC)',
+  PLATINUM: 'Platinum Cineplex',
+  MIX: 'Bioskop Mitra Nasional',
+};
+
+export function buildFlyerTicketLinksText(
+  cinemas: NationalCinemaItem[],
+  flyerLinks?: Partial<Record<FlyerKey, string>>
+): string {
+  if (!flyerLinks || !Array.isArray(cinemas) || cinemas.length === 0) return '';
+  const uniqueKeys = Array.from(new Set(cinemas.map((c) => c.flyerKey)));
+  const lines: string[] = [];
+  for (const key of uniqueKeys) {
+    const url = (flyerLinks[key] || '').trim();
+    if (url) {
+      lines.push(`• *Link Tiket ${FLYER_LABEL_MAP[key] || key}:* ${url}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 // Cooldown cache so we don't spam the same WhatsApp number with duplicate flyer images within 45 seconds
 const recentFlyerSentCache = new Map<string, number>();
 

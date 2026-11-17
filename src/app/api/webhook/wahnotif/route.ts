@@ -20,7 +20,8 @@ import {
   lookupNationalCinemaFlyers,
   sendFlyerImageToWhatsAppIfPossible,
   extractRequestedUnlistedCity,
-  buildUnlistedCityInstagramReply
+  buildUnlistedCityInstagramReply,
+  buildFlyerTicketLinksText
 } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
@@ -626,11 +627,15 @@ ${voucherLiveConfig.closingActionText}`
     // CASE 1-FLYER: SPECIFIC CITY OR CINEMA CHAIN MATCH FROM 9 OFFICIAL FLYERS
     if (isRoadshowModeOff && flyerLookup.found && (isRoadshowAction || isGeneralCityListQuery || hasSpecificCity || cityParam)) {
       const flyerLinksBlock = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Lihat Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
+      const perFlyerTicketLinks = buildFlyerTicketLinksText(flyerLookup.cinemas, db.settings.flyerLinks);
+      const combinedLinksText = perFlyerTicketLinks
+        ? `${perFlyerTicketLinks}\n${activeLinksText}`
+        : activeLinksText;
 
       await sendFlyerImageToWhatsAppIfPossible({
         phone: cleanSender || inboundRawPhone,
         imageUrl: flyerLookup.primaryFlyerUrl,
-        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}\n\n📅 Tayang Serentak: Mulai *19 NOVEMBER 2026*`,
+        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}\n\n📅 Tayang Serentak: Mulai *19 NOVEMBER 2026*${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket:*\n${perFlyerTicketLinks}` : ''}`,
         apiKey: db.settings.wahnotifApiKey,
       });
 
@@ -649,14 +654,14 @@ ${flyerLinksBlock}
 • **Tayang Serentak di Bioskop:** Mulai 19 November 2026
 
 🎟️ *LINK RESMI PEMBELIAN TIKET (TINGGAL KLIK LUR):*
-${activeLinksText}
+${combinedLinksText}
 
 ${closingActionText}`;
 
       return NextResponse.json({
         status: 'success',
         success: true,
-        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}${perFlyerTicketLinks ? `\n8. WAJIB sertakan link tiket per flyer berikut:\n${perFlyerTicketLinks}` : ''}`,
         action: 'city_cinema_schedule',
         cityName: flyerLookup.cityOrChainName,
         releaseDate: '19 November 2026',

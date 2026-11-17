@@ -5367,6 +5367,84 @@ export default function AdminDashboardClient() {
                   </div>
                 </div>
 
+                {/* 4.5 LINK TIKET KHUSUS PER FLYER BIOSKOP (SINKRON KE /lokasi-bioskop & WEBHOOK WA) */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                  <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-black text-[10px] uppercase tracking-wider mb-1">
+                        Sinkron Otomatis ke /lokasi-bioskop &amp; Webhook WA
+                      </span>
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                        Link Pembelian Tiket Per Flyer Bioskop (8 Flyer Resmi)
+                      </h4>
+                      <p className="text-[11px] text-slate-600 mt-0.5">
+                        Isi link tiket masing-masing jaringan bioskop/flyer di bawah ini. Jika ada penonton di WA menanyakan kota tertentu (misal <b>Bogor</b>), bot akan mengirim <b>gambar flyer</b> + <b>daftar bioskop</b> + <b>link tiket flyer tersebut</b> secara otomatis!
+                      </p>
+                    </div>
+                    <Link
+                      href="/lokasi-bioskop"
+                      target="_blank"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-[11px] font-bold shrink-0"
+                    >
+                      <span>Lihat /lokasi-bioskop</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {[
+                      { key: 'XXI_1', label: '1. Flyer Cinema XXI — Bagian 1', hint: 'Jabodetabek, Bandung, Bogor, Depok, Tangerang, Cilegon, Bekasi, Cirebon, Semarang, Jogja, Solo, Klaten' },
+                      { key: 'XXI_2', label: '2. Flyer Cinema XXI — Bagian 2', hint: 'Surabaya, Sidoarjo, Malang, Kediri, Jember, Gresik, Tuban, Medan, Batam, Lampung, Palembang, Pekanbaru, Jambi, Bengkulu, Samarinda' },
+                      { key: 'CGV', label: '3. Flyer CGV Cinemas (11 Kota)', hint: 'Tegal, Purwokerto, Jogja, Solo, Madiun, Mojokerto, Surabaya, Blitar, Kediri, Jember, Gresik' },
+                      { key: 'CINEPOLIS', label: '4. Flyer Cinépolis Cinemas (8 Kota)', hint: 'Bekasi, Tegal, Semarang, Batu, Surabaya, Jember, Medan, Bali' },
+                      { key: 'SAMS', label: "5. Flyer Sam's Studios (17 Kota)", hint: 'Cianjur, Cibadak, Gombong, Indramayu, Kebumen, Klaten, Nganjuk, Pasuruan, Pekalongan, Pemalang, Probolinggo, Salatiga, Solo, Subang, Ungaran, Labuan Bajo' },
+                      { key: 'NSC', label: '6. Flyer NSC — New Star Cineplex (30 Kota)', hint: 'Purbalingga, Wonosobo, Purworejo, Temanggung, Salatiga, Demak, Kendal, Kudus, Jepara, Pati, Rembang, Cepu, Purwodadi, Tuban, Bojonegoro, Ngawi, Jombang, Banyuwangi, dll.' },
+                      { key: 'PLATINUM', label: '7. Flyer Platinum Cineplex (18 Kota)', hint: 'Batang, Baturaja, Berau, Blora, BSD, Cibitung, Kebumen, Kolaka, Lahat, Magelang, Majenang, Palopo, Pangkalanbun, Sibolga, Sidoarjo, Solo, Batulicin, Sragen' },
+                      { key: 'MIX', label: '8. Flyer Bioskop Mitra Nasional', hint: 'Golden Theater, Dakota, Denpasar Cineplex, Surya Yudha, Gajah Mada, FLIX, BES, MSB, JIG, Planet Cinema, Local Cinema, KCM' },
+                    ].map((item) => {
+                      const val = (settings.flyerLinks as Record<string, string> | undefined)?.[item.key] || '';
+                      return (
+                        <div key={item.key} className="bg-white border border-slate-200 rounded-xl p-3 space-y-1.5 shadow-xs">
+                          <div className="flex items-center justify-between gap-2">
+                            <label className="text-[11px] font-black text-slate-900">
+                              {item.label}
+                            </label>
+                            {val && (
+                              <a
+                                href={val}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5 font-bold shrink-0"
+                              >
+                                <span>Test</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-400 line-clamp-1" title={item.hint}>
+                            {item.hint}
+                          </p>
+                          <input
+                            type="url"
+                            value={val}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                flyerLinks: {
+                                  ...(settings.flyerLinks || {}),
+                                  [item.key]: e.target.value,
+                                },
+                              })
+                            }
+                            placeholder={`https://... (opsional link khusus ${item.key})`}
+                            className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-lg px-3 py-1.5 text-xs text-slate-900 outline-none font-mono"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* 5. SUBJUDUL PENAWARAN */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-2">
                   <label className="block text-xs font-black uppercase text-slate-900 tracking-wider">
