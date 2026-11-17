@@ -96,10 +96,10 @@ export async function GET(req: NextRequest) {
   const toolDefinition = {
     status: 'active',
     success: true,
-    message: 'Master Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant (Multi-Tools: Jadwal Roadshow, Link Tiket Presale/BOGO, Info Film/Cast/OST, Klaim Voucher).',
+    message: 'Master Webhook API Piye Toh Kih siap digunakan untuk Wahnotif AI Assistant (Multi-Tools: Daftar Bioskop 95+ Kota & 9 Flyer Resmi, Link Tiket Live Website Presale/BOGO, Info Film/Cast/OST, Klaim Voucher).',
     name: 'piye_to_kih_master_assistant',
-    title: 'Master AI Webhook Piye Toh Kih (Jadwal, Cast, Harga Tiket, Voucher & Persona)',
-    description: 'Master webhook terintegrasi yang menyediakan data lengkap jadwal roadshow 17 kota, roster cast pemain, rentang perkiraan harga tiket (HTM Rp 30.000 - Rp 50.000), link langsung beli tiket bioskop (XXI, TIX ID, CGV, Cinepolis), promo Buy 1 Get 1, fakta resmi film, serta penerbitan voucher fisik & pengingat prioritas.',
+    title: 'Master AI Webhook Piye Toh Kih (Daftar Bioskop 95+ Kota, Flyer Resmi, Link Tiket Live Website, Promo BOGO & Persona)',
+    description: 'WAJIB PANGGIL WEBHOOK INI setiap kali penonton bertanya tentang KOTA MANA PUN di seluruh Indonesia (Bandung, Jakarta, Bogor, Depok, Tangerang, Bekasi, Tegal, Semarang, Jogja, Solo, Surabaya, Malang, Kediri, Medan, Bali, dll.), menanyakan lokasi bioskop (XXI, CGV, Cinépolis, Sam\'s Studios, NSC, Platinum, dll.), link beli tiket, promo Buy 1 Get 1 (BOGO), jadwal presale, atau harga tiket. Webhook ini mengambil data real-time dari website live dan mengirim gambar flyer bioskop resmi ke WhatsApp.',
     url: `${effectiveOrigin}/api/webhook/wahnotif`,
     webhook_url: `${effectiveOrigin}/api/webhook/wahnotif`,
     method: 'POST',
@@ -148,7 +148,7 @@ export async function GET(req: NextRequest) {
     tools: [
       {
         name: 'get_roadshow_schedule',
-        description: 'Mengambil jadwal rundown lengkap per kota, jam acara (sekolah, kampus, radio, mall, bioskop), lokasi penukaran voucher fisik, dan roster cast pemain yang hadir.',
+        description: WAHNOTIF_TOOL_ROADSHOW_SCHEMA.description,
         url: `${effectiveOrigin}/api/webhook/roadshow`,
         method: 'POST',
         parameters: WAHNOTIF_TOOL_ROADSHOW_SCHEMA.parameters
