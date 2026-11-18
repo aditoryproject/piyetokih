@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb } from '@/lib/db';
 import { FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
@@ -15,17 +17,49 @@ interface BackgroundJobState {
   shouldCancel: boolean;
 }
 
-const bgJob: BackgroundJobState = {
-  isRunning: false,
-  startedAt: null,
-  totalTarget: 0,
-  processed: 0,
-  sent: 0,
-  failed: 0,
-  currentBatch: 1,
-  statusMessage: 'Idle',
-  shouldCancel: false,
-};
+const JOB_STATE_FILE = path.join(process.cwd(), 'data', 'broadcast-job.json');
+
+function loadPersistedJobState(): BackgroundJobState {
+  try {
+    if (fs.existsSync(JOB_STATE_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(JOB_STATE_FILE, 'utf-8'));
+      return {
+        isRunning: false, // On fresh process start, no in-memory loop is running yet
+        startedAt: raw.startedAt || null,
+        totalTarget: Number(raw.totalTarget || 0),
+        processed: Number(raw.processed || 0),
+        sent: Number(raw.sent || 0),
+        failed: Number(raw.failed || 0),
+        currentBatch: Number(raw.currentBatch || 1),
+        statusMessage: raw.isRunning
+          ? `Terhenti karena restart server (${raw.sent || 0}/${raw.totalTarget || 0} sudah terkirim & tersimpan aman — klik Mulai lagi untuk melanjutkan sisa yang belum terkirim).`
+          : (raw.statusMessage || 'Idle'),
+        shouldCancel: false,
+      };
+    }
+  } catch {}
+  return {
+    isRunning: false,
+    startedAt: null,
+    totalTarget: 0,
+    processed: 0,
+    sent: 0,
+    failed: 0,
+    currentBatch: 1,
+    statusMessage: 'Idle',
+    shouldCancel: false,
+  };
+}
+
+function persistJobState(state: BackgroundJobState) {
+  try {
+    const dir = path.dirname(JOB_STATE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(JOB_STATE_FILE, JSON.stringify(state, null, 2));
+  } catch {}
+}
+
+const bgJob: BackgroundJobState = loadPersistedJobState();
 
 const HEADER_VARIATIONS = [
   '🎬 *KABAR GEMBIRA! LINK TIKET PRESALE & BUY 1 GET 1 RESMI DIBUKA!* 🎬',
@@ -202,6 +236,10 @@ export async function GET(req: NextRequest) {
       variantIndex: 0,
     });
 
+    const totalSentDb =
+      db.leads.filter(l => l.presaleFollowupStatus === 'sent').length +
+      db.bogoReminders.filter(r => r.presaleFollowupStatus === 'sent').length;
+
     return NextResponse.json({
       success: true,
       cityFilter: cityQuery,
@@ -210,6 +248,7 @@ export async function GET(req: NextRequest) {
       pendingLeadsCount: eligibleLeads.length,
       pendingRemindersCount: eligibleReminders.length,
       totalPendingFollowup: (targetQuery === 'leads' ? eligibleLeads.length : targetQuery === 'reminders' ? eligibleReminders.length : eligibleLeads.length + eligibleReminders.length),
+      totalSentDb,
       sampleMessagePreview: sampleMessage,
       backgroundJob: bgJob,
     });
@@ -462,12 +501,14 @@ export async function POST(req: NextRequest) {
           }
 
           bgJob.processed++;
+          persistJobState(bgJob);
         }
       } finally {
         bgJob.isRunning = false;
         bgJob.statusMessage = bgJob.shouldCancel
           ? `Dihentikan oleh Admin (${bgJob.sent} terkirim, ${bgJob.failed} gagal).`
           : `Selesai! Total ${bgJob.sent} berhasil terkirim dari ${bgJob.totalTarget} kontak.`;
+        persistJobState(bgJob);
       }
     };
 

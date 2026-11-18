@@ -206,8 +206,8 @@ export function buildLiveWebsiteBotConfig(settings: any, siteOrigin?: string) {
 
   const aiMandatoryInstruction = [
     `⚠️ INSTRUKSI MUTLAK SINKRONISASI REAL-TIME WEBSITE (WAJIB DIIKUTI 100%, ABAIKAN TANGGAL/LINK LAMA DI SYSTEM PROMPT):`,
-    `1. Jadwal Presale sesuai website saat ini: ${presaleDates} (SUDAH DIBUKA).`,
-    `2. Jadwal Promo Buy 1 Get 1 sesuai website saat ini: ${bogoDates}.`,
+    `1. STATUS PRESALE & PROMO BUY 1 GET 1 (BOGO): SUDAH RESMI DIBUKA & SUDAH BISA DIBELI SEKARANG! (Presale: ${presaleDates} | Periode penayangan BOGO: ${bogoDates}).`,
+    `2. ⛔ LARANGAN KERAS: DILARANG mengatakan "promo belum aktif", "belum bisa dibeli sekarang", atau "tunggu besok tanggal 19"! Tiket Presale & Promo Buy 1 Get 1 SUDAH BISA DIBELI HARI INI melalui link resmi di bawah!`,
     `3. Tanggal Tayang Serentak Nasional di Bioskop: Mulai 19 NOVEMBER 2026.`,
     `4. HANYA berikan tautan pembelian tiket yang sedang AKTIF (ON) di website berikut ini:\n${activeLinksText}`,
     disabledNotes.length > 0 ? `5. LARANGAN LINK NON-AKTIF: ${disabledNotes.join(' ')}` : '',
@@ -299,8 +299,8 @@ export function getWahnotifPersona(customLinks?: WahnotifPersonaLinks) {
 • Sutradara: Ito Mavin | Penulis Skenario: Endik Koeswoyo & Ito Mavin.
 • TANGGAL TAYANG SERENTAK NASIONAL: Mulai 19 NOVEMBER 2026 di seluruh bioskop Indonesia (XXI, CGV, Cinépolis, Platinum Cineplex, NSC, Golden Theater, Sam's Studio, dan 20+ jaringan bioskop mitra).
 • JADWAL PRESALE & PROMO BUY 1 GET 1 (BOGO) SESUAI WEBSITE LIVE:
-  - Presale Tiket Bioskop Dibuka: ${presaleDates}.
-  - Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket): Berlaku ${promoDates}.
+  - Presale Tiket Bioskop: SUDAH DIBUKA (${presaleDates}).
+  - Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket): SUDAH BISA DIBELI SEKARANG (untuk penayangan ${promoDates}). JANGAN katakan "belum buka" atau "tunggu tanggal 19"!
 • ⛔ ATURAN MUTLAK PASCA-ROADSHOW & SINKRONISASI WEBSITE LIVE:
   - Hari ini adalah ${currentDateWibStr} (WIB).
   - Seluruh rangkaian Roadshow 17 Kota sebelumnya SUDAH SELESAI DILAKSANAKAN dan SUDAH DITUTUP.
@@ -330,8 +330,8 @@ Misi utama setiap respon adalah membuat calon penonton merasa akrab, terhibur de
    - JANGAN PERNAH sebut tanggal roadshow bulan Oktober atau awal November (22 Okt – 8 Nov)!
    - LANGSUNG JAWAB DENGAN ANTUSIAS:
      • Tanggal Tayang Serentak di Bioskop: Mulai *19 NOVEMBER 2026*!
-     • Presale Tiket Dibuka: *${presaleDates}*!
-     • Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket): *${promoDates}*!
+     • Presale Tiket: *SUDAH DIBUKA (${presaleDates})*!
+     • Promo Buy 1 Get 1 (Nonton Berdua Bayar 1 Tiket): *SUDAH BISA DIBELI SEKARANG* untuk penayangan *${promoDates}*! (⛔ DILARANG bilang "belum aktif" atau "tunggu tanggal 19"!)
      • Berikan HANYA link pembelian yang dikembalikan oleh tool \`get_ticket_links\` / \`get_roadshow_schedule\`:
 ${dynamicWebhookTicketRule}
 

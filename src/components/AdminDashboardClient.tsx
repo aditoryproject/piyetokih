@@ -515,6 +515,11 @@ export default function AdminDashboardClient() {
   };
 
   useEffect(() => {
+    fetchFollowupPreview('all', 'all', 4);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (!isFollowupModalOpen && !followupBgJob?.isRunning) return;
     const interval = setInterval(async () => {
       try {
@@ -1470,6 +1475,52 @@ export default function AdminDashboardClient() {
             </button>
           </div>
         </header>
+
+        {/* LIVE BROADCAST PROGRESS BANNER (TERLIHAT DI SEMUA TAB WALAUPUN CHROME BARU DIBUKA) */}
+        {followupBgJob && (followupBgJob.isRunning || followupBgJob.totalTarget > 0) && (
+          <div className={`mx-4 sm:mx-6 lg:mx-8 mt-4 p-4 rounded-2xl border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            followupBgJob.isRunning
+              ? 'bg-amber-50 border-amber-300 text-amber-950'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-950'
+          }`}>
+            <div className="space-y-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-black">
+                {followupBgJob.isRunning ? (
+                  <RefreshCw className="w-4 h-4 text-amber-600 animate-spin shrink-0" />
+                ) : (
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                )}
+                <span>
+                  {followupBgJob.isRunning
+                    ? `Broadcast WA Sedang Berjalan (Gelombang #${followupBgJob.currentBatch || 1})`
+                    : 'Status Broadcast WA Terakhir'}
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[11px] font-mono">
+                  {followupBgJob.sent}/{followupBgJob.totalTarget} Terkirim ({followupBgJob.failed} Gagal)
+                </span>
+              </div>
+              <p className="text-[11px] opacity-85 truncate">{followupBgJob.statusMessage}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => openFollowupModal(followupTarget)}
+                className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
+              >
+                Buka Panel Broadcast
+              </button>
+              {followupBgJob.isRunning && (
+                <button
+                  type="button"
+                  onClick={handleStopFollowupJob}
+                  className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition"
+                >
+                  ⏹ Hentikan
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* BODY PADDING */}
         <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl">
