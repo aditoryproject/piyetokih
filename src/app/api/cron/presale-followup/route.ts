@@ -204,6 +204,8 @@ export async function GET(req: NextRequest) {
 
     const eligibleLeads = db.leads.filter(l => isCityEligible(l.cityLocation) && isPendingFollowup(l));
     const eligibleReminders = db.bogoReminders.filter(r => isCityEligible(r.city) && isPendingFollowup(r));
+    const eligibleCrm = eligibleReminders.filter(r => String(r.id).startsWith('CRM-'));
+    const eligibleNonCrmReminders = eligibleReminders.filter(r => !String(r.id).startsWith('CRM-'));
 
     const sampleCity = cityQuery !== 'all' ? cityQuery : 'Kediri';
     const cityCinemas = getCityCinemaTicketLinks(
@@ -247,7 +249,16 @@ export async function GET(req: NextRequest) {
       stage: stageQuery,
       pendingLeadsCount: eligibleLeads.length,
       pendingRemindersCount: eligibleReminders.length,
-      totalPendingFollowup: (targetQuery === 'leads' ? eligibleLeads.length : targetQuery === 'reminders' ? eligibleReminders.length : eligibleLeads.length + eligibleReminders.length),
+      pendingCrmCount: eligibleCrm.length,
+      totalPendingFollowup: (
+        targetQuery === 'leads'
+          ? eligibleLeads.length
+          : targetQuery === 'crm'
+          ? eligibleCrm.length
+          : targetQuery === 'reminders'
+          ? eligibleNonCrmReminders.length
+          : eligibleLeads.length + eligibleReminders.length
+      ),
       totalSentDb,
       sampleMessagePreview: sampleMessage,
       backgroundJob: bgJob,
@@ -328,8 +339,11 @@ export async function POST(req: NextRequest) {
     const seenPhones = new Set<string>();
 
     // Utamakan Pendaftar Reminder BOGO & Kontak CRM terlebih dahulu, lalu Leads Voucher (tanpa duplikat nomor WA)
-    if (targetType === 'all' || targetType === 'reminders') {
+    if (targetType === 'all' || targetType === 'reminders' || targetType === 'crm') {
       for (const rem of db.bogoReminders) {
+        const isCrmRecord = String(rem.id).startsWith('CRM-');
+        if (targetType === 'crm' && !isCrmRecord) continue;
+        if (targetType === 'reminders' && isCrmRecord) continue;
         if (isCityEligible(rem.city) && isContactEligible(rem)) {
           let clean = rem.phone.replace(/[^0-9]/g, '');
           if (clean.startsWith('0')) clean = '62' + clean.slice(1);

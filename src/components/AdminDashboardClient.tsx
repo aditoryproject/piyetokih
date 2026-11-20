@@ -148,7 +148,7 @@ export default function AdminDashboardClient() {
 
   // Advanced Presale Follow-Up Modal State
   const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
-  const [followupTarget, setFollowupTarget] = useState<'all' | 'leads' | 'reminders'>('all');
+  const [followupTarget, setFollowupTarget] = useState<'all' | 'leads' | 'reminders' | 'crm'>('all');
   const [followupCity, setFollowupCity] = useState<string>('all');
   const [followupStage, setFollowupStage] = useState<number>(4);
   const [followupDelay, setFollowupDelay] = useState<number>(20); // Safe anti-spam delay in seconds
@@ -558,7 +558,7 @@ export default function AdminDashboardClient() {
     } catch {}
   };
 
-  const openFollowupModal = (target: 'all' | 'leads' | 'reminders' = 'all') => {
+  const openFollowupModal = (target: 'all' | 'leads' | 'reminders' | 'crm' = 'all') => {
     setFollowupTarget(target);
     setIsFollowupModalOpen(true);
     fetchFollowupPreview(followupCity, target, followupStage);
@@ -8562,15 +8562,16 @@ export default function AdminDashboardClient() {
                   <select
                     value={followupTarget}
                     onChange={(e) => {
-                      const newTarget = e.target.value as 'all' | 'leads' | 'reminders';
+                      const newTarget = e.target.value as 'all' | 'leads' | 'reminders' | 'crm';
                       setFollowupTarget(newTarget);
                       fetchFollowupPreview(followupCity, newTarget, followupStage);
                     }}
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
-                    <option value="all">Semua Kontak (Leads Booking + Reminder BOGO)</option>
+                    <option value="all">Semua Kontak (Leads + Reminder + Import CRM Wahnotif)</option>
+                    <option value="crm">Hanya Kontak Import CRM Wahnotif</option>
+                    <option value="reminders">Hanya Pendaftar Pengingat Tiket (Web &amp; WA)</option>
                     <option value="leads">Hanya Pemegang Voucher / Leads (Booking Code)</option>
-                    <option value="reminders">Hanya Pendaftar Pengingat Tiket (BOGO Reminder)</option>
                   </select>
                 </div>
 
