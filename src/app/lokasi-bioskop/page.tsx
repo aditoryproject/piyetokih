@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Film } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import CinemaFlyersGallery from '@/components/CinemaFlyersGallery';
 import { FAST_TRACK_TICKET_LINKS } from '@/lib/bot-knowledge';
+import { NATIONAL_CINEMA_FLYER_DATA } from '@/lib/cinema-flyers';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +69,12 @@ export default function LokasiBioskopPage() {
           instagramUrl={instagramUrl}
           ticketUrl={ticketUrl}
           flyerLinks={db.settings.flyerLinks}
+          citiesData={
+            Array.isArray(db.settings.nationalCinemaLocations) &&
+            db.settings.nationalCinemaLocations.length > 0
+              ? db.settings.nationalCinemaLocations
+              : NATIONAL_CINEMA_FLYER_DATA
+          }
         />
       </div>
     </div>

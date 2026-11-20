@@ -111,7 +111,8 @@ export async function POST(req: NextRequest) {
 
     const flyerLookup = lookupNationalCinemaFlyers(
       `${requestedCity} ${requestedChain !== 'all' ? requestedChain : ''} ${queryText}`.trim(),
-      FAST_TRACK_TICKET_LINKS.website
+      FAST_TRACK_TICKET_LINKS.website,
+      db.settings.nationalCinemaLocations
     );
 
     if (flyerLookup.found) {

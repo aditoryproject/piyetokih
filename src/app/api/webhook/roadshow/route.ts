@@ -66,8 +66,12 @@ export async function POST(req: NextRequest) {
       body._wahnotif_phone || body.phone || body.number || body.sender || args._wahnotif_phone || args.phone || args.number || ''
     ).trim();
 
-    // Lookup against the 9 Official Cinema List Flyers (95+ Cities & All Cinema Chains)
-    const flyerLookup = lookupNationalCinemaFlyers(normalizedCity || cleanCityStr, FAST_TRACK_TICKET_LINKS.website);
+    // Lookup against the National Cinema Locations (Admin-editable, seeded from 9 Official Flyers)
+    const flyerLookup = lookupNationalCinemaFlyers(
+      normalizedCity || cleanCityStr,
+      FAST_TRACK_TICKET_LINKS.website,
+      db.settings.nationalCinemaLocations
+    );
     const isRoadshowModeOff = db.settings.isRoadshowActive === false;
 
     // If Roadshow Mode is OFF and we found a matching city or cinema chain in the 9 Official Flyers:

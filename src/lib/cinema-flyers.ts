@@ -905,15 +905,20 @@ export interface FlyerLookupResult {
 
 export function lookupNationalCinemaFlyers(
   rawQuery: string,
-  siteOrigin: string = 'https://piyetokihfilm.com'
+  siteOrigin: string = 'https://piyetokihfilm.com',
+  customCities?: NationalCitySchedule[]
 ): FlyerLookupResult {
   const origin = siteOrigin.replace(/\/$/, '');
   const q = String(rawQuery || '').toLowerCase().trim();
+  const activeDataset =
+    Array.isArray(customCities) && customCities.length > 0
+      ? customCities
+      : NATIONAL_CINEMA_FLYER_DATA;
 
   const toFullUrl = (key: FlyerKey) => `${origin}${FLYER_PATHS[key]}`;
 
   // 1. Check specific city match first
-  for (const cityEntry of NATIONAL_CINEMA_FLYER_DATA) {
+  for (const cityEntry of activeDataset) {
     const matchedAlias = cityEntry.aliases.some(alias => {
       if (q === alias) return true;
       const regex = new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');

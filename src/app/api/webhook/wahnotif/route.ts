@@ -620,8 +620,12 @@ ${voucherLiveConfig.closingActionText}`
       showTixid
     } = liveConfig;
 
-    // Lookup against the 9 Official Cinema List Flyers (95+ Cities & All Cinema Chains)
-    const flyerLookup = lookupNationalCinemaFlyers(`${cityParam} ${normalizedQuery} ${queryText}`.trim(), siteOrigin);
+    // Lookup against the National Cinema Locations (Admin-editable, seeded from 9 Official Flyers)
+    const flyerLookup = lookupNationalCinemaFlyers(
+      `${cityParam} ${normalizedQuery} ${queryText}`.trim(),
+      siteOrigin,
+      db.settings.nationalCinemaLocations
+    );
     const isRoadshowModeOff = db.settings.isRoadshowActive === false;
 
     // CASE 1-FLYER: SPECIFIC CITY OR CINEMA CHAIN MATCH FROM 9 OFFICIAL FLYERS

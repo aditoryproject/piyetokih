@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import {
   FlyerKey,
+  NationalCitySchedule,
   NATIONAL_CINEMA_FLYER_DATA,
 } from '@/lib/cinema-flyers';
 
@@ -18,6 +19,7 @@ interface CinemaFlyersGalleryProps {
   instagramUrl?: string;
   ticketUrl?: string;
   flyerLinks?: Partial<Record<FlyerKey, string>>;
+  citiesData?: NationalCitySchedule[];
 }
 
 const CHAIN_FILTERS = [
@@ -34,6 +36,7 @@ export default function CinemaFlyersGallery({
   instagramUrl = 'https://www.instagram.com/piyetokihfilm.official/',
   ticketUrl = 'https://m.21cineplex.com',
   flyerLinks = {},
+  citiesData = NATIONAL_CINEMA_FLYER_DATA,
 }: CinemaFlyersGalleryProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChain, setSelectedChain] = useState('ALL');
@@ -46,7 +49,7 @@ export default function CinemaFlyersGallery({
   const filteredCities = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
 
-    return NATIONAL_CINEMA_FLYER_DATA.map((city) => {
+    return citiesData.map((city) => {
       const cinemasByChain =
         selectedChain === 'ALL'
           ? city.cinemas
@@ -81,7 +84,7 @@ export default function CinemaFlyersGallery({
 
       return null;
     }).filter((item): item is NonNullable<typeof item> => item !== null);
-  }, [searchQuery, selectedChain]);
+  }, [searchQuery, selectedChain, citiesData]);
 
   const totalCinemasShown = useMemo(
     () => filteredCities.reduce((acc, c) => acc + c.cinemas.length, 0),

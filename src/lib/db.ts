@@ -9,6 +9,7 @@ import {
   CityData,
   CinemaVenue,
 } from './cities';
+import type { NationalCitySchedule } from './cinema-flyers';
 export type { MovieCastMember, MovieSettings, CityData, CinemaVenue };
 export { DEFAULT_MOVIE_SETTINGS };
 
@@ -95,6 +96,7 @@ export interface AppSettings {
     PLATINUM?: string;
     MIX?: string;
   };
+  nationalCinemaLocations?: NationalCitySchedule[];
 
   // Maintenance / Coming Soon Mode (Toggleable via Dashboard)
   isMaintenanceMode?: boolean;

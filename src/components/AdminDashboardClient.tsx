@@ -11,6 +11,11 @@ import {
   CityRundownItem,
   applyRoadshowOverride,
 } from '@/lib/cities';
+import {
+  NATIONAL_CINEMA_FLYER_DATA,
+  NationalCitySchedule,
+  FlyerKey,
+} from '@/lib/cinema-flyers';
 import { DEFAULT_MOVIE_SETTINGS, MovieSettings, MovieCastMember } from '@/lib/movie-types';
 import { getYouTubeEmbedUrl } from '@/components/OfficialTrailerSection';
 import {
@@ -358,6 +363,12 @@ export default function AdminDashboardClient() {
   const [selectedCitySlug, setSelectedCitySlug] = useState<string>('semarang');
   const [citySearchQuery, setCitySearchQuery] = useState<string>('');
   const [expandedSection, setExpandedSection] = useState<'cinemas' | 'booth' | 'rundown'>('cinemas');
+
+  // National Cinema Locations editor state (/lokasi-bioskop & WA webhook sync)
+  const [cinemaLocSearch, setCinemaLocSearch] = useState<string>('');
+  const [newLocCityName, setNewLocCityName] = useState<string>('');
+  const [newLocProvince, setNewLocProvince] = useState<string>('');
+  const [newCinemaInputs, setNewCinemaInputs] = useState<Record<string, { name: string; chain: string; flyerKey: FlyerKey }>>({});
 
 
   // Security & Authentication state
@@ -1304,6 +1315,7 @@ export default function AdminDashboardClient() {
     { id: 'articles', label: '📰 Kabar & Galeri Hub', icon: Newspaper, badge: articles.length },
     { id: 'settings', label: 'Pengaturan Voucher & Tayang', icon: Settings },
     { id: 'bogo', label: 'Promo Buy 1 Get 1 (BOGO)', icon: Ticket, badge: 'Promo' },
+    { id: 'cinemas', label: 'Lokasi Bioskop', icon: MapPin, badge: 'Nasional' },
     { id: 'email', label: 'Pengaturan Email Gateway', icon: Mail },
     { id: 'cities', label: 'Jadwal Roadshow 17 Kota', icon: Calendar, badge: '17 Kota' },
     { id: 'wahnotif', label: 'Wahnotif & Webhook', icon: MessageSquare },
@@ -6518,6 +6530,293 @@ export default function AdminDashboardClient() {
             </div>
           )}
 
+
+          {/* TAB: LOKASI BIOSKOP NASIONAL (SINKRON KE /lokasi-bioskop & WEBHOOK WA) */}
+          {activeTab === 'cinemas' && (() => {
+            const currentLocations: NationalCitySchedule[] =
+              Array.isArray(settings.nationalCinemaLocations) && settings.nationalCinemaLocations.length > 0
+                ? settings.nationalCinemaLocations
+                : NATIONAL_CINEMA_FLYER_DATA;
+
+            const setLocations = (updated: NationalCitySchedule[]) => {
+              setSettings({ ...settings, nationalCinemaLocations: updated });
+            };
+
+            const chainToFlyerKey = (chain: string): FlyerKey => {
+              if (chain === 'Cinema XXI') return 'XXI_1';
+              if (chain === 'CGV Cinemas') return 'CGV';
+              if (chain === 'Cinépolis') return 'CINEPOLIS';
+              if (chain === "Sam's Studios") return 'SAMS';
+              if (chain === 'NSC') return 'NSC';
+              if (chain === 'Platinum Cineplex') return 'PLATINUM';
+              return 'MIX';
+            };
+
+            const q = cinemaLocSearch.trim().toLowerCase();
+            const filteredLocs = q
+              ? currentLocations.filter(
+                  (c) =>
+                    c.displayName.toLowerCase().includes(q) ||
+                    c.provinceOrRegion.toLowerCase().includes(q) ||
+                    c.cinemas.some(
+                      (cin) =>
+                        cin.name.toLowerCase().includes(q) ||
+                        cin.chain.toLowerCase().includes(q)
+                    )
+                )
+              : currentLocations;
+
+            return (
+              <div className="space-y-6">
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                      <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-amber-500" />
+                        <span>Pengelola Daftar Lokasi Bioskop ({currentLocations.length} Kota)</span>
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Tambah atau hapus kota &amp; bioskop di sini. Perubahan otomatis sinkron ke halaman{' '}
+                        <Link href="/lokasi-bioskop" target="_blank" className="text-amber-600 font-bold underline">
+                          /lokasi-bioskop
+                        </Link>{' '}
+                        dan <b>Webhook WhatsApp Mas Kidi</b> tanpa perlu ubah coding!
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!confirm('Reset daftar lokasi bioskop kembali ke data default awal?')) return;
+                          setLocations(NATIONAL_CINEMA_FLYER_DATA);
+                        }}
+                        className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-bold transition"
+                      >
+                        Reset Default
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveSettings}
+                        disabled={savingSettings}
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md transition disabled:opacity-50"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>{savingSettings ? 'Menyimpan...' : 'Simpan Daftar Lokasi'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {settingsSuccess && (
+                    <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 font-bold">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Daftar lokasi bioskop berhasil disimpan &amp; langsung aktif di website serta Webhook WA!</span>
+                    </div>
+                  )}
+
+                  {/* Add New City Form */}
+                  <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
+                    <span className="text-xs font-black uppercase text-amber-950 block">
+                      + Tambah Kota Baru
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <input
+                        type="text"
+                        value={newLocCityName}
+                        onChange={(e) => setNewLocCityName(e.target.value)}
+                        placeholder="Nama Kota (misal: Garut)"
+                        className="bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-amber-500"
+                      />
+                      <input
+                        type="text"
+                        value={newLocProvince}
+                        onChange={(e) => setNewLocProvince(e.target.value)}
+                        placeholder="Provinsi / Wilayah (misal: Jawa Barat)"
+                        className="bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-amber-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const name = newLocCityName.trim();
+                          if (!name) return alert('Masukkan nama kota terlebih dahulu.');
+                          const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                          if (currentLocations.some((c) => c.cityKey === slug || c.displayName.toLowerCase() === name.toLowerCase())) {
+                            return alert(`Kota "${name}" sudah ada di daftar.`);
+                          }
+                          const newCity: NationalCitySchedule = {
+                            cityKey: slug || `city-${Date.now()}`,
+                            displayName: name,
+                            provinceOrRegion: newLocProvince.trim() || 'Indonesia',
+                            aliases: [name.toLowerCase()],
+                            cinemas: [],
+                          };
+                          setLocations([newCity, ...currentLocations]);
+                          setNewLocCityName('');
+                          setNewLocProvince('');
+                        }}
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Tambah Kota</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={cinemaLocSearch}
+                      onChange={(e) => setCinemaLocSearch(e.target.value)}
+                      placeholder="Cari kota, provinsi, atau nama bioskop untuk diedit..."
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:border-amber-500 text-xs text-slate-900 outline-none"
+                    />
+                  </div>
+
+                  {/* City List */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredLocs.map((city) => {
+                      const draft = newCinemaInputs[city.cityKey] || {
+                        name: '',
+                        chain: 'Cinema XXI',
+                        flyerKey: 'XXI_1' as FlyerKey,
+                      };
+
+                      return (
+                        <div
+                          key={city.cityKey}
+                          className="border border-slate-200 rounded-2xl p-4 bg-slate-50/60 space-y-3 flex flex-col justify-between"
+                        >
+                          <div className="space-y-2.5">
+                            <div className="flex items-start justify-between gap-2 border-b border-slate-200 pb-2">
+                              <div>
+                                <h4 className="text-sm font-black text-slate-900">{city.displayName}</h4>
+                                <p className="text-[11px] text-slate-500">{city.provinceOrRegion} • {city.cinemas.length} Bioskop</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!confirm(`Hapus kota "${city.displayName}" beserta semua bioskopnya?`)) return;
+                                  setLocations(currentLocations.filter((c) => c.cityKey !== city.cityKey));
+                                }}
+                                className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-100 transition"
+                                title="Hapus Kota"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            {city.cinemas.length === 0 ? (
+                              <p className="text-[11px] text-slate-400 italic">Belum ada bioskop di kota ini. Tambahkan di bawah.</p>
+                            ) : (
+                              <ul className="space-y-1.5">
+                                {city.cinemas.map((cin, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs"
+                                  >
+                                    <div className="min-w-0">
+                                      <span className="font-bold text-slate-800 block truncate">{cin.name}</span>
+                                      <span className="text-[10px] text-slate-400">{cin.chain}</span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = currentLocations.map((c) => {
+                                          if (c.cityKey !== city.cityKey) return c;
+                                          return {
+                                            ...c,
+                                            cinemas: c.cinemas.filter((_, i) => i !== idx),
+                                          };
+                                        });
+                                        setLocations(updated);
+                                      }}
+                                      className="p-1 rounded text-rose-500 hover:bg-rose-50 shrink-0"
+                                      title="Hapus Bioskop"
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+
+                          {/* Add Cinema Inline */}
+                          <div className="pt-2 border-t border-slate-200 flex flex-col sm:flex-row gap-1.5">
+                            <input
+                              type="text"
+                              value={draft.name}
+                              onChange={(e) =>
+                                setNewCinemaInputs({
+                                  ...newCinemaInputs,
+                                  [city.cityKey]: { ...draft, name: e.target.value },
+                                })
+                              }
+                              placeholder="Nama bioskop baru..."
+                              className="flex-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-900 outline-none"
+                            />
+                            <select
+                              value={draft.chain}
+                              onChange={(e) =>
+                                setNewCinemaInputs({
+                                  ...newCinemaInputs,
+                                  [city.cityKey]: {
+                                    ...draft,
+                                    chain: e.target.value,
+                                    flyerKey: chainToFlyerKey(e.target.value),
+                                  },
+                                })
+                              }
+                              className="bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-[11px] text-slate-800 outline-none"
+                            >
+                              <option value="Cinema XXI">Cinema XXI</option>
+                              <option value="CGV Cinemas">CGV Cinemas</option>
+                              <option value="Cinépolis">Cinépolis</option>
+                              <option value="Sam's Studios">Sam&apos;s Studios</option>
+                              <option value="NSC">NSC</option>
+                              <option value="Platinum Cineplex">Platinum Cineplex</option>
+                              <option value="Bioskop Mitra">Bioskop Mitra</option>
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const cName = draft.name.trim();
+                                if (!cName) return;
+                                const updated = currentLocations.map((c) => {
+                                  if (c.cityKey !== city.cityKey) return c;
+                                  return {
+                                    ...c,
+                                    cinemas: [
+                                      ...c.cinemas,
+                                      {
+                                        name: cName,
+                                        chain: draft.chain,
+                                        flyerKey: draft.flyerKey,
+                                        bookingChannel: draft.chain,
+                                      },
+                                    ],
+                                  };
+                                });
+                                setLocations(updated);
+                                setNewCinemaInputs({
+                                  ...newCinemaInputs,
+                                  [city.cityKey]: { ...draft, name: '' },
+                                });
+                              }}
+                              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] shrink-0"
+                            >
+                              + Bioskop
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* TAB 4: WAHNOTIF & SCRIPT CHAT (CLEAN WHITE) */}
           {activeTab === 'wahnotif' && (
