@@ -45,15 +45,15 @@ export default function LokasiBioskopPage() {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-black uppercase tracking-widest">
             <MapPin className="w-3.5 h-3.5" />
-            <span>8 Flyer Resmi Bioskop Indonesia</span>
+            <span>Daftar Resmi Bioskop Seluruh Indonesia</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
             Lokasi Bioskop <span className="text-amber-400">PIYE TO KIH?</span>
           </h1>
           <p className="text-xs sm:text-base text-slate-300 leading-relaxed">
-            Cek daftar resmi jaringan bioskop yang menayangkan film{' '}
+            Cari kota atau nama bioskop yang menayangkan film{' '}
             <strong className="text-white">PIYE TO KIH? THE MOVIE</strong> mulai{' '}
-            <strong className="text-emerald-400">19 November 2026</strong>. Klik flyer mana saja untuk memperbesar tampilan!
+            <strong className="text-emerald-400">19 November 2026</strong> di seluruh Indonesia.
           </p>
           <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 pt-1">
             <Film className="w-3.5 h-3.5 text-amber-400" />
@@ -63,7 +63,7 @@ export default function LokasiBioskopPage() {
           </div>
         </div>
 
-        {/* Interactive Search + 8 Flyers Gallery + Lightbox Popup */}
+        {/* Interactive Search + City & Cinema List */}
         <CinemaFlyersGallery
           instagramUrl={instagramUrl}
           ticketUrl={ticketUrl}
