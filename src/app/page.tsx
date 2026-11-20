@@ -82,13 +82,13 @@ export default async function HomePage() {
             KARYA SUTRADARA <span className="text-white">ITO MAVIN</span>
           </p>
 
-          {/* BERANGKAT KE BIOSKOP 19 NOVEMBER 2026 */}
+          {/* SEDANG TAYANG DI BIOSKOP 19 NOVEMBER 2026 */}
           <div className="my-3 text-center">
             <span className="text-xs sm:text-base md:text-lg text-white font-extrabold uppercase tracking-[0.25em] block leading-tight">
-              BERANGKAT KE BIOSKOP
+              SEDANG TAYANG DI BIOSKOP
             </span>
             <span className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-400 block tracking-widest mt-1 drop-shadow-[0_4px_25px_rgba(52,211,153,0.35)]">
-              19 NOVEMBER 2026
+              MULAI 19 NOVEMBER 2026
             </span>
             {/* LSF 13+ SENSOR RATING BADGE */}
             {(movieSettings?.showLsfBadge ?? true) && (
