@@ -211,11 +211,11 @@ ${liveConfig.closingActionText}`
     if (flyerLookup.found && db.settings.isRoadshowActive === false) {
       return NextResponse.json({
         success: true,
-        important_ai_instruction: `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link: ${effectiveOrigin}/lokasi-bioskop`,
+        important_ai_instruction: `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} dan di bawahnya WAJIB tulis: "Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi: ${effectiveOrigin}/lokasi-bioskop"`,
         action: 'city_cinema_schedule',
         cityName: flyerLookup.cityOrChainName,
         ticketLinks: liveConfig.activeTicketLinks,
-        replyMessage: `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄\n\n🎬 *${flyerLookup.title.toUpperCase()}:*\nFilm *"PIYE TO KIH? THE MOVIE"* sedang tayang serentak mulai **19 NOVEMBER 2026** di:\n${flyerLookup.formattedCinemaList}\n\n📍 *Cek Semua Lokasi Bioskop:* ${effectiveOrigin}/lokasi-bioskop\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}\n\n🎟️ *LINK RESMI PEMBELIAN TIKET:*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
+        replyMessage: `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄\n\n🎬 *${flyerLookup.title.toUpperCase()}:*\nFilm *"PIYE TO KIH? THE MOVIE"* sedang tayang serentak mulai **19 NOVEMBER 2026** di:\n${flyerLookup.formattedCinemaList}\n\n📍 *Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi:*\n👉 ${effectiveOrigin}/lokasi-bioskop\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}\n\n🎟️ *LINK RESMI PEMBELIAN TIKET:*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 
@@ -279,7 +279,7 @@ ${liveConfig.closingActionText}`
               isExpired: true,
               cityName: cityData.cityName,
               ticketLinks: liveConfig.activeTicketLinks,
-              replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare lur? 😄\n\n🎬 *INFO PENAYANGAN BIOSKOP ${cityData.cityName.toUpperCase()} — PIYE TO KIH? THE MOVIE:*\nFilm komedi *"PIYE TO KIH?"* tayang serentak mulai *19 NOVEMBER 2026* di bioskop ${cityData.cityName} (${cinemasNameList})!\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale Tiket Dibuka:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1 (BOGO):* ${liveConfig.bogoDates}\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
+              replyMessage: `Halo warga ${cityData.cityName} bolo kencengku! Piye kabare lur? 😄\n\n🎬 *INFO PENAYANGAN BIOSKOP ${cityData.cityName.toUpperCase()} — PIYE TO KIH? THE MOVIE:*\nFilm komedi *"PIYE TO KIH?"* tayang serentak mulai *19 NOVEMBER 2026* di bioskop ${cityData.cityName} (${cinemasNameList})!\n\n📍 *Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi:*\n👉 ${effectiveOrigin}/lokasi-bioskop\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale Tiket Dibuka:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1 (BOGO):* ${liveConfig.bogoDates}\n\n🎟️ *LINK LANGSUNG TIKET & PROMO BIOSKOP (TINGGAL KLIK LUR):*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
             }, { status: 200, headers: corsHeaders });
           }
 

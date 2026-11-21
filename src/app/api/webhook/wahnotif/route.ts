@@ -640,7 +640,7 @@ ${voucherLiveConfig.closingActionText}`
 Film komedi keluarga *"PIYE TO KIH? THE MOVIE"* sedang tayang serentak mulai **19 NOVEMBER 2026** di bioskop:
 ${flyerLookup.formattedCinemaList}
 
-📍 *Cek Daftar Lengkap Semua Kota di Website:*
+📍 *Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi:*
 👉 ${siteOrigin}/lokasi-bioskop
 
 📅 *JADWAL PENTING TIKET & PROMO:*
@@ -656,7 +656,7 @@ ${closingActionText}`;
       return NextResponse.json({
         status: 'success',
         success: true,
-        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari website berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link daftar lokasi: ${siteOrigin}/lokasi-bioskop${perFlyerTicketLinks ? `\n8. WAJIB sertakan link tiket per jaringan berikut:\n${perFlyerTicketLinks}` : ''}`,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari website berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} dan di bawahnya WAJIB tulis: "Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi: ${siteOrigin}/lokasi-bioskop"${perFlyerTicketLinks ? `\n8. WAJIB sertakan link tiket per jaringan berikut:\n${perFlyerTicketLinks}` : ''}`,
         action: 'city_cinema_schedule',
         cityName: flyerLookup.cityOrChainName,
         releaseDate: '19 November 2026',

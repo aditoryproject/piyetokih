@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       matchedCityName = flyerLookup.cityOrChainName;
       cityCinemasList = flyerLookup.formattedCinemaList;
       const perFlyerTicketLinks = buildFlyerTicketLinksText(flyerLookup.cinemas, db.settings.flyerLinks);
-      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket Khusus Jaringan Bioskop:*\n${perFlyerTicketLinks}` : ''}`;
+      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n\n📍 *Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi:*\n👉 ${FAST_TRACK_TICKET_LINKS.website}/lokasi-bioskop${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket Khusus Jaringan Bioskop:*\n${perFlyerTicketLinks}` : ''}`;
     } else {
       const effectiveCity = getCityByNameOrSlug(requestedCity || queryText);
       if (effectiveCity) {
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
         );
         if (cityCinemas.length > 0) {
           cityCinemasList = cityCinemas.map(c => `• *${c.cinemaName}*`).join('\n');
-          cinemaCityNote = `\n\n🍿 *Daftar Bioskop di ${effectiveCity.name}:*\n` + cityCinemasList;
+          cinemaCityNote = `\n\n🍿 *Daftar Bioskop di ${effectiveCity.name}:*\n${cityCinemasList}\n\n📍 *Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi:*\n👉 ${FAST_TRACK_TICKET_LINKS.website}/lokasi-bioskop`;
         }
         const cityOverride = db.settings.cityLinkOverrides?.[effectiveCity.slug] || (effectiveCity.slug === 'jogja' ? db.settings.cityLinkOverrides?.['yogyakarta'] : undefined);
         if (cityOverride) {
@@ -195,7 +195,7 @@ ${closingActionText}`;
     return NextResponse.json({
       success: true,
       important_ai_instruction: flyerLookup.found
-        ? `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link: ${FAST_TRACK_TICKET_LINKS.website}/lokasi-bioskop`
+        ? `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} dan di bawahnya WAJIB tulis: "Untuk cek semua lokasi penayangan Piye To Kih?, kunjungi: ${FAST_TRACK_TICKET_LINKS.website}/lokasi-bioskop"`
         : liveConfig.aiMandatoryInstruction,
       ticketLinks: activeTicketLinks,
       presaleDates,
