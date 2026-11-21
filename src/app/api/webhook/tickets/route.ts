@@ -3,7 +3,7 @@ import { FAST_TRACK_TICKET_LINKS, MAS_KIDI_JOKES } from '@/lib/bot-knowledge';
 import { getCityCinemaTicketLinks, getCityByNameOrSlug } from '@/lib/cities';
 import { getDb } from '@/lib/db';
 import { WAHNOTIF_TOOL_TICKETS_SCHEMA, buildLiveWebsiteBotConfig } from '@/lib/wahnotif';
-import { lookupNationalCinemaFlyers, sendFlyerImageToWhatsAppIfPossible, buildFlyerTicketLinksText } from '@/lib/cinema-flyers';
+import { lookupNationalCinemaFlyers, buildFlyerTicketLinksText } from '@/lib/cinema-flyers';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -118,16 +118,8 @@ export async function POST(req: NextRequest) {
     if (flyerLookup.found) {
       matchedCityName = flyerLookup.cityOrChainName;
       cityCinemasList = flyerLookup.formattedCinemaList;
-      const flyerLinks = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
       const perFlyerTicketLinks = buildFlyerTicketLinksText(flyerLookup.cinemas, db.settings.flyerLinks);
-      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n${flyerLinks}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket Khusus Jaringan Bioskop:*\n${perFlyerTicketLinks}` : ''}`;
-
-      await sendFlyerImageToWhatsAppIfPossible({
-        phone: senderPhone,
-        imageUrl: flyerLookup.primaryFlyerUrl,
-        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket:*\n${perFlyerTicketLinks}` : ''}`,
-        apiKey: db.settings.wahnotifApiKey,
-      });
+      cinemaCityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket Khusus Jaringan Bioskop:*\n${perFlyerTicketLinks}` : ''}`;
     } else {
       const effectiveCity = getCityByNameOrSlug(requestedCity || queryText);
       if (effectiveCity) {
@@ -203,7 +195,7 @@ ${closingActionText}`;
     return NextResponse.json({
       success: true,
       important_ai_instruction: flyerLookup.found
-        ? `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`
+        ? `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link: ${FAST_TRACK_TICKET_LINKS.website}/lokasi-bioskop`
         : liveConfig.aiMandatoryInstruction,
       ticketLinks: activeTicketLinks,
       presaleDates,
@@ -214,10 +206,6 @@ ${closingActionText}`;
       requestedCity: matchedCityName || requestedCity || 'Nasional',
       requestedChain,
       cinemas: flyerLookup.found ? flyerLookup.cinemas : undefined,
-      imageUrl: flyerLookup.primaryFlyerUrl,
-      image_url: flyerLookup.primaryFlyerUrl,
-      mediaUrl: flyerLookup.primaryFlyerUrl,
-      flyerUrls: flyerLookup.flyerUrls,
       action: isPriceInquiry ? 'ticket_price_info' : 'get_ticket_links',
       estimatedPriceRange: isPriceInquiry ? 'Rp 30.000 – Rp 50.000' : undefined,
       nationalReleaseDate: '19 November 2026',

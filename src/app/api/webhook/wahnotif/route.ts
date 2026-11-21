@@ -18,7 +18,6 @@ import {
 } from '@/lib/wahnotif';
 import {
   lookupNationalCinemaFlyers,
-  sendFlyerImageToWhatsAppIfPossible,
   extractRequestedUnlistedCity,
   buildUnlistedCityInstagramReply,
   buildFlyerTicketLinksText
@@ -628,29 +627,21 @@ ${voucherLiveConfig.closingActionText}`
     );
     const isRoadshowModeOff = db.settings.isRoadshowActive === false;
 
-    // CASE 1-FLYER: SPECIFIC CITY OR CINEMA CHAIN MATCH FROM 9 OFFICIAL FLYERS
+    // CASE 1-CITY: SPECIFIC CITY OR CINEMA CHAIN MATCH FROM LIVE WEBSITE LIST
     if (isRoadshowModeOff && flyerLookup.found && (isRoadshowAction || isGeneralCityListQuery || hasSpecificCity || cityParam)) {
-      const flyerLinksBlock = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Lihat Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
       const perFlyerTicketLinks = buildFlyerTicketLinksText(flyerLookup.cinemas, db.settings.flyerLinks);
       const combinedLinksText = perFlyerTicketLinks
         ? `${perFlyerTicketLinks}\n${activeLinksText}`
         : activeLinksText;
 
-      await sendFlyerImageToWhatsAppIfPossible({
-        phone: cleanSender || inboundRawPhone,
-        imageUrl: flyerLookup.primaryFlyerUrl,
-        caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}\n\n📅 Tayang Serentak: Mulai *19 NOVEMBER 2026*${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket:*\n${perFlyerTicketLinks}` : ''}`,
-        apiKey: db.settings.wahnotifApiKey,
-      });
-
       const reply = `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄
 
 🎬 *${flyerLookup.title.toUpperCase()}:*
-Film komedi keluarga *"PIYE TO KIH? THE MOVIE"* resmi tayang serentak mulai **19 NOVEMBER 2026** di bioskop:
+Film komedi keluarga *"PIYE TO KIH? THE MOVIE"* sedang tayang serentak mulai **19 NOVEMBER 2026** di bioskop:
 ${flyerLookup.formattedCinemaList}
 
-🖼️ *FLYER RESMI DAFTAR BIOSKOP:*
-${flyerLinksBlock}
+📍 *Cek Daftar Lengkap Semua Kota di Website:*
+👉 ${siteOrigin}/lokasi-bioskop
 
 📅 *JADWAL PENTING TIKET & PROMO:*
 • **Presale Tiket Dibuka:** ${presaleDates}
@@ -665,17 +656,13 @@ ${closingActionText}`;
       return NextResponse.json({
         status: 'success',
         success: true,
-        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}${perFlyerTicketLinks ? `\n8. WAJIB sertakan link tiket per flyer berikut:\n${perFlyerTicketLinks}` : ''}`,
+        important_ai_instruction: `${aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari website berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link daftar lokasi: ${siteOrigin}/lokasi-bioskop${perFlyerTicketLinks ? `\n8. WAJIB sertakan link tiket per jaringan berikut:\n${perFlyerTicketLinks}` : ''}`,
         action: 'city_cinema_schedule',
         cityName: flyerLookup.cityOrChainName,
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
         cinemas: flyerLookup.cinemas,
-        imageUrl: flyerLookup.primaryFlyerUrl,
-        image_url: flyerLookup.primaryFlyerUrl,
-        mediaUrl: flyerLookup.primaryFlyerUrl,
-        flyerUrls: flyerLookup.flyerUrls,
         ticketLinks: activeTicketLinks,
         replyMessage: reply
       }, { status: 200, headers: corsHeaders });
@@ -721,24 +708,15 @@ ${closingActionText}`;
       }, { status: 200, headers: corsHeaders });
     }
 
-    // CASE 1A: GENERAL CITY LIST INQUIRY (ALL 9 OFFICIAL FLYERS)
+    // CASE 1A: GENERAL CITY LIST INQUIRY (LIVE WEBSITE LIST)
     if (!hasSpecificCity && (isGeneralCityListQuery || isRoadshowAction || action === 'get_roadshow_schedule')) {
-      await sendFlyerImageToWhatsAppIfPossible({
-        phone: cleanSender || inboundRawPhone,
-        imageUrl: flyerLookup.primaryFlyerUrl,
-        caption: `🎬 *Daftar Lengkap Bioskop Penayangan Serentak 19 November 2026 — PIYE TO KIH? THE MOVIE*`,
-        apiKey: db.settings.wahnotifApiKey,
-      });
-
-      const allFlyersBlock = flyerLookup.flyerUrls.map((u, idx) => `• Flyer ${idx + 1}: ${u}`).join('\n');
-
       const reply = `Halo bolo asik! Piye kabare? Pas banget lur! 😄
 
-🎬 *DAFTAR LENGKAP BIOSKOP PENAYANGAN SERENTAK 19 NOVEMBER 2026 — "PIYE TO KIH? THE MOVIE":*
+🎬 *DAFTAR LENGKAP KOTA & BIOSKOP PENAYANGAN FILM "PIYE TO KIH? THE MOVIE":*
 ${flyerLookup.formattedCinemaList}
 
-🖼️ *LIHAT FLYER RESMI DAFTAR BIOSKOP:*
-${allFlyersBlock}
+📍 *Cari Kota & Nama Bioskop Selengkapnya di Website:*
+👉 ${siteOrigin}/lokasi-bioskop
 
 📅 *CATAT TANGGAL PENTINGNYA LUR:*
 • **Presale Tiket Dibuka:** ${presaleDates}
@@ -748,7 +726,7 @@ ${allFlyersBlock}
 🎟️ *LINK LANGSUNG BELI TIKET BIOSKOP (TINGGAL KLIK):*
 ${activeLinksText}
 
-Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, langsung Mas Kidi cekkan nama bioskop & kirimkan flyernya! 🍿✨`;
+Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, langsung Mas Kidi cekkan daftar bioskop terdekat! 🍿✨`;
 
       return NextResponse.json({
         status: 'success',
@@ -759,10 +737,6 @@ Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, langsung M
         releaseDate: '19 November 2026',
         presaleDates,
         bogoDates,
-        imageUrl: flyerLookup.primaryFlyerUrl,
-        image_url: flyerLookup.primaryFlyerUrl,
-        mediaUrl: flyerLookup.primaryFlyerUrl,
-        flyerUrls: flyerLookup.flyerUrls,
         ticketLinks: activeTicketLinks,
         replyMessage: reply
       }, { status: 200, headers: corsHeaders });
@@ -925,15 +899,8 @@ Sampean rencana nonton di kota mana nih lur? Sebutkan nama kotamu ya, langsung M
       if (flyerLookup.found) {
         matchedStopName = flyerLookup.cityOrChainName;
         cityCinemasList = flyerLookup.formattedCinemaList;
-        const flyerLinks = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
-        cityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}\n${flyerLinks}`;
-
-        await sendFlyerImageToWhatsAppIfPossible({
-          phone: cleanSender || inboundRawPhone,
-          imageUrl: flyerLookup.primaryFlyerUrl,
-          caption: `🎬 *${flyerLookup.title}*\n\n${flyerLookup.formattedCinemaList}`,
-          apiKey: db.settings.wahnotifApiKey,
-        });
+        const perFlyerTicketLinks = buildFlyerTicketLinksText(flyerLookup.cinemas, db.settings.flyerLinks);
+        cityNote = `\n\n🍿 *${flyerLookup.title}:*\n${cityCinemasList}${perFlyerTicketLinks ? `\n\n🎟️ *Link Tiket Khusus Jaringan Bioskop:*\n${perFlyerTicketLinks}` : ''}\n📍 *Cek Daftar Lengkap:* ${siteOrigin}/lokasi-bioskop`;
       } else {
         const detectedTicketCity = getCityByNameOrSlug(cityParam || queryText);
         if (detectedTicketCity) {

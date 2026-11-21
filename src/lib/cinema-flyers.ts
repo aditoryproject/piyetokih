@@ -1023,37 +1023,28 @@ export function lookupNationalCinemaFlyers(
     }
   }
 
-  // 3. Default: All Flyers Overview (95+ Kota Seluruh Indonesia)
-  const allFlyerUrls: string[] = [
-    toFullUrl('XXI_1'),
-    toFullUrl('XXI_2'),
-    toFullUrl('CGV'),
-    toFullUrl('CINEPOLIS'),
-    toFullUrl('SAMS'),
-    toFullUrl('NSC'),
-    toFullUrl('PLATINUM'),
-    toFullUrl('MIX'),
-  ];
+  // 3. Default: All Cities & Cinemas Overview (Live from activeDataset)
+  const groupedByRegion: Record<string, string[]> = {};
+  for (const cityEntry of activeDataset) {
+    if (!cityEntry.cinemas || cityEntry.cinemas.length === 0) continue;
+    const region = cityEntry.provinceOrRegion || 'Indonesia';
+    if (!groupedByRegion[region]) groupedByRegion[region] = [];
+    groupedByRegion[region].push(cityEntry.displayName);
+  }
 
-  const summaryByChain = [
-    `• *Cinema XXI (30 Kota):* Jakarta, Bandung, Bogor, Depok, Tangerang, Cilegon, Bekasi, Cikarang, Cirebon, Semarang, Yogyakarta, Klaten, Solo, Pekalongan, Surabaya, Sidoarjo, Malang, Kediri, Jember, Gresik, Tuban, Medan, Rantau Prapat, Batam, Lampung, Palembang, Pekanbaru, Jambi, Bengkulu, Samarinda`,
-    `• *CGV Cinemas (11 Kota):* Tegal, Purwokerto, Yogyakarta, Solo, Madiun, Mojokerto, Surabaya, Blitar, Kediri, Jember, Gresik`,
-    `• *Cinépolis (8 Kota):* Bekasi, Tegal, Semarang, Batu, Surabaya, Jember, Medan, Bali`,
-    `• *Sam's Studios (17 Kota):* Cianjur, Cibadak, Gombong, Indramayu, Jalur, Kebumen, Klaten, Nganjuk, Pasuruan, Pekalongan, Pemalang, Probolinggo, Salatiga, Solo, Subang, Ungaran, Labuan Bajo`,
-    `• *NSC - New Star Cineplex (30 Kota):* Purbalingga, Wonosobo, Purworejo, Temanggung, Salatiga, Demak, Mangkang, Kendal, Kudus, Jepara, Pati, Rembang, Cepu, Purwodadi, Pemalang, Kulonprogo, Wonosari, Tuban, Bojonegoro, Ngawi, Lamongan, Nganjuk, Jombang, Trenggalek, Kepanjen, Pasuruan, Genteng, Banyuwangi, Jajag, Sumenep`,
-    `• *Platinum Cineplex (18 Kota):* Batang, Baturaja, Berau, Blora, Tangerang BSD, Bekasi Cibitung, Kebumen, Kolaka, Lahat, Magelang, Majenang, Palopo, Pangkalanbun, Sibolga, Sidoarjo, Solo, Batulicin, Sragen`,
-    `• *Bioskop Mitra Lainnya:* Golden Theater (Kediri, Tulungagung), Dakota (Cilacap, Sengkang), Denpasar Cineplex (Bali), Surya Yudha (Banjarnegara), Gajah Mada (Tegal), LTD9 (Bangka Belitung), Flix (Bekasi), BES (Pangkal Pinang, Metro Lampung), MSB (Brebes, Bulakamba, Bumiayu, Slawi), JIG (Purwodadi), Planet Cinema (Bone), Local Cinema (Manado, Mataram), Sena Moviemax (Kroya), KCM (Greenland, Situbondo, Jember, Pamekasan)`,
-  ].join('\n\n');
+  const summaryByRegion = Object.entries(groupedByRegion)
+    .map(([region, cities]) => `• *${region}:* ${cities.join(', ')}`)
+    .join('\n');
 
   return {
     found: false,
     matchType: 'all_flyers',
-    title: 'Daftar Lengkap Bioskop Penayangan Serentak 19 November 2026',
+    title: 'Daftar Lengkap Lokasi Bioskop Penayangan Film PIYE TO KIH?',
     cityOrChainName: 'Seluruh Indonesia',
     cinemas: [],
-    flyerUrls: allFlyerUrls,
-    primaryFlyerUrl: toFullUrl('XXI_1'),
-    formattedCinemaList: summaryByChain,
+    flyerUrls: [],
+    primaryFlyerUrl: '',
+    formattedCinemaList: summaryByRegion,
   };
 }
 

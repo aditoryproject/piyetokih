@@ -206,18 +206,16 @@ ${liveConfig.closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 
-    // Check flyer / city / cinema inquiry first
-    const flyerLookup = lookupNationalCinemaFlyers(query, effectiveOrigin);
+    // Check city / cinema inquiry first (live list, no flyer image)
+    const flyerLookup = lookupNationalCinemaFlyers(query, effectiveOrigin, db.settings.nationalCinemaLocations);
     if (flyerLookup.found && db.settings.isRoadshowActive === false) {
-      const flyerLinksBlock = flyerLookup.flyerUrls.map((u, idx) => `🖼️ *Flyer Daftar Bioskop ${idx + 1}:* ${u}`).join('\n');
       return NextResponse.json({
         success: true,
-        important_ai_instruction: `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop dari Flyer Resmi berikut: ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link flyer: ${flyerLookup.primaryFlyerUrl}`,
+        important_ai_instruction: `${liveConfig.aiMandatoryInstruction}\n7. WAJIB sebutkan daftar bioskop berikut (TANPA mengirim gambar flyer): ${flyerLookup.cinemas.map(c => c.name).join(', ')} serta sertakan link: ${effectiveOrigin}/lokasi-bioskop`,
         action: 'city_cinema_schedule',
         cityName: flyerLookup.cityOrChainName,
-        imageUrl: flyerLookup.primaryFlyerUrl,
         ticketLinks: liveConfig.activeTicketLinks,
-        replyMessage: `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄\n\n🎬 *${flyerLookup.title.toUpperCase()}:*\nFilm *"PIYE TO KIH? THE MOVIE"* tayang serentak mulai **19 NOVEMBER 2026** di:\n${flyerLookup.formattedCinemaList}\n\n${flyerLinksBlock}\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}\n\n🎟️ *LINK RESMI PEMBELIAN TIKET:*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
+        replyMessage: `Halo bolo asik di *${flyerLookup.cityOrChainName}*! Piye kabare lur? 😄\n\n🎬 *${flyerLookup.title.toUpperCase()}:*\nFilm *"PIYE TO KIH? THE MOVIE"* sedang tayang serentak mulai **19 NOVEMBER 2026** di:\n${flyerLookup.formattedCinemaList}\n\n📍 *Cek Semua Lokasi Bioskop:* ${effectiveOrigin}/lokasi-bioskop\n\n📅 *JADWAL TIKET & PROMO:*\n• *Presale:* ${liveConfig.presaleDates}\n• *Promo Buy 1 Get 1:* ${liveConfig.bogoDates}\n\n🎟️ *LINK RESMI PEMBELIAN TIKET:*\n${liveConfig.activeLinksText}\n\n${liveConfig.closingActionText}`
       }, { status: 200, headers: corsHeaders });
     }
 

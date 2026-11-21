@@ -14,10 +14,10 @@ import {
 } from './bot-knowledge';
 import { CITIES_DATA, getCityRoadshowTemporalStatus } from './cities';
 
-// TOOL 1: DAFTAR BIOSKOP NASIONAL (9 FLYER RESMI 95+ KOTA) & JADWAL TAYANG PER KOTA
+// TOOL 1: DAFTAR BIOSKOP NASIONAL (SINKRON LIVE WEBSITE) & JADWAL TAYANG PER KOTA
 export const WAHNOTIF_TOOL_ROADSHOW_SCHEMA = {
   name: "get_roadshow_schedule",
-  description: "WAJIB PANGGIL TOOL INI setiap kali penonton bertanya tentang KOTA MANA PUN di seluruh Indonesia (contoh: 'kalo di Bandung bioskop mana?', 'XXI mana di Bandung?', 'Jakarta tayang dimana?', 'Tegal ada gak?', 'Surabaya', 'Kediri', 'Semarang', 'Medan', 'Bali', dll.) atau bertanya 'tayang di kota mana saja / daftar bioskop'. Tool ini mengambil daftar resmi bioskop dari 9 Flyer Nasional (XXI, CGV, Cinépolis, Sam's Studios, NSC, Platinum, Golden Theater, Dakota, KCM, dll.), mengirim gambar flyer resmi ke WhatsApp penonton, serta mengambil link tiket yang sedang AKTIF (ON) di website live.",
+  description: "WAJIB PANGGIL TOOL INI setiap kali penonton bertanya tentang KOTA MANA PUN di seluruh Indonesia (contoh: 'kalo di Bandung bioskop mana?', 'XXI mana di Bandung?', 'Jakarta tayang dimana?', 'Tegal ada gak?', 'Surabaya', 'Kediri', 'Semarang', 'Medan', 'Bali', dll.) atau bertanya 'tayang di kota mana saja / daftar bioskop'. Tool ini mengambil daftar resmi kota & bioskop terbaru sesuai data live website (XXI, CGV, Cinépolis, Sam's Studios, NSC, Platinum, Golden Theater, Dakota, KCM, dll.) dalam bentuk list teks bersih (tanpa kirim gambar flyer), serta mengambil link tiket yang sedang AKTIF (ON) di website live.",
   parameters: {
     type: "object",
     properties: {
@@ -528,8 +528,8 @@ Untuk wilayah **BANDUNG**, film *"PIYE TO KIH? THE MOVIE"* tayang resmi di:
 • **CINEMA XXI:** **Ciwalk XXI** *(Cihampelas Walk)*
 *(Catatan: Sesuai rilis daftar bioskop resmi, di Bandung HANYA tayang di **Ciwalk XXI** ya lur!)*
 
-🖼️ *Flyer Resmi Daftar Bioskop XXI:*
-${links.website}/flyers/PYTK_LIST_XXI_1.jpg
+📍 *Cek Daftar Lengkap Semua Kota:*
+${links.website}/lokasi-bioskop
 
 📅 *JADWAL PENTING TIKET & PROMO:*
 • **Presale Tiket Dibuka:** ${presaleDates}
